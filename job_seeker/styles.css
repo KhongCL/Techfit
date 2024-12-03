@@ -69,26 +69,40 @@ nav {
 footer {
     background-color: #333;
     color: white;
-    padding: 20px 0; /* Remove padding from the sides */
+    padding: 20px 0 0 0; /* Remove padding from the sides */
     display: flex;
     flex-direction: column;
     align-items: center;
 }
+
+
 
 .footer-content {
     display: flex;
     justify-content: space-between;
     width: 100%;
     max-width: 1200px;
+    padding: 0 20px; /* Add padding to the sides */
 }
 
 .footer-left {
     display: flex;
     align-items: center;
+    padding-left: 0; /* Ensure no padding on the left side */
+    margin-left: 0; /* Ensure no margin on the left side */
+}
+
+.footer-logo {
+    margin-right: 20px; /* Add some space between the logo and the social media icons */
+    
+    margin-left: 0; /* Remove any left margin */
+
 }
 
 .footer-logo img {
     height: 50px;
+    margin-left: 0; /* Remove any left margin */
+    
 }
 
 .footer-nav {
@@ -112,7 +126,6 @@ footer {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    margin-left: 20px;
 }
 
 .social-media p {
