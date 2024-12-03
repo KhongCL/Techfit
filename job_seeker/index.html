@@ -8,14 +8,27 @@
 </head>
 <body>
     <header>
-        <h1>TechFit</h1>
+        <div class="logo">
+            <a href="index.html"><img src="logo.png" alt="TechFit Logo"></a>
+        </div>
         <nav>
             <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="assessment.html">Assessment</a></li>
+                <li><a href="assessment.html">Assessment</a>
+                    <ul class="dropdown">
+                        <li><a href="start-assessment.html">Start Assessment</a></li>
+                        <li><a href="assessment-history.html">Assessment History</a></li>
+                        <li><a href="assessment-summary.html">Assessment Summary</a></li>
+                    </ul>
+                </li>
                 <li><a href="resources.html">Resources</a></li>
                 <li><a href="about.html">About</a></li>
-                <li><a href="profile.html">Profile</a></li>
+                <li><a href="profile.html" id="profile-link" style="display:none;">Profile</a>
+                    <ul class="dropdown" id="profile-dropdown" style="display:none;">
+                        <li><a href="settings.html">Settings</a></li>
+                        <li><a href="logout.html">Logout</a></li>
+                    </ul>
+                </li>
+                <li><a href="login.html" id="login-link">Login/Register</a></li>
             </ul>
         </nav>
     </header>
@@ -27,6 +40,20 @@
     </section>
 
     <footer>
+        <div class="footer-logo">
+            <a href="index.html"><img src="logo.png" alt="TechFit Logo"></a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="assessment.html">Assessment</a></li>
+                <li><a href="resources.html">Resources</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="feedback.html">Feedback</a></li>
+                <li><a href="contact.html">Contact Us</a></li>
+                <li><a href="terms.html">Terms & Condition</a></li>
+                <li><a href="privacy.html">Privacy Policy</a></li>
+            </ul>
+        </nav>
         <p>&copy; 2023 TechPathway: TechFit. All rights reserved.</p>
     </footer>
 
