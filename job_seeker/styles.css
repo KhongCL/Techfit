@@ -1,12 +1,13 @@
 body {
     font-family: Arial, sans-serif;
+    margin: 0; /* Ensure no default margin around the body */
 }
 
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
+    padding: 10px 0; /* Remove padding from the sides */
     background-color: #333;
 }
 
@@ -68,7 +69,7 @@ nav {
 footer {
     background-color: #333;
     color: white;
-    padding: 20px;
+    padding: 20px 0; /* Remove padding from the sides */
     display: flex;
     flex-direction: column;
     align-items: center;
