@@ -72,7 +72,7 @@ footer {
     padding: 20px 0 0 0; /* Remove padding from the sides */
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: left;
 }
 
 
@@ -96,6 +96,7 @@ footer {
     margin-right: 20px; /* Add some space between the logo and the social media icons */
     
     margin-left: 0; /* Remove any left margin */
+    
 
 }
 
