@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Contact / Support</title>
+    <title>TechPathway: TechFit - Coding Playground</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -23,22 +23,26 @@
         </nav>
     </header>
 
-    <section id="contact">
-        <h2>Contact / Support</h2>
-        <p>If you have any questions or need support, please contact us:</p>
-        <form>
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email">
-            <label for="message">Message:</label>
-            <textarea id="message" name="message"></textarea>
-            <button type="submit">Send</button>
-        </form>
+    <section id="playground">
+        <h2>Coding Playground</h2>
+        <label for="language">Select Language:</label>
+        <select id="language">
+            <option value="python">Python</option>
+            <option value="javascript">JavaScript</option>
+            <option value="java">Java</option>
+            <option value="c">C</option>
+            <option value="cpp">C++</option>
+        </select>
+        <textarea id="code" rows="10" cols="50" placeholder="Write your code here..."></textarea>
+        <button onclick="runCode()">Run Code</button>
+        <h3>Output:</h3>
+        <pre id="output"></pre>
     </section>
 
     <footer>
         <p>&copy; 2023 TechPathway: TechFit. All rights reserved.</p>
     </footer>
-</body>
-</html> 
 
-hello, world
+    <script src="scripts.js"></script>
+</body>
+</html>
