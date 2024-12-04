@@ -12,24 +12,31 @@
             <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
         <nav>
-            <ul class="nav-list">
-                <li><a>Assessment</a>
-                    <ul class="dropdown">
-                        <li><a href="start-assessment.html">Start Assessment</a></li>
-                        <li><a href="assessment-history.html">Assessment History</a></li>
-                        <li><a href="assessment-summary.html">Assessment Summary</a></li>
-                    </ul>
-                </li>
-                <li><a href="resources.html">Resources</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="profile.html" id="profile-link" style="display:none;">Profile</a>
-                    <ul class="dropdown" id="profile-dropdown" style="display:none;">
-                        <li><a href="settings.html">Settings</a></li>
-                        <li><a href="logout.html">Logout</a></li>
-                    </ul>
-                </li>
-                <li><a href="login.html" id="login-link">Login/Register</a></li>
-            </ul>
+            <div class="nav-container">
+                <ul class="nav-list">
+                    <li><a href="#">Assessment</a>
+                        <ul class="dropdown">
+                            <li><a href="start-assessment.html">Start Assessment</a></li>
+                            <li><a href="assessment-history.html">Assessment History</a></li>
+                            <li><a href="assessment-summary.html">Assessment Summary</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="resources.html">Resources</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="profile.html" id="profile-link" style="display:none;">Profile</a>
+                        <ul class="dropdown" id="profile-dropdown" style="display:none;">
+                            <li><a href="settings.html">Settings</a></li>
+                            <li><a href="logout.html">Logout</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="login.html" id="login-link">Login/Register</a></li>
+                </ul>
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
         </nav>
     </header>
 
@@ -85,7 +92,6 @@
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
-
 
     <script src="scripts.js"></script>
 </body>

@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "../../../../../../dev"
+		},
+		{
+			"path": "../../.."
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "RWDD2308"
+	}
+}
