@@ -3,41 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login / Register</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="scripts.js"></script>
+    <title>Login</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #1e1e1e;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 400px;
+            text-align: center;
+        }
+        .container img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+        input[type="text"], input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+        }
+        input[type="submit"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>TechPathway: TechFit</h1>
-        <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="profile.html">Profile</a></li>
-                <li><a href="skills.html">Technical Skills</a></li>
-                <li><a href="personality.html">Personality Assessment</a></li>
-                <li><a href="resources.html">Resources</a></li>
-                <li><a href="results.html">Results</a></li>
-                <li><a href="contact.html">Contact</a></li>
-                <li><a href="login.html">Login/Register</a></li>
-            </ul>
-        </nav>
-    </header>
-
-    <section id="login">
-        <h2>Login / Register</h2>
-        <form id="loginForm" onsubmit="submitForm(event, 'loginForm', 'login.php')">
+    <div class="container">
+        <h2>Login</h2>
+        <img src="images/usericon.png" alt="User Icon">
+        <form action="login.php" method="post">
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password">
-            <button type="submit">Login</button>
-        </form>
-        <p>Don't have an account? <a href="register.html">Register here</a>.</p>
-    </section>
+            <input type="text" id="username" name="username" required><br>
 
-    <footer>
-        <p>&copy; 2023 TechPathway: TechFit. All rights reserved.</p>
-    </footer>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br>
+
+            <input type="submit" value="Login">
+        </form>
+        <p>Don't have an account? <a href="register.html">Sign up here</a></p>
+    </div>
 </body>
 </html>
