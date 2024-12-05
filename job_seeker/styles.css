@@ -1,10 +1,12 @@
 body {
     font-family: Arial, sans-serif;
     margin: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
     padding-top: 60px;
     min-height: 100vh;
+    overflow-x: hidden; /* Prevent horizontal overflow */
 }
 
 /* Header */
@@ -157,6 +159,8 @@ header {
     text-align: center;
     padding: 50px;
     background-color: #f4f4f4;
+    width: 100%; /* Ensure section takes full width */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
 }
 
 #home h2 {
@@ -192,6 +196,7 @@ footer {
     align-items: center;
     margin-top: auto;
     width: 100%; /* Ensure footer spans full width */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
 }
 
 .footer-content {
