@@ -157,12 +157,17 @@ header {
 
 /* Section Styling */
 #home {
+    flex: 1; /* Allow the section to grow and fill available space */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     text-align: center;
     padding: 50px;
     background-color: #f4f4f4;
     width: 100%; /* Ensure section takes full width */
     box-sizing: border-box; /* Include padding and border in element's total width and height */
     margin: 0; /* Remove any default margin */
+    
 }
 
 #home h2 {
@@ -196,10 +201,10 @@ footer {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-top: auto;
     width: 100%; /* Ensure footer spans full width */
     box-sizing: border-box; /* Include padding and border in element's total width and height */
     margin: 0; /* Remove any default margin */
+    position: relative; /* Ensure correct positioning */
 }
 
 .footer-content {
