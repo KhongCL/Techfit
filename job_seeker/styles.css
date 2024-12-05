@@ -196,7 +196,7 @@ header {
 /* Footer Styles */
 footer {
     flex: 1; /* Allow the section to grow and fill available space */
-    background-color: #333;
+    background-color: #791717;
     color: white;
     padding: 20px 0;
     display: flex;
@@ -214,6 +214,7 @@ footer {
     max-width: 1200px;
     padding: 0 20px;
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    background-color: aquamarine;
 }
 
 .footer-left {
