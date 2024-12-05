@@ -165,7 +165,7 @@ header {
     padding: 50px;
     background-color: #f4f4f4;
     width: 100%; /* Ensure section takes full width */
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    position: relative; /* Ensure correct positioning */
     margin: 0; /* Remove any default margin */
     
 }
@@ -195,6 +195,7 @@ header {
 
 /* Footer Styles */
 footer {
+    flex: 1; /* Allow the section to grow and fill available space */
     background-color: #333;
     color: white;
     padding: 20px 0;
@@ -202,7 +203,6 @@ footer {
     flex-direction: column;
     align-items: center;
     width: 100%; /* Ensure footer spans full width */
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
     margin: 0; /* Remove any default margin */
     position: relative; /* Ensure correct positioning */
 }
