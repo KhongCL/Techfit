@@ -206,6 +206,7 @@ footer {
     box-sizing: border-box; /* Include padding and border in element's total width and height */
     margin: 0; /* Remove any default margin */
     position: relative; /* Ensure correct positioning */
+    z-index:1000;
 }
 
 .footer-content {
@@ -305,6 +306,7 @@ footer {
     .footer-content {
         flex-direction: column;
         align-items: center;
+        background-color: #333;
     }
 
     .footer-left {
