@@ -167,6 +167,7 @@ header {
     width: 100%; /* Ensure section takes full width */
     box-sizing: border-box; /* Include padding and border in element's total width and height */
     margin: 0; /* Remove any default margin */
+    position: relative; /* Ensure correct positioning */
     
 }
 
