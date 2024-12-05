@@ -211,10 +211,11 @@ footer {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1450px;
     padding: 0 20px;
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
     background-color: aquamarine;
+    margin:0;
 }
 
 .footer-left {
