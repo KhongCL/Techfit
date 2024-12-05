@@ -206,7 +206,6 @@ footer {
     box-sizing: border-box; /* Include padding and border in element's total width and height */
     margin: 0; /* Remove any default margin */
     position: relative; /* Ensure correct positioning */
-    z-index:1000;
 }
 
 .footer-content {
@@ -216,6 +215,7 @@ footer {
     max-width: 1200px;
     padding: 0 20px;
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    background-color: #333; /* Ensure background color spans full width */
 }
 
 .footer-left {
@@ -306,7 +306,7 @@ footer {
     .footer-content {
         flex-direction: column;
         align-items: center;
-        background-color: #333;
+        
     }
 
     .footer-left {
