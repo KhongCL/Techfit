@@ -165,8 +165,8 @@ header {
     padding: 50px;
     background-color: #f4f4f4;
     width: 100%; /* Ensure section takes full width */
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
     margin: 0; /* Remove any default margin */
+    position: relative; /* Ensure correct positioning */
     
 }
 
@@ -202,7 +202,6 @@ footer {
     flex-direction: column;
     align-items: center;
     width: 100%; /* Ensure footer spans full width */
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
     margin: 0; /* Remove any default margin */
     position: relative; /* Ensure correct positioning */
 }
@@ -214,6 +213,7 @@ footer {
     max-width: 1200px;
     padding: 0 20px;
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    background-color: #c42e2e; /* Ensure background color spans full width */
 }
 
 .footer-left {
@@ -304,6 +304,7 @@ footer {
     .footer-content {
         flex-direction: column;
         align-items: center;
+        
     }
 
     .footer-left {
