@@ -225,7 +225,7 @@ footer {
     margin-left: 0;
     flex: 1 1 30%; /* Take full width on smaller screens */
     min-width: 200px; /* Ensure columns don't get too narrow */
-    justify-content: center; /* Center align content */
+    justify-content: left; /* Center align content */
     text-align: center; /* Center align text */
 }
 
@@ -266,6 +266,7 @@ footer {
     flex: 1 1 70%; /* Take approximately two-thirds of the width */
     justify-content: center; /* Center align content */
     text-align: center; /* Center align text */
+    margin:0;
 }
 
 .footer-column {
