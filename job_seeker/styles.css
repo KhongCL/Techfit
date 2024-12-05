@@ -21,6 +21,7 @@ header {
     left: 0;
     width: 100%;
     z-index: 1000;
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
 }
 
 .logo img {
@@ -161,6 +162,7 @@ header {
     background-color: #f4f4f4;
     width: 100%; /* Ensure section takes full width */
     box-sizing: border-box; /* Include padding and border in element's total width and height */
+    margin: 0; /* Remove any default margin */
 }
 
 #home h2 {
@@ -197,6 +199,7 @@ footer {
     margin-top: auto;
     width: 100%; /* Ensure footer spans full width */
     box-sizing: border-box; /* Include padding and border in element's total width and height */
+    margin: 0; /* Remove any default margin */
 }
 
 .footer-content {
