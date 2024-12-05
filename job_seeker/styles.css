@@ -198,26 +198,37 @@ footer {
     justify-content: space-between;
     width: 100%;
     max-width: 1200px;
-    padding: 0 20px;
+    gap: 3.5rem;
+    width: 100%;
+    padding: 60px;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 
 .footer-left {
     display: flex;
     align-items: center;
+    flex-direction: column;
+    text-align: center;
+    padding-left: 0;
+    margin-left: 0;
+    flex: 1 1 100%; /* Take full width on smaller screens */
+    margin-bottom: 20px; /* Add space between sections on smaller screens */
 }
 
 .footer-logo {
     margin-right: 20px;
+    margin-bottom: 20px;
 }
 
 .footer-logo img {
     height: 50px;
+    margin-left: 0;
 }
 
 .social-media {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
 }
 
 .social-media p {
@@ -237,32 +248,71 @@ footer {
 .footer-right {
     display: flex;
     justify-content: space-between;
-    width: 50%;
+    width: 100%;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
 }
 
 .footer-column {
     margin: 0 20px;
+    flex: 1 1 30%; /* Take approximately one-third of the width */
+    min-width: 200px; /* Ensure columns don't get too narrow */
 }
 
 .footer-column h3 {
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 400;
     margin-bottom: 10px;
 }
 
 .footer-column ul {
     list-style: none;
     padding: 0;
+    margin-top: 20px;
 }
 
 .footer-column ul li {
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 
 .footer-column ul li a {
-    color: white;
+    color: #bfbfbf;
     text-decoration: none;
+}
+
+.footer-column ul li a:hover {
+    color: #fff;
 }
 
 .footer-bottom {
     margin-top: 20px;
     text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        gap: 1rem;
+    }
+
+    .footer-left {
+        order: 1; /* Ensure footer-left is displayed first */
+        width: 100%; /* Ensure it takes full width */
+        text-align: center;
+    }
+
+    .footer-right {
+        order: 2; /* Ensure footer-right is displayed second */
+        flex-direction: column;
+        align-items: center;
+        width: 100%; /* Ensure it takes full width */
+    }
+
+    .footer-column {
+        margin: 10px 0;
+        flex: 1 1 100%; /* Take full width on smaller screens */
+    }
 }
