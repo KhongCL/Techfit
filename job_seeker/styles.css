@@ -215,7 +215,7 @@ footer {
     max-width: 1200px;
     padding: 0 20px;
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
-    background-color: #333; /* Ensure background color spans full width */
+    background-color: #c42e2e; /* Ensure background color spans full width */
 }
 
 .footer-left {
