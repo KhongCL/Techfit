@@ -165,7 +165,6 @@ header {
     padding: 50px;
     background-color: #f4f4f4;
     width: 100%; /* Ensure section takes full width */
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
     margin: 0; /* Remove any default margin */
     position: relative; /* Ensure correct positioning */
     
@@ -203,7 +202,6 @@ footer {
     flex-direction: column;
     align-items: center;
     width: 100%; /* Ensure footer spans full width */
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
     margin: 0; /* Remove any default margin */
     position: relative; /* Ensure correct positioning */
 }
