@@ -489,3 +489,29 @@ footer {
         max-width: 400px;
     }
 }
+
+/* Terms and Conditions Style */
+.terms {
+    padding: 60px 20px;
+    background-color: #f4f4f4;
+    margin-top: 60px;
+}
+
+.terms .last-updated {
+    text-align: center;
+}
+
+.terms-header {
+    font-size: 1.2rem;
+    padding-top: 30px;
+    padding-left: 60px;
+    font-weight: bold;
+}
+
+.terms-text ol {
+    margin-left: 60px;
+}
+
+.terms-text ol li {
+    margin-bottom: 10px;
+}
