@@ -166,6 +166,7 @@ header {
     background-color: #f4f4f4;
     width: 100%; /* Ensure section takes full width */
     box-sizing: border-box; /* Include padding and border in element's total width and height */
+    position: relative; /* Ensure correct positioning */
     margin: 0; /* Remove any default margin */
     
 }
@@ -202,29 +203,31 @@ footer {
     flex-direction: column;
     align-items: center;
     width: 100%; /* Ensure footer spans full width */
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
     margin: 0; /* Remove any default margin */
     position: relative; /* Ensure correct positioning */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
 }
 
 .footer-content {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    max-width: 1200px;
-    padding: 0 20px;
+    padding: 0 0px;
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
+
 }
 
 .footer-left {
     display: flex;
     align-items: center;
-    padding-left: 0;
+    padding-left: 20px;
     margin-left: 0;
-    flex: 1 1 30%; /* Take full width on smaller screens */
+    padding-right: 10px;
+    flex: 1 1 20%; /* Take full width on smaller screens */
     min-width: 200px; /* Ensure columns don't get too narrow */
-    justify-content: center; /* Center align content */
+    justify-content: left; /* Center align content */
     text-align: center; /* Center align text */
+    order:1;
 }
 
 .footer-logo {
@@ -252,25 +255,27 @@ footer {
 }
 
 .social-icons img {
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
 }
 
 .footer-right {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     width: 100%;
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
     flex: 1 1 70%; /* Take approximately two-thirds of the width */
-    justify-content: center; /* Center align content */
     text-align: center; /* Center align text */
+    align-items: right;
+    order:2;
 }
 
 .footer-column {
-    margin: 0 20px;
-    flex: 1 1 28%; /* Take approximately one-third of the width */
+    margin: 0 0px;
+    flex: 1 1 20%; /* Take approximately one-third of the width */
     min-width: 200px; /* Ensure columns don't get too narrow */
 }
+
 
 .footer-column h3 {
     margin-bottom: 10px;
@@ -297,6 +302,9 @@ footer {
 .footer-bottom {
     margin-top: 20px;
     text-align: center;
+    width: 100%; /* Ensure footer-bottom spans full width */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    padding: 0; /* Remove any default padding */
 }
 
 /* Responsive Design */
@@ -310,6 +318,9 @@ footer {
         order: 1; /* Ensure footer-left is displayed first */
         width: 100%; /* Ensure it takes full width */
         text-align: center;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px; /* Add space below footer-left */
     }
 
     .footer-right {
@@ -323,6 +334,7 @@ footer {
     .footer-column {
         margin: 10px 0;
         flex: 1 1 100%; /* Take full width on smaller screens */
+        text-align: center; /* Center align text on smaller screens */
     }
 }
 
