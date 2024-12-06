@@ -165,6 +165,7 @@ header {
     padding: 50px;
     background-color: #f4f4f4;
     width: 100%; /* Ensure section takes full width */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
     position: relative; /* Ensure correct positioning */
     margin: 0; /* Remove any default margin */
     
@@ -195,7 +196,6 @@ header {
 
 /* Footer Styles */
 footer {
-    flex: 1; /* Allow the section to grow and fill available space */
     background-color: #791717;
     color: white;
     padding: 20px 0;
@@ -204,18 +204,15 @@ footer {
     align-items: center;
     width: 100%; /* Ensure footer spans full width */
     margin: 0; /* Remove any default margin */
-    position: relative; /* Ensure correct positioning */
 }
 
 .footer-content {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    max-width: 1450px;
-    padding: 0 20px;
+    padding: 0 0px;
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
     background-color: aquamarine;
-    margin:0;
 }
 
 .footer-left {
@@ -225,8 +222,9 @@ footer {
     margin-left: 0;
     flex: 1 1 30%; /* Take full width on smaller screens */
     min-width: 200px; /* Ensure columns don't get too narrow */
-    justify-content: left; /* Center align content */
+    justify-content: center; /* Center align content */
     text-align: center; /* Center align text */
+    background-color: blueviolet;
 }
 
 .footer-logo {
@@ -254,19 +252,18 @@ footer {
 }
 
 .social-icons img {
-    width: 24px;
-    height: 24px;
+    width: 30px;
+    height: 30px;
 }
 
 .footer-right {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     width: 100%;
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
     flex: 1 1 70%; /* Take approximately two-thirds of the width */
-    justify-content: center; /* Center align content */
     text-align: center; /* Center align text */
-    margin:0;
+    background-color: burlywood;
 }
 
 .footer-column {
@@ -274,6 +271,7 @@ footer {
     flex: 1 1 28%; /* Take approximately one-third of the width */
     min-width: 200px; /* Ensure columns don't get too narrow */
 }
+
 
 .footer-column h3 {
     margin-bottom: 10px;
@@ -300,6 +298,9 @@ footer {
 .footer-bottom {
     margin-top: 20px;
     text-align: center;
+    width: 100%; /* Ensure footer-bottom spans full width */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    padding: 0; /* Remove any default padding */
 }
 
 /* Responsive Design */
@@ -326,6 +327,7 @@ footer {
     .footer-column {
         margin: 10px 0;
         flex: 1 1 100%; /* Take full width on smaller screens */
+        text-align: center; /* Center align text on smaller screens */
     }
 }
 
