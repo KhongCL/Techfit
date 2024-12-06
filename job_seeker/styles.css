@@ -196,7 +196,7 @@ header {
 
 /* Footer Styles */
 footer {
-    background-color: #791717;
+    background-color: #333;
     color: white;
     padding: 20px 0;
     display: flex;
@@ -211,8 +211,9 @@ footer {
     justify-content: space-between;
     width: 100%;
     padding: 0 0px;
+    max-width: 1200px;
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
-    background-color: aquamarine;
+
 }
 
 .footer-left {
@@ -224,7 +225,6 @@ footer {
     min-width: 200px; /* Ensure columns don't get too narrow */
     justify-content: center; /* Center align content */
     text-align: center; /* Center align text */
-    background-color: blueviolet;
 }
 
 .footer-logo {
@@ -263,7 +263,6 @@ footer {
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
     flex: 1 1 70%; /* Take approximately two-thirds of the width */
     text-align: center; /* Center align text */
-    background-color: burlywood;
 }
 
 .footer-column {
