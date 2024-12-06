@@ -212,7 +212,7 @@ footer {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    padding: 0 20px;
+    padding: 0 0px;
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
 
 }
@@ -267,13 +267,14 @@ footer {
     flex: 1 1 70%; /* Take approximately two-thirds of the width */
     text-align: center; /* Center align text */
     align-items: right;
+    padding:0 0px;
     
 }
 
 .footer-column {
     margin: 0 20px;
     flex: 1 1 20%; /* Take approximately one-third of the width */
-    min-width: 200px; /* Ensure columns don't get too narrow */
+    min-width: 150px; /* Ensure columns don't get too narrow */
 }
 
 
@@ -308,6 +309,40 @@ footer {
 }
 
 /* Responsive Design */
+@media (max-width: 1300px) {
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+        padding:0 0px;
+    }
+
+    .footer-left {
+        width: 100%; /* Ensure it takes full width */
+        text-align: left;
+        align-items: center;
+        justify-content: center;
+        padding:0 0px;
+        
+    }
+
+    .footer-right {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Create a 2x2 grid */
+        grid-column: span 2; /* Make footer-right span two columns */
+        gap: 0 20px; /* Add space between grid items */
+        width: 100%; /* Ensure it takes full width */
+        text-align: center; /* Center align text */
+        padding:0 0px;
+    }
+
+    .footer-column {
+        margin: 0; /* Remove margin */
+        flex: 1 1 100%; /* Take full width on smaller screens */
+        text-align: center; /* Center align text on smaller screens */
+    }
+}
+
+/* Responsive Design */
 @media (max-width: 600px) {
     .footer-content {
         flex-direction: column;
@@ -327,6 +362,10 @@ footer {
 
     .footer-right {
         order: 2; /* Ensure footer-right is displayed second */
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        flex: 1 1 70%; /* Take approximately two-thirds of the width */
         flex-direction: column;
         align-items: center;
         width: 100%; /* Ensure it takes full width */
