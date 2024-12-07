@@ -98,15 +98,16 @@ $conn->close();
 
         .logo {
             position: absolute;
-            top: 10px;
+            top: 20px;
             left: 20px;
+            z-index: 2; /* Ensure the logo is above the container */
         }
         .logo img {
             height: 50px;
         }
 
         h2 {
-            margin-top: 0;
+            margin-top: 60px; /* Add margin to avoid overlap with the logo */
         }
 
         .container {
@@ -120,6 +121,8 @@ $conn->close();
             box-sizing: border-box;
             overflow-y: auto; /* Add vertical scrollbar */
             max-height: 90vh;
+            position: relative; /* Ensure the logo is positioned relative to the container */
+            z-index: 1; /* Ensure the container is below the logo */
 
         }
 
@@ -161,14 +164,32 @@ $conn->close();
             color: red;
             font-weight: bold;
         }
+
+        @media (max-width: 600px) {
+            .logo {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin-bottom: 20px;
+                align-items: left;
+                justify-content: left;
+                z-index: 2;
+            }
+
+            h2 {
+                margin-top: 0; /* Remove top margin for mobile */
+            }
+        }
         
     </style>
 </head>
 <body>
-    <div class="logo">
-        <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
-    </div>
+    
     <div class="container">
+        <div class="logo">
+            <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+        </div>
+    
         <h2>Register</h2>
 
         <?php
