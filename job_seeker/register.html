@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register</title>
+    <title>Register - TechFit</title>
     <style>
         body {
             background-color: #121212;
@@ -24,7 +24,11 @@
         .logo img {
             height: 50px;
         }
-        
+
+        h2 {
+            margin-top: 0;
+        }
+
         .container {
             background-color: #1e1e1e;
             padding: 40px;
@@ -37,8 +41,8 @@
             width: calc(100% - 20px);
             padding: 10px;
             margin: 10px 0;
-            border: none;
-            border-radius: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
             background-color: #333;
             color: #fff;
         }
@@ -47,7 +51,7 @@
             padding: 10px;
             margin: 10px 0;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             background-color: #007bff;
             color: #fff;
             cursor: pointer;
@@ -62,6 +66,12 @@
         a:hover {
             text-decoration: underline;
         }
+
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+        
     </style>
 </head>
 <body>
@@ -70,6 +80,15 @@
     </div>
     <div class="container">
         <h2>Register</h2>
+
+        <?php
+        session_start();
+        if (isset($_SESSION['error_message'])) {
+            echo '<p class="error-message">' . $_SESSION['error_message'] . '</p>';
+            unset($_SESSION['error_message']);
+        }
+        ?>
+
         <form action="register.php" method="post">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required><br>
