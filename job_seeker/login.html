@@ -15,6 +15,20 @@
             height: 100vh;
             margin: 0;
         }
+
+        .logo {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+        }
+        .logo img {
+            height: 50px;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
         .container {
             background-color: #1e1e1e;
             padding: 40px;
@@ -33,14 +47,14 @@
             width: calc(100% - 20px);
             padding: 10px;
             margin: 10px 0;
-            border: none;
+            border: 1px solid #ccc;
             border-radius: 5px;
             background-color: #333;
             color: #fff;
         }
         input[type="submit"] {
             width: calc(100% - 20px);
-            padding: 10px;
+            padding: 10px 20px;
             margin: 10px 0;
             border: none;
             border-radius: 5px;
@@ -61,6 +75,9 @@
     </style>
 </head>
 <body>
+    <div class="logo">
+        <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+    </div>
     <div class="container">
         <h2>Login</h2>
         <img src="images/usericon.png" alt="User Icon">

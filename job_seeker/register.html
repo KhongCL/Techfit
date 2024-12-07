@@ -15,6 +15,16 @@
             height: 100vh;
             margin: 0;
         }
+
+        .logo {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+        }
+        .logo img {
+            height: 50px;
+        }
+        
         .container {
             background-color: #1e1e1e;
             padding: 40px;
@@ -55,6 +65,9 @@
     </style>
 </head>
 <body>
+    <div class="logo">
+        <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+    </div>
     <div class="container">
         <h2>Register</h2>
         <form action="register.php" method="post">
