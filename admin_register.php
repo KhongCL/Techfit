@@ -186,6 +186,42 @@ $conn->close();
             margin-bottom: 20px;
         }
 
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        .popup button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        .popup button:hover {
+            background-color: #0056b3;
+        }
+        .popup ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .popup ul li {
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        .popup ul li:hover {
+            text-decoration: underline;
+        }
+
         @media (max-width: 600px) {
             .logo {
                 position: relative;
@@ -268,8 +304,15 @@ $conn->close();
     </div>
     <div class="container">
         <h2 style="margin-top: -25px;">Admin Register</h2> <!-- Move title up by 25px -->
-        <div id="error-message" class="error-message"></div>
-        <form action="register.php" method="post" onsubmit="return validateForm()">
+        <div id="error-message" class="error-message">
+        <?php
+        if (isset($_SESSION['error_message'])) {
+            echo '<p class="error-message">' . $_SESSION['error_message'] . '</p>';
+            unset($_SESSION['error_message']);
+        }
+        ?>
+        </div>
+        <form action="admin_register.php?key=techfit" method="post" onsubmit="return validateForm()">
             <div class="form-row">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>

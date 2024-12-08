@@ -40,12 +40,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         } else {
             $_SESSION['error_message'] = "Invalid password.";
-            header("Location: admin_login.html");
+            header("Location: admin_login.php?key=techfit");
             exit();
         }
     } else {
         $_SESSION['error_message'] = "No admin user found with that username.";
-        header("Location: admin_login.html");
+        header("Location: admin_login.php?key=techfit");
         exit();
     }
 }
@@ -156,6 +156,7 @@ $conn->close();
         }
         ?>
         
+        <img src="images/usericon.png" alt="User Icon">
             <form action="admin_login.php?key=techfit" method="post">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required><br>
