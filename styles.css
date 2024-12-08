@@ -308,8 +308,45 @@ footer {
     padding: 0; /* Remove any default padding */
 }
 
+/* Footer Responsive Design */
+@media (max-width: 800px) {
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+    }
 
-/* Responsive Design */
+    .footer-left {
+        order: 1; /* Ensure footer-left is displayed first */
+        width: 100%; /* Ensure it takes full width */
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px; /* Add space below footer-left */
+        padding: 0;
+    }
+
+    .footer-right {
+        order: 2; /* Ensure footer-right is displayed second */
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        flex-direction: column;
+        align-items: center;
+        width: 100%; /* Ensure it takes full width */
+        text-align: center; /* Center align text */
+        padding: 0;
+    }
+
+    .footer-column {
+        margin: 10px 0;
+        flex: 1 1 100%; /* Take full width on smaller screens */
+        text-align: center; /* Center align text on smaller screens */
+    }
+}
+
+
+/* Footer Responsive Design */
 @media (max-width: 600px) {
     .footer-content {
         flex-direction: column;
