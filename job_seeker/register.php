@@ -178,8 +178,10 @@ $conn->close();
         }
         .error-message {
             color: red;
+            font-weight: bold;
             margin-bottom: 20px;
         }
+
         .popup {
             display: none;
             position: fixed;
@@ -215,6 +217,21 @@ $conn->close();
         .popup ul li:hover {
             text-decoration: underline;
         }
+
+        @media (max-width: 600px) {
+            .logo {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin-bottom: 20px;
+                align-items: left;
+                justify-content: left;
+                z-index: 2;
+            }
+
+            h2 {
+                margin-top: 0; /* Remove top margin for mobile */
+            }
     </style>
     <script>
         function validateForm() {
