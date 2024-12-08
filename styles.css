@@ -1,0 +1,575 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    padding-top: 60px;
+    min-height: 100vh;
+    overflow-x: hidden; /* Prevent horizontal overflow */
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #333;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+}
+
+.logo img {
+    height: 50px;
+}
+
+/* Navigation Bar */
+.nav-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.nav-list {
+    list-style: none;
+    display: flex;
+    justify-content: flex-end;
+    margin: 0;
+    padding: 0 20px;
+}
+
+.nav-list li {
+    position: relative;
+    margin-left: 10px;
+}
+
+.nav-list a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    display: block;
+}
+
+/* Hover dropdown for 'Assessment' */
+.nav-list li:hover > .dropdown {
+    display: block;
+}
+
+.nav-list .dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #444;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    z-index: 10;
+    width: 200px;
+}
+
+.nav-list .dropdown li {
+    width: auto;
+}
+
+.nav-list .dropdown a {
+    padding: 10px 15px;
+    display: block;
+    color: white;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.nav-list li:hover > a {
+    background-color: #555;
+}
+
+/* Hamburger Menu */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+    gap: 5px;
+    z-index: 1001;
+}
+
+.hamburger span {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .nav-list {
+        display: none;
+        flex-direction: column;
+        align-items: flex-start;
+        position: absolute;
+        top: 60px;
+        right: 0;
+        background-color: #333;
+        width: 100%;
+        z-index: 1000;
+        padding: 10px 0;
+    }
+
+    .nav-list.active {
+        display: flex;
+    }
+
+    .nav-list li {
+        width: 100%;
+    }
+
+    .nav-list a {
+        padding: 10px 20px;
+        width: 100%;
+        text-align: left;
+    }
+
+    .nav-list .dropdown {
+        position: static;
+        background-color: #444;
+        margin-top: 5px;
+        border-radius: 0;
+        box-shadow: none;
+        width: 100%;
+    }
+
+    .nav-list .dropdown a {
+        padding: 10px 20px;
+    }
+
+    .hamburger {
+        display: flex;
+        position: absolute;
+        top: 20px;
+        right:60px;
+    }
+}
+
+/* Section Styling */
+#home {
+    flex: 1; /* Allow the section to grow and fill available space */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 50px;
+    background-color: #f4f4f4;
+    width: 100%; /* Ensure section takes full width */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    position: relative; /* Ensure correct positioning */
+    margin: 0; /* Remove any default margin */
+    
+}
+
+#home h2 {
+    font-size: 2em;
+    margin-bottom: 20px;
+}
+
+#home p {
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+#home button {
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+#home button:hover {
+    background-color: #555;
+}
+
+/* Footer Styles */
+footer {
+    background-color: #333;
+    color: white;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%; /* Ensure footer spans full width */
+    margin: 0; /* Remove any default margin */
+    position: relative; /* Ensure correct positioning */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 0px;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+
+}
+
+.footer-left {
+    display: flex;
+    align-items: center;
+    padding-left: 20px;
+    margin-left: 0;
+    padding-right: 10px;
+    flex: 1 1 20%; /* Take full width on smaller screens */
+    min-width: 200px; /* Ensure columns don't get too narrow */
+    justify-content: left; /* Center align content */
+    text-align: center; /* Center align text */
+
+}
+
+.footer-logo {
+    margin-right: 20px;
+}
+
+.footer-logo img {
+    height: 50px;
+    margin-left: 0;
+}
+
+.social-media {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center align content */
+}
+
+.social-media p {
+    margin: 10px 0;
+}
+
+.social-icons {
+    display: flex;
+    gap: 10px;
+}
+
+.social-icons img {
+    width: 30px;
+    height: 30px;
+}
+
+.footer-right {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    flex: 1 1 70%; /* Take approximately two-thirds of the width */
+    text-align: center; /* Center align text */
+    align-items: right;
+    padding:0 0px;
+    
+}
+
+.footer-column {
+    margin: 0 20px;
+    flex: 1 1 20%; /* Take approximately one-third of the width */
+    min-width: 150px; /* Ensure columns don't get too narrow */
+}
+
+
+.footer-column h3 {
+    margin-bottom: 10px;
+}
+
+.footer-column ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-column ul li {
+    margin-bottom: 5px;
+}
+
+.footer-column ul li a {
+    color: #bfbfbf;
+    text-decoration: none;
+}
+
+.footer-column ul li a:hover {
+    color: #fff;
+}
+
+.footer-bottom {
+    margin-top: 20px;
+    text-align: center;
+    width: 100%; /* Ensure footer-bottom spans full width */
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    padding: 0; /* Remove any default padding */
+}
+
+/* Footer Responsive Design */
+@media (max-width: 800px) {
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+    }
+
+    .footer-left {
+        order: 1; /* Ensure footer-left is displayed first */
+        width: 100%; /* Ensure it takes full width */
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px; /* Add space below footer-left */
+        padding: 0;
+    }
+
+    .footer-right {
+        order: 2; /* Ensure footer-right is displayed second */
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        flex-direction: column;
+        align-items: center;
+        width: 100%; /* Ensure it takes full width */
+        text-align: center; /* Center align text */
+        padding: 0;
+    }
+
+    .footer-column {
+        margin: 10px 0;
+        flex: 1 1 100%; /* Take full width on smaller screens */
+        text-align: center; /* Center align text on smaller screens */
+    }
+}
+
+
+/* Footer Responsive Design */
+@media (max-width: 600px) {
+    .footer-content {
+        flex-direction: column;
+        align-items: center;
+        padding:0 0px;
+    }
+
+    .footer-left {
+        order: 1; /* Ensure footer-left is displayed first */
+        width: 100%; /* Ensure it takes full width */
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px; /* Add space below footer-left */
+        padding:0 0px;
+    }
+
+    .footer-right {
+        order: 2; /* Ensure footer-right is displayed second */
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        flex: 1 1 70%; /* Take approximately two-thirds of the width */
+        flex-direction: column;
+        align-items: center;
+        width: 100%; /* Ensure it takes full width */
+        text-align: center; /* Center align text */
+        padding:0 0px;
+    }
+
+    .footer-column {
+        margin: 10px 0;
+        flex: 1 1 100%; /* Take full width on smaller screens */
+        text-align: center; /* Center align text on smaller screens */
+    }
+}
+
+.about-us {
+    padding-top: 60px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-color: #f4f4f4;
+}
+
+.about-us .container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.about-block {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.about-block .text-left,
+.about-block .text-right {
+    flex: 1;
+    padding: 20px;
+}
+
+.about-block .text-left h2,
+.about-block .text-right h2 {
+    font-size: 28px;
+    color: #333;
+}
+
+.about-block .text-left p,
+.about-block .text-right p {
+    font-size: 18px;
+    line-height: 1.6;
+    color: #555;
+}
+
+.about-block .image-left,
+.about-block .image-right {
+    flex: 1;
+    padding: 20px;
+    box-sizing: border-box;
+    min-width: 200px;
+}
+
+.about-block img {
+    width: 100%;
+    height: auto;
+    flex: 1;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .about-block {
+        flex-direction: column;
+    }
+
+    .about-block .text-left,
+    .about-block .text-right {
+        order: 1; 
+    }
+
+    .about-block .image-left,
+    .about-block .image-right {
+        order: 2;
+    }
+}
+
+
+
+/* Values Gallery Style */
+.values-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 30px;
+}
+
+.value-item {
+    text-align: center;
+}
+
+.value-item img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.value-item p {
+    font-size: 18px;
+    color: #555;
+    margin-top: 10px;
+}
+
+/* Contact Us Style */
+.contact-us {
+    padding: 60px 20px;
+    background-color: #f4f4f4;
+    margin-top: 60px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.contact-block {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+}
+
+.contact-box {
+    background-color: #fff;
+    border: 2px solid #ddd;
+    padding: 25px;
+    width: 280px;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.contact-box:hover {
+    transform: translateY(-5px);
+}
+
+.contact-box h2 {
+    font-size: 1.4rem;
+    color: #333;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.contact-box p {
+    font-size: 1rem;
+    color: #666;
+}
+
+.icon {
+    color: #007BFF;
+    font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+    .contact-block {
+        flex-direction: column;
+        gap: 20px;
+        align-content: center;
+    }
+
+    .contact-box {
+        width: 100%;
+        max-width: 400px;
+    }
+}
+
+/* Terms and Conditions Style */
+.terms {
+    padding: 60px 20px;
+    background-color: #f4f4f4;
+    margin-top: 60px;
+}
+
+.terms .last-updated {
+    text-align: center;
+}
+
+.terms-header {
+    font-size: 1.2rem;
+    padding-top: 30px;
+    padding-left: 60px;
+    font-weight: bold;
+}
+
+.terms-text ol {
+    margin-left: 60px;
+}
+
+.terms-text ol li {
+    margin-bottom: 10px;
+}

@@ -24,23 +24,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         if (password_verify($password, $row['password'])) {
-            
             // Start session and set session variables
             $_SESSION['user_id'] = $row['user_id'];
             $_SESSION['username'] = $row['username'];
             $_SESSION['role'] = $row['role'];
 
-            // Redirect to home page
-            header("Location: index.html");
+            // Redirect based on role
+            if ($row['role'] == 'Job Seeker') {
+                header("Location: job_seeker/index.html");
+            } else if ($row['role'] == 'Employer') {
+                header("Location: employer/index.html");
+            } else if ($row['role'] == 'Admin') {
+                header("Location: admin/index.html");
+            }
             exit();
         } else {
             $_SESSION['error_message'] = "Invalid password.";
-            header("Location: login.php");
+            header("Location: login.html");
             exit();
         }
     } else {
         $_SESSION['error_message'] = "No user found with that username.";
-        header("Location: login.php");
+        header("Location: login.html");
         exit();
     }
 }

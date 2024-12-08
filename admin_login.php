@@ -14,33 +14,38 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Check for unique key in URL
+$admin_key = "techfit";
+if (!isset($_GET['key']) || $_GET['key'] !== $admin_key) {
+    die("Access denied.");
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $sql = "SELECT * FROM User WHERE username='$username'";
+    $sql = "SELECT * FROM User WHERE username='$username' AND role='Admin'";
     $result = $conn->query($sql);
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         if (password_verify($password, $row['password'])) {
-            
             // Start session and set session variables
             $_SESSION['user_id'] = $row['user_id'];
             $_SESSION['username'] = $row['username'];
             $_SESSION['role'] = $row['role'];
 
-            // Redirect to home page
-            header("Location: index.html");
+            // Redirect to admin dashboard
+            header("Location: admin/index.html");
             exit();
         } else {
             $_SESSION['error_message'] = "Invalid password.";
-            header("Location: login.php");
+            header("Location: admin_login.html");
             exit();
         }
     } else {
-        $_SESSION['error_message'] = "No user found with that username.";
-        header("Location: login.php");
+        $_SESSION['error_message'] = "No admin user found with that username.";
+        header("Location: admin_login.html");
         exit();
     }
 }
@@ -53,7 +58,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - TechFit</title>
+    <title>Admin Login - TechFit</title>
     <style>
         body {
             background-color: #121212;
@@ -132,32 +137,29 @@ $conn->close();
         }
         
     </style>
+
 </head>
 <body>
+    
+    <main>
     <div class="logo">
-        <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
-    </div>
-    <div class="container">
-        <h2>Login</h2>
-
-        <?php
-        if (isset($_SESSION['error_message'])) {
-            echo '<p class="error-message">' . $_SESSION['error_message'] . '</p>';
-            unset($_SESSION['error_message']);
-        }
-        ?>
+            <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+        </div>
+        <div class="container">
         
-        <img src="images/usericon.png" alt="User Icon">
-        <form action="login.php" method="post">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required><br>
+            <h2>Admin Login</h2>
+            <form action="admin_login.php?key=techfit" method="post">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required><br>
 
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required><br>
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required><br>
 
-            <input type="submit" value="Login">
-        </form>
-        <p>Don't have an account? <a href="register.php">Sign up here</a></p>
-    </div>
+                <input type="submit" value="Login">
+            </form>
+            <p>Don't have an account? <a href="admin_register.php?key=techfit">Sign up here</a></p>
+        </div>
+    </main>
+    
 </body>
 </html>
