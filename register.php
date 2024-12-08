@@ -29,6 +29,8 @@ function generateNextId($conn, $table, $column, $prefix) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_id = generateNextId($conn, 'User', 'user_id', 'U');
     $username = $_POST['username'];
+    $first_name = $_POST['first_name'];
+    $last_name = $_POST['last_name'];
     $email = $_POST['email'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $birthday = $_POST['birthday'];
@@ -45,8 +47,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    $sql = "INSERT INTO User (user_id, username, email, password, birthday, gender, role, is_active)
-            VALUES ('$user_id', '$username', '$email', '$password', '$birthday', '$gender', '$role', TRUE)";
+    $sql = "INSERT INTO User (user_id, username, first_name, last_name, email, password, birthday, gender, role, is_active)
+            VALUES ('$user_id', '$username', '$first_name', '$last_name', '$email', '$password', '$birthday', '$gender', '$role', TRUE)";
 
     if ($conn->query($sql) === TRUE) {
         if ($role == 'Job Seeker') {
