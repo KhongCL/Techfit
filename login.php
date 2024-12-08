@@ -40,12 +40,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         } else {
             $_SESSION['error_message'] = "Invalid password.";
-            header("Location: login.html");
+            header("Location: login.php");
             exit();
         }
     } else {
         $_SESSION['error_message'] = "No user found with that username.";
-        header("Location: login.html");
+        header("Location: login.php");
         exit();
     }
 }
