@@ -152,7 +152,6 @@ $conn->close();
             color: #fff;
             cursor: pointer;
         }
-        
         input[type="submit"]:hover {
             background-color: #0056b3;
         }
@@ -180,6 +179,41 @@ $conn->close();
         .error-message {
             color: red;
             margin-bottom: 20px;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        .popup button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        .popup button:hover {
+            background-color: #0056b3;
+        }
+        .popup ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .popup ul li {
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        .popup ul li:hover {
+            text-decoration: underline;
         }
     </style>
     <script>
@@ -237,6 +271,19 @@ $conn->close();
 
             return isValid;
         }
+
+        function openPopup() {
+            document.getElementById("popup").style.display = "block";
+        }
+
+        function closePopup() {
+            document.getElementById("popup").style.display = "none";
+        }
+
+        function selectJobPosition(position) {
+            document.getElementById("job_position_interested").value = position;
+            closePopup();
+        }
     </script>
 </head>
 <body>
@@ -281,7 +328,7 @@ $conn->close();
                     <option value="Employer">Employer</option>
                 </select>
                 <label for="job_position_interested">Job Position Interested:</label>
-                <input type="text" id="job_position_interested" name="job_position_interested">
+                <input type="text" id="job_position_interested" name="job_position_interested" readonly onclick="openPopup()" value="Select">
             </div>
             <div class="form-row checkbox-row">
                 <input type="checkbox" id="terms" name="terms" required>
@@ -290,6 +337,24 @@ $conn->close();
             <input type="submit" value="Register">
         </form>
         <p>Already have an account? <a href="login.php">Login here</a></p>
+    </div>
+
+    <div id="popup" class="popup">
+        <h3>Select Job Position</h3>
+        <ul>
+            <li onclick="selectJobPosition('Software Developer/Engineer')">Software Developer/Engineer</li>
+            <li onclick="selectJobPosition('Full-Stack Developer')">Full-Stack Developer</li>
+            <li onclick="selectJobPosition('Data Scientist')">Data Scientist</li>
+            <li onclick="selectJobPosition('DevOps Engineer')">DevOps Engineer</li>
+            <li onclick="selectJobPosition('Cybersecurity Analyst')">Cybersecurity Analyst</li>
+            <li onclick="selectJobPosition('Cloud Engineer')">Cloud Engineer</li>
+            <li onclick="selectJobPosition('UI/UX Designer')">UI/UX Designer</li>
+            <li onclick="selectJobPosition('IT Support Specialist')">IT Support Specialist</li>
+            <li onclick="selectJobPosition('Machine Learning Engineer')">Machine Learning Engineer</li>
+            <li onclick="selectJobPosition('QA Analyst')">QA Analyst</li>
+            <li onclick="selectJobPosition('Others')">Others</li>
+        </ul>
+        <button onclick="closePopup()">Close</button>
     </div>
 </body>
 </html>
