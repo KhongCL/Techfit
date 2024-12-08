@@ -1,4 +1,8 @@
 <?php
+session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -12,8 +16,18 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Function to generate the next ID with a given prefix
+function generateNextId($conn, $table, $column, $prefix) {
+    $sql = "SELECT MAX(CAST(SUBSTRING($column, LENGTH('$prefix') + 1) AS UNSIGNED)) AS max_id FROM $table WHERE $column LIKE '$prefix%'";
+    $result = $conn->query($sql);
+    $row = $result->fetch_assoc();
+    $max_id = $row['max_id'] ? $row['max_id'] : 0;
+    $next_id = $prefix . str_pad($max_id + 1, 2, '0', STR_PAD_LEFT);
+    return $next_id;
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $user_id = uniqid();
+    $user_id = generateNextId($conn, 'User', 'user_id', 'U');
     $username = $_POST['username'];
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
@@ -24,25 +38,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $role = $_POST['role'];
     $job_position_interested = $_POST['job_position_interested'];
 
+    // Check for duplicate username or email
+    $check_sql = "SELECT * FROM User WHERE username='$username' OR email='$email'";
+    $check_result = $conn->query($check_sql);
+    if ($check_result->num_rows > 0) {
+        $_SESSION['error_message'] = "Username or email already exists.";
+        header("Location: register.php");
+        exit();
+    }
+
     $sql = "INSERT INTO User (user_id, username, first_name, last_name, email, password, birthday, gender, role, is_active)
             VALUES ('$user_id', '$username', '$first_name', '$last_name', '$email', '$password', '$birthday', '$gender', '$role', TRUE)";
 
     if ($conn->query($sql) === TRUE) {
         if ($role == 'Job Seeker') {
+            $job_seeker_id = generateNextId($conn, 'Job_Seeker', 'job_seeker_id', 'J');
             $sql = "INSERT INTO Job_Seeker (job_seeker_id, user_id, job_position_interested)
-                    VALUES ('$user_id', '$user_id', '$job_position_interested')";
+                    VALUES ('$job_seeker_id', '$user_id', '$job_position_interested')";
         } else if ($role == 'Employer') {
+            $employer_id = generateNextId($conn, 'Employer', 'employer_id', 'E');
             $sql = "INSERT INTO Employer (employer_id, user_id, job_position_interested)
-                    VALUES ('$user_id', '$user_id', '$job_position_interested')";
+                    VALUES ('$employer_id', '$user_id', '$job_position_interested')";
         }
 
         if ($conn->query($sql) === TRUE) {
-            echo "Registration successful!";
+            header("Location: login.php");
+            exit();
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
+            $_SESSION['error_message'] = "Error: " . $conn->error;
+            header("Location: register.php");
+            exit();
         }
     } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+        $_SESSION['error_message'] = "Error: " . $conn->error;
+        header("Location: register.php");
+        exit();
     }
 }
 
@@ -122,6 +152,7 @@ $conn->close();
             color: #fff;
             cursor: pointer;
         }
+        
         input[type="submit"]:hover {
             background-color: #0056b3;
         }

@@ -148,6 +148,14 @@ $conn->close();
         <div class="container">
         
             <h2>Admin Login</h2>
+
+            <?php
+        if (isset($_SESSION['error_message'])) {
+            echo '<p class="error-message">' . $_SESSION['error_message'] . '</p>';
+            unset($_SESSION['error_message']);
+        }
+        ?>
+        
             <form action="admin_login.php?key=techfit" method="post">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required><br>

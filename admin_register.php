@@ -94,65 +94,69 @@ $conn->close();
             align-items: center;
             height: 100vh;
             margin: 0;
-            overflow:hidden; /* Prevent scrolling*/
         }
 
         .logo {
             position: absolute;
-            top: 20px;
+            top: 10px;
             left: 20px;
-            z-index: 2; /* Ensure the logo is above the container */
         }
         .logo img {
             height: 50px;
         }
 
         h2 {
-            margin-top: 60px; /* Add margin to avoid overlap with the logo */
+            margin-top: -25px; /* Move title up by 25px */
         }
 
         .container {
             background-color: #1e1e1e;
-            padding: 40px;
+            padding: 50px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            max-width: 400px;
+            width: 900px; /* Increased width */
             text-align: center;
-            box-sizing: border-box;
-            overflow-y: auto; /* Add vertical scrollbar */
-            max-height: 90vh;
-            position: relative; /* Ensure the logo is positioned relative to the container */
-            z-index: 1; /* Ensure the container is below the logo */
-
         }
-
-        input[type="text"], input[type="email"], input[type="password"], input[type="date"], select {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 35px; /* Increased spacing */
+        }
+        .form-row label {
+            flex: 1;
+            margin-right: 10px; /* Increased spacing */
+        }
+        .form-row input, .form-row select {
+            flex: 1;
+            padding: 15px; /* Increased padding */
+            border: none;
+            border-radius: 10px;
             background-color: #333;
             color: #fff;
-            box-sizing: border-box;
+        }
+        .form-row.full-width input, .form-row.full-width select {
+            width: calc(100% - 30px); /* Adjusted width */
+        }
+        .form-row input[type="checkbox"] {
+            flex: 0;
+            margin-right: 20px;
         }
         
         input[type="submit"] {
             width: 100%;
-            padding: 10px 20px;
-            margin: 10px 0;
+            padding: 15px; /* Increased padding */
+            margin: 20px 0; /* Increased spacing */
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             background-color: #007bff;
             color: #fff;
             cursor: pointer;
-            box-sizing: border-box;
         }
 
         input[type="submit"]:hover {
             background-color: #0056b3;
         }
+
         a {
             color: #007bff;
             text-decoration: none;
@@ -161,9 +165,25 @@ $conn->close();
             text-decoration: underline;
         }
 
+        .form-row.full-width {
+            flex-direction: column;
+        }
+        .form-row.full-width input, .form-row.full-width select {
+            width: calc(100% - 30px); /* Adjusted width */
+        }
+        .form-row.checkbox-row {
+            align-items: center;
+            justify-content: center; /* Center align the checkbox row */
+        }
+        .form-row.checkbox-row label {
+            flex: none;
+            margin-right: 10px;
+        }
+
         .error-message {
             color: red;
             font-weight: bold;
+            margin-bottom: 20px;
         }
 
         @media (max-width: 600px) {
@@ -183,50 +203,109 @@ $conn->close();
         }
         
     </style>
+    <script>
+        function validateForm() {
+            let isValid = true;
+            let errorMessage = "";
+
+            // Password validation
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirm_password").value;
+            if (password.length < 8) {
+                errorMessage += "Password must be at least 8 characters long.<br>";
+                isValid = false;
+            }
+            if (!/[0-9]/.test(password)) {
+                errorMessage += "Password must contain at least one number.<br>";
+                isValid = false;
+            }
+            if (!/[a-zA-Z]/.test(password)) {
+                errorMessage += "Password must contain at least one letter.<br>";
+                isValid = false;
+            }
+            if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                errorMessage += "Password must contain at least one symbol.<br>";
+                isValid = false;
+            }
+            if (password !== confirmPassword) {
+                errorMessage += "Passwords do not match.<br>";
+                isValid = false;
+            }
+
+            // Birthday validation
+            const birthday = document.getElementById("birthday").value;
+            if (!birthday) {
+                errorMessage += "Please enter your birthday.<br>";
+                isValid = false;
+            }
+
+            // First name and last name validation
+            const firstName = document.getElementById("first_name").value;
+            const lastName = document.getElementById("last_name").value;
+            if (!/^[a-zA-Z-]+$/.test(firstName)) {
+                errorMessage += "First name can only contain letters and hyphens.<br>";
+                isValid = false;
+            }
+            if (!/^[a-zA-Z-]+$/.test(lastName)) {
+                errorMessage += "Last name can only contain letters and hyphens.<br>";
+                isValid = false;
+            }
+
+            // Display error message
+            if (!isValid) {
+                document.getElementById("error-message").innerHTML = errorMessage;
+            }
+
+            return isValid;
+        }
+    </script>
     
 </head>
 <body>
 
-    <main>
-        <div class="container">
-        <div class="logo">
-            <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
-        </div>
-            <h2>Admin Register</h2>
-            <?php
-
-            if (isset($_SESSION['error_message'])) {
-                echo '<p class="error-message">' . $_SESSION['error_message'] . '</p>';
-                unset($_SESSION['error_message']);
-            }
-            ?>
-            <form action="admin_register.php?key=techfit" method="post">
+<div class="logo">
+        <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+    </div>
+    <div class="container">
+        <h2 style="margin-top: -25px;">Admin Register</h2> <!-- Move title up by 25px -->
+        <div id="error-message" class="error-message"></div>
+        <form action="register.php" method="post" onsubmit="return validateForm()">
+            <div class="form-row">
                 <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required><br>
-
+                <input type="text" id="username" name="username" required>
                 <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required><br>
-
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-row">
+                <label for="first_name">First Name:</label>
+                <input type="text" id="first_name" name="first_name" required>
+                <label for="last_name">Last Name:</label>
+                <input type="text" id="last_name" name="last_name" required>
+            </div>
+            <div class="form-row">
                 <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required><br>
-
+                <input type="password" id="password" name="password" required>
                 <label for="confirm_password">Confirm Password:</label>
-                <input type="password" id="confirm_password" name="confirm_password" required><br>
-
+                <input type="password" id="confirm_password" name="confirm_password" required>
+            </div>
+            <div class="form-row">
                 <label for="birthday">Birthday:</label>
-                <input type="date" id="birthday" name="birthday" required><br>
-
+                <input type="date" id="birthday" name="birthday" required>
                 <label for="gender">Gender:</label>
-                <select id="gender" name="gender" required>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select><br>
-
-                <input type="submit" value="Register">
-            </form>
-            <p>Already have an account? <a href="admin_login.php?key=techfit">Login here</a></p>
-        </div>
-    </main>
+                <select id="gender" name="gender">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+            
+            <div class="form-row checkbox-row">
+                <input type="checkbox" id="terms" name="terms" required>
+                <label for="terms">I agree to the terms and conditions and privacy policy</label>
+            </div>
+            <input type="submit" value="Register">
+        </form>
+        <p>Already have an account? <a href="login.php">Login here</a></p>
+    </div>
 
 </body>
 </html>
