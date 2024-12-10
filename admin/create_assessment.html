@@ -82,8 +82,12 @@
             </div>
         </nav>
     </header>
-    <h1>Create New Assessment</h1>
+    <main>
+        <h1>Create New Assessment</h1>
         <form action="create_assessment.php" method="post">
+            <label for="assessment_name">Assessment Name:</label>
+            <input type="text" id="assessment_name" name="assessment_name" required><br>
+
             <label for="assessment_type">Assessment Type:</label>
             <select id="assessment_type" name="assessment_type" required>
                 <option value="preliminary">Preliminary</option>

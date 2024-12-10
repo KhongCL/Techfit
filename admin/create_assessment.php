@@ -27,7 +27,7 @@ function generateNextId($conn, $table, $column, $prefix) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $assessment_id = generateNextId($conn, 'Assessment', 'assessment_id', 'AS');
+    $assessment_id = generateNextId($conn, 'Assessment_Admin', 'assessment_id', 'AS');
     $admin_user_id = $_SESSION['user_id']; // Assuming the admin is logged in and their user_id is stored in the session
 
     // Retrieve the admin_id using the user_id
@@ -42,19 +42,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
+    $assessment_name = $_POST['assessment_name'];
     $assessment_type = $_POST['assessment_type'];
-    $start_time = $_POST['start_time'];
-    $end_time = $_POST['end_time'];
+    $question_text = $_POST['question_text'];
+    $answer_type = $_POST['answer_type'];
+    $timestamp = date('Y-m-d H:i:s');
 
-   
-    $sql = "INSERT INTO Assessment (assessment_id, admin_id, assessment_type, start_time, end_time, is_active)
-            VALUES ('$assessment_id', '$admin_id', '$assessment_type', '$start_time', '$end_time', TRUE)";
-    echo $sql; // Debugging: Print the SQL query
-
+    // Insert the assessment into the database
+    $sql = "INSERT INTO Assessment_Admin (assessment_id, admin_id, assessment_name, assessment_type, timestamp, is_active)
+            VALUES ('$assessment_id', '$admin_id', '$assessment_name', '$assessment_type', '$timestamp', TRUE)";
     if ($conn->query($sql) === TRUE) {
-        $_SESSION['success_message'] = "Assessment created successfully.";
-        header("Location: manage_assessments.html");
-        exit();
+        // Insert the question into the database
+        $question_id = generateNextId($conn, 'Question', 'question_id', 'Q');
+        $sql = "INSERT INTO Question (question_id, assessment_id, question_text, answer_type)
+                VALUES ('$question_id', '$assessment_id', '$question_text', '$answer_type')";
+        if ($conn->query($sql) === TRUE) {
+            $_SESSION['success_message'] = "Assessment and question created successfully.";
+            header("Location: manage_assessments.html");
+            exit();
+        } else {
+            $_SESSION['error_message'] = "Error: " . $conn->error;
+            header("Location: create_assessment.html");
+            exit();
+        }
     } else {
         $_SESSION['error_message'] = "Error: " . $conn->error;
         header("Location: create_assessment.html");
