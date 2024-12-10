@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $_SESSION['success_message'] = "Questions added successfully.";
-    header("Location: manage_assessments.html");
+    header("Location: manage_assessments.php");
     exit();
 }
 
