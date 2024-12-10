@@ -44,27 +44,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $assessment_name = $_POST['assessment_name'];
     $assessment_type = $_POST['assessment_type'];
-    $question_text = $_POST['question_text'];
-    $answer_type = $_POST['answer_type'];
     $timestamp = date('Y-m-d H:i:s');
 
     // Insert the assessment into the database
     $sql = "INSERT INTO Assessment_Admin (assessment_id, admin_id, assessment_name, assessment_type, timestamp, is_active)
             VALUES ('$assessment_id', '$admin_id', '$assessment_name', '$assessment_type', '$timestamp', TRUE)";
     if ($conn->query($sql) === TRUE) {
-        // Insert the question into the database
-        $question_id = generateNextId($conn, 'Question', 'question_id', 'Q');
-        $sql = "INSERT INTO Question (question_id, assessment_id, question_text, answer_type)
-                VALUES ('$question_id', '$assessment_id', '$question_text', '$answer_type')";
-        if ($conn->query($sql) === TRUE) {
-            $_SESSION['success_message'] = "Assessment and question created successfully.";
-            header("Location: manage_assessments.html");
-            exit();
-        } else {
-            $_SESSION['error_message'] = "Error: " . $conn->error;
-            header("Location: create_assessment.html");
-            exit();
-        }
+        // Redirect to create_questions.php with the assessment_id
+        header("Location: create_questions.php?assessment_id=$assessment_id");
+        exit();
     } else {
         $_SESSION['error_message'] = "Error: " . $conn->error;
         header("Location: create_assessment.html");

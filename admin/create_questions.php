@@ -3,8 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Assessment - TechFit</title>
+    <title>Create Questions - TechFit</title>
     <link rel="stylesheet" href="styles.css">
+    <script>
+        let questionCount = 0;
+
+        function addQuestion() {
+            questionCount++;
+            const questionDiv = document.createElement('div');
+            questionDiv.id = `question-${questionCount}`;
+            questionDiv.innerHTML = `
+                <label for="question_text_${questionCount}">Question Text:</label>
+                <textarea id="question_text_${questionCount}" name="question_text[]" required></textarea><br>
+
+                <label for="answer_type_${questionCount}">Answer Type:</label>
+                <select id="answer_type_${questionCount}" name="answer_type[]" onchange="showAnswerOptions(${questionCount})" required>
+                    <option value="multiple choice">Multiple Choice</option>
+                    <option value="true/false">True/False</option>
+                    <option value="fill in the blank">Fill in the Blank</option>
+                    <option value="essay">Essay</option>
+                    <option value="code">Code</option>
+                </select><br>
+
+                <div id="answer_options_${questionCount}"></div>
+                <button type="button" onclick="removeQuestion(${questionCount})">Remove Question</button>
+                <hr>
+            `;
+            document.getElementById('questions').appendChild(questionDiv);
+        }
+
+        function removeQuestion(id) {
+            const questionDiv = document.getElementById(`question-${id}`);
+            questionDiv.remove();
+        }
+
+        function showAnswerOptions(id) {
+            const answerType = document.getElementById(`answer_type_${id}`).value;
+            const answerOptionsDiv = document.getElementById(`answer_options_${id}`);
+            answerOptionsDiv.innerHTML = '';
+
+            if (answerType === 'multiple choice') {
+                answerOptionsDiv.innerHTML = `
+                    <label for="choices_${id}">Choices:</label>
+                    <div id="choices_${id}">
+                        <input type="text" name="choices_${id}[]" required>
+                        <button type="button" onclick="addChoice(${id})">Add Choice</button>
+                    </div>
+                `;
+            } else if (answerType === 'true/false') {
+                answerOptionsDiv.innerHTML = `
+                    <label for="true_false_${id}">Answer:</label>
+                    <select id="true_false_${id}" name="true_false_${id}" required>
+                        <option value="true">True</option>
+                        <option value="false">False</option>
+                    </select>
+                `;
+            } else if (answerType === 'fill in the blank') {
+                answerOptionsDiv.innerHTML = `
+                    <label for="blank_${id}">Blank:</label>
+                    <input type="text" id="blank_${id}" name="blank_${id}" required>
+                `;
+            } else if (answerType === 'code') {
+                answerOptionsDiv.innerHTML = `
+                    <label for="code_${id}">Code:</label>
+                    <textarea id="code_${id}" name="code_${id}" required></textarea>
+                `;
+            }
+        }
+
+        function addChoice(id) {
+            const choicesDiv = document.getElementById(`choices_${id}`);
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = `choices_${id}[]`;
+            input.required = true;
+            choicesDiv.insertBefore(input, choicesDiv.lastElementChild);
+        }
+
+        function saveAssessment() {
+            document.getElementById('questions-form').submit();
+        }
+    </script>
 </head>
 <body>
     <header>
@@ -83,23 +162,26 @@
         </nav>
     </header>
     <main>
-        <h1>Create New Assessment</h1>
-        <form action="create_assessment.php" method="post">
-            <label for="assessment_name">Assessment Name:</label>
-            <input type="text" id="assessment_name" name="assessment_name" required><br>
-
-            <label for="assessment_type">Assessment Type:</label>
-            <select id="assessment_type" name="assessment_type" required>
-                <option value="preliminary">Preliminary</option>
-                <option value="experience">Experience</option>
-                <option value="employer_score">Employer Score</option>
-                <option value="detailed">Detailed</option>
-                <option value="technical">Technical</option>
-            </select><br>
-
-            <input type="submit" value="Create Assessment">
+        <h1>Create Questions for Assessment</h1>
+        <p>Assessment ID: <strong><?php echo htmlspecialchars($_GET['assessment_id']); ?></strong></p>
+        <?php
+        if (isset($_SESSION['success_message'])) {
+            echo '<p class="success-message">' . $_SESSION['success_message'] . '</p>';
+            unset($_SESSION['success_message']);
+        }
+        if (isset($_SESSION['error_message'])) {
+            echo '<p class="error-message">' . $_SESSION['error_message'] . '</p>';
+            unset($_SESSION['error_message']);
+        }
+        ?>
+        <form id="questions-form" action="save_questions.php" method="post">
+            <input type="hidden" name="assessment_id" value="<?php echo htmlspecialchars($_GET['assessment_id']); ?>">
+            <div id="questions"></div>
+            <button type="button" onclick="addQuestion()">Add Question</button>
+            <button type="button" onclick="saveAssessment()">Save Assessment</button>
         </form>
     </main>
+    
     <footer>
         <div class="footer-content">
             <div class="footer-left">
@@ -158,5 +240,3 @@
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
-</body>
-</html>
