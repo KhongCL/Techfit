@@ -49,6 +49,8 @@
                         <input type="text" name="choices_${id}[]" required>
                         <button type="button" onclick="addChoice(${id})">Add Choice</button>
                     </div>
+                    <label for="correct_choice_${id}">Correct Choice:</label>
+                    <select id="correct_choice_${id}" name="correct_choice_${id}" required></select>
                 `;
             } else if (answerType === 'true/false') {
                 answerOptionsDiv.innerHTML = `
@@ -63,9 +65,14 @@
                     <label for="blank_${id}">Blank:</label>
                     <input type="text" id="blank_${id}" name="blank_${id}" required>
                 `;
+            } else if (answerType === 'essay') {
+                answerOptionsDiv.innerHTML = `
+                    <label for="essay_${id}">Correct Answer:</label>
+                    <textarea id="essay_${id}" name="essay_${id}" required></textarea>
+                `;
             } else if (answerType === 'code') {
                 answerOptionsDiv.innerHTML = `
-                    <label for="code_${id}">Code:</label>
+                    <label for="code_${id}">Correct Answer:</label>
                     <textarea id="code_${id}" name="code_${id}" required></textarea>
                 `;
             }
@@ -78,6 +85,22 @@
             input.name = `choices_${id}[]`;
             input.required = true;
             choicesDiv.insertBefore(input, choicesDiv.lastElementChild);
+
+            // Update the correct choice dropdown
+            updateCorrectChoiceDropdown(id);
+        }
+
+        function updateCorrectChoiceDropdown(id) {
+            const choices = document.getElementsByName(`choices_${id}[]`);
+            const correctChoiceDropdown = document.getElementById(`correct_choice_${id}`);
+            correctChoiceDropdown.innerHTML = '';
+
+            choices.forEach((choice, index) => {
+                const option = document.createElement('option');
+                option.value = choice.value;
+                option.text = choice.value;
+                correctChoiceDropdown.appendChild(option);
+            });
         }
 
         function saveAssessment() {

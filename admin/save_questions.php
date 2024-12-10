@@ -31,13 +31,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $question_texts = $_POST['question_text'];
     $answer_types = $_POST['answer_type'];
 
+    // Check if the assessment_id exists in the Assessment_Admin table
+    $assessment_check_sql = "SELECT assessment_id FROM Assessment_Admin WHERE assessment_id = '$assessment_id'";
+    $assessment_check_result = $conn->query($assessment_check_sql);
+    if ($assessment_check_result->num_rows == 0) {
+        $_SESSION['error_message'] = "Invalid assessment ID.";
+        header("Location: create_questions.php?assessment_id=$assessment_id");
+        exit();
+    }
+
     foreach ($question_texts as $index => $question_text) {
         $question_id = generateNextId($conn, 'Question', 'question_id', 'Q');
         $answer_type = $answer_types[$index];
+        $correct_answer = '';
+
+        // Determine the correct answer based on the question type
+        if ($answer_type === 'multiple choice') {
+            $correct_answer = $_POST["correct_choice_$index"];
+        } else if ($answer_type === 'true/false') {
+            $correct_answer = $_POST["true_false_$index"];
+        } else if ($answer_type === 'fill in the blank') {
+            $correct_answer = $_POST["blank_$index"];
+        } else if ($answer_type === 'essay') {
+            $correct_answer = $_POST["essay_$index"];
+        } else if ($answer_type === 'code') {
+            $correct_answer = $_POST["code_$index"];
+        }
 
         // Insert the question into the database
-        $sql = "INSERT INTO Question (question_id, assessment_id, question_text, answer_type)
-                VALUES ('$question_id', '$assessment_id', '$question_text', '$answer_type')";
+        $sql = "INSERT INTO Question (question_id, assessment_id, question_text, answer_type, correct_answer)
+                VALUES ('$question_id', '$assessment_id', '$question_text', '$answer_type', '$correct_answer')";
 
         if ($conn->query($sql) !== TRUE) {
             $_SESSION['error_message'] = "Error: " . $conn->error;
