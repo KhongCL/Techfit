@@ -43,12 +43,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $assessment_name = $_POST['assessment_name'];
-    $assessment_type = $_POST['assessment_type'];
     $timestamp = date('Y-m-d H:i:s');
 
     // Insert the assessment into the database
-    $sql = "INSERT INTO Assessment_Admin (assessment_id, admin_id, assessment_name, assessment_type, timestamp, is_active)
-            VALUES ('$assessment_id', '$admin_id', '$assessment_name', '$assessment_type', '$timestamp', TRUE)";
+    $sql = "INSERT INTO Assessment_Admin (assessment_id, admin_id, assessment_name, timestamp, is_active)
+            VALUES ('$assessment_id', '$admin_id', '$assessment_name', '$timestamp', TRUE)";
     if ($conn->query($sql) === TRUE) {
         // Redirect to create_questions.php with the assessment_id
         header("Location: create_questions.php?assessment_id=$assessment_id");
