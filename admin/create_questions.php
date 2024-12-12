@@ -59,12 +59,12 @@
                         <button type="button" onclick="addChoice(${id})">Add Choice</button>
                     </div>
                     <label for="correct_choice_${id}">Correct Choice:</label>
-                    <select id="correct_choice_${id}" name="correct_choice_${id}" required></select>
+                    <select id="correct_choice_${id}" name="correct_choice[]" required></select>
                 `;
             } else if (answerType === 'true/false') {
                 answerOptionsDiv.innerHTML = `
                     <label for="true_false_${id}">Answer:</label>
-                    <select id="true_false_${id}" name="true_false_${id}" required>
+                    <select id="true_false_${id}" name="correct_choice[]" required>
                         <option value="true">True</option>
                         <option value="false">False</option>
                     </select>
@@ -72,17 +72,17 @@
             } else if (answerType === 'fill in the blank') {
                 answerOptionsDiv.innerHTML = `
                     <label for="blank_${id}">Blank:</label>
-                    <input type="text" id="blank_${id}" name="blank_${id}" required>
+                    <input type="text" id="blank_${id}" name="correct_choice[]" required>
                 `;
             } else if (answerType === 'essay') {
                 answerOptionsDiv.innerHTML = `
                     <label for="essay_${id}">Correct Answer:</label>
-                    <textarea id="essay_${id}" name="essay_${id}" required></textarea>
+                    <textarea id="essay_${id}" name="correct_choice[]" required></textarea>
                 `;
             } else if (answerType === 'code') {
                 answerOptionsDiv.innerHTML = `
                     <label for="code_${id}">Correct Answer:</label>
-                    <textarea id="code_${id}" name="code_${id}" required></textarea>
+                    <textarea id="code_${id}" name="correct_choice[]" required></textarea>
                 `;
             }
         }

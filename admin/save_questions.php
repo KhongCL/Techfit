@@ -31,6 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $question_texts = $_POST['question_text'];
     $question_types = $_POST['question_type'];
     $answer_types = $_POST['answer_type'];
+    $correct_answers = $_POST['correct_choice'];
 
     // Check if the assessment_id exists in the Assessment_Admin table
     $assessment_check_sql = "SELECT assessment_id FROM Assessment_Admin WHERE assessment_id = '$assessment_id'";
@@ -45,20 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $question_id = generateNextId($conn, 'Question', 'question_id', 'Q');
         $question_type = $question_types[$index];
         $answer_type = $answer_types[$index];
-        $correct_answer = '';
-
-        // Determine the correct answer based on the question type
-        if ($answer_type === 'multiple choice') {
-            $correct_answer = $_POST["correct_choice_$index"];
-        } else if ($answer_type === 'true/false') {
-            $correct_answer = $_POST["true_false_$index"];
-        } else if ($answer_type === 'fill in the blank') {
-            $correct_answer = $_POST["blank_$index"];
-        } else if ($answer_type === 'essay') {
-            $correct_answer = $_POST["essay_$index"];
-        } else if ($answer_type === 'code') {
-            $correct_answer = $_POST["code_$index"];
-        }
+        $correct_answer = $correct_answers[$index];
 
         // Insert the question into the database
         $sql = "INSERT INTO Question (question_id, assessment_id, question_text, question_type, answer_type, correct_answer)
