@@ -38,6 +38,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $role = $_POST['role'];
     $job_positions_interested = isset($_POST['job_position_interested']) ? $_POST['job_position_interested'] : '';
 
+    // Debugging: Print the job positions interested
+    error_log("Job Positions Interested: " . $job_positions_interested);
+
     // Check for duplicate username or email
     $check_sql = "SELECT * FROM User WHERE username='$username' OR email='$email'";
     $check_result = $conn->query($check_sql);
@@ -50,6 +53,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "INSERT INTO User (user_id, username, first_name, last_name, email, password, birthday, gender, role, is_active, job_position_interested)
             VALUES ('$user_id', '$username', '$first_name', '$last_name', '$email', '$password', '$birthday', '$gender', '$role', TRUE, '$job_positions_interested')";
 
+    // Debugging: Print the SQL query
+    error_log("SQL Query: " . $sql);
+
     if ($conn->query($sql) === TRUE) {
         if ($role == 'Job Seeker') {
             $job_seeker_id = generateNextId($conn, 'Job_Seeker', 'job_seeker_id', 'J');
@@ -60,6 +66,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $sql = "INSERT INTO Employer (employer_id, user_id, job_position_interested)
                     VALUES ('$employer_id', '$user_id', '$job_positions_interested')";
         }
+
+        // Debugging: Print the SQL query for Job_Seeker or Employer
+        error_log("SQL Query for Role: " . $sql);
 
         if ($conn->query($sql) === TRUE) {
             header("Location: login.php");
