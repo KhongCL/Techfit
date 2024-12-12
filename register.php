@@ -36,7 +36,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $birthday = $_POST['birthday'];
     $gender = $_POST['gender'];
     $role = $_POST['role'];
-    $job_position_interested = $_POST['job_position_interested'];
+    $job_positions_interested = isset($_POST['job_position_interested']) ? $_POST['job_position_interested'] : [];
+
+    // Convert the array to a comma-separated string
+    $job_positions_interested_str = implode(',', $job_positions_interested);
 
     // Check for duplicate username or email
     $check_sql = "SELECT * FROM User WHERE username='$username' OR email='$email'";
@@ -54,11 +57,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($role == 'Job Seeker') {
             $job_seeker_id = generateNextId($conn, 'Job_Seeker', 'job_seeker_id', 'J');
             $sql = "INSERT INTO Job_Seeker (job_seeker_id, user_id, job_position_interested)
-                    VALUES ('$job_seeker_id', '$user_id', '$job_position_interested')";
+                    VALUES ('$job_seeker_id', '$user_id', '$job_positions_interested_str')";
         } else if ($role == 'Employer') {
             $employer_id = generateNextId($conn, 'Employer', 'employer_id', 'E');
             $sql = "INSERT INTO Employer (employer_id, user_id, job_position_interested)
-                    VALUES ('$employer_id', '$user_id', '$job_position_interested')";
+                    VALUES ('$employer_id', '$user_id', '$job_positions_interested_str')";
         }
 
         if ($conn->query($sql) === TRUE) {
@@ -297,9 +300,13 @@ $conn->close();
             document.getElementById("popup").style.display = "none";
         }
 
-        function selectJobPosition(position) {
-            document.getElementById("job_position_interested").value = position;
-            closePopup();
+        function updateJobPositions() {
+            var checkboxes = document.querySelectorAll('#popup input[type="checkbox"]:checked');
+            var selectedPositions = [];
+            checkboxes.forEach(function(checkbox) {
+                selectedPositions.push(checkbox.value);
+            });
+            document.getElementById("job_position_interested").value = selectedPositions.join(', ');
         }
     </script>
 </head>
@@ -359,17 +366,17 @@ $conn->close();
     <div id="popup" class="popup">
         <h3>Select Job Position</h3>
         <ul>
-            <li onclick="selectJobPosition('Software Developer/Engineer')">Software Developer/Engineer</li>
-            <li onclick="selectJobPosition('Full-Stack Developer')">Full-Stack Developer</li>
-            <li onclick="selectJobPosition('Data Scientist')">Data Scientist</li>
-            <li onclick="selectJobPosition('DevOps Engineer')">DevOps Engineer</li>
-            <li onclick="selectJobPosition('Cybersecurity Analyst')">Cybersecurity Analyst</li>
-            <li onclick="selectJobPosition('Cloud Engineer')">Cloud Engineer</li>
-            <li onclick="selectJobPosition('UI/UX Designer')">UI/UX Designer</li>
-            <li onclick="selectJobPosition('IT Support Specialist')">IT Support Specialist</li>
-            <li onclick="selectJobPosition('Machine Learning Engineer')">Machine Learning Engineer</li>
-            <li onclick="selectJobPosition('QA Analyst')">QA Analyst</li>
-            <li onclick="selectJobPosition('Others')">Others</li>
+            <li><input type="checkbox" value="Software Developer/Engineer" onclick="updateJobPositions()"> Software Developer/Engineer</li>
+            <li><input type="checkbox" value="Full-Stack Developer" onclick="updateJobPositions()"> Full-Stack Developer</li>
+            <li><input type="checkbox" value="Data Scientist" onclick="updateJobPositions()"> Data Scientist</li>
+            <li><input type="checkbox" value="DevOps Engineer" onclick="updateJobPositions()"> DevOps Engineer</li>
+            <li><input type="checkbox" value="Cybersecurity Analyst" onclick="updateJobPositions()"> Cybersecurity Analyst</li>
+            <li><input type="checkbox" value="Cloud Engineer" onclick="updateJobPositions()"> Cloud Engineer</li>
+            <li><input type="checkbox" value="UI/UX Designer" onclick="updateJobPositions()"> UI/UX Designer</li>
+            <li><input type="checkbox" value="IT Support Specialist" onclick="updateJobPositions()"> IT Support Specialist</li>
+            <li><input type="checkbox" value="Machine Learning Engineer" onclick="updateJobPositions()"> Machine Learning Engineer</li>
+            <li><input type="checkbox" value="QA Analyst" onclick="updateJobPositions()"> QA Analyst</li>
+            <li><input type="checkbox" value="Others" onclick="updateJobPositions()"> Others</li>
         </ul>
         <button onclick="closePopup()">Close</button>
     </div>
