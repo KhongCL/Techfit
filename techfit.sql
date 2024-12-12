@@ -13,7 +13,6 @@ CREATE TABLE User (
     gender ENUM('Male', 'Female'),
     role ENUM('Job Seeker', 'Employer', 'Admin') NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE
-    job_position_interested VARCHAR(255) -- Added to store multiple job positions
 );
 
 CREATE TABLE Job_Seeker (
