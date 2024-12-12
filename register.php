@@ -36,10 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $birthday = $_POST['birthday'];
     $gender = $_POST['gender'];
     $role = $_POST['role'];
-    $job_positions_interested = isset($_POST['job_position_interested']) ? $_POST['job_position_interested'] : [];
-
-    // Convert the array to a comma-separated string
-    $job_positions_interested_str = implode(',', $job_positions_interested);
+    $job_positions_interested = isset($_POST['job_position_interested']) ? $_POST['job_position_interested'] : '';
 
     // Check for duplicate username or email
     $check_sql = "SELECT * FROM User WHERE username='$username' OR email='$email'";
@@ -50,18 +47,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    $sql = "INSERT INTO User (user_id, username, first_name, last_name, email, password, birthday, gender, role, is_active)
-            VALUES ('$user_id', '$username', '$first_name', '$last_name', '$email', '$password', '$birthday', '$gender', '$role', TRUE)";
+    $sql = "INSERT INTO User (user_id, username, first_name, last_name, email, password, birthday, gender, role, is_active, job_position_interested)
+            VALUES ('$user_id', '$username', '$first_name', '$last_name', '$email', '$password', '$birthday', '$gender', '$role', TRUE, '$job_positions_interested')";
 
     if ($conn->query($sql) === TRUE) {
         if ($role == 'Job Seeker') {
             $job_seeker_id = generateNextId($conn, 'Job_Seeker', 'job_seeker_id', 'J');
             $sql = "INSERT INTO Job_Seeker (job_seeker_id, user_id, job_position_interested)
-                    VALUES ('$job_seeker_id', '$user_id', '$job_positions_interested_str')";
+                    VALUES ('$job_seeker_id', '$user_id', '$job_positions_interested')";
         } else if ($role == 'Employer') {
             $employer_id = generateNextId($conn, 'Employer', 'employer_id', 'E');
             $sql = "INSERT INTO Employer (employer_id, user_id, job_position_interested)
-                    VALUES ('$employer_id', '$user_id', '$job_positions_interested_str')";
+                    VALUES ('$employer_id', '$user_id', '$job_positions_interested')";
         }
 
         if ($conn->query($sql) === TRUE) {
