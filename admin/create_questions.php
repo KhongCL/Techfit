@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Questions - TechFit</title>
+    <title>Create Questions for Assessment - TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <script>
         let questionCount = 0;
@@ -15,6 +15,15 @@
             questionDiv.innerHTML = `
                 <label for="question_text_${questionCount}">Question Text:</label>
                 <textarea id="question_text_${questionCount}" name="question_text[]" required></textarea><br>
+
+                <label for="question_type_${questionCount}">Question Type:</label>
+                <select id="question_type_${questionCount}" name="question_type[]" required>
+                    <option value="preliminary">Preliminary</option>
+                    <option value="experience">Experience</option>
+                    <option value="employer_score">Employer Score</option>
+                    <option value="detailed">Detailed</option>
+                    <option value="technical">Technical</option>
+                </select><br>
 
                 <label for="answer_type_${questionCount}">Answer Type:</label>
                 <select id="answer_type_${questionCount}" name="answer_type[]" onchange="showAnswerOptions(${questionCount})" required>
@@ -263,3 +272,6 @@
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
+    <script src="scripts.js"></script>
+</body>
+</html>

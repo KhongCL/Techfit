@@ -29,6 +29,7 @@ function generateNextId($conn, $table, $column, $prefix) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $assessment_id = $_POST['assessment_id'];
     $question_texts = $_POST['question_text'];
+    $question_types = $_POST['question_type'];
     $answer_types = $_POST['answer_type'];
 
     // Check if the assessment_id exists in the Assessment_Admin table
@@ -42,6 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     foreach ($question_texts as $index => $question_text) {
         $question_id = generateNextId($conn, 'Question', 'question_id', 'Q');
+        $question_type = $question_types[$index];
         $answer_type = $answer_types[$index];
         $correct_answer = '';
 
@@ -59,8 +61,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // Insert the question into the database
-        $sql = "INSERT INTO Question (question_id, assessment_id, question_text, answer_type, correct_answer)
-                VALUES ('$question_id', '$assessment_id', '$question_text', '$answer_type', '$correct_answer')";
+        $sql = "INSERT INTO Question (question_id, assessment_id, question_text, question_type, answer_type, correct_answer)
+                VALUES ('$question_id', '$assessment_id', '$question_text', '$question_type', '$answer_type', '$correct_answer')";
 
         if ($conn->query($sql) !== TRUE) {
             $_SESSION['error_message'] = "Error: " . $conn->error;

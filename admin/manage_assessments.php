@@ -90,7 +90,6 @@
                 <tr>
                     <th>Assessment ID</th>
                     <th>Assessment Name</th>
-                    <th>Assessment Type</th>
                     <th>Timestamp</th>
                     <th>Actions</th>
                 </tr>
@@ -110,7 +109,7 @@
                     die("Connection failed: " . $conn->connect_error);
                 }
 
-                $sql = "SELECT assessment_id, assessment_name, assessment_type, timestamp FROM Assessment_Admin";
+                $sql = "SELECT assessment_id, assessment_name, timestamp FROM Assessment_Admin";
                 $result = $conn->query($sql);
 
                 if ($result->num_rows > 0) {
@@ -118,13 +117,12 @@
                         echo "<tr>";
                         echo "<td>" . htmlspecialchars($row['assessment_id']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['assessment_name']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['assessment_type']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['timestamp']) . "</td>";
                         echo "<td><a href='edit_assessment.html?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Edit</a> | <a href='delete_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Delete</a></td>";
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='5'>No assessments found</td></tr>";
+                    echo "<tr><td colspan='4'>No assessments found</td></tr>";
                 }
 
                 $conn->close();
