@@ -13,6 +13,7 @@ CREATE TABLE User (
     gender ENUM('Male', 'Female'),
     role ENUM('Job Seeker', 'Employer', 'Admin') NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE
+    job_position_interested VARCHAR(255) -- Added to store multiple job positions
 );
 
 CREATE TABLE Job_Seeker (
@@ -20,7 +21,7 @@ CREATE TABLE Job_Seeker (
     user_id VARCHAR(5) NOT NULL,
     resume BLOB,
     linkedin_link VARCHAR(255),
-    job_position_interested VARCHAR(100),
+    job_position_interested VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
@@ -29,7 +30,7 @@ CREATE TABLE Employer (
     user_id VARCHAR(5) NOT NULL,
     company_name VARCHAR(100) NOT NULL,
     linkedin_link VARCHAR(255),
-    job_position_interested VARCHAR(100),
+    job_position_interested VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
