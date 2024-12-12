@@ -168,7 +168,6 @@ header {
     box-sizing: border-box; /* Include padding and border in element's total width and height */
     position: relative; /* Ensure correct positioning */
     margin: 0; /* Remove any default margin */
-    
 }
 
 #home h2 {
@@ -551,7 +550,7 @@ footer {
     margin-top: 60px;
 }
 
-.terms .last-updated {
+.last-updated {
     text-align: center;
 }
 
@@ -567,5 +566,31 @@ footer {
 }
 
 .terms-text ol li {
+    margin-bottom: 10px;
+}
+
+/* Privacy Policy Style */  
+.privacy-policy {
+    padding: 60px 20px;
+    background-color: #f4f4f4;
+    margin-top: 60px;
+}
+
+.privacy-header {
+    text-align: center;
+    font-size: 2.0rem;
+    margin-top: 60px;
+    font-weight: bold;
+}
+
+.privacy-section {
+    font-size: 1.4rem;
+    margin-top: 60px;
+    margin-bottom: 60px;
+}
+
+.privacy-text li {
+    font-size: 1.2rem;
+    text-align: justify;
     margin-bottom: 10px;
 }
