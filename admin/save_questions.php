@@ -31,22 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $question_texts = $_POST['question_text'];
     $question_types = $_POST['question_type'];
     $answer_types = $_POST['answer_type'];
-    $correct_answers = [];
-
-    // Collect correct answers based on answer type
-    foreach ($answer_types as $index => $answer_type) {
-        if ($answer_type === 'multiple choice') {
-            $correct_answers[$index] = $_POST["correct_choice_${index}"];
-        } else if ($answer_type === 'true/false') {
-            $correct_answers[$index] = $_POST["correct_choice_${index}"];
-        } else if ($answer_type === 'fill in the blank') {
-            $correct_answers[$index] = $_POST["correct_choice_${index}"];
-        } else if ($answer_type === 'essay') {
-            $correct_answers[$index] = $_POST["correct_choice_${index}"];
-        } else if ($answer_type === 'code') {
-            $correct_answers[$index] = $_POST["correct_choice_${index}"];
-        }
-    }
+    $correct_answers = $_POST['correct_choice'];
 
     // Check if the assessment_id exists in the Assessment_Admin table
     $assessment_check_sql = "SELECT assessment_id FROM Assessment_Admin WHERE assessment_id = '$assessment_id'";
@@ -63,20 +48,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $answer_type = $answer_types[$index];
         $correct_answer = $correct_answers[$index];
 
-        // Log the values for debugging
-        error_log("Question ID: $question_id, Assessment ID: $assessment_id, Question Text: $question_text, Question Type: $question_type, Answer Type: $answer_type, Correct Answer: $correct_answer");
-
         // Insert the question into the database
         $sql = "INSERT INTO Question (question_id, assessment_id, question_text, question_type, answer_type, correct_answer)
                 VALUES ('$question_id', '$assessment_id', '$question_text', '$question_type', '$answer_type', '$correct_answer')";
 
-        // Log the SQL query for debugging
-        error_log("Executing SQL: $sql");
-
         if ($conn->query($sql) !== TRUE) {
-            // Log the error message
-            error_log("Error inserting question: " . $conn->error);
-            // Display the error message
             $_SESSION['error_message'] = "Error: " . $conn->error;
             header("Location: create_questions.php?assessment_id=$assessment_id");
             exit();
