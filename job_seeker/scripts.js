@@ -43,3 +43,22 @@ document.addEventListener('DOMContentLoaded', function() {
         navList.classList.toggle('active');
     });
 });
+
+// FAQ dropdown functionality
+document.querySelectorAll('.faq-question').forEach(item => {
+    item.addEventListener('click', () => {
+        const faqItem = item.closest('.faq-item'); // Get the parent .faq-item
+        const answer = faqItem.querySelector('.faq-answer'); // Find the answer
+        const arrow = faqItem.querySelector('.dropdown-arrow'); // Get the arrow
+
+        // Toggle the 'open' class on the .faq-item to show/hide the answer
+        faqItem.classList.toggle('open');
+
+        // Rotate the arrow based on whether the item is open
+        if (faqItem.classList.contains('open')) {
+            arrow.style.transform = 'rotate(180deg)'; // Rotate when open
+        } else {
+            arrow.style.transform = 'rotate(0deg)'; // Rotate back when closed
+        }
+    });
+});
