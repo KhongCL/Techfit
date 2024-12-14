@@ -50,8 +50,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    $sql = "INSERT INTO User (user_id, username, first_name, last_name, email, password, birthday, gender, role, is_active, job_position_interested)
-            VALUES ('$user_id', '$username', '$first_name', '$last_name', '$email', '$password', '$birthday', '$gender', '$role', TRUE, '$job_positions_interested')";
+    $sql = "INSERT INTO User (user_id, username, first_name, last_name, email, password, birthday, gender, role, is_active)
+            VALUES ('$user_id', '$username', '$first_name', '$last_name', '$email', '$password', '$birthday', '$gender', '$role', TRUE)";
 
     // Debugging: Print the SQL query
     error_log("SQL Query: " . $sql);
@@ -101,9 +101,12 @@ $conn->close();
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* Align items from the top */
             height: 100vh;
             margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: auto; /* Enable scrolling */
         }
 
         .logo {
@@ -124,13 +127,17 @@ $conn->close();
             padding: 50px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            width: 900px; /* Increased width */
+            width: 100%;
+            max-width: 900px; /* Set max width */
             text-align: center;
+            box-sizing: border-box;
+            overflow: auto; /* Enable scrolling */
         }
         .form-row {
             display: flex;
             justify-content: space-between;
             margin-bottom: 35px; /* Increased spacing */
+            flex-wrap: wrap; /* Allow wrapping */
         }
         .form-row label {
             flex: 1;
@@ -143,6 +150,7 @@ $conn->close();
             border-radius: 10px;
             background-color: #333;
             color: #fff;
+            margin-bottom: 10px; /* Add margin for spacing */
         }
         .form-row.full-width input, .form-row.full-width select {
             width: calc(100% - 30px); /* Adjusted width */
@@ -228,19 +236,25 @@ $conn->close();
         }
 
         @media (max-width: 600px) {
-            .logo {
-                position: relative;
-                top: 0;
-                left: 0;
-                margin-bottom: 20px;
-                align-items: left;
-                justify-content: left;
-                z-index: 2;
+            .container {
+                padding: 20px;
+                overflow: auto; /* Enable scrolling */
             }
-
-            h2 {
-                margin-top: 0; /* Remove top margin for mobile */
+            .form-row {
+                flex-direction: column;
+                align-items: flex-start;
             }
+            .form-row label, .form-row input, .form-row select {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .form-row input, .form-row select {
+                padding: 10px; /* Reduce padding */
+            }
+            .form-row input[type="checkbox"] {
+                margin-right: 10px;
+            }
+        }
     </style>
     <script>
         function validateForm() {
