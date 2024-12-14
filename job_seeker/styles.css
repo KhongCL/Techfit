@@ -547,30 +547,76 @@ footer {
 }
 
 /* Terms and Conditions Style */
-.terms {
+#terms {
     padding: 60px 20px;
     background-color: #f4f4f4;
     margin-top: 60px;
 }
 
-.last-updated {
+#terms h2 {
+    font-size: 2.5em;
+    font-weight: 700;
     text-align: center;
+    margin-bottom: 20px;
+    color: #333;
 }
 
-.terms-header {
+#terms h3 {
+    font-size: 1.6em;
+    font-weight: 700;
+    text-align: left;
+    padding-top: 40px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+#last-updated {
+    text-align: center;
+    font-size: 1.1em;
+    color: #555;
+    margin-top: 20px;
+}
+
+#terms-header {
     font-size: 1.2rem;
     padding-top: 30px;
-    padding-left: 60px;
     font-weight: bold;
+    color: #333;
 }
 
-.terms-text ol {
-    margin-left: 60px;
-}
 
-.terms-text ol li {
+#terms-text ol li {
     margin-bottom: 10px;
+    font-size: 1.1em;
+    color: #555;
+    text-align: left;
 }
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #terms {
+        padding: 40px 20px;
+    }
+
+    #terms h2 {
+        font-size: 2em;
+    }
+
+    #terms-header {
+        font-size: 1.1rem;
+        padding-left: 20px;
+    }
+
+    #terms-text ol {
+        margin-left: 20px;
+    }
+
+    #terms-text ol li {
+        font-size: 1em;
+        text-align: left;
+    }
+}
+
 
 /* Privacy Policy Style */  
 .privacy-policy {
