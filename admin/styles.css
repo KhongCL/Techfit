@@ -369,6 +369,7 @@ footer {
     flex: 1;
     min-width: 150px; /* Adjust this value as needed */
     margin: 10px;
+    text-align: left; /* Align text to the left */
 }
 
 
@@ -379,6 +380,7 @@ footer {
 .footer-column ul {
     list-style: none;
     padding: 0;
+    text-align: left; /* Align text to the left */
 }
 
 .footer-column ul li {
