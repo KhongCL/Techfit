@@ -235,7 +235,7 @@ $conn->close();
             text-decoration: underline;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 850px) {
             .container {
                 padding: 20px;
                 overflow: auto; /* Enable scrolling */
