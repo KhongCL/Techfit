@@ -43,6 +43,7 @@ CREATE TABLE Assessment_Admin (
     assessment_id VARCHAR(5) PRIMARY KEY,
     admin_id VARCHAR(5) NOT NULL,
     assessment_name VARCHAR(100) NOT NULL,
+    description TEXT, -- Added description column
     timestamp DATETIME NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (admin_id) REFERENCES Admin(admin_id)
