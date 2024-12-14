@@ -92,7 +92,7 @@ CREATE TABLE Admin_Resource (
     resource_id VARCHAR(5),
     action_type ENUM('added', 'edited', 'deleted') NOT NULL,
     timestamp DATETIME NOT NULL,
-    notes TEXT,
+    description TEXT,
     PRIMARY KEY (admin_id, resource_id),
     FOREIGN KEY (admin_id) REFERENCES Admin(admin_id),
     FOREIGN KEY (resource_id) REFERENCES Resource(resource_id)
