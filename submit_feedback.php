@@ -1,4 +1,3 @@
-<!-- filepath: /c:/xampp/htdocs/Techfit/submit_feedback.php -->
 <?php
 session_start();
 error_reporting(E_ALL);
@@ -37,12 +36,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             VALUES ('$feedback_id', '$user_id', '$feedback_text', '$timestamp')";
 
     if ($conn->query($sql) === TRUE) {
-        $_SESSION['success_message'] = "Feedback submitted successfully.";
-        header("Location: feedback.html");
+        $_SESSION['success_message'] = "Thank you! Your feedback has been submitted successfully.";
+        header("Location: feedback.php");
         exit();
     } else {
         $_SESSION['error_message'] = "Error: " . $conn->error;
-        header("Location: feedback.html");
+        header("Location: feedback.php");
         exit();
     }
 }

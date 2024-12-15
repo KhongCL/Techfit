@@ -40,15 +40,22 @@
     </header>
 
     <section id="feedback">
-        <h2>Feedback</h2>
-        <div class="feedback-container">
-            <form action="submit_feedback.php" method="post">
-                <label for="feedback_text">Your Feedback:</label>
-                <textarea id="feedback_text" name="feedback_text" required></textarea>
-                <button type="submit" class="submit-button">Submit</button>
-            </form>
-        </div>
-    </section>
+    <h2>Feedback</h2>
+    <div class="feedback-container">
+        <?php
+        session_start();
+        if (isset($_SESSION['success_message'])) {
+            echo '<p class="success-message">' . $_SESSION['success_message'] . '</p>';
+            unset($_SESSION['success_message']);
+        }
+        ?>
+        <form action="submit_feedback.php" method="post">
+            <label for="feedback_text">Your Feedback:</label>
+            <textarea id="feedback_text" name="feedback_text" required></textarea>
+            <button type="submit" class="submit-button">Submit</button>
+        </form>
+    </div>
+</section>
 
     <footer>
         <div class="footer-content">
@@ -81,7 +88,7 @@
                     <h3>Contact</h3>
                     <ul>
                         <li><a href="contact.html">Contact Us</a></li>
-                        <li><a href="feedback.html">Feedback</a></li>
+                        <li><a href="feedback.php">Feedback</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
