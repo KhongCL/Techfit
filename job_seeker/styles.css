@@ -175,6 +175,11 @@ header {
     margin: 0; /* Remove any default margin */
 }
 
+/* Main content should take all available space except the footer */
+main {
+    flex: 1;
+}
+
 #home h2 {
     font-size: 2em;
     margin-bottom: 20px;
