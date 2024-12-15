@@ -66,10 +66,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $sql = "INSERT INTO Employer (employer_id, user_id, job_position_interested)
                     VALUES ('$employer_id', '$user_id', '$job_positions_interested')";
         }
-
+    
         // Debugging: Print the SQL query for Job_Seeker or Employer
         error_log("SQL Query for Role: " . $sql);
-
+    
         if ($conn->query($sql) === TRUE) {
             header("Location: login.php");
             exit();
@@ -336,7 +336,14 @@ $conn->close();
     </div>
     <div class="container">
         <h2 style="margin-top: -25px;">Register</h2> <!-- Move title up by 25px -->
-        <div id="error-message" class="error-message"></div>
+        <div id="error-message" class="error-message">
+            <?php
+                if (isset($_SESSION['error_message'])) {
+                    echo $_SESSION['error_message'];
+                    unset($_SESSION['error_message']);
+                }
+                ?>
+        </div>
         <form action="register.php" method="post" onsubmit="return validateForm()">
             <div class="form-row">
                 <label for="username">Username:</label>
