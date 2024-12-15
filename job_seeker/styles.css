@@ -9,7 +9,6 @@ body {
     overflow-x: hidden; /* Prevent horizontal overflow */
 }
 
-
 /* Header */
 header {
     display: flex;
@@ -24,7 +23,7 @@ header {
     z-index: 1000;
     box-sizing: border-box; /* Include padding and border in element's total width and height */
 }
-
+    
 .logo img {
     height: 50px;
 }
@@ -57,11 +56,6 @@ header {
     display: block;
 }
 
-/* Hover dropdown for 'Assessment' */
-.nav-list li:hover > .dropdown {
-    display: block;
-}
-
 .nav-list .dropdown {
     display: none;
     position: absolute;
@@ -72,13 +66,32 @@ header {
     padding: 0;
     margin: 0;
     z-index: 10;
-    width: 200px;
-    border: 1px solid #555; /* Add border to dropdown */
+    width: 280px;
+    border: 1px solid #555;
+    transition: background-color 0.3s ease;
 }
 
+.nav-list li:hover > .dropdown {
+    display: block;
+}
+
+#profile-link:hover > .dropdown {
+    left: auto;
+    right: 0;
+}
+
+#profile-dropdown li:hover > .dropdown {
+    left: auto;
+    right: 100%;
+    top: 0;
+    background-color: #555;
+    border: 1px solid #666;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Styling for nested dropdown links */
 .nav-list .dropdown li {
     width: auto;
-    position: relative; /* Ensure relative positioning for nested dropdowns */
 }
 
 .nav-list .dropdown a {
@@ -87,10 +100,24 @@ header {
     color: white;
     text-decoration: none;
     white-space: nowrap;
+    transition: background-color 0.3s ease; /* Smooth hover transition */
+}
+
+.nav-list .dropdown a:hover {
+    background-color: #666;
+}
+
+#profile-dropdown .dropdown a:hover {
+    background-color: #777;
+}
+
+#profile-dropdown li:hover > .dropdown {
+    background: linear-gradient(90deg, #555, #666); /* Gradient effect for nested dropdowns */
 }
 
 .nav-list li:hover > a {
     background-color: #555;
+    transition: background-color 0.3s ease;
 }
 
 /* Hamburger Menu */
@@ -108,8 +135,9 @@ header {
     background-color: white;
 }
 
+
 /* Responsive Design */
-@media (max-width: 600px) {
+@media (max-width: 700px) {
     .nav-list {
         display: none;
         flex-direction: column;
@@ -157,6 +185,7 @@ header {
         right: 20px;
     }
 }
+
 
 /* Global Box-Sizing */
 *, *::before, *::after {
@@ -268,6 +297,11 @@ footer {
 .social-icons img {
     width: 30px;
     height: 30px;
+    transition: transform 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.social-icons img:hover {
+    transform: translateY(-5px); /* Levitating effect */
 }
 
 .footer-right {
