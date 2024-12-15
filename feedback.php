@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechFit - Resources</title>
+    <title>TechFit - Home</title>
     <link rel="stylesheet" href="styles.css?v=2.0">
 </head>
 <body>
@@ -11,33 +11,51 @@
         <div class="logo">
             <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
-        <div class="nav-container">
-            <ul class="nav-list">
-                <li><a href="resources.html">Resources</a></li>
-                <li><a href="about.html">About</a></li>
-                <li><a href="#">Assessment</a>
-                    <ul class="dropdown">
-                        <li><a href="start_assessment.html">Start Assessment</a></li>
-                        <li><a href="assessment_history.html">Start Assessment</a></li>
-                        <li><a href="assessment_summary.html">Assessment Summary</a></li>
-                    </ul>
-                </li>
-            </ul>
         <nav>
-            <!-- <div class="nav-list">
-                <li><a href="profile.html">Profile</a></li>
-            </div> -->
-
-            <div class="nav-list">
-                <li><a href="profile.html"><img src="images/usericon.png" style="width:20px; height:20px; "> Profile</a></li>
+            <div class="nav-container">
+                <ul class="nav-list">
+                    <li><a href="#">Resources</a>
+                        <ul class="dropdown">
+                            <li><a href="useful_links.html">Useful Links</a></li>
+                            <li><a href="faq.html">FAQ</a></li>
+                            <li><a href="sitemap.html">Sitemap</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="profile.html" id="profile-link" style="display:none;">Profile</a>
+                        <ul class="dropdown" id="profile-dropdown" style="display:none;">
+                            <li><a href="settings.html">Settings</a></li>
+                            <li><a href="logout.html">Logout</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="login.php" id="login-link">Login/Register</a></li>
+                </ul>
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
             </div>
         </nav>
-
     </header>
 
-    <section id="home">
-
-    </section>
+    <section id="feedback">
+    <h2>Feedback</h2>
+    <div class="feedback-container">
+        <?php
+        session_start();
+        if (isset($_SESSION['success_message'])) {
+            echo '<p class="success-message">' . $_SESSION['success_message'] . '</p>';
+            unset($_SESSION['success_message']);
+        }
+        ?>
+        <form action="submit_feedback.php" method="post">
+            <label for="feedback_text">Your Feedback:</label>
+            <textarea id="feedback_text" name="feedback_text" required></textarea>
+            <button type="submit" class="submit-button">Submit</button>
+        </form>
+    </div>
+</section>
 
     <footer>
         <div class="footer-content">
@@ -60,7 +78,9 @@
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="resources.html">Resources</a></li>
+                        <li><a href="useful_links.html">Useful Links</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="sitemap.html">Sitemap</a></li>
                         <li><a href="about.html">About</a></li>
                     </ul>
                 </div>
@@ -68,7 +88,7 @@
                     <h3>Contact</h3>
                     <ul>
                         <li><a href="contact.html">Contact Us</a></li>
-                        <li><a href="feedback.html">Feedback</a></li>
+                        <li><a href="feedback.php">Feedback</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">

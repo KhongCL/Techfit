@@ -9,14 +9,6 @@ body {
     overflow-x: hidden; /* Prevent horizontal overflow */
 }
 
-/* Ensure the body and html take full height */
-html, body {
-    height: 100%;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-}
-
 /* Header */
 header {
     display: flex;
@@ -80,12 +72,10 @@ header {
     margin: 0;
     z-index: 10;
     width: 200px;
-    border: 1px solid #555; /* Add border to dropdown */
 }
 
 .nav-list .dropdown li {
     width: auto;
-    position: relative; /* Ensure relative positioning for nested dropdowns */
 }
 
 .nav-list .dropdown a {
@@ -161,7 +151,7 @@ header {
         display: flex;
         position: absolute;
         top: 20px;
-        right: 20px;
+        right:60px;
     }
 }
 
@@ -170,7 +160,7 @@ header {
     box-sizing: border-box;
 }
 
-/* Section Styling */
+/* Home Styling */
 #home {
     flex: 1; /* Allow the section to grow and fill available space */
     display: flex;
@@ -183,11 +173,15 @@ header {
     box-sizing: border-box; /* Include padding and border in element's total width and height */
     position: relative; /* Ensure correct positioning */
     margin: 0; /* Remove any default margin */
-    
 }
 
 /* Main content should take all available space except the footer */
 main {
+    flex: 1;
+}
+
+/* Main content should take all available space except the footer */
+section {
     flex: 1;
 }
 
@@ -252,8 +246,6 @@ footer {
 
 .footer-logo {
     margin-right: 20px;
-    align-items: center;
-    padding-top: 25px;
 }
 
 .footer-logo img {
@@ -283,7 +275,7 @@ footer {
 
 .footer-right {
     display: flex;
-    justify-content: flex-start;
+    justify-content: flex-end;
     width: 100%;
     flex-wrap: wrap; /* Allow wrapping on smaller screens */
     flex: 1 1 70%; /* Take approximately two-thirds of the width */
@@ -332,45 +324,41 @@ footer {
     padding: 0; /* Remove any default padding */
 }
 
-/* Footer Responsive Design */
-@media (max-width: 800px) {
+/* Responsive Design */
+@media (max-width: 1300px) {
     .footer-content {
         flex-direction: column;
         align-items: center;
-        padding: 0;
+        padding:0 0px;
     }
 
     .footer-left {
-        order: 1; /* Ensure footer-left is displayed first */
         width: 100%; /* Ensure it takes full width */
-        text-align: center;
+        text-align: left;
         align-items: center;
         justify-content: center;
-        margin-bottom: 20px; /* Add space below footer-left */
-        padding: 0;
+        padding:0 0px;
+        
     }
 
     .footer-right {
-        order: 2; /* Ensure footer-right is displayed second */
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap; /* Allow wrapping on smaller screens */
-        flex-direction: column;
-        align-items: center;
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Create a 2x2 grid */
+        grid-column: span 2; /* Make footer-right span two columns */
+        gap: 0 20px; /* Add space between grid items */
         width: 100%; /* Ensure it takes full width */
         text-align: center; /* Center align text */
-        padding: 0;
+        padding:0 0px;
     }
 
     .footer-column {
-        margin: 10px 0;
+        margin: 0; /* Remove margin */
         flex: 1 1 100%; /* Take full width on smaller screens */
         text-align: center; /* Center align text on smaller screens */
     }
 }
 
-
-/* Footer Responsive Design */
+/* Responsive Design */
 @media (max-width: 600px) {
     .footer-content {
         flex-direction: column;
@@ -980,8 +968,29 @@ footer {
         max-width: 100%;
         height: auto;
     }
+
 }
 
+.search_candidate{
+    max-width:200px;
+    max-height: 40px;
+    background-color: #666;
+    border: 1px solid #313131; /* Border around the container */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}   
+
+.footer-right {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    flex: 1 1 70%; /* Take approximately two-thirds of the width */
+    text-align: center; /* Center align text */
+    align-items: right;
+    padding:0 0px;
+    
+}
 
 /* Feeback */
 .feedback-container {
