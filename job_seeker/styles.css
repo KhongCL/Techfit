@@ -329,73 +329,72 @@ footer {
     .footer-content {
         flex-direction: column;
         align-items: center;
-        padding:0 0px;
+        padding: 0;
     }
 
     .footer-left {
-        width: 100%; /* Ensure it takes full width */
+        width: 100%;
         text-align: left;
         align-items: center;
         justify-content: center;
-        padding:0 0px;
-        
+        padding: 0;
     }
 
     .footer-right {
         display: grid;
-        grid-template-columns: 1fr 1fr; /* Create a 2x2 grid */
-        grid-column: span 2; /* Make footer-right span two columns */
-        gap: 0 20px; /* Add space between grid items */
-        width: 100%; /* Ensure it takes full width */
-        text-align: center; /* Center align text */
-        padding:0 0px;
+        grid-template-columns: 1fr 1fr;
+        grid-column: span 2;
+        gap: 0 20px;
+        width: 100%;
+        text-align: center;
+        padding: 0;
     }
 
     .footer-column {
-        margin: 0; /* Remove margin */
-        flex: 1 1 100%; /* Take full width on smaller screens */
-        text-align: center; /* Center align text on smaller screens */
+        margin: 0;
+        flex: 1 1 100%;
+        text-align: center;
     }
 }
 
-/* Responsive Design */
 @media (max-width: 600px) {
     .footer-content {
         flex-direction: column;
         align-items: center;
-        padding:0 0px;
+        padding: 0;
     }
 
     .footer-left {
-        order: 1; /* Ensure footer-left is displayed first */
-        width: 100%; /* Ensure it takes full width */
+        order: 1;
+        width: 100%;
         text-align: center;
         align-items: center;
         justify-content: center;
-        margin-bottom: 20px; /* Add space below footer-left */
-        padding:0 0px;
+        margin-bottom: 20px;
+        padding: 0;
     }
 
     .footer-right {
-        order: 2; /* Ensure footer-right is displayed second */
+        order: 2;
         display: flex;
         justify-content: flex-end;
-        flex-wrap: wrap; /* Allow wrapping on smaller screens */
-        flex: 1 1 70%; /* Take approximately two-thirds of the width */
+        flex-wrap: wrap;
+        flex: 1 1 70%;
         flex-direction: column;
         align-items: center;
-        width: 100%; /* Ensure it takes full width */
-        text-align: center; /* Center align text */
-        padding:0 0px;
+        width: 100%;
+        text-align: center;
+        padding: 0;
     }
 
     .footer-column {
         margin: 10px 0;
-        flex: 1 1 100%; /* Take full width on smaller screens */
-        text-align: center; /* Center align text on smaller screens */
+        flex: 1 1 100%;
+        text-align: center;
     }
 }
 
+/* About Us Style */
 #about-us {
     padding-top: 60px;
     padding-left: 20px;
@@ -488,6 +487,31 @@ footer {
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
     margin-top: 30px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #mission,
+    #vision {
+        flex-direction: column;
+    }
+
+    #mission-text,
+    #vision-text,
+    #mission-image,
+    #vision-image {
+        padding: 10px 0;
+    }
+
+    #mission-text,
+    #vision-text {
+        order: 1;
+    }
+
+    #mission-image,
+    #vision-image {
+        order: 2;
+    }
 }
 
 /* Contact Us Style */
