@@ -1023,3 +1023,66 @@ footer {
     font-weight: bold;
     margin-bottom: 20px;
 }
+
+/* Profile */
+
+#profile {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-top: 80px; /* Add space between header and image */
+    margin-bottom: 80px; /* Add space between image and footer */
+}
+.profile-image {
+    margin-right: 50px; /* Space between image and text */
+    margin-left: 50px; /* Space between image and left wall */
+}
+.profile-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.profile-details h2 {
+    margin: 0;
+    margin-bottom: 30px;
+    font-size: 35px; /* Increase font size */
+}
+.profile-details .detail-line {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; /* Space between lines */
+}
+.profile-details .detail-line i {
+    margin-right: 10px; /* Space between icon and text */
+}
+.profile-details .detail-line span {
+    font-size: 20px; /* Font size for the text */
+}
+.profile-details .edit-button {
+    margin-left: 100px; /* Space between text and button */
+    padding: 5px 10px; /* Reduce padding */
+    font-size: 14px; /* Reduce font size */
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: fit-content; /* Reduce horizontal size */
+}
+.profile-details .edit-button:hover {
+    background-color: #0056b3;
+}
+.logout-button {
+    margin-top: 20px; /* Space above the logout button */
+    padding: 10px 20px;
+    font-size: 14px;
+    background-color: #dc3545; /* Red background color */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: fit-content;
+}
+.logout-button:hover {
+    background-color: #c82333;
+}
