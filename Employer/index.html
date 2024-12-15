@@ -3,62 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Start Assessment - TechFit</title>
+    <title>TechFit Employer - Home</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 600px;
-            margin: 20px auto; /* Center the container */
-            text-align: center;
-            flex: 1; /* Allow the container to grow and take available space */
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* Center content vertically */
-        }
-
-        .container h2 {
-            margin-top: 0;
-        }
-
-        .rules {
-            text-align: left;
-            margin-bottom: 20px;
-        }
-
-        .checkbox {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .checkbox input {
-            margin-right: 10px;
-        }
-
-        .start-button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            align-self: flex-end; /* Align the button to the bottom right */
-            margin-top: auto; /* Push the button to the bottom */
-        }
-
-        .start-button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-
-    </style>
 </head>
 <body>
     <header>
@@ -68,13 +14,7 @@
         <nav>
             <div class="nav-container">
                 <ul class="nav-list">
-                    <li><a href="#">Assessment</a>
-                        <ul class="dropdown">
-                            <li><a href="start_assessment.html">Start Assessment</a></li>
-                            <li><a href="assessment_history.html">Assessment History</a></li>
-                            <li><a href="assessment_summary.html">Assessment Summary</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="#">Candidates</a></li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
                             <li><a href="useful_links.html">Useful Links</a></li>
@@ -100,26 +40,10 @@
         </nav>
     </header>
 
-    <div class="container">
-        <h2>Assessment</h2>
-        <div class="rules">
-            <h3>Rules and Regulations</h3>
-            <p>Please read the following rules and regulations carefully before starting the assessment:</p>
-            <ul>
-                <li>Ensure you have a stable internet connection.</li>
-                <li>Do not refresh the page during the assessment.</li>
-                <li>Answer all questions to the best of your ability.</li>
-                <li>Do not use any external resources or assistance.</li>
-                <li>Complete the assessment within the given time frame.</li>
-            </ul>
-        </div>
-        <div class="checkbox">
-            <input type="checkbox" id="agree" name="agree">
-            <label for="agree">I have read and understood the rules and regulations.</label>
-        </div>
-        <button class="start-button" id="startButton" disabled>Start Assessment</button>
-    </div>
-
+    <main>
+        <h1>Welcome Employer!</h1>
+        <p>Building Better Workplaces Together</p>
+    </main>
     <footer>
         <div class="footer-content">
             <div class="footer-left">
@@ -139,11 +63,9 @@
             </div>
             <div class="footer-right">
                 <div class="footer-column">
-                    <h3>Assessment</h3>
+                    <h3>Candidate</h3>
                     <ul>
-                        <li><a href="start_assessment.html">Start Assessment</a></li>
-                        <li><a href="assessment_history.html">Assessment History</a></li>
-                        <li><a href="assessment_summary.html">Assessment Summary</a></li>
+                        <li><a href="candidates.html">Candidates</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -175,19 +97,6 @@
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
-
-
-    <script>
-        const checkbox = document.getElementById('agree');
-        const startButton = document.getElementById('startButton');
-
-        checkbox.addEventListener('change', function() {
-            startButton.disabled = !this.checked;
-        });
-
-        startButton.addEventListener('click', function() {
-            window.location.href = 'preliminary_questions.html';
-        });
-    </script>
+    <script src="scripts.js"></script>
 </body>
 </html>

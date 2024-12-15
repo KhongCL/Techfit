@@ -1,64 +1,12 @@
+<!-- // php code missing here // -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Start Assessment - TechFit</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 600px;
-            margin: 20px auto; /* Center the container */
-            text-align: center;
-            flex: 1; /* Allow the container to grow and take available space */
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* Center content vertically */
-        }
-
-        .container h2 {
-            margin-top: 0;
-        }
-
-        .rules {
-            text-align: left;
-            margin-bottom: 20px;
-        }
-
-        .checkbox {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .checkbox input {
-            margin-right: 10px;
-        }
-
-        .start-button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            align-self: flex-end; /* Align the button to the bottom right */
-            margin-top: auto; /* Push the button to the bottom */
-        }
-
-        .start-button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-
-    </style>
+    <title>TechFit - Profile</title>
+    <link rel="stylesheet" href="styles.css?v=2.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <header>
@@ -83,13 +31,12 @@
                         </ul>
                     </li>
                     <li><a href="about.html">About</a></li>
-                    <li><a href="profile.html" id="profile-link">Profile</a>
+                    <li><a href="profile.php" id="profile-link">Profile</a>
                         <ul class="dropdown" id="profile-dropdown">
-                            <li><a href="settings.html">Settings</a></li>
-                            <li><a href="logout.html">Logout</a></li>
-                        </ul>
+                            <li><a href="profile.php">Settings</a></li>
+                            <li><a href="logout.php">Logout</a></li>
+                        </ul>   
                     </li>
-                    
                 </ul>
                 <div class="hamburger" id="hamburger">
                     <span></span>
@@ -100,25 +47,35 @@
         </nav>
     </header>
 
-    <div class="container">
-        <h2>Assessment</h2>
-        <div class="rules">
-            <h3>Rules and Regulations</h3>
-            <p>Please read the following rules and regulations carefully before starting the assessment:</p>
-            <ul>
-                <li>Ensure you have a stable internet connection.</li>
-                <li>Do not refresh the page during the assessment.</li>
-                <li>Answer all questions to the best of your ability.</li>
-                <li>Do not use any external resources or assistance.</li>
-                <li>Complete the assessment within the given time frame.</li>
-            </ul>
-        </div>
-        <div class="checkbox">
-            <input type="checkbox" id="agree" name="agree">
-            <label for="agree">I have read and understood the rules and regulations.</label>
-        </div>
-        <button class="start-button" id="startButton" disabled>Start Assessment</button>
-    </div>
+    <main>
+        <section id="profile">
+            <img src="images/testprofile.png" alt="Your Profile" class="profile-image" />
+            <div class="profile-details">
+                <h2>Edit Profile</h2>
+                <div class="detail-line">
+                    <i class="fas fa-user"></i>
+                    <span><?php echo htmlspecialchars($username); ?></span>
+                    <button class="edit-button"><i class="fas fa-edit"></i> Edit</button>
+                </div>
+                <div class="detail-line">
+                    <i class="fas fa-envelope"></i>
+                    <span><?php echo htmlspecialchars($email); ?></span>
+                    <button class="edit-button"><i class="fas fa-edit"></i> Edit</button>
+                </div>
+                <div class="detail-line">
+                    <i class="fas fa-phone"></i>
+                    <span>Phone Number</span>
+                    <button class="edit-button"><i class="fas fa-edit"></i> Edit</button>
+                </div>
+                <div class="detail-line">
+                    <i class="fas fa-lock"></i>
+                    <span>Password</span>
+                    <button class="edit-button"><i class="fas fa-edit"></i> Edit</button>
+                </div>
+                <button class="logout-button" onclick="window.location.href='logout.php'">Logout</button>
+            </div>
+        </section>
+    </main>
 
     <footer>
         <div class="footer-content">
@@ -149,9 +106,7 @@
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.html">Useful Links</a></li>
-                        <li><a href="faq.html">FAQ</a></li>
-                        <li><a href="sitemap.html">Sitemap</a></li>
+                        <li><a href="resources.html">Resources</a></li>
                         <li><a href="about.html">About</a></li>
                     </ul>
                 </div>
@@ -159,7 +114,7 @@
                     <h3>Contact</h3>
                     <ul>
                         <li><a href="contact.html">Contact Us</a></li>
-                        <li><a href="feedback.php">Feedback</a></li>
+                        <li><a href="feedback.html">Feedback</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -176,18 +131,6 @@
         </div>
     </footer>
 
-
-    <script>
-        const checkbox = document.getElementById('agree');
-        const startButton = document.getElementById('startButton');
-
-        checkbox.addEventListener('change', function() {
-            startButton.disabled = !this.checked;
-        });
-
-        startButton.addEventListener('click', function() {
-            window.location.href = 'preliminary_questions.html';
-        });
-    </script>
+    <script src="scripts.js?v=1.0"></script>
 </body>
 </html>

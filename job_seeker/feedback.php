@@ -3,65 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Start Assessment - TechFit</title>
-    <link rel="stylesheet" href="styles.css">
-    <style>
-
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 90%;
-            max-width: 600px;
-            margin: 20px auto; /* Center the container */
-            text-align: center;
-            flex: 1; /* Allow the container to grow and take available space */
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* Center content vertically */
-        }
-
-        .container h2 {
-            margin-top: 0;
-        }
-
-        .rules {
-            text-align: left;
-            margin-bottom: 20px;
-        }
-
-        .checkbox {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .checkbox input {
-            margin-right: 10px;
-        }
-
-        .start-button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            align-self: flex-end; /* Align the button to the bottom right */
-            margin-top: auto; /* Push the button to the bottom */
-        }
-
-        .start-button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-
-    </style>
+    <title>TechFit - Home</title>
+    <link rel="stylesheet" href="styles.css?v=2.0">
 </head>
 <body>
-    <header>
+<header>
         <div class="logo">
             <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
@@ -100,27 +46,25 @@
         </nav>
     </header>
 
-    <div class="container">
-        <h2>Assessment</h2>
-        <div class="rules">
-            <h3>Rules and Regulations</h3>
-            <p>Please read the following rules and regulations carefully before starting the assessment:</p>
-            <ul>
-                <li>Ensure you have a stable internet connection.</li>
-                <li>Do not refresh the page during the assessment.</li>
-                <li>Answer all questions to the best of your ability.</li>
-                <li>Do not use any external resources or assistance.</li>
-                <li>Complete the assessment within the given time frame.</li>
-            </ul>
-        </div>
-        <div class="checkbox">
-            <input type="checkbox" id="agree" name="agree">
-            <label for="agree">I have read and understood the rules and regulations.</label>
-        </div>
-        <button class="start-button" id="startButton" disabled>Start Assessment</button>
+    <section id="feedback">
+    <h2>Feedback</h2>
+    <div class="feedback-container">
+        <?php
+        session_start();
+        if (isset($_SESSION['success_message'])) {
+            echo '<p class="success-message">' . $_SESSION['success_message'] . '</p>';
+            unset($_SESSION['success_message']);
+        }
+        ?>
+        <form action="submit_feedback.php" method="post">
+            <label for="feedback_text">Your Feedback:</label>
+            <textarea id="feedback_text" name="feedback_text" required></textarea>
+            <button type="submit" class="submit-button">Submit</button>
+        </form>
     </div>
+</section>
 
-    <footer>
+<footer>
         <div class="footer-content">
             <div class="footer-left">
                 <div class="footer-logo">
@@ -176,18 +120,6 @@
         </div>
     </footer>
 
-
-    <script>
-        const checkbox = document.getElementById('agree');
-        const startButton = document.getElementById('startButton');
-
-        checkbox.addEventListener('change', function() {
-            startButton.disabled = !this.checked;
-        });
-
-        startButton.addEventListener('click', function() {
-            window.location.href = 'preliminary_questions.html';
-        });
-    </script>
+    <script src="scripts.js?v=1.0"></script>
 </body>
 </html>
