@@ -27,6 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Start session and set session variables
             $_SESSION['user_id'] = $row['user_id'];
             $_SESSION['username'] = $row['username'];
+            $_SESSION['email'] = $row['email']; // Add email to session
             $_SESSION['role'] = $row['role'];
 
             // Redirect based on role
@@ -132,10 +133,7 @@ $conn->close();
         }
         a:hover {
             text-decoration: underline;
-
-        
         }
-        
     </style>
 </head>
 <body>
