@@ -118,50 +118,29 @@
     </script>
 </head>
 <body>
-    <header>
+<header>
         <div class="logo">
             <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
         <nav>
             <div class="nav-container">
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
                 <ul class="nav-list">
                     <li><a href="#">Assessments</a>
                         <ul class="dropdown">
-                            <li><a href="#">Manage Assessments</a>
-                                <ul class="dropdown">
-                                    <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                                    <li><a href="create_assessment.html">Create New Assessment</a></li>
-                                    <li><a href="edit_assessment.html">Edit Existing Assessments</a></li>
-                                    <li><a href="delete_assessment.html">Delete Assessments</a></li>
-                                    <li><a href="view_assessment_results.html">View Assessment Results</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="#">Manage Questions</a>
-                                <ul class="dropdown">
-                                    <li><a href="manage_questions.html">Manage Questions</a></li>
-                                    <li><a href="add_question.html">Add New Question</a></li>
-                                    <li><a href="edit_question.html">Edit Existing Questions</a></li>
-                                    <li><a href="delete_question.html">Delete Questions</a></li>
-                                </ul>
-                            </li>
+                            <li><a href="create_assessment.html">Create New Assessment</a></li>
+                            <li><a href="edit_assessment.html">Edit/Delete Existing Assessments</a></li>
+                            <li><a href="view_assessment_results.html">View Assessment Results</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Users</a>
                         <ul class="dropdown">
-                            <li><a href="#">Manage Users</a>
-                                <ul class="dropdown">
-                                    <li><a href="manage_users.html">Manage Users</a></li>
-                                    <li><a href="view_all_users.html">View All Users</a></li>
-                                    <li><a href="edit_user_profile.html">Edit User Profiles</a></li>
-                                    <li><a href="delete_user_account.html">Delete User Accounts</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="#">User Feedback</a>
-                                <ul class="dropdown">
-                                    <li><a href="user_feedback.html">User Feedback</a></li>
-                                    <li><a href="manage_feedback.html">Manage Feedback</a></li>
-                                </ul>
-                            </li>
+                            <li><a href="manage_users.html">Manage Users</a></li>
+                            <li><a href="user_feedback.html">User Feedback</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Reports</a>
@@ -173,26 +152,32 @@
                     </li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
-                            <li><a href="add_resource.html">Add New Resource</a></li>
-                            <li><a href="edit_resource.html">Edit Existing Resources</a></li>
+                            <li><a href="add_resource.html">Add New Resources</a></li>
+                            <li><a href="edit_resource.html">Edit/Delete Existing Resources</a></li>
                         </ul>
                     </li>
                     <li><a href="about.html">About</a></li>
-                    <li><a href="profile.html" id="profile-link">Profile</a>
+                    <li>
+                        <a href="#" id="profile-link">
+                            <div class="profile-info">
+                                <span class="username" id="username">Admin</span>
+                                <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
+                            </div>
+                        </a>
                         <ul class="dropdown" id="profile-dropdown">
-                            <li><a href="settings.html">Settings</a></li>
+                            <li><a href="settings.html">Settings</a>
+                                <ul class="dropdown">
+                                    <li><a href="manage_profile.html">Manage Profile</a></li>
+                                    <li><a href="system_configuration.html">System Configuration Settings</a></li>
+                                </ul>
+                            </li>
                             <li><a href="logout.html">Logout</a></li>
                         </ul>
-                    </li>
+                    </li>                    
                 </ul>
-                <div class="hamburger" id="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
             </div>
         </nav>
-    </header>
+    </header> 
     <main>
         <h1>Create Questions for Assessment</h1>
         <p>Assessment ID: <strong><?php echo htmlspecialchars($_GET['assessment_id']); ?></strong></p>

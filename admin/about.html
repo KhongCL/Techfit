@@ -13,44 +13,23 @@
         </div>
         <nav>
             <div class="nav-container">
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
                 <ul class="nav-list">
                     <li><a href="#">Assessments</a>
                         <ul class="dropdown">
-                            <li><a href="#">Manage Assessments</a>
-                                <ul class="dropdown">
-                                    <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                                    <li><a href="create_assessment.html">Create New Assessment</a></li>
-                                    <li><a href="edit_assessment.html">Edit Existing Assessments</a></li>
-                                    <li><a href="delete_assessment.html">Delete Assessments</a></li>
-                                    <li><a href="view_assessment_results.html">View Assessment Results</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="#">Manage Questions</a>
-                                <ul class="dropdown">
-                                    <li><a href="manage_questions.html">Manage Questions</a></li>
-                                    <li><a href="add_question.html">Add New Question</a></li>
-                                    <li><a href="edit_question.html">Edit Existing Questions</a></li>
-                                    <li><a href="delete_question.html">Delete Questions</a></li>
-                                </ul>
-                            </li>
+                            <li><a href="create_assessment.html">Create New Assessment</a></li>
+                            <li><a href="edit_assessment.html">Edit/Delete Existing Assessments</a></li>
+                            <li><a href="view_assessment_results.html">View Assessment Results</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Users</a>
                         <ul class="dropdown">
-                            <li><a href="#">Manage Users</a>
-                                <ul class="dropdown">
-                                    <li><a href="manage_users.html">Manage Users</a></li>
-                                    <li><a href="view_all_users.html">View All Users</a></li>
-                                    <li><a href="edit_user_profile.html">Edit User Profiles</a></li>
-                                    <li><a href="delete_user_account.html">Delete User Accounts</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="#">User Feedback</a>
-                                <ul class="dropdown">
-                                    <li><a href="user_feedback.html">User Feedback</a></li>
-                                    <li><a href="manage_feedback.html">Manage Feedback</a></li>
-                                </ul>
-                            </li>
+                            <li><a href="manage_users.html">Manage Users</a></li>
+                            <li><a href="user_feedback.html">User Feedback</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Reports</a>
@@ -62,26 +41,32 @@
                     </li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
-                            <li><a href="add_resource.html">Add New Resource</a></li>
-                            <li><a href="edit_resource.html">Edit Existing Resources</a></li>
+                            <li><a href="add_resource.html">Add New Resources</a></li>
+                            <li><a href="edit_resource.html">Edit/Delete Existing Resources</a></li>
                         </ul>
                     </li>
                     <li><a href="about.html">About</a></li>
-                    <li><a href="profile.html" id="profile-link">Profile</a>
+                    <li>
+                        <a href="#" id="profile-link">
+                            <div class="profile-info">
+                                <span class="username" id="username">Admin</span>
+                                <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
+                            </div>
+                        </a>
                         <ul class="dropdown" id="profile-dropdown">
-                            <li><a href="settings.html">Settings</a></li>
+                            <li><a href="settings.html">Settings</a>
+                                <ul class="dropdown">
+                                    <li><a href="manage_profile.html">Manage Profile</a></li>
+                                    <li><a href="system_configuration.html">System Configuration Settings</a></li>
+                                </ul>
+                            </li>
                             <li><a href="logout.html">Logout</a></li>
                         </ul>
-                    </li>
+                    </li>                    
                 </ul>
-                <div class="hamburger" id="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
             </div>
         </nav>
-    </header>
+    </header> 
 
     <section id="about-us">
         <div class="container">
@@ -91,7 +76,7 @@
             <div id="mission" class="about-block">
                 <div id="mission-text" class="text-left">
                     <h3>Our Mission</h3>
-                    <p>We are committed to helping job seekers achieve their goals by offering effective, skill-assessing tools that match them with the right opportunities.</p>
+                    <p>To help job seekers achieve their goals by offering effective, skill-assessing tools that match them with the right employers.</p>
                 </div>
                 <div id="mission-image" class="image-right">
                     <img src="https://picsum.photos/500/300?random=1" alt="Our Mission in Action">
@@ -105,7 +90,7 @@
                 </div>
                 <div id="vision-text" class="text-right">
                     <h3>Our Vision</h3>
-                    <p>Our vision is to revolutionize the way people interact with technology, creating a future where innovation and sustainability go hand in hand. We aim to lead the way in providing cutting-edge solutions that empower businesses and individuals alike.</p>
+                    <p>To make job searching and hiring easy and effective for everyone, making meaningful connections that benefit both job seekers and employers.</p>
                 </div>
             </div>
     
@@ -123,10 +108,6 @@
                 <div class="value-item">
                     <img src="https://picsum.photos/300/300?random=3" alt="Collaboration">
                     <p>Collaboration</p>
-                </div>
-                <div class="value-item">
-                    <img src="https://picsum.photos/300/300?random=4" alt="Excellence">
-                    <p>Excellence</p>
                 </div>
             </div>
         </div>
@@ -193,5 +174,6 @@
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
+    <script src="scripts.js"></script>
 </body>
 </html>

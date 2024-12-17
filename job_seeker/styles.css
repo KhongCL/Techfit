@@ -9,6 +9,7 @@ body {
     overflow-x: hidden; /* Prevent horizontal overflow */
 }
 
+
 /* Header */
 header {
     display: flex;
@@ -64,10 +65,9 @@ header {
     background-color: #444;
     list-style: none;
     padding: 0;
-    margin: 0;
+    transform: translateY(-6px);
     z-index: 10;
     width: 280px;
-    border: 1px solid #555;
     transition: background-color 0.3s ease;
 }
 
@@ -89,6 +89,26 @@ header {
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
 }
 
+.profile-info {
+    display: flex;
+    align-items: center;
+    margin-top: -5px; /* Move the entire profile-info block up */
+}
+
+.profile-image {
+    display: inline-block;
+    margin-left: 10px; /* Adjust the space between the username and the image */
+    width: 30px; /* Set the size of the profile image */
+    height: 30px; /* Ensure the image is square */
+    border-radius: 50%;
+}
+
+.username {
+    display: inline-block;
+    color: white; /* Username color */
+    font-size: 16px;
+}
+
 /* Styling for nested dropdown links */
 .nav-list .dropdown li {
     width: auto;
@@ -101,6 +121,12 @@ header {
     text-decoration: none;
     white-space: nowrap;
     transition: background-color 0.3s ease; /* Smooth hover transition */
+    transition: padding-left 0.6s ease;
+}
+
+.nav-list .dropdown a:hover {
+    background-color: #666;
+    padding-left: 20px; 
 }
 
 .nav-list .dropdown a:hover {
@@ -112,7 +138,8 @@ header {
 }
 
 #profile-dropdown li:hover > .dropdown {
-    background: linear-gradient(90deg, #555, #666); /* Gradient effect for nested dropdowns */
+    background: linear-gradient(90deg, #555, #666);
+    transform: translateY(-1px);
 }
 
 .nav-list li:hover > a {
@@ -133,26 +160,50 @@ header {
     width: 25px;
     height: 3px;
     background-color: white;
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
+/* Sidebar and Hamburger Animation */
+.nav-list.active {
+    transform: translateX(0);
+}
 
-/* Responsive Design */
-@media (max-width: 700px) {
-    .nav-list {
-        display: none;
-        flex-direction: column;
-        align-items: flex-start;
-        position: absolute;
-        top: 60px;
-        right: 0;
-        background-color: #333;
-        width: 100%;
-        z-index: 1000;
-        padding: 10px 0;
+.hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(6px, 6px);
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+        position: fixed;
+        top: 20px;
+        right: 20px;
     }
 
-    .nav-list.active {
+    .nav-list {
         display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100%;
+        background-color: #333;
+        width: 350px; /* Increased width */
+        z-index: 1000;
+        padding: 60px 20px;
+        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+        justify-content: flex-start;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
     }
 
     .nav-list li {
@@ -175,14 +226,28 @@ header {
     }
 
     .nav-list .dropdown a {
-        padding: 10px 20px;
+        padding: 10px 15px;
+        display: block;
+        color: white;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background-color 0.3s ease; /* Smooth hover transition */
+        transition: padding-left 0.6s ease;
     }
-
-    .hamburger {
-        display: flex;
-        position: absolute;
-        top: 20px;
-        right: 20px;
+    
+    .nav-list .dropdown a:hover {
+        background-color: #666;
+        padding-left: 20px; 
+        
+    }
+    .profile-image {
+        display: none;
+    }
+    
+    /* Show the username instead of the profile image */
+    .username {
+        display: inline-block;
+        font-size: 16px;
     }
 }
 
@@ -277,6 +342,11 @@ footer {
 .footer-logo img {
     height: 50px;
     margin-left: 0;
+    transition: transform 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.footer-logo img:hover {
+    transform: translateY(-5px); /* Levitating effect */
 }
 
 .social-media {
@@ -355,7 +425,7 @@ footer {
 }
 
 /* Responsive Design */
-@media (max-width: 1080px) {
+@media (max-width: 1103px) {
     .footer-content {
         flex-direction: column;
         align-items: center;
@@ -503,13 +573,14 @@ footer {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 10px;
 }
 
 .value-item {
     text-align: center;
     flex: 1;
     min-width: 200px;
+    max-width: 200px;
 }
 
 .value-item p {
@@ -1010,7 +1081,6 @@ footer {
     align-items: center;
     width: 30px;
     height: 30px;
-    background-color: #e1e1e1;
 }
 
 /* FAQ Answer Closed */
@@ -1131,36 +1201,58 @@ footer {
     }
 }
 
-
-/* Feeback */
-.feedback-container {
+/* Feedback*/
+#feedback-section {
+    width: 100%;
+    max-width: 1200px;
+    margin: 10px auto;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: 20px;
-    box-sizing: border-box;
 }
 
-.feedback-container form {
+#feedback-title {
+    font-size: 2rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#feedback-container {
     width: 100%;
     max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.feedback-form {
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
 }
 
-.feedback-container label {
+#feedback-group {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+#feedback-label {
     margin-bottom: 10px;
     font-weight: bold;
 }
 
-.feedback-container textarea {
+#feedback_text {
     width: 100%;
     height: 150px;
     padding: 10px;
-    margin-bottom: 20px;
     border: 1px solid #ccc;
     border-radius: 5px;
     resize: vertical;
@@ -1174,6 +1266,7 @@ footer {
     background-color: #007bff;
     color: #fff;
     cursor: pointer;
+    font-size: 1rem;
 }
 
 .submit-button:hover {

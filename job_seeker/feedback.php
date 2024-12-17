@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechFit - Home</title>
+    <title>Feedback - TechFit</title>
     <link rel="stylesheet" href="styles.css?v=2.0">
 </head>
 <body>
@@ -29,13 +29,18 @@
                         </ul>
                     </li>
                     <li><a href="about.html">About</a></li>
-                    <li><a href="profile.html" id="profile-link">Profile</a>
+                    <li>
+                        <a href="#" id="profile-link">
+                            <div class="profile-info">
+                                <span class="username" id="username">Job Seeker</span>
+                                <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
+                            </div>
+                        </a>
                         <ul class="dropdown" id="profile-dropdown">
-                            <li><a href="settings.html">Settings</a></li>
-                            <li><a href="logout.html">Logout</a></li>
+                            <li><a href="profile.php">Settings</a></li>
+                            <li><a href="logout.php">Logout</a></li>
                         </ul>
                     </li>
-                    
                 </ul>
                 <div class="hamburger" id="hamburger">
                     <span></span>
@@ -46,25 +51,27 @@
         </nav>
     </header>
 
-    <section id="feedback">
-    <h2>Feedback</h2>
-    <div class="feedback-container">
-        <?php
-        session_start();
-        if (isset($_SESSION['success_message'])) {
-            echo '<p class="success-message">' . $_SESSION['success_message'] . '</p>';
-            unset($_SESSION['success_message']);
-        }
-        ?>
-        <form action="submit_feedback.php" method="post">
-            <label for="feedback_text">Your Feedback:</label>
-            <textarea id="feedback_text" name="feedback_text" required></textarea>
-            <button type="submit" class="submit-button">Submit</button>
-        </form>
-    </div>
-</section>
+    <section id="feedback-section" class="form-section">
+        <h2 id="feedback-title">Feedback</h2>
+        <div id="feedback-container" class="feedback-container">
+            <?php
+            session_start();
+            if (isset($_SESSION['success_message'])) {
+                echo '<p class="success-message">' . $_SESSION['success_message'] . '</p>';
+                unset($_SESSION['success_message']);
+            }
+            ?>
+            <form action="submit_feedback.php" method="post" id="feedback-form" class="feedback-form">
+                <div id="feedback-group" class="form-group">
+                    <label for="feedback_text" id="feedback-label">Your Feedback:</label>
+                    <textarea id="feedback_text" name="feedback_text" required></textarea>
+                </div>
+                <button type="submit" id="feedback-submit" class="submit-button">Submit</button>
+            </form>
+        </div>
+    </section>
 
-<footer>
+    <footer>
         <div class="footer-content">
             <div class="footer-left">
                 <div class="footer-logo">
@@ -82,14 +89,6 @@
                 </div>
             </div>
             <div class="footer-right">
-                <div class="footer-column">
-                    <h3>Assessment</h3>
-                    <ul>
-                        <li><a href="start_assessment.html">Start Assessment</a></li>
-                        <li><a href="assessment_history.html">Assessment History</a></li>
-                        <li><a href="assessment_summary.html">Assessment Summary</a></li>
-                    </ul>
-                </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>

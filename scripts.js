@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const hamburger = document.getElementById('hamburger');
     const navList = document.querySelector('.nav-list');
     const assessmentLink = document.querySelector('li > a[href="#"]'); // The "Assessment" link
-    
+
     // Handle dropdown menu
     navItems.forEach(item => {
         item.addEventListener('click', function(event) {
@@ -40,7 +40,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Handle hamburger menu toggle
     hamburger.addEventListener('click', function() {
+        hamburger.classList.toggle('active');
         navList.classList.toggle('active');
+    });
+
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 900) {
+            hamburger.classList.remove("active");
+            navList.classList.remove("active");
+        }
     });
 });
 
@@ -62,3 +70,4 @@ document.querySelectorAll('.faq-question').forEach(item => {
         }
     });
 });
+

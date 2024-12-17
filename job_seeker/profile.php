@@ -83,33 +83,39 @@ $email = $_SESSION['email'];
     </style>
 </head>
 <body>
-    <header>
+<header>
         <div class="logo">
-            <a href="/Techfit/Techfit/index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+            <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
         <nav>
             <div class="nav-container">
                 <ul class="nav-list">
                     <li><a href="#">Assessment</a>
                         <ul class="dropdown">
-                            <li><a href="/Techfit/Techfit/start_assessment.html">Start Assessment</a></li>
-                            <li><a href="/Techfit/Techfit/assessment_history.html">Assessment History</a></li>
-                            <li><a href="/Techfit/Techfit/assessment_summary.html">Assessment Summary</a></li>
+                            <li><a href="start_assessment.html">Start Assessment</a></li>
+                            <li><a href="assessment_history.html">Assessment History</a></li>
+                            <li><a href="assessment_summary.html">Assessment Summary</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
-                            <li><a href="/Techfit/Techfit/useful_links.html">Useful Links</a></li>
-                            <li><a href="/Techfit/Techfit/faq.html">FAQ</a></li>
-                            <li><a href="/Techfit/Techfit/sitemap.html">Sitemap</a></li>
+                            <li><a href="useful_links.html">Useful Links</a></li>
+                            <li><a href="faq.html">FAQ</a></li>
+                            <li><a href="sitemap.html">Sitemap</a></li>
                         </ul>
                     </li>
-                    <li><a href="/Techfit/Techfit/about.html">About</a></li>
-                    <li><a href="/Techfit/Techfit/job_seeker/profile.php" id="profile-link">Profile</a>
+                    <li><a href="about.html">About</a></li>
+                    <li>
+                        <a href="#" id="profile-link">
+                            <div class="profile-info">
+                                <span class="username" id="username">Job Seeker</span>
+                                <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
+                            </div>
+                        </a>
                         <ul class="dropdown" id="profile-dropdown">
-                            <li><a href="/Techfit/Techfit/job_seeker/profile.php">Settings</a></li>
-                            <li><a href="/Techfit/Techfit/logout.php">Logout</a></li>
-                        </ul>   
+                            <li><a href="profile.php">Settings</a></li>
+                            <li><a href="logout.php">Logout</a></li>
+                        </ul>
                     </li>
                 </ul>
                 <div class="hamburger" id="hamburger">

@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const hamburger = document.getElementById('hamburger');
     const navList = document.querySelector('.nav-list');
     const assessmentLink = document.querySelector('li > a[href="#"]'); // The "Assessment" link
-    
+
     // Handle dropdown menu
     navItems.forEach(item => {
         item.addEventListener('click', function(event) {
@@ -40,6 +40,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Handle hamburger menu toggle
     hamburger.addEventListener('click', function() {
+        hamburger.classList.toggle('active');
         navList.classList.toggle('active');
+    });
+
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 1080) {
+            hamburger.classList.remove("active");
+            navList.classList.remove("active");
+        }
+    });
+});
+
+// FAQ dropdown functionality
+document.querySelectorAll('.faq-question').forEach(item => {
+    item.addEventListener('click', () => {
+        const faqItem = item.closest('.faq-item'); // Get the parent .faq-item
+        const answer = faqItem.querySelector('.faq-answer'); // Find the answer
+        const arrow = faqItem.querySelector('.dropdown-arrow'); // Get the arrow
+
+        // Toggle the 'open' class on the .faq-item to show/hide the answer
+        faqItem.classList.toggle('open');
+
+        // Rotate the arrow based on whether the item is open
+        if (faqItem.classList.contains('open')) {
+            arrow.style.transform = 'rotate(180deg)'; // Rotate when open
+        } else {
+            arrow.style.transform = 'rotate(0deg)'; // Rotate back when closed
+        }
     });
 });

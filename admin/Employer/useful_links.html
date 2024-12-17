@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us - TechFit</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Useful Links - TechFit</title>
+    <link rel="stylesheet" href="styles.css?v=2.0">
 </head>
 <body>
     <header>
@@ -14,6 +14,7 @@
         <nav>
             <div class="nav-container">
                 <ul class="nav-list">
+                    <li><a href="#">Candidates</a></li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
                             <li><a href="useful_links.html">Useful Links</a></li>
@@ -22,13 +23,18 @@
                         </ul>
                     </li>
                     <li><a href="about.html">About</a></li>
-                    <li><a href="profile.html" id="profile-link" style="display:none;">Profile</a>
-                        <ul class="dropdown" id="profile-dropdown" style="display:none;">
-                            <li><a href="settings.html">Settings</a></li>
-                            <li><a href="logout.html">Logout</a></li>
+                    <li>
+                        <a href="#" id="profile-link">
+                            <div class="profile-info">
+                                <span class="username" id="username">Employer</span>
+                                <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
+                            </div>
+                        </a>
+                        <ul class="dropdown" id="profile-dropdown">
+                            <li><a href="profile.php">Settings</a></li>
+                            <li><a href="logout.php">Logout</a></li>
                         </ul>
-                    </li>
-                    <li><a href="login.php" id="login-link">Login/Register</a></li>
+                    </li> 
                 </ul>
                 <div class="hamburger" id="hamburger">
                     <span></span>
@@ -39,47 +45,31 @@
         </nav>
     </header>
 
-    <section id="about-us">
-        <div class="container">
-            <h2>About Us</h2>
+    <section id="resources">
+        <h2>Useful Links</h2>
+        <p>Here are some useful links to help you get started on your career in IT:</p>
     
-            <!-- Mission Section -->
-            <div id="mission" class="about-block">
-                <div id="mission-text" class="text-left">
-                    <h3>Our Mission</h3>
-                    <p>To help job seekers achieve their goals by offering effective, skill-assessing tools that match them with the right employers.</p>
-                </div>
-                <div id="mission-image" class="image-right">
-                    <img src="https://picsum.photos/500/300?random=1" alt="Our Mission in Action">
-                </div>
+        <div class="resource-columns">
+            <div class="resource-column">
+                <h3>For Job Seekers</h3>
+                <ul>
+                    <li><a href="https://www.upwork.com/">Upwork</a></li>
+                    <li><a href="https://www.linkedin.com/">LinkedIn</a></li>
+                    <li><a href="https://www.foundit.my/">foundit</a></li>
+                    <li><a href="https://malaysia.indeed.com/">Indeed</a></li>
+                    <li><a href="https://www.flexjobs.com/">FlexJobs</a></li>
+                </ul>
             </div>
     
-            <!-- Vision Section -->
-            <div id="vision" class="about-block">
-                <div id="vision-image" class="image-left">
-                    <img src="https://picsum.photos/1600/900?random=2" alt="Vision Image">
-                </div>
-                <div id="vision-text" class="text-right">
-                    <h3>Our Vision</h3>
-                    <p>To make job searching and hiring easy and effective for everyone, making meaningful connections that benefit both job seekers and employers.</p>
-                </div>
-            </div>
-    
-            <!-- Values Section -->
-            <h3 id="values-title">Our Values</h3>
-            <div id="values-gallery" class="values-gallery">
-                <div class="value-item">
-                    <img src="https://picsum.photos/300/300?random=1" alt="Innovation">
-                    <p>Innovation</p>
-                </div>
-                <div class="value-item">
-                    <img src="https://picsum.photos/300/300?random=2" alt="Integrity">
-                    <p>Integrity</p>
-                </div>
-                <div class="value-item">
-                    <img src="https://picsum.photos/300/300?random=3" alt="Collaboration">
-                    <p>Collaboration</p>
-                </div>
+            <div class="resource-column">
+                <h3>For Employers</h3>
+                <ul>
+                    <li><a href="https://www.hired.com/">Hired</a></li>
+                    <li><a href="https://www.workable.com/">Workable</a></li>
+                    <li><a href="https://www.greenhouse.io/">Greenhouse</a></li>
+                    <li><a href="https://www.wayup.com/">WayUp</a></li>
+                    <li><a href="https://www.techcareers.com/">TechCareers</a></li>
+                </ul>
             </div>
         </div>
     </section>
@@ -102,6 +92,12 @@
                 </div>
             </div>
             <div class="footer-right">
+                <div class="footer-column">
+                    <h3>Candidate</h3>
+                    <ul>
+                        <li><a href="candidates.html">Candidates</a></li>
+                    </ul>
+                </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
@@ -130,6 +126,7 @@
         <div class="footer-bottom">
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
-    </footer>   
+    </footer>
+    <script src="scripts.js"></script>
 </body>
 </html>

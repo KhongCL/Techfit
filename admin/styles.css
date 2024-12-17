@@ -65,10 +65,9 @@ header {
     background-color: #444;
     list-style: none;
     padding: 0;
-    margin: 0;
+    transform: translateY(-6px);
     z-index: 10;
     width: 280px;
-    border: 1px solid #555;
     transition: background-color 0.3s ease;
 }
 
@@ -90,6 +89,26 @@ header {
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
 }
 
+.profile-info {
+    display: flex;
+    align-items: center;
+    margin-top: -5px; /* Move the entire profile-info block up */
+}
+
+.profile-image {
+    display: inline-block;
+    margin-left: 10px; /* Adjust the space between the username and the image */
+    width: 30px; /* Set the size of the profile image */
+    height: 30px; /* Ensure the image is square */
+    border-radius: 50%;
+}
+
+.username {
+    display: inline-block;
+    color: white; /* Username color */
+    font-size: 16px;
+}
+
 /* Styling for nested dropdown links */
 .nav-list .dropdown li {
     width: auto;
@@ -102,6 +121,12 @@ header {
     text-decoration: none;
     white-space: nowrap;
     transition: background-color 0.3s ease; /* Smooth hover transition */
+    transition: padding-left 0.6s ease;
+}
+
+.nav-list .dropdown a:hover {
+    background-color: #666;
+    padding-left: 20px; 
 }
 
 .nav-list .dropdown a:hover {
@@ -113,7 +138,8 @@ header {
 }
 
 #profile-dropdown li:hover > .dropdown {
-    background: linear-gradient(90deg, #555, #666); /* Gradient effect for nested dropdowns */
+    background: linear-gradient(90deg, #555, #666);
+    transform: translateY(-1px);
 }
 
 .nav-list li:hover > a {
@@ -134,26 +160,50 @@ header {
     width: 25px;
     height: 3px;
     background-color: white;
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
+/* Sidebar and Hamburger Animation */
+.nav-list.active {
+    transform: translateX(0);
+}
 
-/* Responsive Design */
-@media (max-width: 700px) {
-    .nav-list {
-        display: none;
-        flex-direction: column;
-        align-items: flex-start;
-        position: absolute;
-        top: 60px;
-        right: 0;
-        background-color: #333;
-        width: 100%;
-        z-index: 1000;
-        padding: 10px 0;
+.hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(6px, 6px);
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+@media (max-width: 768px) {
+    .hamburger {
+        display: flex;
+        position: fixed;
+        top: 20px;
+        right: 20px;
     }
 
-    .nav-list.active {
+    .nav-list {
         display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100%;
+        background-color: #333;
+        width: 350px; /* Increased width */
+        z-index: 1000;
+        padding: 60px 20px;
+        box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+        justify-content: flex-start;
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
     }
 
     .nav-list li {
@@ -176,14 +226,28 @@ header {
     }
 
     .nav-list .dropdown a {
-        padding: 10px 20px;
+        padding: 10px 15px;
+        display: block;
+        color: white;
+        text-decoration: none;
+        white-space: nowrap;
+        transition: background-color 0.3s ease; /* Smooth hover transition */
+        transition: padding-left 0.6s ease;
     }
-
-    .hamburger {
-        display: flex;
-        position: absolute;
-        top: 20px;
-        right: 20px;
+    
+    .nav-list .dropdown a:hover {
+        background-color: #666;
+        padding-left: 20px; 
+        
+    }
+    .profile-image {
+        display: none;
+    }
+    
+    /* Show the username instead of the profile image */
+    .username {
+        display: inline-block;
+        font-size: 16px;
     }
 }
 
@@ -278,6 +342,11 @@ footer {
 .footer-logo img {
     height: 50px;
     margin-left: 0;
+    transition: transform 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.footer-logo img:hover {
+    transform: translateY(-5px); /* Levitating effect */
 }
 
 .social-media {
@@ -356,7 +425,7 @@ footer {
 }
 
 /* Responsive Design */
-@media (max-width: 1080px) {
+@media (max-width: 1200px) {
     .footer-content {
         display: flex;
         flex-direction: column;
@@ -386,7 +455,7 @@ footer {
     }
 
     .footer-column:nth-child(5) {
-        grid-column: 3 / 4;
+        grid-column: 2 / 3;
         justify-self: center;
     }
 
@@ -514,13 +583,14 @@ footer {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 10px;
 }
 
 .value-item {
     text-align: center;
     flex: 1;
     min-width: 200px;
+    max-width: 200px;
 }
 
 .value-item p {
@@ -1021,7 +1091,6 @@ footer {
     align-items: center;
     width: 30px;
     height: 30px;
-    background-color: #e1e1e1;
 }
 
 /* FAQ Answer Closed */
@@ -1195,4 +1264,109 @@ footer {
     color: green;
     font-weight: bold;
     margin-bottom: 20px;
+}
+
+/* Main Section Styles */
+#create-assessment-main {
+    width: 100%;
+    max-width: 1000px;
+    margin: 10px auto;
+    padding: 40px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#create-assessment-main h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+#create-assessment-title {
+    font-size: 2.0rem;
+    color: #333;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* Form Section Styles */
+#create-assessment-section {
+    width: 100%;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+#create-assessment-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+#assessment-name-label,
+#description-label {
+    font-size: 1.2rem;
+    color: #555;
+    margin-bottom: 8px;
+    display: block;
+}
+
+#assessment_name,
+#description {
+    font-family: Arial, sans-serif;
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+#assessment_name::placeholder,
+#description::placeholder {
+    color: #aaa;
+}
+
+#description {
+    resize: vertical;
+    height: 100px;
+}
+
+#submit-button {
+    padding: 12px 20px;
+    font-size: 1.2rem;
+    color: #fff;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#submit-button:hover {
+    background-color: #0056b3;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #create-assessment-main {
+        margin-top: 30px;
+    }
+
+    #create-assessment-title {
+        font-size: 1.6rem;
+    }
+
+    #create-assessment-section {
+        padding: 15px;
+    }
+
+    #submit-button {
+        font-size: 1rem;
+        padding: 10px 15px;
+    }
 }
