@@ -256,42 +256,33 @@ header {
     }
 }
 
-/* For mobile, toggle visibility using opacity and max-height instead of display */
+/* Responsive styles */
 @media (max-width: 768px) {
     .nav-list .dropdown {
-        opacity: 0;  /* Initially hidden */
-        max-height: 0;  /* Collapse the dropdown */
-        overflow: hidden;  /* Hide overflowing content */
-        transition: opacity 0.3s ease, max-height 0.3s ease;  /* Smooth transition */
-        background-color: #444;
-        margin-top: 5px;
-        border-radius: 0;
-        box-shadow: none;
-        width: 100%;
+        display: none; /* Hide dropdown by default */
     }
 
-    /* When active, show the dropdown */
-    .nav-list li.active > .dropdown {
-        opacity: 1;  /* Make the dropdown visible */
-        max-height: 500px;  /* Adjust this based on content height */
+    .nav-list .dropdown.active {
+        display: block; /* Show active dropdown */
+        opacity: 1;
+        transition: all 0.3s ease-in-out;
     }
 
-    /* Ensure the dropdown items are aligned correctly */
+    .nav-list li.active > a {
+        background-color: #555; /* Highlight the active link */
+    }
+
     .nav-list .dropdown a {
         padding: 10px 15px;
-        display: block;
         color: white;
         text-decoration: none;
-        white-space: nowrap;
         transition: background-color 0.3s ease;
     }
 
     .nav-list .dropdown a:hover {
         background-color: #666;
-        padding-left: 20px;
     }
 }
-
 
 /* Global Box-Sizing */
 *, *::before, *::after {
