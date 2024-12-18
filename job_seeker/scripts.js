@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle dropdown menu
     navItems.forEach(item => {
         item.addEventListener('click', function(event) {
-            // Prevent click from closing the dropdown
+            // Prevent click from closing the dropdown if on mobile
             event.stopPropagation();
 
             // Close any open dropdowns except the current one
