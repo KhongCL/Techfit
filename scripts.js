@@ -1,38 +1,54 @@
 document.addEventListener('DOMContentLoaded', function () {
-    const navItems = document.querySelectorAll('.nav-list > li > a');
-    const dropdowns = document.querySelectorAll('.dropdown');
+    const navItems = document.querySelectorAll('.nav-list > li > a'); // Top-level links
+    const dropdowns = document.querySelectorAll('.dropdown'); // Dropdown menus
     const hamburger = document.getElementById('hamburger');
     const navList = document.querySelector('.nav-list');
 
-    // Helper function to check if we're in the responsive state
+    // Helper: Check if we're in responsive mode
     const isMobile = () => window.innerWidth < 768;
 
-    // Handle dropdown toggle for mobile
+    // Toggle dropdown visibility
     navItems.forEach(item => {
         item.addEventListener('click', function (event) {
-            // If not in responsive mode, do nothing
-            if (!isMobile()) return;
+            if (isMobile()) {
+                const parent = item.parentElement; // The parent <li>
+                const dropdown = parent.querySelector('.dropdown');
 
-            const parent = item.parentElement; // The parent <li>
-            const dropdown = parent.querySelector('.dropdown');
+                // Prevent default link behavior for links with dropdowns
+                if (dropdown) {
+                    event.preventDefault();
 
-            // Prevent default navigation behavior for links with dropdowns
-            if (dropdown) {
-                event.preventDefault();
-
-                // Close all other dropdowns
-                dropdowns.forEach(dd => {
-                    if (dd !== dropdown) {
-                        dd.classList.remove('active');
-                        dd.parentElement.classList.remove('active');
+                    // Toggle the current dropdown
+                    const isActive = dropdown.classList.contains('active');
+                    closeAllDropdowns(); // Close all open dropdowns
+                    if (!isActive) {
+                        dropdown.classList.add('active');
+                        parent.classList.add('active');
                     }
-                });
-
-                // Toggle the current dropdown
-                dropdown.classList.toggle('active');
-                parent.classList.toggle('active');
+                }
             }
         });
+
+        // Optional: Add `touchstart` for better mobile compatibility
+        item.addEventListener('touchstart', function (event) {
+            if (isMobile()) {
+                event.preventDefault(); // Prevent ghost clicks
+                item.click(); // Trigger the click event manually
+            }
+        });
+    });
+
+    // Close all dropdowns
+    const closeAllDropdowns = () => {
+        dropdowns.forEach(dd => dd.classList.remove('active'));
+        navItems.forEach(item => item.parentElement.classList.remove('active'));
+    };
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function (event) {
+        if (isMobile() && !event.target.closest('.nav-list')) {
+            closeAllDropdowns();
+        }
     });
 
     // Handle hamburger menu toggle
@@ -41,25 +57,16 @@ document.addEventListener('DOMContentLoaded', function () {
         navList.classList.toggle('active');
     });
 
-    // Ensure nav resets on window resize
+    // Reset state on resize
     window.addEventListener('resize', function () {
         if (!isMobile()) {
-            // Reset all dropdowns and navigation state
+            closeAllDropdowns();
             hamburger.classList.remove('active');
             navList.classList.remove('active');
-            dropdowns.forEach(dd => dd.classList.remove('active'));
-            navItems.forEach(item => item.parentElement.classList.remove('active'));
-        }
-    });
-
-    // Close dropdowns when clicking outside (mobile only)
-    document.addEventListener('click', function (event) {
-        if (isMobile() && !event.target.closest('.nav-list')) {
-            dropdowns.forEach(dd => dd.classList.remove('active'));
-            navItems.forEach(item => item.parentElement.classList.remove('active'));
         }
     });
 });
+
 
 // FAQ dropdown functionality
 document.querySelectorAll('.faq-question').forEach(item => {
