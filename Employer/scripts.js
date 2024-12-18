@@ -4,37 +4,30 @@ document.addEventListener('DOMContentLoaded', function () {
     const hamburger = document.getElementById('hamburger');
     const navList = document.querySelector('.nav-list');
 
-    // Helper: Check if we're in responsive mode
-    const isMobile = () => window.innerWidth < 768;
-
     // Toggle dropdown visibility
     navItems.forEach(item => {
         item.addEventListener('click', function (event) {
-            if (isMobile()) {
-                const parent = item.parentElement; // The parent <li>
-                const dropdown = parent.querySelector('.dropdown');
+            const parent = item.parentElement; // The parent <li>
+            const dropdown = parent.querySelector('.dropdown');
 
-                // Prevent default link behavior for links with dropdowns
-                if (dropdown) {
-                    event.preventDefault();
+            // Prevent default link behavior for links with dropdowns
+            if (dropdown) {
+                event.preventDefault();
 
-                    // Toggle the current dropdown
-                    const isActive = dropdown.classList.contains('active');
-                    closeAllDropdowns(); // Close all open dropdowns
-                    if (!isActive) {
-                        dropdown.classList.add('active');
-                        parent.classList.add('active');
-                    }
+                // Toggle the current dropdown
+                const isActive = dropdown.classList.contains('active');
+                closeAllDropdowns(); // Close all open dropdowns
+                if (!isActive) {
+                    dropdown.classList.add('active');
+                    parent.classList.add('active');
                 }
             }
         });
 
         // Optional: Add `touchstart` for better mobile compatibility
         item.addEventListener('touchstart', function (event) {
-            if (isMobile()) {
-                event.preventDefault(); // Prevent ghost clicks
-                item.click(); // Trigger the click event manually
-            }
+            event.preventDefault(); // Prevent ghost clicks
+            item.click(); // Trigger the click event manually
         });
     });
 
@@ -46,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Close dropdowns when clicking outside
     document.addEventListener('click', function (event) {
-        if (isMobile() && !event.target.closest('.nav-list')) {
+        if (!event.target.closest('.nav-list')) {
             closeAllDropdowns();
         }
     });
@@ -57,13 +50,11 @@ document.addEventListener('DOMContentLoaded', function () {
         navList.classList.toggle('active');
     });
 
-    // Reset state on resize
+    // Reset state on resize (still useful for removing active states)
     window.addEventListener('resize', function () {
-        if (!isMobile()) {
-            closeAllDropdowns();
-            hamburger.classList.remove('active');
-            navList.classList.remove('active');
-        }
+        closeAllDropdowns();
+        hamburger.classList.remove('active');
+        navList.classList.remove('active');
     });
 });
 
