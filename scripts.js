@@ -6,7 +6,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Handle dropdown menu
     navItems.forEach(item => {
-        item.addEventListener('click', function(event) {
+        // Function to toggle active state for mobile dropdowns
+        const handleToggle = (event) => {
             // Prevent click from closing the dropdown if on mobile
             event.stopPropagation();
 
@@ -19,7 +20,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Toggle the clicked dropdown
             item.classList.toggle('active');
-        });
+        };
+
+        // Add click event listener for both desktop and mobile
+        item.addEventListener('click', handleToggle);
+        item.addEventListener('touchend', handleToggle); // Handle touch events for mobile
     });
 
     // Handle Assessment dropdown behavior for hover and click
@@ -52,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// FAQ dropdown functionality
+// FAQ dropdown functionality (unchanged)
 document.querySelectorAll('.faq-question').forEach(item => {
     item.addEventListener('click', () => {
         const faqItem = item.closest('.faq-item'); // Get the parent .faq-item
