@@ -67,7 +67,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-
 // FAQ dropdown functionality
 document.querySelectorAll('.faq-question').forEach(item => {
     item.addEventListener('click', () => {

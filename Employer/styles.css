@@ -254,6 +254,34 @@ header {
         display: inline-block;
         font-size: 16px;
     }
+
+    .dropdown {
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Active dropdown styles */
+    .dropdown.active {
+        display: block;
+        transform: translateY(0);
+    }
+
+    /* Highlight active parent item */
+    .nav-list li.active > a {
+        background-color: #555;
+    }
+
+    /* Ensure links inside dropdown are styled correctly */
+    .dropdown a {
+        padding: 10px 15px;
+        color: white;
+        text-decoration: none;
+        display: block;
+    }
+
+    .dropdown a:hover {
+        background-color: #666;
+    }
 }
 
 /* Global Box-Sizing */

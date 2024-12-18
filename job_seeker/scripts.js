@@ -1,53 +1,68 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const navItems = document.querySelectorAll('.nav-list > li');
+document.addEventListener('DOMContentLoaded', function () {
+    const navItems = document.querySelectorAll('.nav-list > li > a'); // Top-level links
+    const dropdowns = document.querySelectorAll('.dropdown'); // Dropdown menus
     const hamburger = document.getElementById('hamburger');
     const navList = document.querySelector('.nav-list');
-    const assessmentLink = document.querySelector('li > a[href="#"]'); // The "Assessment" link
 
-    // Handle dropdown menu
+    // Helper: Check if we're in responsive mode
+    const isMobile = () => window.innerWidth < 768;
+
+    // Toggle dropdown visibility
     navItems.forEach(item => {
-        item.addEventListener('click', function(event) {
-            // Prevent click from closing the dropdown if on mobile
-            event.stopPropagation();
+        item.addEventListener('click', function (event) {
+            if (isMobile()) {
+                const parent = item.parentElement; // The parent <li>
+                const dropdown = parent.querySelector('.dropdown');
 
-            // Close any open dropdowns except the current one
-            navItems.forEach(navItem => {
-                if (navItem !== item) {
-                    navItem.classList.remove('active');
+                // Prevent default link behavior for links with dropdowns
+                if (dropdown) {
+                    event.preventDefault();
+
+                    // Toggle the current dropdown
+                    const isActive = dropdown.classList.contains('active');
+                    closeAllDropdowns(); // Close all open dropdowns
+                    if (!isActive) {
+                        dropdown.classList.add('active');
+                        parent.classList.add('active');
+                    }
                 }
-            });
+            }
+        });
 
-            // Toggle the clicked dropdown
-            item.classList.toggle('active');
+        // Optional: Add `touchstart` for better mobile compatibility
+        item.addEventListener('touchstart', function (event) {
+            if (isMobile()) {
+                event.preventDefault(); // Prevent ghost clicks
+                item.click(); // Trigger the click event manually
+            }
         });
     });
 
-    // Handle Assessment dropdown behavior for hover and click
-    assessmentLink.addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent the default behavior of the link
-        const assessmentDropdown = event.target.nextElementSibling;
-        assessmentDropdown.classList.toggle('active'); // Toggle visibility of the dropdown on click
-    });
+    // Close all dropdowns
+    const closeAllDropdowns = () => {
+        dropdowns.forEach(dd => dd.classList.remove('active'));
+        navItems.forEach(item => item.parentElement.classList.remove('active'));
+    };
 
     // Close dropdowns when clicking outside
-    document.addEventListener('click', function(event) {
-        if (!event.target.closest('.nav-list')) {
-            navItems.forEach(item => {
-                item.classList.remove('active');
-            });
+    document.addEventListener('click', function (event) {
+        if (isMobile() && !event.target.closest('.nav-list')) {
+            closeAllDropdowns();
         }
     });
 
     // Handle hamburger menu toggle
-    hamburger.addEventListener('click', function() {
+    hamburger.addEventListener('click', function () {
         hamburger.classList.toggle('active');
         navList.classList.toggle('active');
     });
 
-    window.addEventListener('resize', function() {
-        if (window.innerWidth > 900) {
-            hamburger.classList.remove("active");
-            navList.classList.remove("active");
+    // Reset state on resize
+    window.addEventListener('resize', function () {
+        if (!isMobile()) {
+            closeAllDropdowns();
+            hamburger.classList.remove('active');
+            navList.classList.remove('active');
         }
     });
 });
