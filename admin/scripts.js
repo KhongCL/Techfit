@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     window.addEventListener('resize', function() {
-        if (window.innerWidth > 1080) {
+        if (window.innerWidth > 900) {
             hamburger.classList.remove("active");
             navList.classList.remove("active");
         }
@@ -56,7 +56,6 @@ document.addEventListener('DOMContentLoaded', function() {
 document.querySelectorAll('.faq-question').forEach(item => {
     item.addEventListener('click', () => {
         const faqItem = item.closest('.faq-item'); // Get the parent .faq-item
-        const answer = faqItem.querySelector('.faq-answer'); // Find the answer
         const arrow = faqItem.querySelector('.dropdown-arrow'); // Get the arrow
 
         // Toggle the 'open' class on the .faq-item to show/hide the answer

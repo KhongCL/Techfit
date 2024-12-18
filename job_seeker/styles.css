@@ -1095,11 +1095,23 @@ footer {
     overflow: hidden;
 }
 
+/* FAQ Answer Closed */
+.faq-answer {
+    display: block;
+    margin-top: 10px;
+    font-size: 1.1rem;
+    color: #555;
+    padding-left: 20px;
+    overflow: hidden;
+    max-height: 0;
+    padding: 0 20px;
+    transition: max-height 0.5s ease, padding 0.5s ease;
+}
+
 /* FAQ Answer Open */
 .faq-item.open .faq-answer {
-    display: block;
-    max-height: 200px;
-    padding-left: 20px;
+    max-height: 100px;
+    padding: 10px 20px;
 }
 
 @media (max-width: 768px) {
@@ -1131,6 +1143,11 @@ footer {
 
     .dropdown-arrow {
         font-size: 1.3rem;
+    }
+
+    .faq-item.open .faq-answer {
+        max-height: 270px;
+        padding: 10px 20px;
     }
 }
 
