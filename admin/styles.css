@@ -1330,7 +1330,7 @@ footer {
     margin-bottom: 20px;
 }
 
-/* Main Section Styles */
+/* Create Assessment */
 #create-assessment-main {
     width: 100%;
     max-width: 1000px;
@@ -1353,7 +1353,6 @@ footer {
     margin-bottom: 20px;
 }
 
-/* Form Section Styles */
 #create-assessment-section {
     width: 100%;
     background-color: #fff;
