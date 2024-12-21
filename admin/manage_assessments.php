@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
+<header>
         <div class="logo">
             <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
@@ -22,7 +22,7 @@
                     <li><a href="#">Assessments</a>
                         <ul class="dropdown">
                             <li><a href="create_assessment.html">Create New Assessment</a></li>
-                            <li><a href="edit_assessment.html">Edit/Delete Existing Assessments</a></li>
+                            <li><a href="manage_assessments.php">Manage Assessments</a></li>
                             <li><a href="view_assessment_results.html">View Assessment Results</a></li>
                         </ul>
                     </li>
@@ -41,8 +41,9 @@
                     </li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
-                            <li><a href="add_resource.html">Add New Resources</a></li>
-                            <li><a href="edit_resource.html">Edit/Delete Existing Resources</a></li>
+                            <li><a href="useful_links.html">Manage Useful Links</a></li>
+                            <li><a href="faq.html">Manage FAQs</a></li>
+                            <li><a href="sitemap.html">Manage Sitemap</a></li>
                         </ul>
                     </li>
                     <li><a href="about.html">About</a></li>
@@ -136,10 +137,8 @@
                 <div class="footer-column">
                     <h3>Assessments</h3>
                     <ul>
-                        <li><a href="manage_assessments.php">Manage Assessments</a></li>
                         <li><a href="create_assessment.html">Create New Assessment</a></li>
-                        <li><a href="edit_assessment.html">Edit Existing Assessments</a></li>
-                        <li><a href="delete_assessment.html">Delete Assessments</a></li>
+                        <li><a href="manage_assessments.php">Manage Assessments</a></li>
                         <li><a href="view_assessment_results.html">View Assessment Results</a></li>
                     </ul>
                 </div>
@@ -147,9 +146,7 @@
                     <h3>Users</h3>
                     <ul>
                         <li><a href="manage_users.html">Manage Users</a></li>
-                        <li><a href="view_all_users.html">View All Users</a></li>
-                        <li><a href="edit_user_profile.html">Edit User Profiles</a></li>
-                        <li><a href="delete_user_account.html">Delete User Accounts</a></li>
+                        <li><a href="user_feedback.html">User Feedback</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -161,10 +158,20 @@
                     </ul>
                 </div>
                 <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="useful_links.html">Manage Useful Links</a></li>
+                        <li><a href="faq.html">Manage FAQs</a></li>
+                        <li><a href="sitemap.html">Manage Sitemap</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
                     <h3>About</h3>
                     <ul>
                         <li><a href="about.html">About</a></li>
                         <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="terms.html">Terms & Condition</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
