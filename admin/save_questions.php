@@ -27,6 +27,9 @@ function generateNextId($conn, $table, $column, $prefix) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Log the entire $_POST array
+    error_log("POST data: " . print_r($_POST, true));
+
     $assessment_id = $_POST['assessment_id'];
     $question_texts = $_POST['question_text'];
     $question_types = $_POST['question_type'];
@@ -48,6 +51,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $answer_type = $answer_types[$index];
         $correct_answer = $correct_answers[$index];
 
+        // Debugging: Log the answer type and index
+        error_log("Answer Type for Question $question_id: $answer_type (Index: $index)");
+
         // Insert the question into the database
         $sql = "INSERT INTO Question (question_id, assessment_id, question_text, question_type, answer_type, correct_answer)
                 VALUES ('$question_id', '$assessment_id', '$question_text', '$question_type', '$answer_type', '$correct_answer')";
@@ -56,6 +62,51 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['error_message'] = "Error: " . $conn->error;
             header("Location: create_questions.php?assessment_id=$assessment_id");
             exit();
+        }
+
+        // Insert choices for multiple choice questions
+        if ($answer_type === 'multiple choice') {
+            error_log("Inserting choices for Question $question_id");
+            $choices_key = "choices_" . ($index + 1); // Adjust the key by adding 1
+            if (isset($_POST[$choices_key])) {
+                $choices = $_POST[$choices_key];
+                foreach ($choices as $choice_text) {
+                    $choice_id = generateNextId($conn, 'Choices', 'choice_id', 'C');
+                    $sql = "INSERT INTO Choices (choice_id, question_id, choice_text)
+                            VALUES ('$choice_id', '$question_id', '$choice_text')";
+                    if ($conn->query($sql) !== TRUE) {
+                        $_SESSION['error_message'] = "Error: " . $conn->error;
+                        header("Location: create_questions.php?assessment_id=$assessment_id");
+                        exit();
+                    }
+                }
+            } else {
+                error_log("Choices key $choices_key not found in POST data");
+            }
+        }
+
+        // Insert test cases for code questions
+        if ($answer_type === 'code') {
+            error_log("Inserting test cases for Question $question_id");
+            $test_cases_key = "test_cases_" . ($index + 1); // Adjust the key by adding 1
+            $expected_output_key = "expected_output_" . ($index + 1); // Adjust the key by adding 1
+            if (isset($_POST[$test_cases_key]) && isset($_POST[$expected_output_key])) {
+                $test_cases = $_POST[$test_cases_key];
+                $expected_outputs = $_POST[$expected_output_key];
+                foreach ($test_cases as $tc_index => $input) {
+                    $test_case_id = generateNextId($conn, 'Test_Cases', 'test_case_id', 'T');
+                    $expected_output = $expected_outputs[$tc_index];
+                    $sql = "INSERT INTO Test_Cases (test_case_id, question_id, input, expected_output)
+                            VALUES ('$test_case_id', '$question_id', '$input', '$expected_output')";
+                    if ($conn->query($sql) !== TRUE) {
+                        $_SESSION['error_message'] = "Error: " . $conn->error;
+                        header("Location: create_questions.php?assessment_id=$assessment_id");
+                        exit();
+                    }
+                }
+            } else {
+                error_log("Test cases or expected output key not found in POST data for index $index");
+            }
         }
     }
 

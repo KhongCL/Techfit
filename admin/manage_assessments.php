@@ -104,7 +104,7 @@
                         echo "<td>" . htmlspecialchars($row['assessment_id']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['assessment_name']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['timestamp']) . "</td>";
-                        echo "<td><a href='edit_assessment.html?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Edit</a> | <a href='delete_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Delete</a></td>";
+                        echo "<td><a href='edit_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Edit</a> | <a href='delete_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Delete</a></td>";
                         echo "</tr>";
                     }
                 } else {

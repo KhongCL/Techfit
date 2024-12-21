@@ -1,9 +1,12 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Questions for Assessment - TechFit</title>
+    <title>Edit Questions for Assessment - TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <script>
         let questionCount = 0;
@@ -44,9 +47,7 @@
                     <option value="code">Code</option>
                 </select><br>
 
-                <div id="answer_options_${questionCount}">
-                    ${getMultipleChoiceOptions(questionCount)}
-                </div>
+                <div id="answer_options_${questionCount}"></div>
                 <button type="button" onclick="removeQuestion(${questionCount})">Remove Question</button>
                 <hr>
             `;
@@ -56,7 +57,12 @@
         function removeQuestion(id) {
             if (confirm('Are you sure you want to remove this question?')) {
                 const questionDiv = document.getElementById(`question-${id}`);
-                questionDiv.remove();
+                questionDiv.style.display = 'none';
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'removed_questions[]';
+                input.value = id;
+                questionDiv.appendChild(input);
                 isFormDirty = true;
             }
         }
@@ -146,15 +152,11 @@
             choiceContainer.appendChild(removeButton);
             choicesDiv.insertBefore(choiceContainer, choicesDiv.lastElementChild);
 
-            // Update the correct choice dropdown after adding the new choice
-            input.addEventListener('input', function() {
-                updateCorrectChoiceDropdown(id);
-            });
-
+            // Update the correct choice dropdown
             updateCorrectChoiceDropdown(id);
             isFormDirty = true;
         }
-        
+
         function addTestCase(id) {
             const testCasesDiv = document.getElementById(`test_cases_${id}`);
             const input = document.createElement('textarea');
@@ -200,10 +202,56 @@
             isFormDirty = false;
             document.getElementById('questions-form').submit();
         }
+
+        // Fetch existing questions for the assessment
+        document.addEventListener('DOMContentLoaded', function() {
+            const assessmentId = "<?php echo htmlspecialchars($_GET['assessment_id']); ?>";
+            fetch(`get_questions.php?assessment_id=${assessmentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(question => {
+                        addQuestion();
+                        document.getElementById(`question_text_${questionCount}`).value = question.question_text;
+                        document.getElementById(`question_type_${questionCount}`).value = question.question_type;
+                        document.getElementById(`answer_type_${questionCount}`).value = question.answer_type;
+                        showAnswerOptions(questionCount);
+                        if (question.answer_type === 'multiple choice') {
+                            // Fetch and populate choices for multiple choice questions
+                            fetch(`get_choices.php?question_id=${question.question_id}`)
+                                .then(response => response.json())
+                                .then(choices => {
+                                    choices.forEach(choice => {
+                                        addChoice(questionCount);
+                                        const choiceInputs = document.getElementsByName(`choices_${questionCount}[]`);
+                                        choiceInputs[choiceInputs.length - 2].value = choice.choice_text; // Set the value of the last added choice input
+                                    });
+                                    document.getElementById(`correct_choice_${questionCount}`).value = question.correct_answer;
+                                });
+                        } else if (question.answer_type === 'code') {
+                            // Populate code question options
+                            document.getElementById(`code_${questionCount}`).value = question.correct_answer;
+                            // Fetch and populate test cases for code questions
+                            fetch(`get_test_cases.php?question_id=${question.question_id}`)
+                                .then(response => response.json())
+                                .then(testCases => {
+                                    testCases.forEach(testCase => {
+                                        addTestCase(questionCount);
+                                        const testCaseInputs = document.getElementsByName(`test_cases_${questionCount}[]`);
+                                        const expectedOutputInputs = document.getElementsByName(`expected_output_${questionCount}[]`);
+                                        testCaseInputs[testCaseInputs.length - 2].value = testCase.input;
+                                        expectedOutputInputs[expectedOutputInputs.length - 2].value = testCase.expected_output;
+                                    });
+                                });
+                        } else {
+                            document.getElementById(`correct_choice_${questionCount}`).value = question.correct_answer;
+                        }
+                    });
+                });
+        });
     </script>
 </head>
 <body>
-<header>
+    <header>
         <div class="logo">
             <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
@@ -265,7 +313,7 @@
         </nav>
     </header>    
     <main>
-        <h1>Create Questions for Assessment</h1>
+        <h1>Edit Questions for Assessment</h1>
         <p>Assessment ID: <strong><?php echo htmlspecialchars($_GET['assessment_id']); ?></strong></p>
         <?php
         if (isset($_SESSION['success_message'])) {
