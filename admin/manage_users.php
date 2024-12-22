@@ -1,9 +1,44 @@
+<?php
+$host = 'localhost';
+$username = 'root';
+$password = '';
+$database = 'techfit'; 
+
+$conn = new mysqli($host, $username, $password, $database);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch Job Seeker data
+$jobSeekerQuery = "
+    SELECT 
+        job_seeker.user_id AS name, 
+        NULL AS education_level, 
+        NULL AS position_experienced, 
+        assessment_job_seeker.score AS assessment_score 
+    FROM job_seeker 
+    LEFT JOIN assessment_job_seeker 
+    ON job_seeker.job_seeker_id = assessment_job_seeker.assessment_id";
+$jobSeekerResult = $conn->query($jobSeekerQuery);
+
+// Fetch Employer data
+$employerQuery = "
+    SELECT 
+        employer.user_id AS name, 
+        employer.company_name, 
+        NULL AS company_type 
+    FROM employer";
+$employerResult = $conn->query($employerQuery);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - TechFit</title>
+    <title>Techfit</title>
     <link rel="stylesheet" href="styles.css">   
 </head>
 <body>
@@ -28,7 +63,7 @@
                     </li>
                     <li><a href="#">Users</a>
                         <ul class="dropdown">
-                            <li><a href="manage_users.php">Manage Users</a></li>
+                            <li><a href="manage_users.html">Manage Users</a></li>
                             <li><a href="user_feedback.html">User Feedback</a></li>
                         </ul>
                     </li>
@@ -69,10 +104,62 @@
         </nav>
     </header>    
 
-    <section id="home">
-        <h2>Admin Dashboard</h2>
-        <p>Welcome, Admin! Use the navigation above to manage assessments, questions, and view results.</p>
-    </section>
+    <div class="content">
+        <div class="tabs">
+            <button class="tab active">Manage User</button>
+            <button class="tab">Manage Feedback</button>
+        </div>
+
+        <div class="section">
+            <h2 class="section-title">USER <a href="#" class="delete-link">Delete</a></h2>
+
+            <div class="user-section">
+                <h3 class="user-type">Job Seeker</h3>
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Education Level</th>
+                            <th>Position Experienced</th>
+                            <th>Assessment Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($row = $jobSeekerResult->fetch_assoc()) { ?>
+                            <tr>
+                                <td><input type="checkbox"> <?php echo htmlspecialchars($row['name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['education_level']); ?></td>
+                                <td><?php echo htmlspecialchars($row['position_experienced']); ?></td>
+                                <td><?php echo htmlspecialchars($row['assessment_score']); ?></td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="user-section">
+                <h3 class="user-type">Employer</h3>
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Company Name</th>
+                            <th>Company Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($row = $employerResult->fetch_assoc()) { ?>
+                            <tr>
+                                <td><input type="checkbox"> <?php echo htmlspecialchars($row['name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['company_name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['company_type']); ?></td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
     <footer>
         <div class="footer-content">

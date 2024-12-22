@@ -1433,3 +1433,80 @@ footer {
         padding: 10px 15px;
     }
 }
+
+
+/* manage user */
+/* start */
+.content {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .tabs {
+    display: flex;
+    margin-bottom: 20px;
+  }
+  
+  .tab {
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    margin-right: 5px;
+  }
+  
+  .tab.active {
+    background-color: #ddd;
+  }
+  
+  .section {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
+  .section-title {
+    font-size: 20px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .delete-link {
+    color: red;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  
+  .user-section {
+    margin-top: 20px;
+  }
+  
+  .user-type {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .user-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .user-table th, .user-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .user-table th {
+    background-color: #f0f0f0;
+  }
+  
+  .user-table td input[type="checkbox"] {
+    margin-right: 10px;
+  }
+/* end */
