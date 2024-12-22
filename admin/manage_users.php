@@ -1,3 +1,9 @@
+<!-- note: 
+ what table and data type should i refer to for job seeker's 
+ education level, position experienced, and company type for employer? 
+ -->
+
+
 <?php
 $host = 'localhost';
 $username = 'root';
