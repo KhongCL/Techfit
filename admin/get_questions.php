@@ -37,6 +37,20 @@ while ($row = $result->fetch_assoc()) {
     }
 
     $row['choices'] = $choices;
+
+    // Fetch programming language for code questions
+    if ($row['answer_type'] === 'code') {
+        $language_sql = "SELECT programming_language FROM Test_Cases WHERE question_id = ? LIMIT 1";
+        $language_stmt = $conn->prepare($language_sql);
+        $language_stmt->bind_param("s", $question_id);
+        $language_stmt->execute();
+        $language_result = $language_stmt->get_result();
+        if ($language_row = $language_result->fetch_assoc()) {
+            $row['programming_language'] = $language_row['programming_language'];
+        }
+        $language_stmt->close();
+    }
+
     $questions[] = $row;
 
     $choices_stmt->close();

@@ -106,7 +106,7 @@
         function getCodeQuestionOptions(id) {
             return `
                 <label for="code_language_${id}">Select Language:</label>
-                <select id="code_language_${id}" name="code_language[]" required>
+                <select id="code_language_${id}" name="code_language_${id}" required>
                     <option value="python">Python</option>
                     <option value="javascript">JavaScript</option>
                     <option value="java">Java</option>

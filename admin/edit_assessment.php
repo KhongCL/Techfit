@@ -280,6 +280,7 @@ session_start();
                         } else if (question.answer_type === 'code') {
                             // Populate code question options
                             document.getElementById(`code_${questionCount}`).value = question.correct_answer;
+                            document.getElementById(`code_language_${questionCount}`).value = question.programming_language; // Set the programming language
                             // Fetch and populate test cases for code questions
                             fetch(`get_test_cases.php?question_id=${question.question_id}`)
                                 .then(response => response.json())

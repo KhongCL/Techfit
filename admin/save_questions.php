@@ -35,7 +35,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $question_types = $_POST['question_type'];
     $answer_types = $_POST['answer_type'];
     $correct_answers = $_POST['correct_choice'];
-    $programming_languages = $_POST['code_language']; // Added line
 
     // Check if the assessment_id exists in the Assessment_Admin table
     $assessment_check_sql = "SELECT assessment_id FROM Assessment_Admin WHERE assessment_id = '$assessment_id'";
@@ -91,7 +90,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             error_log("Inserting test cases for Question $question_id");
             $test_cases_key = "test_cases_" . ($index + 1); // Adjust the key by adding 1
             $expected_output_key = "expected_output_" . ($index + 1); // Adjust the key by adding 1
-            $programming_language = $programming_languages[$index]; // Added line
+            $programming_language_key = "code_language_" . ($index + 1); // Adjust the key by adding 1
+            $programming_language = isset($_POST[$programming_language_key]) ? $_POST[$programming_language_key] : 'python'; // Default to 'python' if not set
             if (isset($_POST[$test_cases_key]) && isset($_POST[$expected_output_key])) {
                 $test_cases = $_POST[$test_cases_key];
                 $expected_outputs = $_POST[$expected_output_key];
