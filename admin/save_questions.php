@@ -35,6 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $question_types = $_POST['question_type'];
     $answer_types = $_POST['answer_type'];
     $correct_answers = $_POST['correct_choice'];
+    $programming_languages = $_POST['code_language']; // Added line
 
     // Check if the assessment_id exists in the Assessment_Admin table
     $assessment_check_sql = "SELECT assessment_id FROM Assessment_Admin WHERE assessment_id = '$assessment_id'";
@@ -90,14 +91,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             error_log("Inserting test cases for Question $question_id");
             $test_cases_key = "test_cases_" . ($index + 1); // Adjust the key by adding 1
             $expected_output_key = "expected_output_" . ($index + 1); // Adjust the key by adding 1
+            $programming_language = $programming_languages[$index]; // Added line
             if (isset($_POST[$test_cases_key]) && isset($_POST[$expected_output_key])) {
                 $test_cases = $_POST[$test_cases_key];
                 $expected_outputs = $_POST[$expected_output_key];
                 foreach ($test_cases as $tc_index => $input) {
                     $test_case_id = generateNextId($conn, 'Test_Cases', 'test_case_id', 'T');
                     $expected_output = $expected_outputs[$tc_index];
-                    $stmt = $conn->prepare("INSERT INTO Test_Cases (test_case_id, question_id, input, expected_output) VALUES (?, ?, ?, ?)");
-                    $stmt->bind_param("ssss", $test_case_id, $question_id, $input, $expected_output);
+                    $stmt = $conn->prepare("INSERT INTO Test_Cases (test_case_id, question_id, input, expected_output, programming_language) VALUES (?, ?, ?, ?, ?)"); // Modified line
+                    $stmt->bind_param("sssss", $test_case_id, $question_id, $input, $expected_output, $programming_language); // Modified line
                     if ($stmt->execute() !== TRUE) {
                         $_SESSION['error_message'] = "Error: " . $stmt->error;
                         header("Location: create_questions.php?assessment_id=$assessment_id");

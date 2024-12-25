@@ -170,6 +170,6 @@ CREATE TABLE Test_Cases (
     question_id VARCHAR(5) NOT NULL,
     input TEXT NOT NULL,
     expected_output TEXT NOT NULL,
-    programming_language ENUM('python', 'javascript', 'java', 'c++') NOT NULL,
+    programming_language ENUM('python', 'javascript', 'java', 'cpp') NOT NULL,
     FOREIGN KEY (question_id) REFERENCES Question(question_id)
 );
