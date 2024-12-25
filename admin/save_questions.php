@@ -54,12 +54,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Debugging: Log the answer type and index
         error_log("Answer Type for Question $question_id: $answer_type (Index: $index)");
 
-        // Insert the question into the database
-        $sql = "INSERT INTO Question (question_id, assessment_id, question_text, question_type, answer_type, correct_answer)
-                VALUES ('$question_id', '$assessment_id', '$question_text', '$question_type', '$answer_type', '$correct_answer')";
+        // Prepare and bind
+        $stmt = $conn->prepare("INSERT INTO Question (question_id, assessment_id, question_text, question_type, answer_type, correct_answer) VALUES (?, ?, ?, ?, ?, ?)");
+        $stmt->bind_param("ssssss", $question_id, $assessment_id, $question_text, $question_type, $answer_type, $correct_answer);
 
-        if ($conn->query($sql) !== TRUE) {
-            $_SESSION['error_message'] = "Error: " . $conn->error;
+        if ($stmt->execute() !== TRUE) {
+            $_SESSION['error_message'] = "Error: " . $stmt->error;
             header("Location: create_questions.php?assessment_id=$assessment_id");
             exit();
         }
@@ -72,10 +72,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $choices = $_POST[$choices_key];
                 foreach ($choices as $choice_text) {
                     $choice_id = generateNextId($conn, 'Choices', 'choice_id', 'C');
-                    $sql = "INSERT INTO Choices (choice_id, question_id, choice_text)
-                            VALUES ('$choice_id', '$question_id', '$choice_text')";
-                    if ($conn->query($sql) !== TRUE) {
-                        $_SESSION['error_message'] = "Error: " . $conn->error;
+                    $stmt = $conn->prepare("INSERT INTO Choices (choice_id, question_id, choice_text) VALUES (?, ?, ?)");
+                    $stmt->bind_param("sss", $choice_id, $question_id, $choice_text);
+                    if ($stmt->execute() !== TRUE) {
+                        $_SESSION['error_message'] = "Error: " . $stmt->error;
                         header("Location: create_questions.php?assessment_id=$assessment_id");
                         exit();
                     }
@@ -96,10 +96,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 foreach ($test_cases as $tc_index => $input) {
                     $test_case_id = generateNextId($conn, 'Test_Cases', 'test_case_id', 'T');
                     $expected_output = $expected_outputs[$tc_index];
-                    $sql = "INSERT INTO Test_Cases (test_case_id, question_id, input, expected_output)
-                            VALUES ('$test_case_id', '$question_id', '$input', '$expected_output')";
-                    if ($conn->query($sql) !== TRUE) {
-                        $_SESSION['error_message'] = "Error: " . $conn->error;
+                    $stmt = $conn->prepare("INSERT INTO Test_Cases (test_case_id, question_id, input, expected_output) VALUES (?, ?, ?, ?)");
+                    $stmt->bind_param("ssss", $test_case_id, $question_id, $input, $expected_output);
+                    if ($stmt->execute() !== TRUE) {
+                        $_SESSION['error_message'] = "Error: " . $stmt->error;
                         header("Location: create_questions.php?assessment_id=$assessment_id");
                         exit();
                     }

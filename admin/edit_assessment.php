@@ -26,6 +26,7 @@ session_start();
             const questionDiv = document.createElement('div');
             questionDiv.id = `question-${questionCount}`;
             questionDiv.innerHTML = `
+                <input type="hidden" id="question_id_${questionCount}" name="question_id[]" value="">
                 <label for="question_text_${questionCount}">Question Text:</label>
                 <textarea id="question_text_${questionCount}" name="question_text[]" required></textarea><br>
 
@@ -47,7 +48,9 @@ session_start();
                     <option value="code">Code</option>
                 </select><br>
 
-                <div id="answer_options_${questionCount}"></div>
+                <div id="answer_options_${questionCount}">
+                    ${getMultipleChoiceOptions(questionCount)}
+                </div>
                 <button type="button" onclick="removeQuestion(${questionCount})">Remove Question</button>
                 <hr>
             `;
@@ -64,143 +67,51 @@ session_start();
                 input.value = id;
                 questionDiv.appendChild(input);
                 isFormDirty = true;
+
+                // Send AJAX request to update is_active to false
+                const questionId = document.getElementById(`question_id_${id}`).value;
+                fetch('update_question_status.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question_id: questionId, is_active: false })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Question status updated successfully.');
+                    } else {
+                        console.error('Failed to update question status.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
             }
-        }
-
-        function showAnswerOptions(id) {
-            const answerType = document.getElementById(`answer_type_${id}`).value;
-            const answerOptionsDiv = document.getElementById(`answer_options_${id}`);
-            answerOptionsDiv.innerHTML = '';
-
-            if (answerType === 'multiple choice') {
-                answerOptionsDiv.innerHTML = getMultipleChoiceOptions(id);
-            } else if (answerType === 'true/false') {
-                answerOptionsDiv.innerHTML = `
-                    <label for="true_false_${id}">Answer:</label>
-                    <select id="true_false_${id}" name="correct_choice[]" required>
-                        <option value="true">True</option>
-                        <option value="false">False</option>
-                    </select>
-                `;
-            } else if (answerType === 'fill in the blank') {
-                answerOptionsDiv.innerHTML = `
-                    <label for="blank_${id}">Blank:</label>
-                    <input type="text" id="blank_${id}" name="correct_choice[]" required>
-                `;
-            } else if (answerType === 'essay') {
-                answerOptionsDiv.innerHTML = `
-                    <label for="essay_${id}">Correct Answer:</label>
-                    <textarea id="essay_${id}" name="correct_choice[]" required></textarea>
-                `;
-            } else if (answerType === 'code') {
-                answerOptionsDiv.innerHTML = getCodeQuestionOptions(id);
-            }
-        }
-
-        function getMultipleChoiceOptions(id) {
-            return `
-                <label for="choices_${id}">Choices:</label>
-                <div id="choices_${id}">
-                    <input type="text" name="choices_${id}[]" required>
-                    <button type="button" onclick="addChoice(${id})">Add Choice</button>
-                </div>
-                <label for="correct_choice_${id}">Correct Choice:</label>
-                <select id="correct_choice_${id}" name="correct_choice[]" required></select>
-            `;
-        }
-
-        function getCodeQuestionOptions(id) {
-            return `
-                <label for="code_language_${id}">Select Language:</label>
-                <select id="code_language_${id}" name="code_language[]" required>
-                    <option value="python">Python</option>
-                    <option value="javascript">JavaScript</option>
-                    <option value="java">Java</option>
-                    <option value="cpp">C++</option>
-                </select><br>
-
-                <label for="code_${id}">Correct Answer:</label>
-                <textarea id="code_${id}" name="correct_choice[]" required></textarea><br>
-
-                <label for="test_cases_${id}">Test Cases:</label>
-                <div id="test_cases_${id}">
-                    <textarea name="test_cases_${id}[]" placeholder="Input" required></textarea>
-                    <textarea name="expected_output_${id}[]" placeholder="Expected Output" required></textarea>
-                    <button type="button" onclick="addTestCase(${id})">Add Test Case</button>
-                </div>
-            `;
-        }
-
-        function addChoice(id) {
-            const choicesDiv = document.getElementById(`choices_${id}`);
-            const choiceContainer = document.createElement('div');
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.name = `choices_${id}[]`;
-            input.required = true;
-
-            const removeButton = document.createElement('button');
-            removeButton.type = 'button';
-            removeButton.textContent = 'Remove Choice';
-            removeButton.onclick = function() {
-                choiceContainer.remove();
-                updateCorrectChoiceDropdown(id);
-                isFormDirty = true;
-            };
-
-            choiceContainer.appendChild(input);
-            choiceContainer.appendChild(removeButton);
-            choicesDiv.insertBefore(choiceContainer, choicesDiv.lastElementChild);
-
-            // Update the correct choice dropdown
-            updateCorrectChoiceDropdown(id);
-            isFormDirty = true;
-        }
-
-        function addTestCase(id) {
-            const testCasesDiv = document.getElementById(`test_cases_${id}`);
-            const input = document.createElement('textarea');
-            input.name = `test_cases_${id}[]`;
-            input.placeholder = 'Input';
-            input.required = true;
-
-            const output = document.createElement('textarea');
-            output.name = `expected_output_${id}[]`;
-            output.placeholder = 'Expected Output';
-            output.required = true;
-
-            const removeButton = document.createElement('button');
-            removeButton.type = 'button';
-            removeButton.textContent = 'Remove Test Case';
-            removeButton.onclick = function() {
-                input.remove();
-                output.remove();
-                removeButton.remove();
-                isFormDirty = true;
-            };
-
-            testCasesDiv.insertBefore(input, testCasesDiv.lastElementChild);
-            testCasesDiv.insertBefore(output, testCasesDiv.lastElementChild);
-            testCasesDiv.insertBefore(removeButton, testCasesDiv.lastElementChild);
-            isFormDirty = true;
-        }
-
-        function updateCorrectChoiceDropdown(id) {
-            const choices = document.getElementsByName(`choices_${id}[]`);
-            const correctChoiceDropdown = document.getElementById(`correct_choice_${id}`);
-            correctChoiceDropdown.innerHTML = '';
-
-            choices.forEach((choice, index) => {
-                const option = document.createElement('option');
-                option.value = choice.value;
-                option.text = choice.value;
-                correctChoiceDropdown.appendChild(option);
-            });
         }
 
         function saveAssessment() {
             isFormDirty = false;
-            document.getElementById('questions-form').submit();
+            const form = document.getElementById('questions-form');
+            const formData = new FormData(form);
+
+            fetch('update_questions.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Assessment updated successfully.');
+                    window.location.reload();
+                } else {
+                    alert('Failed to update assessment.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         }
 
         // Fetch existing questions for the assessment
@@ -211,22 +122,20 @@ session_start();
                 .then(data => {
                     data.forEach(question => {
                         addQuestion();
+                        document.getElementById(`question_id_${questionCount}`).value = question.question_id;
                         document.getElementById(`question_text_${questionCount}`).value = question.question_text;
                         document.getElementById(`question_type_${questionCount}`).value = question.question_type;
                         document.getElementById(`answer_type_${questionCount}`).value = question.answer_type;
                         showAnswerOptions(questionCount);
                         if (question.answer_type === 'multiple choice') {
-                            // Fetch and populate choices for multiple choice questions
-                            fetch(`get_choices.php?question_id=${question.question_id}`)
-                                .then(response => response.json())
-                                .then(choices => {
-                                    choices.forEach(choice => {
-                                        addChoice(questionCount);
-                                        const choiceInputs = document.getElementsByName(`choices_${questionCount}[]`);
-                                        choiceInputs[choiceInputs.length - 2].value = choice.choice_text; // Set the value of the last added choice input
-                                    });
-                                    document.getElementById(`correct_choice_${questionCount}`).value = question.correct_answer;
-                                });
+                            // Populate choices for multiple choice questions
+                            const choicesDiv = document.getElementById(`choices_${questionCount}`);
+                            question.choices.forEach(choice => {
+                                addChoice(questionCount);
+                                const choiceInputs = document.getElementsByName(`choices_${questionCount}[]`);
+                                choiceInputs[choiceInputs.length - 2].value = choice.choice_text; // Set the value of the last added choice input
+                            });
+                            document.getElementById(`correct_choice_${questionCount}`).value = question.correct_answer;
                         } else if (question.answer_type === 'code') {
                             // Populate code question options
                             document.getElementById(`code_${questionCount}`).value = question.correct_answer;
@@ -248,7 +157,7 @@ session_start();
                     });
                 });
         });
-    </script>
+</script>
 </head>
 <body>
     <header>
