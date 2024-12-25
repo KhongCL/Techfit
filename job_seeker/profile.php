@@ -124,6 +124,86 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
         $error_message = "Invalid password. Must be at least 8 characters long and contain at least one letter, one number, and one special character.";
     }
 }
+// Handle LinkedIn link update
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_linkedin'])) {
+    $new_linkedin = $_POST['new_linkedin'];
+
+    // Validate LinkedIn URL
+    if (filter_var($new_linkedin, FILTER_VALIDATE_URL)) {
+        $conn = new mysqli("localhost", "root", "", "techfit");
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+
+        // Update the LinkedIn link for the logged-in user
+        $stmt = $conn->prepare("UPDATE Job_Seeker SET linkedin_link=? WHERE user_id=?");
+        $stmt->bind_param("ss", $new_linkedin, $user_id); // Treat user_id as a string
+        if ($stmt->execute()) {
+            $success_message = "LinkedIn profile updated successfully.";
+        } else {
+            $error_message = "Failed to update LinkedIn profile: " . $stmt->error;
+        }
+
+        $stmt->close();
+        $conn->close();
+    } else {
+        $error_message = "Invalid LinkedIn URL.";
+    }
+}
+
+// Handle resume link update
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_resume'])) {
+    $new_resume = $_POST['new_resume'];
+
+    // Validate resume URL
+    if (filter_var($new_resume, FILTER_VALIDATE_URL)) {
+        $conn = new mysqli("localhost", "root", "", "techfit");
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+
+        // Update the resume link for the logged-in user
+        $stmt = $conn->prepare("UPDATE Job_Seeker SET resume=? WHERE user_id=?");
+        $stmt->bind_param("ss", $new_resume, $user_id); // Treat user_id as a string
+        if ($stmt->execute()) {
+            $success_message = "Resume link updated successfully.";
+        } else {
+            $error_message = "Failed to update resume link: " . $stmt->error;
+        }
+
+        $stmt->close();
+        $conn->close();
+    } else {
+        $error_message = "Invalid resume URL.";
+    }
+}
+
+// Fetch LinkedIn link for display
+$conn = new mysqli("localhost", "root", "", "techfit");
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+$stmt = $conn->prepare("SELECT linkedin_link FROM Job_Seeker WHERE user_id=?");
+$stmt->bind_param("s", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$linkedin_link = $result->fetch_assoc()['linkedin_link'];
+$stmt->close();
+$conn->close();
+
+// Fetch resume link for display
+$conn = new mysqli("localhost", "root", "", "techfit");
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+$stmt = $conn->prepare("SELECT resume FROM Job_Seeker WHERE user_id=?");
+$stmt->bind_param("s", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$resume_link = $result->fetch_assoc()['resume'];
+$stmt->close();
+$conn->close();
+?>
 ?>
 
 <!DOCTYPE html>
@@ -273,7 +353,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
 <body>
     <header>
         <div class="logo">
-            <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+            <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
         <nav>
             <div class="nav-container">
@@ -296,7 +376,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
                     <li><a href="profile.php" id="profile-link">Profile</a>
                         <ul class="dropdown" id="profile-dropdown">
                             <li><a href="profile.php">Settings</a></li>
-                            <li><a href="profile.php">Logout</a></li>
+                            <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li> <!-- Updated Logout link -->
                         </ul>   
                     </li>
                 </ul>
@@ -331,6 +411,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
                     <span>Password</span>
                     <button class="edit-button" onclick="openPopup('password-popup')"><i class="fas fa-edit"></i> Edit Password</button>
                 </div>
+                <!-- New LinkedIn Profile Row -->
+                <div class="detail-line">
+                    <img src="images/linkedin.png" alt="LinkedIn" style="width: 20px; height: 20px; margin-right: 10px;">
+                    <span>LinkedIn Profile</span>
+                    <button class="edit-button" onclick="openPopup('linkedin-popup')"><i class="fas fa-edit"></i> Edit Link</button>
+                </div>
+                <?php if ($linkedin_link): ?>
+                <div class="detail-line">
+                    <a href="<?php echo htmlspecialchars($linkedin_link); ?>" target="_blank" style="color: #007bff;"><?php echo htmlspecialchars($linkedin_link); ?></a>
+                </div>
+                <?php endif; ?>
+                <!-- New Resume Row -->
+                <div class="detail-line" style="margin-bottom: 50px;">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Resume</span>
+                    <button class="edit-button" onclick="openPopup('resume-popup')"><i class="fas fa-edit"></i> Edit Resume</button>
+                </div>
+                <?php if ($resume_link): ?>
+                <div class="detail-line">
+                    <a href="<?php echo htmlspecialchars($resume_link); ?>" target="_blank" style="color: #007bff;">Download Resume</a>
+                </div>
+                <?php endif; ?>
                 <button class="logout-button" onclick="openPopup('logout-popup')">Logout</button>
             </div>
         </section>
@@ -368,6 +470,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
         </form>
     </div>
 
+    <!-- New LinkedIn Popup -->
+    <div id="linkedin-popup" class="popup">
+        <form action="profile.php" method="post">
+            <h2>Edit LinkedIn Profile</h2>
+            <input type="text" name="new_linkedin" placeholder="LinkedIn Profile URL" required>
+            <input type="submit" value="Update">
+            <button type="button" class="close-button" onclick="closePopup('linkedin-popup')">Cancel</button>
+        </form>
+    </div>
+
+    <!-- New Resume Popup -->
+    <div id="resume-popup" class="popup">
+    <form action="profile.php" method="post">
+        <h2>Edit Resume</h2>
+        <input type="text" name="new_resume" placeholder="Resume Link" required>
+        <input type="submit" value="Update">
+        <button type="button" class="close-button" onclick="closePopup('resume-popup')">Cancel</button>
+    </form>
+</div>
+
     <div id="logout-popup" class="popup">
         <h2>Are you sure you want to Log Out?</h2>
         <form id="logout-form" action="profile.php" method="post">
@@ -381,7 +503,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
         <div class="footer-content">
             <div class="footer-left">
                 <div class="footer-logo">
-                    <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+                    <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
                 </div>
                 <div class="social-media">
                     <p>Keep up with TechFit:</p>
