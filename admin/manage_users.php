@@ -20,23 +20,33 @@ if ($conn->connect_error) {
 // Fetch Job Seeker data
 $jobSeekerQuery = "
     SELECT 
-        job_seeker.user_id AS name, 
-        NULL AS education_level, 
-        NULL AS position_experienced, 
-        assessment_job_seeker.score AS assessment_score 
+        job_seeker.user_id AS 'name', 
+        job_seeker.education_level AS 'education level', 
+        job_seeker.year_of_experience AS 'year of experience', 
+        assessment_job_seeker.score AS 'assessment score' 
     FROM job_seeker 
     LEFT JOIN assessment_job_seeker 
-    ON job_seeker.job_seeker_id = assessment_job_seeker.assessment_id";
+    ON job_seeker.job_seeker_id = assessment_job_seeker.job_seeker_id";
 $jobSeekerResult = $conn->query($jobSeekerQuery);
+
+
+if (isset($row['education_level'])) {
+    $educationLevel = $row['education_level'];
+} else {
+    $educationLevel = null; // or some default value
+}
 
 // Fetch Employer data
 $employerQuery = "
     SELECT 
-        employer.user_id AS name, 
-        employer.company_name, 
-        NULL AS company_type 
+        employer.user_id AS 'name', 
+        employer.company_name AS 'company name', 
+        employer.company_type AS 'company type'
     FROM employer";
 $employerResult = $conn->query($employerQuery);
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -113,7 +123,6 @@ $employerResult = $conn->query($employerQuery);
     <div class="content">
         <div class="tabs">
             <button class="tab active">Manage User</button>
-            <button class="tab">Manage Feedback</button>
         </div>
 
         <div class="section">
@@ -124,19 +133,19 @@ $employerResult = $conn->query($employerQuery);
                 <table class="user-table">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Education Level</th>
-                            <th>Position Experienced</th>
-                            <th>Assessment Score</th>
+                            <th>name</th>
+                            <th>education level</th>
+                            <th>year of experience</th>
+                            <th>assessment score</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php while ($row = $jobSeekerResult->fetch_assoc()) { ?>
                             <tr>
-                                <td><input type="checkbox"> <?php echo htmlspecialchars($row['name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['education_level']); ?></td>
-                                <td><?php echo htmlspecialchars($row['position_experienced']); ?></td>
-                                <td><?php echo htmlspecialchars($row['assessment_score']); ?></td>
+                                <td><input type="checkbox"> <?php echo htmlspecialchars($row["name"]); ?></td>
+                                <td><?php echo htmlspecialchars(($row['education level']));?></td>
+                                <td><?php echo htmlspecialchars(($row['year of experience']));?></td>
+                                <td><?php echo htmlspecialchars(($row['assessment score']));?></td>
                             </tr>
                         <?php } ?>
                     </tbody>
@@ -156,9 +165,10 @@ $employerResult = $conn->query($employerQuery);
                     <tbody>
                         <?php while ($row = $employerResult->fetch_assoc()) { ?>
                             <tr>
-                                <td><input type="checkbox"> <?php echo htmlspecialchars($row['name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['company_name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['company_type']); ?></td>
+                                <td><input type="checkbox"> 
+                                <?php echo htmlspecialchars($row['name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['company name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['company type']); ?></td>
                             </tr>
                         <?php } ?>
                     </tbody>
