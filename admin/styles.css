@@ -1436,7 +1436,6 @@ footer {
 
 
 /* manage user */
-/* start */
 .content {
     padding: 20px;
     font-family: Arial, sans-serif;
@@ -1509,4 +1508,4 @@ footer {
   .user-table td input[type="checkbox"] {
     margin-right: 10px;
   }
-/* end */
+
