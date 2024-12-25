@@ -26,6 +26,7 @@ foreach ($_POST['question_id'] as $index => $question_id) {
 
     if (!$stmt->execute()) {
         $response['success'] = false;
+        $response['error'] = $stmt->error;
         break;
     }
 
@@ -46,6 +47,7 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                 $stmt->bind_param("sss", $choice_id, $question_id, $choice_text);
                 if (!$stmt->execute()) {
                     $response['success'] = false;
+                    $response['error'] = $stmt->error;
                     break 2;
                 }
             }
@@ -72,6 +74,7 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                 $stmt->bind_param("ssss", $test_case_id, $question_id, $input, $expected_output);
                 if (!$stmt->execute()) {
                     $response['success'] = false;
+                    $response['error'] = $stmt->error;
                     break 2;
                 }
             }
