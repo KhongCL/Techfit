@@ -21,6 +21,8 @@ CREATE TABLE Job_Seeker (
     resume BLOB,
     linkedin_link VARCHAR(255),
     job_position_interested VARCHAR(255),
+    education_level VARCHAR(100), -- Added column
+    year_of_experience INT, -- Added column
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
@@ -30,6 +32,7 @@ CREATE TABLE Employer (
     company_name VARCHAR(100) NOT NULL,
     linkedin_link VARCHAR(255),
     job_position_interested VARCHAR(255),
+    company_type VARCHAR(100), -- Added column
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
@@ -167,5 +170,6 @@ CREATE TABLE Test_Cases (
     question_id VARCHAR(5) NOT NULL,
     input TEXT NOT NULL,
     expected_output TEXT NOT NULL,
+    programming_language ENUM('python', 'javascript', 'java', 'c++') NOT NULL,
     FOREIGN KEY (question_id) REFERENCES Question(question_id)
 );
