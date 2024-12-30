@@ -1434,3 +1434,77 @@ footer {
         padding: 10px 15px;
     }
 }
+
+.report {
+    display: flex;                      
+    flex-direction: row;           
+    align-items: flex-start; 
+    row-gap: 20px 40px;       
+    transition: background-color 0.3s, color 0.3s;
+    text-align: center;
+    border-bottom: black;
+}
+
+.report_select {
+    padding: 20px;
+    background-color: white;
+    text-decoration: none;
+    border: white;
+    align-self: center;
+}
+
+.report_select:hover {
+    background-color: #f0f0f0;
+}
+
+
+.report_select:active,
+.report_select:focus {
+    background-color: #dfdfdf;
+}
+
+.align{
+    display: flex;                      
+    flex-direction: row;  
+    width: 100%;    
+}
+
+.content {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.assessment-section {
+    margin-right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #f4f4f4;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.assessment-section h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.assessment-section select {
+    margin-right: 0;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.selection{
+    margin-right: auto;
+}
