@@ -1,9 +1,3 @@
-<!-- note: 
- what table and data type should i refer to for job seeker's 
- education level, position experienced, and company type for employer? 
- -->
-
-
 <?php
 $host = 'localhost';
 $username = 'root';
@@ -11,11 +5,6 @@ $password = '';
 $database = 'techfit'; 
 
 $conn = new mysqli($host, $username, $password, $database);
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
 
 // Fetch Job Seeker data
 $jobSeekerQuery = "
@@ -29,13 +18,6 @@ $jobSeekerQuery = "
     ON job_seeker.job_seeker_id = assessment_job_seeker.job_seeker_id";
 $jobSeekerResult = $conn->query($jobSeekerQuery);
 
-
-if (isset($row['education_level'])) {
-    $educationLevel = $row['education_level'];
-} else {
-    $educationLevel = null; // or some default value
-}
-
 // Fetch Employer data
 $employerQuery = "
     SELECT 
@@ -45,8 +27,41 @@ $employerQuery = "
     FROM employer";
 $employerResult = $conn->query($employerQuery);
 
+// Fetch Disabled Users data
+$disabledUsersQuery = "
+    SELECT 
+        disabled_users.user_id AS 'name', 
+        disabled_users.disabled_date AS 'disabled date'
+    FROM disabled_users";
+$disabledUsersResult = $conn->query($disabledUsersQuery);
 
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete'])) {
+    $userIds = $_POST['user_ids'];
+    $disabledDate = date('Y-m-d H:i:s');
 
+    foreach ($userIds as $userId) {
+        // Fetch user details
+        $userQuery = "SELECT user_id FROM job_seeker WHERE user_id = '$userId' UNION SELECT user_id FROM employer WHERE user_id = '$userId'";
+        $userResult = $conn->query($userQuery);
+        $user = $userResult->fetch_assoc();
+
+        if ($user) {
+            // Transfer user to disabled_users table
+            $conn->query("INSERT INTO disabled_users (user_id, disabled_date) VALUES ('$userId', '$disabledDate')");
+
+            // Remove user from job_seeker table
+            $conn->query("DELETE FROM job_seeker WHERE user_id = '$userId'");
+
+            // Remove user from employer table
+            $conn->query("DELETE FROM employer WHERE user_id = '$userId'");
+        }
+    }
+
+    // Refresh the page to reflect changes
+    header('Location: manage_users.php');
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -125,56 +140,81 @@ $employerResult = $conn->query($employerQuery);
             <button class="tab active">Manage User</button>
         </div>
 
-        <div class="section">
-            <h2 class="section-title">USER <a href="#" class="delete-link">Delete</a></h2>
+        <form method="POST" action="manage_users.php">
+            <div class="delete_button">
+                <h2 class="section-title">USER <button type="submit" name="delete" class="delete-link">Delete</button></h2>
 
-            <div class="user-section">
-                <h3 class="user-type">Job Seeker</h3>
-                <table class="user-table">
-                    <thead>
-                        <tr>
-                            <th>name</th>
-                            <th>education level</th>
-                            <th>year of experience</th>
-                            <th>assessment score</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while ($row = $jobSeekerResult->fetch_assoc()) { ?>
+                <div class="user-section">
+                    <h3 class="user-type">Job Seeker</h3>
+                    <table class="user-table">
+                        <thead>
                             <tr>
-                                <td><input type="checkbox"> <?php echo htmlspecialchars($row["name"]); ?></td>
-                                <td><?php echo htmlspecialchars(($row['education level']));?></td>
-                                <td><?php echo htmlspecialchars(($row['year of experience']));?></td>
-                                <td><?php echo htmlspecialchars(($row['assessment score']));?></td>
+                                <th>Select</th>
+                                <th>Name</th>
+                                <th>Education Level</th>
+                                <th>Year of Experience</th>
+                                <th>Assessment Score</th>
                             </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            <?php while ($row = $jobSeekerResult->fetch_assoc()) { ?>
+                                <tr>
+                                    <td><input type="checkbox" name="user_ids[]" value="<?php echo htmlspecialchars($row['name']); ?>"></td>
+                                    <td><?php echo htmlspecialchars($row["name"]); ?></td>
+                                    <td><?php echo htmlspecialchars($row['education level']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['year of experience']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['assessment score']); ?></td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
 
-            <div class="user-section">
-                <h3 class="user-type">Employer</h3>
-                <table class="user-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Company Name</th>
-                            <th>Company Type</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php while ($row = $employerResult->fetch_assoc()) { ?>
+                <div class="user-section">
+                    <h3 class="user-type">Employer</h3>
+                    <table class="user-table">
+                        <thead>
                             <tr>
-                                <td><input type="checkbox"> 
-                                <?php echo htmlspecialchars($row['name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['company name']); ?></td>
-                                <td><?php echo htmlspecialchars($row['company type']); ?></td>
+                                <th>Select</th>
+                                <th>Name</th>
+                                <th>Company Name</th>
+                                <th>Company Type</th>
                             </tr>
-                        <?php } ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <?php while ($row = $employerResult->fetch_assoc()) { ?>
+                                <tr>
+                                    <td><input type="checkbox" name="user_ids[]" value="<?php echo htmlspecialchars($row['name']); ?>"></td>
+                                    <td><?php echo htmlspecialchars($row['name']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['company name']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['company type']); ?></td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="user-section">
+                    <h3 class="user-type">Disabled Users</h3>
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Disabled Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while ($row = $disabledUsersResult->fetch_assoc()) { ?>
+                                <tr>
+                                    <td><?php echo htmlspecialchars($row['name']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['disabled date']); ?></td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 
     <footer>
