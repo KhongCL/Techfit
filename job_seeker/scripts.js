@@ -75,3 +75,20 @@ document.querySelectorAll('.faq-question').forEach(item => {
         }
     });
 });
+
+// Preliminary questions
+document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('agree');
+    checkbox.checked = false;
+
+    const startButton = document.getElementById('start-assessment-button');
+    startButton.disabled = true;
+
+    checkbox.addEventListener('change', function() {
+        startButton.disabled = !this.checked;
+    });
+
+    startButton.addEventListener('click', function() {
+        window.location.href = 'preliminary_questions.html';
+    });
+});

@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Redirect based on role
             if ($row['role'] == 'Job Seeker') {
-                header("Location: job_seeker/index.html");
+                header("Location: job_seeker/index.php");
             } else if ($row['role'] == 'Employer') {
                 header("Location: employer/index.html");
             } else if ($row['role'] == 'Admin') {

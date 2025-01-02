@@ -9,6 +9,67 @@ session_start(); // Start the session to access session variables
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechFit Job Seeker - Home</title>
     <link rel="stylesheet" href="styles.css?v=2.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        .popup h2 {
+            color: #fff; /* Set the heading text color to white */
+        }
+        .popup input[type="text"],
+        .popup input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+        }
+        .popup input[type="submit"] {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        .popup input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .popup .close-button {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .popup .close-button:hover {
+            background-color: #c82333;
+        }
+        .popup .cancel-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .popup .cancel-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -51,7 +112,7 @@ session_start(); // Start the session to access session variables
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
                             <li><a href="profile.php">Settings</a></li>
-                            <li><a href="logout.php">Logout</a></li>
+                            <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li> <!-- Updated Logout link -->
                         </ul>
                     </li>
                 </ul>
@@ -99,7 +160,7 @@ session_start(); // Start the session to access session variables
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.html">Useful Links</a></li>
+                        <li><a href="useful_links.html">Resources</a></li>
                         <li><a href="faq.html">FAQ</a></li>
                         <li><a href="sitemap.html">Sitemap</a></li>
                         <li><a href="about.html">About</a></li>
@@ -126,6 +187,29 @@ session_start(); // Start the session to access session variables
         </div>
     </footer>
 
+    <!-- Logout Popup -->
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <form id="logout-form" action="profile.php" method="post">
+            <input type="hidden" name="logout" value="1">
+            <button type="submit" class="close-button">Yes</button>
+            <button type="button" class="cancel-button" onclick="closePopup('logout-popup')">No</button>
+        </form>
+    </div>
+
     <script src="scripts.js?v=1.0"></script>
+    <script>
+        function openPopup(popupId) {
+            document.getElementById(popupId).style.display = 'block';
+        }
+
+        function closePopup(popupId) {
+            document.getElementById(popupId).style.display = 'none';
+        }
+
+        function logoutUser() {
+            document.getElementById('logout-form').submit();
+        }
+    </script>
 </body>
 </html>

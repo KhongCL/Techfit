@@ -1330,7 +1330,7 @@ footer {
     margin-bottom: 20px;
 }
 
-/* Main Section Styles */
+/* Create Assessment */
 #create-assessment-main {
     width: 100%;
     max-width: 1000px;
@@ -1353,7 +1353,6 @@ footer {
     margin-bottom: 20px;
 }
 
-/* Form Section Styles */
 #create-assessment-section {
     width: 100%;
     background-color: #fff;
@@ -1435,76 +1434,78 @@ footer {
     }
 }
 
-.report {
-    display: flex;                      
-    flex-direction: row;           
-    align-items: flex-start; 
-    row-gap: 20px 40px;       
-    transition: background-color 0.3s, color 0.3s;
-    text-align: center;
-    border-bottom: black;
-}
 
-.report_select {
-    padding: 20px;
-    background-color: white;
-    text-decoration: none;
-    border: white;
-    align-self: center;
-}
-
-.report_select:hover {
-    background-color: #f0f0f0;
-}
-
-
-.report_select:active,
-.report_select:focus {
-    background-color: #dfdfdf;
-}
-
-.align{
-    display: flex;                      
-    flex-direction: row;  
-    width: 100%;    
-}
-
+/* manage user */
 .content {
-    max-width: 800px;
-    margin: 20px auto;
     padding: 20px;
-    background-color: #fff;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    text-align: center;
-}
-
-.assessment-section {
-    margin-right: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  .tabs {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #f4f4f4;
-    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .tab {
+    padding: 10px 20px;
     border: 1px solid #ccc;
-    border-radius: 5px;
-}
-
-.assessment-section h2 {
-    margin: 0;
-    font-size: 20px;
-    font-weight: 600;
-}
-
-.assessment-section select {
-    margin-right: 0;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    cursor: pointer;
+    background-color: #f9f9f9;
+    margin-right: 5px;
+  }
+  
+  .tab.active {
+    background-color: #ddd;
+  }
+  
+  .section {
     background-color: #fff;
-}
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+  }
+  
+  .section-title {
+    font-size: 20px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .delete-link {
+    color: red;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  
+  .user-section {
+    margin-top: 20px;
+  }
+  
+  .user-type {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  .user-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .user-table th, .user-table td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: left;
+  }
+  
+  .user-table th {
+    background-color: #f0f0f0;
+  }
+  
+  .user-table td input[type="checkbox"] {
+    margin-right: 10px;
+  }
 
-.selection{
-    margin-right: auto;
-}

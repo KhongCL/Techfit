@@ -1,9 +1,12 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Questions for Assessment - TechFit</title>
+    <title>Edit Questions for Assessment - TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <script>
         let questionCount = 0;
@@ -23,6 +26,7 @@
             const questionDiv = document.createElement('div');
             questionDiv.id = `question-${questionCount}`;
             questionDiv.innerHTML = `
+                <input type="hidden" id="question_id_${questionCount}" name="question_id[]" value="">
                 <label for="question_text_${questionCount}">Question Text:</label>
                 <textarea id="question_text_${questionCount}" name="question_text[]" required></textarea><br>
 
@@ -56,8 +60,57 @@
         function removeQuestion(id) {
             if (confirm('Are you sure you want to remove this question?')) {
                 const questionDiv = document.getElementById(`question-${id}`);
-                questionDiv.remove();
+                questionDiv.style.display = 'none';
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'removed_questions[]';
+                input.value = id;
+                questionDiv.appendChild(input);
                 isFormDirty = true;
+
+                // Send AJAX request to update is_active to false
+                const questionId = document.getElementById(`question_id_${id}`).value;
+                fetch('update_question_status.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ question_id: questionId, is_active: false })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Question status updated successfully.');
+                    } else {
+                        console.error('Failed to update question status.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        }
+
+        function saveAssessment() {
+            if (confirm('Are you sure you want to save the changes?')) {
+                isFormDirty = false;
+                const form = document.getElementById('questions-form');
+                const formData = new FormData(form);
+
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', 'update_questions.php', true);
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        alert('Assessment updated successfully.');
+                        window.location.href = 'manage_assessments.php';
+                    } else {
+                        alert('Failed to update assessment.');
+                    }
+                };
+                xhr.onerror = function () {
+                    alert('An error occurred while updating the assessment.');
+                };
+                xhr.send(formData);
             }
         }
 
@@ -106,7 +159,7 @@
         function getCodeQuestionOptions(id) {
             return `
                 <label for="code_language_${id}">Select Language:</label>
-                <select id="code_language_${id}" name="code_language_${id}" required>
+                <select id="code_language_${id}" name="code_language[]" required>
                     <option value="python">Python</option>
                     <option value="javascript">JavaScript</option>
                     <option value="java">Java</option>
@@ -142,21 +195,26 @@
                 isFormDirty = true;
             };
 
+            input.oninput = function() {
+                updateCorrectChoiceDropdown(id);
+            };
+
             choiceContainer.appendChild(input);
             choiceContainer.appendChild(removeButton);
             choicesDiv.insertBefore(choiceContainer, choicesDiv.lastElementChild);
 
-            // Update the correct choice dropdown after adding the new choice
-            input.addEventListener('input', function() {
-                updateCorrectChoiceDropdown(id);
-            });
-
+            // Update the correct choice dropdown
             updateCorrectChoiceDropdown(id);
             isFormDirty = true;
         }
-        
+
         function addTestCase(id) {
             const testCasesDiv = document.getElementById(`test_cases_${id}`);
+            if (!testCasesDiv) {
+                console.error(`Test cases div not found for question ${id}`);
+                return;
+            }
+
             const input = document.createElement('textarea');
             input.name = `test_cases_${id}[]`;
             input.placeholder = 'Input';
@@ -196,14 +254,59 @@
             });
         }
 
-        function saveAssessment() {
-            isFormDirty = false;
-            document.getElementById('questions-form').submit();
-        }
+        // Fetch existing questions for the assessment
+        document.addEventListener('DOMContentLoaded', function() {
+            const assessmentId = "<?php echo htmlspecialchars($_GET['assessment_id']); ?>";
+            fetch(`get_questions.php?assessment_id=${assessmentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(question => {
+                        addQuestion();
+                        document.getElementById(`question_id_${questionCount}`).value = question.question_id;
+                        document.getElementById(`question_text_${questionCount}`).value = question.question_text;
+                        document.getElementById(`question_type_${questionCount}`).value = question.question_type;
+                        document.getElementById(`answer_type_${questionCount}`).value = question.answer_type;
+                        showAnswerOptions(questionCount);
+                        if (question.answer_type === 'multiple choice') {
+                            // Populate choices for multiple choice questions
+                            const choicesDiv = document.getElementById(`choices_${questionCount}`);
+                            question.choices.forEach(choice => {
+                                addChoice(questionCount);
+                                const choiceInputs = document.getElementsByName(`choices_${questionCount}[]`);
+                                choiceInputs[choiceInputs.length - 2].value = choice.choice_text; // Set the value of the last added choice input
+                            });
+                            updateCorrectChoiceDropdown(questionCount); // Update the correct choice dropdown
+                            document.getElementById(`correct_choice_${questionCount}`).value = question.correct_answer;
+                        } else if (question.answer_type === 'code') {
+                            // Populate code question options
+                            document.getElementById(`code_${questionCount}`).value = question.correct_answer;
+                            document.getElementById(`code_language_${questionCount}`).value = question.programming_language; // Set the programming language
+                            // Fetch and populate test cases for code questions
+                            fetch(`get_test_cases.php?question_id=${question.question_id}`)
+                                .then(response => response.json())
+                                .then(testCases => {
+                                    testCases.forEach(testCase => {
+                                        addTestCase(questionCount);
+                                        const testCaseInputs = document.getElementsByName(`test_cases_${questionCount}[]`);
+                                        const expectedOutputInputs = document.getElementsByName(`expected_output_${questionCount}[]`);
+                                        testCaseInputs[testCaseInputs.length - 2].value = testCase.input;
+                                        expectedOutputInputs[expectedOutputInputs.length - 2].value = testCase.expected_output;
+                                    });
+                                });
+                        } else if (question.answer_type === 'true/false') {
+                            document.getElementById(`true_false_${questionCount}`).value = question.correct_answer;
+                        } else if (question.answer_type === 'fill in the blank') {
+                            document.getElementById(`blank_${questionCount}`).value = question.correct_answer;
+                        } else if (question.answer_type === 'essay') {
+                            document.getElementById(`essay_${questionCount}`).value = question.correct_answer;
+                        }
+                    });
+                });
+        });
     </script>
 </head>
 <body>
-<header>
+    <header>
         <div class="logo">
             <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
@@ -265,7 +368,7 @@
         </nav>
     </header>    
     <main>
-        <h1>Create Questions for Assessment</h1>
+        <h1>Edit Questions for Assessment</h1>
         <p>Assessment ID: <strong><?php echo htmlspecialchars($_GET['assessment_id']); ?></strong></p>
         <?php
         if (isset($_SESSION['success_message'])) {

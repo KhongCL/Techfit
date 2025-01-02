@@ -1,13 +1,64 @@
+<!-- note: 
+ what table and data type should i refer to for job seeker's 
+ education level, position experienced, and company type for employer? 
+ -->
+
+
+<?php
+$host = 'localhost';
+$username = 'root';
+$password = '';
+$database = 'techfit'; 
+
+$conn = new mysqli($host, $username, $password, $database);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch Job Seeker data
+$jobSeekerQuery = "
+    SELECT 
+        job_seeker.user_id AS 'name', 
+        job_seeker.education_level AS 'education level', 
+        job_seeker.year_of_experience AS 'year of experience', 
+        assessment_job_seeker.score AS 'assessment score' 
+    FROM job_seeker 
+    LEFT JOIN assessment_job_seeker 
+    ON job_seeker.job_seeker_id = assessment_job_seeker.job_seeker_id";
+$jobSeekerResult = $conn->query($jobSeekerQuery);
+
+
+if (isset($row['education_level'])) {
+    $educationLevel = $row['education_level'];
+} else {
+    $educationLevel = null; // or some default value
+}
+
+// Fetch Employer data
+$employerQuery = "
+    SELECT 
+        employer.user_id AS 'name', 
+        employer.company_name AS 'company name', 
+        employer.company_type AS 'company type'
+    FROM employer";
+$employerResult = $conn->query($employerQuery);
+
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Assessments - TechFit</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Techfit</title>
+    <link rel="stylesheet" href="styles.css">   
 </head>
 <body>
-<header>
+    <header>
         <div class="logo">
             <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
@@ -68,54 +119,64 @@
             </div>
         </nav>
     </header>    
-    <main>
-        <h1>Manage Assessments</h1>
-        <button onclick="window.location.href='create_assessment.html'">Create New Assessment</button>
-        <table>
-            <thead>
-                <tr>
-                    <th>Assessment ID</th>
-                    <th>Assessment Name</th>
-                    <th>Timestamp</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $servername = "localhost";
-                $username = "root";
-                $password = "";
-                $dbname = "techfit";
 
-                // Create connection
-                $conn = new mysqli($servername, $username, $password, $dbname);
+    <div class="content">
+        <div class="tabs">
+            <button class="tab active">Manage User</button>
+        </div>
 
-                // Check connection
-                if ($conn->connect_error) {
-                    die("Connection failed: " . $conn->connect_error);
-                }
+        <div class="section">
+            <h2 class="section-title">USER <a href="#" class="delete-link">Delete</a></h2>
 
-                $sql = "SELECT assessment_id, assessment_name, timestamp FROM Assessment_Admin";
-                $result = $conn->query($sql);
+            <div class="user-section">
+                <h3 class="user-type">Job Seeker</h3>
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>name</th>
+                            <th>education level</th>
+                            <th>year of experience</th>
+                            <th>assessment score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($row = $jobSeekerResult->fetch_assoc()) { ?>
+                            <tr>
+                                <td><input type="checkbox"> <?php echo htmlspecialchars($row["name"]); ?></td>
+                                <td><?php echo htmlspecialchars(($row['education level']));?></td>
+                                <td><?php echo htmlspecialchars(($row['year of experience']));?></td>
+                                <td><?php echo htmlspecialchars(($row['assessment score']));?></td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
 
-                if ($result->num_rows > 0) {
-                    while($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td>" . htmlspecialchars($row['assessment_id']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['assessment_name']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['timestamp']) . "</td>";
-                        echo "<td><a href='edit_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Edit</a> | <a href='delete_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Delete</a></td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='4'>No assessments found</td></tr>";
-                }
+            <div class="user-section">
+                <h3 class="user-type">Employer</h3>
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Company Name</th>
+                            <th>Company Type</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php while ($row = $employerResult->fetch_assoc()) { ?>
+                            <tr>
+                                <td><input type="checkbox"> 
+                                <?php echo htmlspecialchars($row['name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['company name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['company type']); ?></td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-                $conn->close();
-                ?>
-            </tbody>
-        </table>
-    </main>
     <footer>
         <div class="footer-content">
             <div class="footer-left">
@@ -180,5 +241,6 @@
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
+    <script src="scripts.js"></script>
 </body>
 </html>

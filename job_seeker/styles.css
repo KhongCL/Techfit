@@ -1355,3 +1355,81 @@ footer {
     font-weight: bold;
     margin-bottom: 20px;
 }
+
+/* Start Assessment */
+#start-assessment-container {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    width: 90%;
+    max-width: 700px;
+    margin: 20px auto;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#start-assessment-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+#start-assessment-container h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+#start-assessment-container h3 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: #444;
+}
+
+#start-assessment-rules {
+    text-align: left;
+    font-size: 1.0rem;
+    color: #555;
+    margin-bottom: 40px;
+}
+
+#start-assessment-rules ul {
+    list-style-type: disc;
+    margin-left: 20px;
+    margin-bottom: 30px;
+}
+
+#agree-checkbox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+}
+
+#agree-checkbox input {
+    margin-right: 15px;
+}
+
+#start-assessment-button {
+    background-color: #007bff;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    align-self: flex-end;
+    margin-top: auto;
+    font-size: 1.1rem;
+}
+
+#start-assessment-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}

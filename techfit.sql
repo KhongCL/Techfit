@@ -21,6 +21,8 @@ CREATE TABLE Job_Seeker (
     resume BLOB,
     linkedin_link VARCHAR(255),
     job_position_interested VARCHAR(255),
+    education_level VARCHAR(100), -- Added column
+    year_of_experience INT, -- Added column
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
@@ -30,6 +32,7 @@ CREATE TABLE Employer (
     company_name VARCHAR(100) NOT NULL,
     linkedin_link VARCHAR(255),
     job_position_interested VARCHAR(255),
+    company_type VARCHAR(100), -- Added column
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
@@ -68,6 +71,7 @@ CREATE TABLE Question (
     question_type ENUM('preliminary', 'experience', 'employer_score', 'detailed', 'technical') NOT NULL,
     answer_type ENUM('multiple choice', 'true/false', 'fill in the blank', 'essay', 'code') NOT NULL,
     correct_answer TEXT, -- Add this column to store the correct answer
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (assessment_id) REFERENCES Assessment_Admin(assessment_id)
 );
 
@@ -152,4 +156,20 @@ CREATE TABLE Assessment_Audit_Log (
     details TEXT DEFAULT NULL,
     FOREIGN KEY (assessment_id) REFERENCES Assessment_Admin(assessment_id),
     FOREIGN KEY (admin_id) REFERENCES Admin(admin_id)
+);
+
+CREATE TABLE Choices (
+    choice_id VARCHAR(5) PRIMARY KEY,
+    question_id VARCHAR(5) NOT NULL,
+    choice_text TEXT NOT NULL,
+    FOREIGN KEY (question_id) REFERENCES Question(question_id)
+);
+
+CREATE TABLE Test_Cases (
+    test_case_id VARCHAR(5) PRIMARY KEY,
+    question_id VARCHAR(5) NOT NULL,
+    input TEXT NOT NULL,
+    expected_output TEXT NOT NULL,
+    programming_language ENUM('python', 'javascript', 'java', 'cpp') NOT NULL,
+    FOREIGN KEY (question_id) REFERENCES Question(question_id)
 );
