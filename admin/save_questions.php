@@ -46,6 +46,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     foreach ($question_texts as $index => $question_text) {
+        if (empty($question_text) || empty($question_types[$index]) || empty($answer_types[$index]) || empty($correct_answers[$index])) {
+            $_SESSION['error_message'] = "All fields are required.";
+            header("Location: create_questions.php?assessment_id=$assessment_id");
+            exit();
+        }
+
         $question_id = generateNextId($conn, 'Question', 'question_id', 'Q');
         $question_type = $question_types[$index];
         $answer_type = $answer_types[$index];
@@ -71,6 +77,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (isset($_POST[$choices_key])) {
                 $choices = $_POST[$choices_key];
                 foreach ($choices as $choice_text) {
+                    if (empty($choice_text)) {
+                        $_SESSION['error_message'] = "All choice fields are required.";
+                        header("Location: create_questions.php?assessment_id=$assessment_id");
+                        exit();
+                    }
                     $choice_id = generateNextId($conn, 'Choices', 'choice_id', 'C');
                     $stmt = $conn->prepare("INSERT INTO Choices (choice_id, question_id, choice_text) VALUES (?, ?, ?)");
                     $stmt->bind_param("sss", $choice_id, $question_id, $choice_text);
@@ -96,10 +107,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $test_cases = $_POST[$test_cases_key];
                 $expected_outputs = $_POST[$expected_output_key];
                 foreach ($test_cases as $tc_index => $input) {
+                    if (empty($input) || empty($expected_outputs[$tc_index])) {
+                        $_SESSION['error_message'] = "All test case fields are required.";
+                        header("Location: create_questions.php?assessment_id=$assessment_id");
+                        exit();
+                    }
                     $test_case_id = generateNextId($conn, 'Test_Cases', 'test_case_id', 'T');
                     $expected_output = $expected_outputs[$tc_index];
-                    $stmt = $conn->prepare("INSERT INTO Test_Cases (test_case_id, question_id, input, expected_output, programming_language) VALUES (?, ?, ?, ?, ?)"); // Modified line
-                    $stmt->bind_param("sssss", $test_case_id, $question_id, $input, $expected_output, $programming_language); // Modified line
+                    $stmt = $conn->prepare("INSERT INTO Test_Cases (test_case_id, question_id, input, expected_output, programming_language) VALUES (?, ?, ?, ?, ?)");
+                    $stmt->bind_param("sssss", $test_case_id, $question_id, $input, $expected_output, $programming_language);
                     if ($stmt->execute() !== TRUE) {
                         $_SESSION['error_message'] = "Error: " . $stmt->error;
                         header("Location: create_questions.php?assessment_id=$assessment_id");

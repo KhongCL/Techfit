@@ -197,9 +197,49 @@
         }
 
         function saveAssessment() {
-            isFormDirty = false;
-            document.getElementById('questions-form').submit();
-        }
+            if (confirm('Are you sure you want to save the changes?')) {
+                const form = document.getElementById('questions-form');
+                
+                // Client-side validation
+                const questionTexts = form.querySelectorAll('textarea[name="question_text[]"]');
+                const questionTypes = form.querySelectorAll('select[name="question_type[]"]');
+                const answerTypes = form.querySelectorAll('select[name="answer_type[]"]');
+                const correctChoices = form.querySelectorAll('textarea[name="correct_choice[]"], input[name="correct_choice[]"], select[name="correct_choice[]"]');
+                
+                for (let i = 0; i < questionTexts.length; i++) {
+                    if (questionTexts[i].value.trim() === '' || questionTypes[i].value.trim() === '' || answerTypes[i].value.trim() === '' || correctChoices[i].value.trim() === '') {
+                        alert('All fields are required.');
+                        return;
+                    }
+
+                    // Additional validation for multiple choice questions
+                    if (answerTypes[i].value === 'multiple choice') {
+                        const choices = form.querySelectorAll(`input[name="choices_${i + 1}[]"]`);
+                        for (let choice of choices) {
+                            if (choice.value.trim() === '') {
+                                alert('All choice fields are required.');
+                                return;
+                            }
+                        }
+                    }
+
+                    // Additional validation for code questions
+                    if (answerTypes[i].value === 'code') {
+                        const testCases = form.querySelectorAll(`textarea[name="test_cases_${i + 1}[]"]`);
+                        const expectedOutputs = form.querySelectorAll(`textarea[name="expected_output_${i + 1}[]"]`);
+                        for (let j = 0; j < testCases.length; j++) {
+                            if (testCases[j].value.trim() === '' || expectedOutputs[j].value.trim() === '') {
+                                alert('All test case fields are required.');
+                                return;
+                            }
+                        }
+                    }
+                }
+
+                isFormDirty = false;
+                form.submit();
+            }
+            }
     </script>
 </head>
 <body>

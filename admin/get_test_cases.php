@@ -22,7 +22,9 @@ $result = $stmt->get_result();
 
 $testCases = array();
 while ($row = $result->fetch_assoc()) {
-    $testCases[] = $row;
+    if (!empty($row['input']) && !empty($row['expected_output'])) { // Ensure input and expected_output are not empty
+        $testCases[] = $row;
+    }
 }
 
 $stmt->close();
