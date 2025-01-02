@@ -1,77 +1,12 @@
-<?php
-$host = 'localhost';
-$username = 'root';
-$password = '';
-$database = 'techfit'; 
-
-$conn = new mysqli($host, $username, $password, $database);
-
-// Fetch Job Seeker data
-$jobSeekerQuery = "
-    SELECT 
-        job_seeker.user_id AS 'name', 
-        job_seeker.education_level AS 'education level', 
-        job_seeker.year_of_experience AS 'year of experience', 
-        assessment_job_seeker.score AS 'assessment score' 
-    FROM job_seeker 
-    LEFT JOIN assessment_job_seeker 
-    ON job_seeker.job_seeker_id = assessment_job_seeker.job_seeker_id";
-$jobSeekerResult = $conn->query($jobSeekerQuery);
-
-// Fetch Employer data
-$employerQuery = "
-    SELECT 
-        employer.user_id AS 'name', 
-        employer.company_name AS 'company name', 
-        employer.company_type AS 'company type'
-    FROM employer";
-$employerResult = $conn->query($employerQuery);
-
-// Fetch Disabled Users data
-$disabledUsersQuery = "
-    SELECT 
-        disabled_users.user_id AS 'name', 
-        disabled_users.disabled_date AS 'disabled date'
-    FROM disabled_users";
-$disabledUsersResult = $conn->query($disabledUsersQuery);
-
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete'])) {
-    $userIds = $_POST['user_ids'];
-    $disabledDate = date('Y-m-d H:i:s');
-
-    foreach ($userIds as $userId) {
-        // Fetch user details
-        $userQuery = "SELECT user_id FROM job_seeker WHERE user_id = '$userId' UNION SELECT user_id FROM employer WHERE user_id = '$userId'";
-        $userResult = $conn->query($userQuery);
-        $user = $userResult->fetch_assoc();
-
-        if ($user) {
-            // Transfer user to disabled_users table
-            $conn->query("INSERT INTO disabled_users (user_id, disabled_date) VALUES ('$userId', '$disabledDate')");
-
-            // Remove user from job_seeker table
-            $conn->query("DELETE FROM job_seeker WHERE user_id = '$userId'");
-
-            // Remove user from employer table
-            $conn->query("DELETE FROM employer WHERE user_id = '$userId'");
-        }
-    }
-
-    // Refresh the page to reflect changes
-    header('Location: manage_users.php');
-    exit();
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Techfit</title>
-    <link rel="stylesheet" href="styles.css">   
+    <title>Create Assessment - TechFit</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <header>
         <div class="logo">
@@ -135,88 +70,30 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete'])) {
         </nav>
     </header>    
 
-    <div class="content">
-        <div class="tabs">
-            <button class="tab active">Manage User</button>
-        </div>
 
-        <form method="POST" action="manage_users.php">
-            <div class="delete_button">
-                <h2 class="section-title">USER <button type="submit" name="delete" class="delete-link">Delete</button></h2>
 
-                <div class="user-section">
-                    <h3 class="user-type">Job Seeker</h3>
-                    <table class="user-table">
-                        <thead>
-                            <tr>
-                                <th>Select</th>
-                                <th>Name</th>
-                                <th>Education Level</th>
-                                <th>Year of Experience</th>
-                                <th>Assessment Score</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $jobSeekerResult->fetch_assoc()) { ?>
-                                <tr>
-                                    <td><input type="checkbox" name="user_ids[]" value="<?php echo htmlspecialchars($row['name']); ?>"></td>
-                                    <td><?php echo htmlspecialchars($row["name"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row['education level']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['year of experience']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['assessment score']); ?></td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="user-section">
-                    <h3 class="user-type">Employer</h3>
-                    <table class="user-table">
-                        <thead>
-                            <tr>
-                                <th>Select</th>
-                                <th>Name</th>
-                                <th>Company Name</th>
-                                <th>Company Type</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $employerResult->fetch_assoc()) { ?>
-                                <tr>
-                                    <td><input type="checkbox" name="user_ids[]" value="<?php echo htmlspecialchars($row['name']); ?>"></td>
-                                    <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['company name']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['company type']); ?></td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="user-section">
-                    <h3 class="user-type">Disabled Users</h3>
-                    <table class="user-table">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Disabled Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $disabledUsersResult->fetch_assoc()) { ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['disabled date']); ?></td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </form>
+    <div class="report">
+        <button class="report_select">Assessment Performance</button>
+        <button class="report_select">User Engagement Static</button>
+        <button class="report_select">Feedback Analysis</button>
     </div>
 
+    <div class="content">
+        <div class="assessment-section">
+            <h2>Assessment</h2>
+        </div>
+    </div>
+    
+    <div class="assessment-section">
+    <select>
+        <option>Select Assessment</option>
+        <option>Assessment 1</option>
+        <option>Assessment 2</option>
+        <option>Assessment 3</option>
+    </select>
+</div>
+
+    
     <footer>
         <div class="footer-content">
             <div class="footer-left">
