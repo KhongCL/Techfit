@@ -1509,3 +1509,197 @@ footer {
     margin-right: 10px;
   }
 
+
+
+
+.report {
+    display: flex;                      
+    flex-direction: row;          
+    align-items: flex-start;
+    row-gap: 20px 40px;      
+    transition: background-color 0.3s, color 0.3s;
+    text-align: center;
+    border-bottom: black;
+}
+.report_select {
+    padding: 35px;
+    background-color: white;
+    text-decoration: none;
+    border: white;
+    align-self: center;
+    font-size: 20px;
+    font: weight 60px;0;
+}
+.report_select:hover {
+    background-color: #f0f0f0;
+}
+.report_select:active,
+.report_select:focus {
+    background-color: #dfdfdf;
+}
+.align{
+    display: flex;                      
+    flex-direction: row;  
+    width: 100%;    
+}
+.chart {
+    margin: 20px auto;
+    width: 200px;
+    height: 200px;
+    background: conic-gradient(#4caf50 50%, #f44336 50%);
+    border-radius: 50%;
+}
+.details {
+    margin-top: 20px;
+}
+select, label {
+    margin: 10px;
+}
+.tabs {
+    display: flex;
+    justify-content: center; /* Center tabs horizontally */
+    border-bottom: 1px solid #ccc;
+    background-color: #f9f9f9;
+    padding: 10px 0;
+}
+.tab {
+    margin: 0 20px;
+    padding: 10px;
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+    border-bottom: 2px solid transparent;
+}
+.tab:hover, .tab.active {
+    border-bottom: 2px solid #000;
+    color: #000;
+}
+.asse_content {
+    font-size: 40px;
+background-color: none;
+text-align: center;
+}
+.assessment-section {
+    display: flex;
+    align-self: flex-end;
+    justify-content: space-between;
+    padding: 20px;
+    margin-right: 10%;
+    font-size: 18px;    
+}
+
+.assessment-section select {
+    padding: 10px;
+    font-size: 16px;
+    background-color: #fff;
+    font-size: 20px;
+}
+
+.chart {
+    margin: 20px auto;
+    width: 400px;
+    height: 400px;
+    background: conic-gradient(
+                green <?= $pass ?>deg,
+                red <?= $pass ?>deg <?= $pass + $fail ?>deg,
+            );
+    border-radius: 50%;
+}
+
+.pass_label{
+max-width: fit-content;
+max-height: fit-content;
+background-color: green;
+}
+
+.fail_label{
+    max-width: fit-content;
+max-height: fit-content;
+background-color: red;
+}
+
+.details {
+    align-self: flex-end;
+    margin-top: 20px;
+    margin-right: 20%;
+    font-size: 20px;
+}
+
+.details_middle{
+    align-self: center;
+    margin-top: 20px;
+    font-size: 25px;
+}
+
+select, label {
+    align-self: flex-end;
+    margin: 10px;
+    margin-right: 20%;
+}
+
+.asse_container {
+    padding: 20px;
+    text-align: center;
+}
+.asse_dropdown {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+.asse_dropdown select {
+    padding: 8px;
+    font-size: 14px;
+}
+canvas {
+    max-width: 300px;
+    margin: 0 auto;
+}
+.legend {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.legend-box {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #000;
+}
+.legend-pass {
+    background-color: green;
+}
+.legend-fail {
+    background-color: red;
+}
+.total {
+    margin-top: 20px;
+    font-size: 16px;
+    text-align: center;
+}
+
+.feedback-container {
+    margin: 20px;
+}
+.feedback-item {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.feedback-content {
+    max-width: 80%;
+}
+.feedback-content p {
+    margin: 5px 0;
+}
+.feedback-icon {
+    font-size: 40px;
+}

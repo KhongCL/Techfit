@@ -75,3 +75,5 @@ document.querySelectorAll('.faq-question').forEach(item => {
         }
     });
 });
+
+
