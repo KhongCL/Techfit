@@ -55,6 +55,7 @@ session_start();
                 <hr>
             `;
             document.getElementById('questions').appendChild(questionDiv);
+            console.log('addQuestion:', questionDiv.innerHTML); // Log the initial state of the question div
         }
 
         function removeQuestion(id) {
@@ -156,13 +157,14 @@ session_start();
             }
         }
 
-        function showAnswerOptions(id) {
+        function showAnswerOptions(id, includeEmptyChoice = true) {
             const answerType = document.getElementById(`answer_type_${id}`).value;
             const answerOptionsDiv = document.getElementById(`answer_options_${id}`);
             answerOptionsDiv.innerHTML = '';
 
             if (answerType === 'multiple choice') {
-                answerOptionsDiv.innerHTML = getMultipleChoiceOptions(id, true);
+                answerOptionsDiv.innerHTML = getMultipleChoiceOptions(id, includeEmptyChoice);
+                console.log('showAnswerOptions (multiple choice):', answerOptionsDiv.innerHTML); // Log the generated HTML
             } else if (answerType === 'true/false') {
                 answerOptionsDiv.innerHTML = `
                     <label for="true_false_${id}">Answer:</label>
@@ -202,6 +204,7 @@ session_start();
                 <label for="correct_choice_${id}">Correct Choice:</label>
                 <select id="correct_choice_${id}" name="correct_choice[]" required></select>
             `;
+            console.log('getMultipleChoiceOptions:', choicesHtml); // Log the generated HTML
             return choicesHtml;
         }
 
@@ -262,6 +265,7 @@ session_start();
             // Update the correct choice dropdown
             updateCorrectChoiceDropdown(id);
             isFormDirty = true;
+            console.log('addChoice:', choiceContainer); // Log the added choice container
         }
 
         function addTestCase(id) {
@@ -303,11 +307,14 @@ session_start();
             correctChoiceDropdown.innerHTML = '';
 
             choices.forEach((choice, index) => {
-                const option = document.createElement('option');
-                option.value = choice.value;
-                option.text = choice.value;
-                correctChoiceDropdown.appendChild(option);
+                if (choice.value.trim() !== '') { // Only add non-empty choices
+                    const option = document.createElement('option');
+                    option.value = choice.value;
+                    option.text = choice.value;
+                    correctChoiceDropdown.appendChild(option);
+                }
             });
+            console.log('updateCorrectChoiceDropdown:', correctChoiceDropdown); // Log the updated dropdown
         }
 
         // Fetch existing questions for the assessment
@@ -323,7 +330,7 @@ session_start();
                         document.getElementById(`question_text_${questionCount}`).value = question.question_text;
                         document.getElementById(`question_type_${questionCount}`).value = question.question_type;
                         document.getElementById(`answer_type_${questionCount}`).value = question.answer_type;
-                        showAnswerOptions(questionCount);
+                        showAnswerOptions(questionCount, false); // Do not include empty choice for existing questions
                         if (question.answer_type === 'multiple choice') {
                             // Populate choices for multiple choice questions
                             console.log('Fetched choices for question:', question.question_id, question.choices); // Log fetched choices
