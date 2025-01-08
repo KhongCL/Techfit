@@ -15,7 +15,10 @@ $jobSeekerQuery = "
         assessment_job_seeker.score AS 'assessment score' 
     FROM job_seeker 
     LEFT JOIN assessment_job_seeker 
-    ON job_seeker.job_seeker_id = assessment_job_seeker.job_seeker_id";
+    ON job_seeker.job_seeker_id = assessment_job_seeker.job_seeker_id
+    INNER JOIN User
+    ON job_seeker.user_id = User.user_id
+    WHERE User.is_active = 1";
 $jobSeekerResult = $conn->query($jobSeekerQuery);
 
 // Fetch Employer data
@@ -24,66 +27,24 @@ $employerQuery = "
         employer.user_id AS 'name', 
         employer.company_name AS 'company name', 
         employer.company_type AS 'company type'
-    FROM employer";
+    FROM employer
+    INNER JOIN User
+    ON employer.user_id = User.user_id
+    WHERE User.is_active = 1";
 $employerResult = $conn->query($employerQuery);
 
-// Fetch Disabled Job Seeker data
-$disabledJobSeekerQuery = "
-    SELECT 
-        disabled_jobseeker.user_id AS 'name', 
-        disabled_jobseeker.disabled_date AS 'disabled date'
-    FROM disabled_jobseeker";
-$disabledJobSeekerResult = $conn->query($disabledJobSeekerQuery);
-
-// Fetch Disabled Employer data
-$disabledEmployerQuery = "
-    SELECT 
-        disabled_employer.user_id AS 'name', 
-        disabled_employer.disabled_date AS 'disabled date'
-    FROM disabled_employer";
-$disabledEmployerResult = $conn->query($disabledEmployerQuery);
-
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete'])) {
     $userIds = $_POST['user_ids'];
-    $disabledDate = date('Y-m-d H:i:s');
-
     foreach ($userIds as $userId) {
-        // Fetch user details
-        $userQuery = "SELECT user_id FROM job_seeker WHERE user_id = '$userId' UNION SELECT user_id FROM employer WHERE user_id = '$userId'";
-        $userResult = $conn->query($userQuery);
-        $user = $userResult->fetch_assoc();
-
-        if ($user) {
-            // Check if the user is a job seeker or employer
-            $jobSeekerQuery = "SELECT * FROM job_seeker WHERE user_id = '$userId'";
-            $jobSeekerResult = $conn->query($jobSeekerQuery);
-            if ($jobSeekerResult->num_rows > 0) {
-                $jobSeeker = $jobSeekerResult->fetch_assoc();
-                // Transfer user to disabled_jobseeker table
-                $conn->query("INSERT INTO disabled_jobseeker (job_seeker_id,user_id, resume, linkedin_link, job_position_interested, education_level, year_of_experience, disabled_date) 
-                VALUES ('{$jobSeeker['job_seeker_id']}','{$jobSeeker['user_id']}', '{$jobSeeker['resume']}', '{$jobSeeker['linkedin_link']}', '{$jobSeeker['job_position_interested']}', '{$jobSeeker['education_level']}', '{$jobSeeker['year_of_experience']}', '$disabledDate')");
-                // Remove user from job_seeker table
-                $conn->query("DELETE FROM job_seeker WHERE user_id = '$userId'");
-            } else {
-                // Fetch employer details
-                $employerQuery = "SELECT * FROM employer WHERE user_id = '$userId'";
-                $employerResult = $conn->query($employerQuery);
-                if ($employerResult->num_rows > 0) {
-                    $employer = $employerResult->fetch_assoc();
-                    // Transfer user to disabled_employer table with all details
-                    $conn->query("INSERT INTO disabled_employer (user_id, employer_id, company_name, linkedin_link, job_position_interested, company_type, disabled_date) 
-                    VALUES ('{$employer['user_id']}', '{$employer['employer_id']}', '{$employer['company_name']}', '{$employer['linkedin_link']}', '{$employer['job_position_interested']}', '{$employer['company_type']}', '$disabledDate')");
-                    // Remove user from employer table
-                    $conn->query("DELETE FROM employer WHERE user_id = '$userId'");
-                }
-            }
-        }
-    }        
+        // Set is_active to 0 for the selected users
+        $updateQuery = "UPDATE user SET is_active = 0 WHERE user_id = '$userId'";
+        $conn->query($updateQuery);
+    }
     // Refresh the page to reflect changes
     header('Location: manage_users.php');
     exit();
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -213,49 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete'])) {
                             <?php } ?>
                         </tbody>
                     </table>
-                </div>
-
-                <div class="user-section">
-                    <h3 class="user-type">Disabled Job Seekers</h3>
-                    <table class="user-table">
-                        <thead>
-                            <tr>
-                                <th>Select</th>
-                                <th>Name</th>
-                                <th>Disabled Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $disabledJobSeekerResult->fetch_assoc()) { ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['disabled date']); ?></td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="user-section">
-                    <h3 class="user-type">Disabled Employers</h3>
-                    <table class="user-table">
-                        <thead>
-                            <tr>
-                                <th>Select</th>
-                                <th>Name</th>
-                                <th>Disabled Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $disabledEmployerResult->fetch_assoc()) { ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['disabled date']); ?></td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
-                </div>
+                </div>            
             </div>
         </form>
     </div>
