@@ -28,6 +28,41 @@
             padding: 20px;
             text-align: center;
         }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        .popup h2 {
+            color: #fff;
+        }
+        .popup button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .popup .close-button {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        .popup .cancel-button {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .popup .close-button:hover {
+            background-color: #c82333;
+        }
+        .popup .cancel-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -60,7 +95,7 @@
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
                             <li><a href="profile.php">Settings</a></li>
-                            <li><a href="logout.php">Logout</a></li>
+                            <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li>
                         </ul>
                     </li> 
                 </ul>
@@ -72,6 +107,13 @@
             </div>
         </nav>
     </header>
+
+    <!-- Logout Popup -->
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" onclick="logoutUser()">Yes</button>
+        <button class="cancel-button" onclick="closePopup('logout-popup')">No</button>
+    </div>
 
     <div class="container">
         <div class="table-container">
@@ -94,28 +136,45 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><input type="checkbox"></td>
-                        <td> </td>
-                        <td> </td>
-                        <td> </td>
-                        <td> </td>
-                        <td class="actions">
-                            <button class="accept">✔</button>
-                            <button class="reject">✖</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><input type="checkbox"></td>
-                        <td> </td>
-                        <td> </td>
-                        <td> </td>
-                        <td> </td>
-                        <td class="actions">
-                            <button class="accept">✔</button>
-                            <button class="reject">✖</button>
-                        </td>
-                    </tr>
+                    <?php
+                    // Database connection
+                    $servername = "localhost";
+                    $username = "root";
+                    $password = "";
+                    $dbname = "techfit";
+
+                    $conn = new mysqli($servername, $username, $password, $dbname);
+
+                    if ($conn->connect_error) {
+                        die("Connection failed: " . $conn->connect_error);
+                    }
+
+                    $sql = "SELECT ajs.score, js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience
+                            FROM Assessment_Job_Seeker ajs
+                            JOIN Job_Seeker js ON ajs.job_seeker_id = js.job_seeker_id
+                            JOIN User u ON js.user_id = u.user_id";
+                    $result = $conn->query($sql);
+
+                    if ($result->num_rows > 0) {
+                        while($row = $result->fetch_assoc()) {
+                            echo "<tr>";
+                            echo "<td><input type='checkbox'></td>";
+                            echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
+                            echo "<td>" . $row['education_level'] . "</td>";
+                            echo "<td>" . $row['year_of_experience'] . "</td>";
+                            echo "<td>" . $row['score'] . "</td>";
+                            echo "<td class='actions'>
+                                    <button class='accept'>✔</button>
+                                    <button class='reject'>✖</button>
+                                  </td>";
+                            echo "</tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='6'>No candidates found</td></tr>";
+                    }
+
+                    $conn->close();
+                    ?>
                 </tbody>
             </table>
         </div>
@@ -174,6 +233,18 @@
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
-    <script src="scripts.js"></script>
+    <script>
+        function openPopup(popupId) {
+            document.getElementById(popupId).style.display = 'block';
+        }
+
+        function closePopup(popupId) {
+            document.getElementById(popupId).style.display = 'none';
+        }
+
+        function logoutUser() {
+            window.location.href = '/Techfit'; // Redirect to the root directory
+        }
+    </script>
 </body>
 </html>
