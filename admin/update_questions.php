@@ -28,6 +28,9 @@ function generateNextId($conn, $table, $column, $prefix) {
 
 $response = array('success' => true);
 
+// Log the received POST data
+error_log("Received POST data: " . print_r($_POST, true));
+
 foreach ($_POST['question_id'] as $index => $question_id) {
     $question_text = $_POST['question_text'][$index];
     $question_type = $_POST['question_type'][$index];
@@ -66,8 +69,10 @@ foreach ($_POST['question_id'] as $index => $question_id) {
     // Update choices for multiple choice questions
     if ($answer_type === 'multiple choice') {
         $choices_key = "choices_" . ($index + 1);
-        if (isset($_POST[$choices_key])) {
+        $choice_ids_key = "choice_id_" . ($index + 1);
+        if (isset($_POST[$choices_key]) && isset($_POST[$choice_ids_key])) {
             $choices = $_POST[$choices_key];
+            $choice_ids = $_POST[$choice_ids_key];
             foreach ($choices as $choice_index => $choice_text) {
                 if (empty($choice_text)) {
                     $response['success'] = false;
@@ -75,17 +80,14 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                     error_log("Validation failed for choice index $choice_index: All choice fields are required.");
                     break 2;
                 }
-    
+
                 // Use the choice ID provided in the form data
-                $choice_id_key = "choice_id_" . ($index + 1) . "_" . ($choice_index + 1);
-                error_log("Choice ID key for choice index $choice_index: " . $choice_id_key);
-                error_log("Choice text for choice index $choice_index: " . $choice_text);
-    
-                $choice_id = isset($_POST[$choice_id_key]) ? $_POST[$choice_id_key] : '';
-    
+                $choice_id = isset($choice_ids[$choice_index]) ? $choice_ids[$choice_index] : '';
+
                 // Log the choice ID to see if it is empty
                 error_log("Choice ID for choice index $choice_index: " . $choice_id);
-    
+                error_log("Choice text for choice index $choice_index: " . $choice_text);
+
                 if (!empty($choice_id)) {
                     // Check if the choice text has changed
                     $check_choice_sql = "SELECT choice_text FROM Choices WHERE choice_id = ? AND question_id = ?";
@@ -94,7 +96,7 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                     $check_choice_stmt->execute();
                     $check_choice_result = $check_choice_stmt->get_result();
                     $existing_choice = $check_choice_result->fetch_assoc();
-    
+
                     if ($existing_choice['choice_text'] !== $choice_text) {
                         // Update existing choice
                         $update_choice_sql = "UPDATE Choices SET choice_text = ? WHERE choice_id = ? AND question_id = ?";
@@ -106,6 +108,8 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                             error_log("Database error for choice ID $choice_id: " . $update_choice_stmt->error);
                             break 2;
                         }
+                    } else {
+                        error_log("No changes detected for choice ID $choice_id");
                     }
                 } else {
                     // Insert new choice
@@ -119,6 +123,7 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                         error_log("Database error for new choice ID $choice_id: " . $insert_choice_stmt->error);
                         break 2;
                     }
+                    error_log("Inserted new choice with ID $choice_id");
                 }
             }
         }
