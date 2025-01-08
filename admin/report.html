@@ -5,6 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Assessment - TechFit</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Function to change content when the button is clicked
+        function user_engagement_static() {
+            document.getElementById("user").innerHTML = "The content has been changed!";
+        }
+
+        function assessment_performance(){
+            document.getElementById("assessment").innerHTML
+        }
+
+        function feedback_analysis() {
+            document.getElementById("assessment").innerHTML = 
+            <div class="feedback-container">
+        <h1>Feedback</h1>
+        <div class="feedback-item">
+            <div class="feedback-content">
+                <p><strong>User: </strong>User_XXX</p>
+                <p><strong>Date: </strong>XX/XX/XXXX</p>
+                <p><strong>Time: </strong>XX:XX:XX</p>
+                <p><strong>Topic: </strong>XXXXXXXXXX</p>
+                <p>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX...</p>
+            </div>
+            <div>
+                <button>&#128465;</button>
+            </div>
+            </div>
+            </div>
+            
+
+            ;
+        }
+
+
+    </script>
+
 </head>
 
 <body>
@@ -73,26 +110,43 @@
 
 
     <div class="report">
-        <button class="report_select">Assessment Performance</button>
-        <button class="report_select">User Engagement Static</button>
-        <button class="report_select">Feedback Analysis</button>
+        <button class="report_select" id="asse_performance">Assessment Performance</button>
+        <button class="report_select" id="user_static">User Engagement Static</button>
+        <button class="report_select" id="feedback_analysis" onclick="feedback_analysis()">Feedback Analysis</button>
+    </div>
+    <h2></h2>
+
+<div id="assessment">
+    <div class="asse_content">Assessment</div>
+
+    <div class="assessment-section">
+        <select>
+            <option>Assessment 1</option>
+            <option>Assessment 2</option>
+            <option>Assessment 3</option>
+        </select>
     </div>
 
-    <div class="content">
-        <div class="assessment-section">
-            <h2>Assessment</h2>
+
+    <div class="chart"></div>
+    <div class="details"></div>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-box legend-pass"></div>
+            <span>Pass</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-box legend-fail"></div>
+            <span>Fail</span>
         </div>
     </div>
-    
-    <div class="assessment-section">
-    <select>
-        <option>Select Assessment</option>
-        <option>Assessment 1</option>
-        <option>Assessment 2</option>
-        <option>Assessment 3</option>
-    </select>
-</div>
 
+
+    <div class="details_middle">
+        <p>Total number of candidates assessed: </p>
+    </div>
+</div>
     
     <footer>
         <div class="footer-content">
