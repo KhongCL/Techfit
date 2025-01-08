@@ -33,18 +33,38 @@ $employerQuery = "
     WHERE User.is_active = 1";
 $employerResult = $conn->query($employerQuery);
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete'])) {
-    $userIds = $_POST['user_ids'];
-    foreach ($userIds as $userId) {
-        // Set is_active to 0 for the selected users
-        $updateQuery = "UPDATE user SET is_active = 0 WHERE user_id = '$userId'";
-        $conn->query($updateQuery);
-    }
-    // Refresh the page to reflect changes
-    header('Location: manage_users.php');
-    exit();
-}
+// Fetch inactive users for restoration
+$restoreUserQuery = "
+    SELECT 
+        user_id AS 'name', 
+        role 
+    FROM User
+    WHERE is_active = 0";
+$restoreUserResult = $conn->query($restoreUserQuery);
 
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['delete'])) {
+        $userIds = $_POST['user_ids'];
+        foreach ($userIds as $userId) {
+            // Set is_active to 0 for the selected users
+            $updateQuery = "UPDATE User SET is_active = 0 WHERE user_id = '$userId'";
+            $conn->query($updateQuery);
+        }
+        // Refresh the page to reflect changes
+        header('Location: manage_users.php');
+        exit();
+    } elseif (isset($_POST['restore'])) {
+        $userIds = $_POST['restore_user_ids'];
+        foreach ($userIds as $userId) {
+            // Set is_active to 1 for the selected users
+            $updateQuery = "UPDATE User SET is_active = 1 WHERE user_id = '$userId'";
+            $conn->query($updateQuery);
+        }
+        // Refresh the page to reflect changes
+        header('Location: manage_users.php');
+        exit();
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -174,7 +194,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['delete'])) {
                             <?php } ?>
                         </tbody>
                     </table>
-                </div>            
+                </div>   
+                
+            <div class="restore_button">
+                <h2 class="section-title">RESTORE USER <button type="submit" name="restore" class="restore-link">Restore</button></h2>
+
+                <div class="user-section">
+                    <h3 class="user-type"></h3>
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th>Name</th>
+                                <th>Role</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php while ($row = $restoreUserResult->fetch_assoc()) { ?>
+                                <tr>
+                                    <td><input type="checkbox" name="restore_user_ids[]" value="<?php echo htmlspecialchars($row['name']); ?>"></td>
+                                    <td><?php echo htmlspecialchars($row['name']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['role']); ?></td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>     
             </div>
         </form>
     </div>
