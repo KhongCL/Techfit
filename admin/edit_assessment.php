@@ -49,7 +49,7 @@ session_start();
                 </select><br>
 
                 <div id="answer_options_${questionCount}">
-                    ${getMultipleChoiceOptions(questionCount)}
+                    ${getMultipleChoiceOptions(questionCount, false)}
                 </div>
                 <button type="button" onclick="removeQuestion(${questionCount})">Remove Question</button>
                 <hr>
@@ -134,6 +134,11 @@ session_start();
                 isFormDirty = false;
                 const formData = new FormData(form);
 
+                // Log the form data
+                for (let pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
+
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', 'update_questions.php', true);
                 xhr.onload = function () {
@@ -157,7 +162,7 @@ session_start();
             answerOptionsDiv.innerHTML = '';
 
             if (answerType === 'multiple choice') {
-                answerOptionsDiv.innerHTML = getMultipleChoiceOptions(id);
+                answerOptionsDiv.innerHTML = getMultipleChoiceOptions(id, true);
             } else if (answerType === 'true/false') {
                 answerOptionsDiv.innerHTML = `
                     <label for="true_false_${id}">Answer:</label>
@@ -181,16 +186,23 @@ session_start();
             }
         }
 
-        function getMultipleChoiceOptions(id) {
-            return `
+        function getMultipleChoiceOptions(id, includeEmptyChoice = true) {
+            let choicesHtml = `
                 <label for="choices_${id}">Choices:</label>
                 <div id="choices_${id}">
+            `;
+            if (includeEmptyChoice) {
+                choicesHtml += `
                     <input type="text" name="choices_${id}[]" required>
+                `;
+            }
+            choicesHtml += `
                     <button type="button" onclick="addChoice(${id})">Add Choice</button>
                 </div>
                 <label for="correct_choice_${id}">Correct Choice:</label>
                 <select id="correct_choice_${id}" name="correct_choice[]" required></select>
             `;
+            return choicesHtml;
         }
 
         function getCodeQuestionOptions(id) {
@@ -215,13 +227,19 @@ session_start();
             `;
         }
 
-        function addChoice(id) {
+        function addChoice(id, choiceId = '', choiceText = '') {
             const choicesDiv = document.getElementById(`choices_${id}`);
             const choiceContainer = document.createElement('div');
             const input = document.createElement('input');
             input.type = 'text';
             input.name = `choices_${id}[]`;
             input.required = true;
+            input.value = choiceText; // Set the value of the choice input
+
+            const choiceIdInput = document.createElement('input');
+            choiceIdInput.type = 'hidden';
+            choiceIdInput.name = `choice_id_${id}[]`;
+            choiceIdInput.value = choiceId;
 
             const removeButton = document.createElement('button');
             removeButton.type = 'button';
@@ -237,6 +255,7 @@ session_start();
             };
 
             choiceContainer.appendChild(input);
+            choiceContainer.appendChild(choiceIdInput);
             choiceContainer.appendChild(removeButton);
             choicesDiv.insertBefore(choiceContainer, choicesDiv.lastElementChild);
 
@@ -297,6 +316,7 @@ session_start();
             fetch(`get_questions.php?assessment_id=${assessmentId}`)
                 .then(response => response.json())
                 .then(data => {
+                    console.log('Fetched questions:', data); // Log fetched questions
                     data.forEach(question => {
                         addQuestion();
                         document.getElementById(`question_id_${questionCount}`).value = question.question_id;
@@ -306,11 +326,9 @@ session_start();
                         showAnswerOptions(questionCount);
                         if (question.answer_type === 'multiple choice') {
                             // Populate choices for multiple choice questions
-                            const choicesDiv = document.getElementById(`choices_${questionCount}`);
+                            console.log('Fetched choices for question:', question.question_id, question.choices); // Log fetched choices
                             question.choices.forEach(choice => {
-                                addChoice(questionCount);
-                                const choiceInputs = document.getElementsByName(`choices_${questionCount}[]`);
-                                choiceInputs[choiceInputs.length - 2].value = choice.choice_text; // Set the value of the last added choice input
+                                addChoice(questionCount, choice.choice_id, choice.choice_text);
                             });
                             updateCorrectChoiceDropdown(questionCount); // Update the correct choice dropdown
                             document.getElementById(`correct_choice_${questionCount}`).value = question.correct_answer;
@@ -326,8 +344,8 @@ session_start();
                                         addTestCase(questionCount);
                                         const testCaseInputs = document.getElementsByName(`test_cases_${questionCount}[]`);
                                         const expectedOutputInputs = document.getElementsByName(`expected_output_${questionCount}[]`);
-                                        testCaseInputs[testCaseInputs.length - 2].value = testCase.input;
-                                        expectedOutputInputs[expectedOutputInputs.length - 2].value = testCase.expected_output;
+                                        testCaseInputs[testCaseInputs.length - 1].value = testCase.input;
+                                        expectedOutputInputs[expectedOutputInputs.length - 1].value = testCase.expected_output;
                                     });
                                 });
                         } else if (question.answer_type === 'true/false') {
