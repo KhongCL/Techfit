@@ -29,8 +29,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Start session and set session variables
             $_SESSION['user_id'] = $row['user_id'];
             $_SESSION['username'] = $row['username'];
-            $_SESSION['email'] = $row['email']; // Add email to session
+            $_SESSION['email'] = $row['email'];
             $_SESSION['role'] = $row['role'];
+
+            // Check if the user is an employer and store the employer ID
+            if ($row['role'] == 'Employer') {
+                $stmt = $conn->prepare("SELECT employer_id FROM Employer WHERE user_id=?");
+                $stmt->bind_param("s", $row['user_id']);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if ($result->num_rows > 0) {
+                    $employer_row = $result->fetch_assoc();
+                    $_SESSION['employer_id'] = $employer_row['employer_id'];
+                }
+            }
 
             // Redirect based on role
             if ($row['role'] == 'Job Seeker') {

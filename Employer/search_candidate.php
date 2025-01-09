@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -63,6 +67,12 @@
         .popup .cancel-button:hover {
             background-color: #0056b3;
         }
+        .actions .accept:hover {
+            color: green;
+        }
+        .actions .reject:hover {
+            color: red;
+        }
     </style>
 </head>
 <body>
@@ -75,7 +85,7 @@
                 <ul class="nav-list">
                     <li><a href="#">Candidates</a>
                         <ul class="dropdown">
-                            <li><a href="search_candidate.html">Search Candidates</a></li>
+                            <li><a href="search_candidate.php">Search Candidates</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Resources</a>
@@ -118,10 +128,10 @@
     <div class="container">
         <div class="table-container">
             <div class="tabs">
-                <button class="active">Active</button>
-                <button>Awaiting Review</button>
+                <button class="active" onclick="showTab('active')">Active</button>
+                <button onclick="showTab('interested')">Interested</button>
+                <button onclick="showTab('uninterested')">Uninterested</button>
                 <button>Reviewed</button>
-                <button>Interested</button>
                 <button class="import">Import Candidates</button>
             </div>
             <table>
@@ -130,12 +140,12 @@
                         <th><input type="checkbox"></th>
                         <th>Name</th>
                         <th>Education Level</th>
-                        <th>Position Experienced</th>
+                        <th>Years of Experience</th>
                         <th>Assessment Score</th>
                         <th>Interested?</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="active-tab">
                     <?php
                     // Database connection
                     $servername = "localhost";
@@ -149,24 +159,115 @@
                         die("Connection failed: " . $conn->connect_error);
                     }
 
-                    $sql = "SELECT ajs.score, js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience
+                    if (!isset($_SESSION['employer_id'])) {
+                        die("Employer not logged in.");
+                    }
+
+                    $employer_id = $_SESSION['employer_id']; // Get the logged-in employer's ID from the session
+
+                    $sql = "SELECT ajs.score, js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id
                             FROM Assessment_Job_Seeker ajs
                             JOIN Job_Seeker js ON ajs.job_seeker_id = js.job_seeker_id
-                            JOIN User u ON js.user_id = u.user_id";
+                            JOIN User u ON js.user_id = u.user_id
+                            LEFT JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id AND ei.employer_id = '$employer_id'
+                            WHERE ei.interest_status IS NULL
+                            LIMIT 8"; // Limit to 8 rows
                     $result = $conn->query($sql);
 
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
-                            echo "<tr>";
+                            echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
                             echo "<td><input type='checkbox'></td>";
                             echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
                             echo "<td>" . $row['education_level'] . "</td>";
                             echo "<td>" . $row['year_of_experience'] . "</td>";
                             echo "<td>" . $row['score'] . "</td>";
-                            echo "<td class='actions'>
-                                    <button class='accept'>✔</button>
-                                    <button class='reject'>✖</button>
-                                  </td>";
+                            echo "<td class='actions'>";
+                            if (isset($row['job_seeker_id'])) {
+                                echo "<button class='accept' onclick='updateInterest(\"" . $row['job_seeker_id'] . "\", \"interested\")'>✔</button>";
+                                echo "<button class='reject' onclick='updateInterest(\"" . $row['job_seeker_id'] . "\", \"uninterested\")'>✖</button>";
+                            }
+                            echo "</td>";
+                            echo "</tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='6'>No candidates found</td></tr>";
+                    }
+
+                    $conn->close();
+                    ?>
+                </tbody>
+                <tbody id="interested-tab" style="display:none;">
+                    <?php
+                    // Database connection
+                    $conn = new mysqli($servername, $username, $password, $dbname);
+
+                    if ($conn->connect_error) {
+                        die("Connection failed: " . $conn->connect_error);
+                    }
+
+                    $sql = "SELECT ajs.score, js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id
+                            FROM Assessment_Job_Seeker ajs
+                            JOIN Job_Seeker js ON ajs.job_seeker_id = js.job_seeker_id
+                            JOIN User u ON js.user_id = u.user_id
+                            JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
+                            WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'interested'
+                            LIMIT 8"; // Limit to 8 rows
+                    $result = $conn->query($sql);
+
+                    if ($result->num_rows > 0) {
+                        while($row = $result->fetch_assoc()) {
+                            echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
+                            echo "<td><input type='checkbox'></td>";
+                            echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
+                            echo "<td>" . $row['education_level'] . "</td>";
+                            echo "<td>" . $row['year_of_experience'] . "</td>";
+                            echo "<td>" . $row['score'] . "</td>";
+                            echo "<td class='actions'>";
+                            if (isset($row['job_seeker_id'])) {
+                                echo "<button class='accept' onclick='removeInterest(\"" . $row['job_seeker_id'] . "\")'>✔</button>";
+                            }
+                            echo "</td>";
+                            echo "</tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='6'>No candidates found</td></tr>";
+                    }
+
+                    $conn->close();
+                    ?>
+                </tbody>
+                <tbody id="uninterested-tab" style="display:none;">
+                    <?php
+                    // Database connection
+                    $conn = new mysqli($servername, $username, $password, $dbname);
+
+                    if ($conn->connect_error) {
+                        die("Connection failed: " . $conn->connect_error);
+                    }
+
+                    $sql = "SELECT ajs.score, js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id
+                            FROM Assessment_Job_Seeker ajs
+                            JOIN Job_Seeker js ON ajs.job_seeker_id = js.job_seeker_id
+                            JOIN User u ON js.user_id = u.user_id
+                            JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
+                            WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'uninterested'
+                            LIMIT 8"; // Limit to 8 rows
+                    $result = $conn->query($sql);
+
+                    if ($result->num_rows > 0) {
+                        while($row = $result->fetch_assoc()) {
+                            echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
+                            echo "<td><input type='checkbox'></td>";
+                            echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
+                            echo "<td>" . $row['education_level'] . "</td>";
+                            echo "<td>" . $row['year_of_experience'] . "</td>";
+                            echo "<td>" . $row['score'] . "</td>";
+                            echo "<td class='actions'>";
+                            if (isset($row['job_seeker_id'])) {
+                                echo "<button class='accept' onclick='removeInterest(\"" . $row['job_seeker_id'] . "\")'>✔</button>";
+                            }
+                            echo "</td>";
                             echo "</tr>";
                         }
                     } else {
@@ -201,7 +302,7 @@
                 <div class="footer-column">
                     <h3>Candidate</h3>
                     <ul>
-                        <li><a href="search_candidate.html">Search Candidates</a></li>
+                        <li><a href="search_candidate.php">Search Candidates</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -244,6 +345,67 @@
 
         function logoutUser() {
             window.location.href = '/Techfit'; // Redirect to the root directory
+        }
+
+        function updateInterest(jobSeekerId, interestStatus) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "update_interest.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // Remove the row from the current tab
+                    var row = document.getElementById('row-' + jobSeekerId);
+                    if (row) {
+                        row.parentNode.removeChild(row);
+                    }
+
+                    // Add the row to the appropriate tab
+                    var newRow = document.createElement('tr');
+                    newRow.id = 'row-' + jobSeekerId;
+                    newRow.innerHTML = row.innerHTML;
+
+                    if (interestStatus === 'interested') {
+                        newRow.querySelector('.actions').innerHTML = "<button class='accept' onclick='removeInterest(\"" + jobSeekerId + "\")'>✔</button>";
+                        document.getElementById('interested-tab').appendChild(newRow);
+                    } else if (interestStatus === 'uninterested') {
+                        newRow.querySelector('.actions').innerHTML = "<button class='accept' onclick='removeInterest(\"" + jobSeekerId + "\")'>✔</button>";
+                        document.getElementById('uninterested-tab').appendChild(newRow);
+                    }
+                }
+            };
+            xhr.send("job_seeker_id=" + jobSeekerId + "&interest_status=" + interestStatus);
+        }
+
+        function removeInterest(jobSeekerId) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "remove_interest.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // Remove the row from the current tab
+                    var row = document.getElementById('row-' + jobSeekerId);
+                    if (row) {
+                        row.parentNode.removeChild(row);
+                    }
+
+                    // Add the row back to the active tab
+                    var newRow = document.createElement('tr');
+                    newRow.id = 'row-' + jobSeekerId;
+                    newRow.innerHTML = row.innerHTML;
+                    newRow.querySelector('.actions').innerHTML = "<button class='accept' onclick='updateInterest(\"" + jobSeekerId + "\", \"interested\")'>✔</button><button class='reject' onclick='updateInterest(\"" + jobSeekerId + "\", \"uninterested\")'>✖</button>";
+                    document.getElementById('active-tab').appendChild(newRow);
+                }
+            };
+            xhr.send("job_seeker_id=" + jobSeekerId);
+        }
+
+        function showTab(tabName) {
+            document.getElementById('active-tab').style.display = 'none';
+            document.getElementById('interested-tab').style.display = 'none';
+            document.getElementById('uninterested-tab').style.display = 'none';
+            document.getElementById(tabName + '-tab').style.display = 'table-row-group';
+            document.querySelectorAll('.tabs button').forEach(button => button.classList.remove('active'));
+            document.querySelector(`.tabs button[onclick="showTab('${tabName}')"]`).classList.add('active');
         }
     </script>
 </body>
