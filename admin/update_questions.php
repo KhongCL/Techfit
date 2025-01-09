@@ -100,6 +100,7 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                             break 2;
                         }
                     } else {
+                        error_log("No changes detected for choice ID $choice_id");
                     }
                 } else {
                     // Insert new choice
@@ -122,6 +123,21 @@ foreach ($_POST['question_id'] as $index => $question_id) {
         $test_cases_key = "test_cases_" . ($index + 1);
         $expected_output_key = "expected_output_" . ($index + 1);
         $test_case_ids_key = "test_case_id_" . ($index + 1);
+
+        // Log the current state of the code_language array
+        error_log("code_language array: " . print_r($_POST['code_language'], true));
+
+        // Check if the programming language is set for the current question
+        if (isset($_POST['code_language'][0])) {
+            $programming_language = $_POST['code_language'][0]; // Get the programming language
+            error_log("Programming language for question index $index: " . $programming_language); // Log the programming language
+        } else {
+            $response['success'] = false;
+            $response['error'] = "Programming language is required for code questions.";
+            error_log("Programming language is missing for question index $index");
+            break;
+        }
+
         if (isset($_POST[$test_cases_key]) && isset($_POST[$expected_output_key]) && isset($_POST[$test_case_ids_key])) {
             $test_cases = $_POST[$test_cases_key];
             $expected_outputs = $_POST[$expected_output_key];
@@ -141,21 +157,22 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                 error_log("Test case ID for test case index $tc_index: " . $test_case_id);
                 error_log("Test case input for test case index $tc_index: " . $input);
                 error_log("Test case expected output for test case index $tc_index: " . $expected_outputs[$tc_index]);
+                error_log("Programming language for test case index $tc_index: " . $programming_language);
 
                 if (!empty($test_case_id)) {
-                    // Check if the test case input or expected output has changed
-                    $check_test_case_sql = "SELECT input, expected_output FROM Test_Cases WHERE test_case_id = ? AND question_id = ?";
+                    // Check if the test case input, expected output, or programming language has changed
+                    $check_test_case_sql = "SELECT input, expected_output, programming_language FROM Test_Cases WHERE test_case_id = ? AND question_id = ?";
                     $check_test_case_stmt = $conn->prepare($check_test_case_sql);
                     $check_test_case_stmt->bind_param("ss", $test_case_id, $question_id);
                     $check_test_case_stmt->execute();
                     $check_test_case_result = $check_test_case_stmt->get_result();
                     $existing_test_case = $check_test_case_result->fetch_assoc();
 
-                    if ($existing_test_case['input'] !== $input || $existing_test_case['expected_output'] !== $expected_outputs[$tc_index]) {
+                    if ($existing_test_case['input'] !== $input || $existing_test_case['expected_output'] !== $expected_outputs[$tc_index] || $existing_test_case['programming_language'] !== $programming_language) {
                         // Update existing test case
-                        $update_test_case_sql = "UPDATE Test_Cases SET input = ?, expected_output = ? WHERE test_case_id = ? AND question_id = ?";
+                        $update_test_case_sql = "UPDATE Test_Cases SET input = ?, expected_output = ?, programming_language = ? WHERE test_case_id = ? AND question_id = ?";
                         $update_test_case_stmt = $conn->prepare($update_test_case_sql);
-                        $update_test_case_stmt->bind_param("ssss", $input, $expected_outputs[$tc_index], $test_case_id, $question_id);
+                        $update_test_case_stmt->bind_param("sssss", $input, $expected_outputs[$tc_index], $programming_language, $test_case_id, $question_id);
                         if (!$update_test_case_stmt->execute()) {
                             $response['success'] = false;
                             $response['error'] = $update_test_case_stmt->error;
@@ -168,9 +185,9 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                 } else {
                     // Insert new test case
                     $test_case_id = generateNextId($conn, 'Test_Cases', 'test_case_id', 'T');
-                    $insert_test_case_sql = "INSERT INTO Test_Cases (test_case_id, question_id, input, expected_output) VALUES (?, ?, ?, ?)";
+                    $insert_test_case_sql = "INSERT INTO Test_Cases (test_case_id, question_id, input, expected_output, programming_language) VALUES (?, ?, ?, ?, ?)";
                     $insert_test_case_stmt = $conn->prepare($insert_test_case_sql);
-                    $insert_test_case_stmt->bind_param("ssss", $test_case_id, $question_id, $input, $expected_outputs[$tc_index]);
+                    $insert_test_case_stmt->bind_param("sssss", $test_case_id, $question_id, $input, $expected_outputs[$tc_index], $programming_language);
                     if (!$insert_test_case_stmt->execute()) {
                         $response['success'] = false;
                         $response['error'] = $insert_test_case_stmt->error;
