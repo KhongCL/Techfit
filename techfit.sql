@@ -173,3 +173,12 @@ CREATE TABLE Test_Cases (
     programming_language ENUM('python', 'javascript', 'java', 'cpp') NOT NULL,
     FOREIGN KEY (question_id) REFERENCES Question(question_id)
 );
+
+CREATE TABLE Employer_Interest (
+    employer_id VARCHAR(5),
+    job_seeker_id VARCHAR(5),
+    interest_status ENUM('interested', 'uninterested') NOT NULL,
+    PRIMARY KEY (employer_id, job_seeker_id),
+    FOREIGN KEY (employer_id) REFERENCES Employer(employer_id),
+    FOREIGN KEY (job_seeker_id) REFERENCES Job_Seeker(job_seeker_id)
+);
