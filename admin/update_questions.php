@@ -41,7 +41,6 @@ foreach ($_POST['question_id'] as $index => $question_id) {
     if (empty($question_text) || empty($question_type) || empty($answer_type) || empty($correct_answer)) {
         $response['success'] = false;
         $response['error'] = "All fields are required.";
-        error_log("Validation failed for question index $index: All fields are required.");
         break;
     }
 
@@ -51,18 +50,15 @@ foreach ($_POST['question_id'] as $index => $question_id) {
         $sql = "INSERT INTO Question (question_id, assessment_id, question_text, question_type, answer_type, correct_answer) VALUES (?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ssssss", $question_id, $_POST['assessment_id'], $question_text, $question_type, $answer_type, $correct_answer);
-        error_log("Inserting new question with ID $question_id");
     } else {
         $sql = "UPDATE Question SET question_text = ?, question_type = ?, answer_type = ?, correct_answer = ? WHERE question_id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("sssss", $question_text, $question_type, $answer_type, $correct_answer, $question_id);
-        error_log("Updating question with ID $question_id");
     }
 
     if (!$stmt->execute()) {
         $response['success'] = false;
         $response['error'] = $stmt->error;
-        error_log("Database error for question ID $question_id: " . $stmt->error);
         break;
     }
 
@@ -77,7 +73,6 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                 if (empty($choice_text)) {
                     $response['success'] = false;
                     $response['error'] = "All choice fields are required.";
-                    error_log("Validation failed for choice index $choice_index: All choice fields are required.");
                     break 2;
                 }
 
@@ -85,9 +80,6 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                 $choice_id = isset($choice_ids[$choice_index]) ? $choice_ids[$choice_index] : '';
 
                 // Log the choice ID to see if it is empty
-                error_log("Choice ID for choice index $choice_index: " . $choice_id);
-                error_log("Choice text for choice index $choice_index: " . $choice_text);
-
                 if (!empty($choice_id)) {
                     // Check if the choice text has changed
                     $check_choice_sql = "SELECT choice_text FROM Choices WHERE choice_id = ? AND question_id = ?";
@@ -105,11 +97,9 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                         if (!$update_choice_stmt->execute()) {
                             $response['success'] = false;
                             $response['error'] = $update_choice_stmt->error;
-                            error_log("Database error for choice ID $choice_id: " . $update_choice_stmt->error);
                             break 2;
                         }
                     } else {
-                        error_log("No changes detected for choice ID $choice_id");
                     }
                 } else {
                     // Insert new choice
@@ -120,10 +110,8 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                     if (!$insert_choice_stmt->execute()) {
                         $response['success'] = false;
                         $response['error'] = $insert_choice_stmt->error;
-                        error_log("Database error for new choice ID $choice_id: " . $insert_choice_stmt->error);
                         break 2;
                     }
-                    error_log("Inserted new choice with ID $choice_id");
                 }
             }
         }
@@ -133,9 +121,11 @@ foreach ($_POST['question_id'] as $index => $question_id) {
     if ($answer_type === 'code') {
         $test_cases_key = "test_cases_" . ($index + 1);
         $expected_output_key = "expected_output_" . ($index + 1);
-        if (isset($_POST[$test_cases_key]) && isset($_POST[$expected_output_key])) {
+        $test_case_ids_key = "test_case_id_" . ($index + 1);
+        if (isset($_POST[$test_cases_key]) && isset($_POST[$expected_output_key]) && isset($_POST[$test_case_ids_key])) {
             $test_cases = $_POST[$test_cases_key];
             $expected_outputs = $_POST[$expected_output_key];
+            $test_case_ids = $_POST[$test_case_ids_key];
             foreach ($test_cases as $tc_index => $input) {
                 if (empty($input) || empty($expected_outputs[$tc_index])) {
                     $response['success'] = false;
@@ -145,19 +135,35 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                 }
 
                 // Use the test case ID provided in the form data
-                $test_case_id_key = "test_case_id_" . ($index + 1) . "_" . ($tc_index + 1);
-                $test_case_id = isset($_POST[$test_case_id_key]) ? $_POST[$test_case_id_key] : '';
+                $test_case_id = isset($test_case_ids[$tc_index]) ? $test_case_ids[$tc_index] : '';
+
+                // Log the test case ID to see if it is empty
+                error_log("Test case ID for test case index $tc_index: " . $test_case_id);
+                error_log("Test case input for test case index $tc_index: " . $input);
+                error_log("Test case expected output for test case index $tc_index: " . $expected_outputs[$tc_index]);
 
                 if (!empty($test_case_id)) {
-                    // Update existing test case
-                    $update_test_case_sql = "UPDATE Test_Cases SET input = ?, expected_output = ? WHERE test_case_id = ? AND question_id = ?";
-                    $update_test_case_stmt = $conn->prepare($update_test_case_sql);
-                    $update_test_case_stmt->bind_param("ssss", $input, $expected_outputs[$tc_index], $test_case_id, $question_id);
-                    if (!$update_test_case_stmt->execute()) {
-                        $response['success'] = false;
-                        $response['error'] = $update_test_case_stmt->error;
-                        error_log("Database error for test case ID $test_case_id: " . $update_test_case_stmt->error);
-                        break 2;
+                    // Check if the test case input or expected output has changed
+                    $check_test_case_sql = "SELECT input, expected_output FROM Test_Cases WHERE test_case_id = ? AND question_id = ?";
+                    $check_test_case_stmt = $conn->prepare($check_test_case_sql);
+                    $check_test_case_stmt->bind_param("ss", $test_case_id, $question_id);
+                    $check_test_case_stmt->execute();
+                    $check_test_case_result = $check_test_case_stmt->get_result();
+                    $existing_test_case = $check_test_case_result->fetch_assoc();
+
+                    if ($existing_test_case['input'] !== $input || $existing_test_case['expected_output'] !== $expected_outputs[$tc_index]) {
+                        // Update existing test case
+                        $update_test_case_sql = "UPDATE Test_Cases SET input = ?, expected_output = ? WHERE test_case_id = ? AND question_id = ?";
+                        $update_test_case_stmt = $conn->prepare($update_test_case_sql);
+                        $update_test_case_stmt->bind_param("ssss", $input, $expected_outputs[$tc_index], $test_case_id, $question_id);
+                        if (!$update_test_case_stmt->execute()) {
+                            $response['success'] = false;
+                            $response['error'] = $update_test_case_stmt->error;
+                            error_log("Database error for test case ID $test_case_id: " . $update_test_case_stmt->error);
+                            break 2;
+                        }
+                    } else {
+                        error_log("No changes detected for test case ID $test_case_id");
                     }
                 } else {
                     // Insert new test case
@@ -171,6 +177,7 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                         error_log("Database error for new test case ID $test_case_id: " . $insert_test_case_stmt->error);
                         break 2;
                     }
+                    error_log("Inserted new test case with ID $test_case_id");
                 }
             }
         }

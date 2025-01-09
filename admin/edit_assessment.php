@@ -97,20 +97,31 @@ session_start();
                 const form = document.getElementById('questions-form');
                 
                 // Client-side validation
-                const questionTexts = form.querySelectorAll('textarea[name="question_text[]"]');
-                const questionTypes = form.querySelectorAll('select[name="question_type[]"]');
-                const answerTypes = form.querySelectorAll('select[name="answer_type[]"]');
-                const correctChoices = form.querySelectorAll('textarea[name="correct_choice[]"], input[name="correct_choice[]"], select[name="correct_choice[]"]');
-                
-                for (let i = 0; i < questionTexts.length; i++) {
-                    if (questionTexts[i].value.trim() === '' || questionTypes[i].value.trim() === '' || answerTypes[i].value.trim() === '' || correctChoices[i].value.trim() === '') {
+                const questionDivs = form.querySelectorAll('div[id^="question-"]');
+                const removedQuestions = form.querySelectorAll('input[name="removed_questions[]"]');
+                const removedQuestionIds = Array.from(removedQuestions).map(input => input.value);
+
+                for (let i = 0; i < questionDivs.length; i++) {
+                    const questionDiv = questionDivs[i];
+                    const questionId = questionDiv.id.split('-')[1];
+
+                    if (removedQuestionIds.includes(questionId)) {
+                        continue; // Skip validation for removed questions
+                    }
+
+                    const questionText = questionDiv.querySelector('textarea[name="question_text[]"]');
+                    const questionType = questionDiv.querySelector('select[name="question_type[]"]');
+                    const answerType = questionDiv.querySelector('select[name="answer_type[]"]');
+                    const correctChoice = questionDiv.querySelector('textarea[name="correct_choice[]"], input[name="correct_choice[]"], select[name="correct_choice[]"]');
+
+                    if (questionText.value.trim() === '' || questionType.value.trim() === '' || answerType.value.trim() === '' || correctChoice.value.trim() === '') {
                         alert('All fields are required.');
                         return;
                     }
 
                     // Additional validation for multiple choice questions
-                    if (answerTypes[i].value === 'multiple choice') {
-                        const choices = form.querySelectorAll(`input[name="choices_${i + 1}[]"]`);
+                    if (answerType.value === 'multiple choice') {
+                        const choices = questionDiv.querySelectorAll(`input[name="choices_${i + 1}[]"]`);
                         for (let choice of choices) {
                             if (choice.value.trim() === '') {
                                 alert('All choice fields are required.');
@@ -120,9 +131,9 @@ session_start();
                     }
 
                     // Additional validation for code questions
-                    if (answerTypes[i].value === 'code') {
-                        const testCases = form.querySelectorAll(`textarea[name="test_cases_${i + 1}[]"]`);
-                        const expectedOutputs = form.querySelectorAll(`textarea[name="expected_output_${i + 1}[]"]`);
+                    if (answerType.value === 'code') {
+                        const testCases = questionDiv.querySelectorAll(`textarea[name="test_cases_${i + 1}[]"]`);
+                        const expectedOutputs = questionDiv.querySelectorAll(`textarea[name="expected_output_${i + 1}[]"]`);
                         for (let j = 0; j < testCases.length; j++) {
                             if (testCases[j].value.trim() === '' || expectedOutputs[j].value.trim() === '') {
                                 alert('All test case fields are required.');
@@ -184,7 +195,7 @@ session_start();
                     <textarea id="essay_${id}" name="correct_choice[]" required></textarea>
                 `;
             } else if (answerType === 'code') {
-                answerOptionsDiv.innerHTML = getCodeQuestionOptions(id);
+                answerOptionsDiv.innerHTML = getCodeQuestionOptions(id, includeEmptyChoice);
             }
         }
 
@@ -208,8 +219,8 @@ session_start();
             return choicesHtml;
         }
 
-        function getCodeQuestionOptions(id) {
-            return `
+        function getCodeQuestionOptions(id, includeEmptyTestCase = true) {
+            let testCasesHtml = `
                 <label for="code_language_${id}">Select Language:</label>
                 <select id="code_language_${id}" name="code_language[]" required>
                     <option value="python">Python</option>
@@ -223,11 +234,19 @@ session_start();
 
                 <label for="test_cases_${id}">Test Cases:</label>
                 <div id="test_cases_${id}">
+            `;
+            if (includeEmptyTestCase) {
+                testCasesHtml += `
                     <textarea name="test_cases_${id}[]" placeholder="Input" required></textarea>
                     <textarea name="expected_output_${id}[]" placeholder="Expected Output" required></textarea>
+                `;
+            }
+            testCasesHtml += `
                     <button type="button" onclick="addTestCase(${id})">Add Test Case</button>
                 </div>
             `;
+            console.log('getCodeQuestionOptions:', testCasesHtml); // Log the generated HTML
+            return testCasesHtml;
         }
 
         function addChoice(id, choiceId = '', choiceText = '') {
@@ -268,7 +287,7 @@ session_start();
             console.log('addChoice:', choiceContainer); // Log the added choice container
         }
 
-        function addTestCase(id) {
+        function addTestCase(id, inputText = '', outputText = '', testCaseId = '') {
             const testCasesDiv = document.getElementById(`test_cases_${id}`);
             if (!testCasesDiv) {
                 console.error(`Test cases div not found for question ${id}`);
@@ -279,11 +298,18 @@ session_start();
             input.name = `test_cases_${id}[]`;
             input.placeholder = 'Input';
             input.required = true;
+            input.value = inputText; // Set the value of the input
 
             const output = document.createElement('textarea');
             output.name = `expected_output_${id}[]`;
             output.placeholder = 'Expected Output';
             output.required = true;
+            output.value = outputText; // Set the value of the output
+
+            const testCaseIdInput = document.createElement('input');
+            testCaseIdInput.type = 'hidden';
+            testCaseIdInput.name = `test_case_id_${id}[]`;
+            testCaseIdInput.value = testCaseId;
 
             const removeButton = document.createElement('button');
             removeButton.type = 'button';
@@ -291,14 +317,17 @@ session_start();
             removeButton.onclick = function() {
                 input.remove();
                 output.remove();
+                testCaseIdInput.remove();
                 removeButton.remove();
                 isFormDirty = true;
             };
 
             testCasesDiv.insertBefore(input, testCasesDiv.lastElementChild);
             testCasesDiv.insertBefore(output, testCasesDiv.lastElementChild);
+            testCasesDiv.insertBefore(testCaseIdInput, testCasesDiv.lastElementChild);
             testCasesDiv.insertBefore(removeButton, testCasesDiv.lastElementChild);
             isFormDirty = true;
+            console.log('addTestCase:', { inputText, outputText, testCaseId }); // Log the added test case
         }
 
         function updateCorrectChoiceDropdown(id) {
@@ -344,17 +373,9 @@ session_start();
                             document.getElementById(`code_${questionCount}`).value = question.correct_answer;
                             document.getElementById(`code_language_${questionCount}`).value = question.programming_language; // Set the programming language
                             // Fetch and populate test cases for code questions
-                            fetch(`get_test_cases.php?question_id=${question.question_id}`)
-                                .then(response => response.json())
-                                .then(testCases => {
-                                    testCases.forEach(testCase => {
-                                        addTestCase(questionCount);
-                                        const testCaseInputs = document.getElementsByName(`test_cases_${questionCount}[]`);
-                                        const expectedOutputInputs = document.getElementsByName(`expected_output_${questionCount}[]`);
-                                        testCaseInputs[testCaseInputs.length - 1].value = testCase.input;
-                                        expectedOutputInputs[expectedOutputInputs.length - 1].value = testCase.expected_output;
-                                    });
-                                });
+                            question.test_cases.forEach(testCase => {
+                                addTestCase(questionCount, testCase.input, testCase.expected_output, testCase.test_case_id);
+                            });
                         } else if (question.answer_type === 'true/false') {
                             document.getElementById(`true_false_${questionCount}`).value = question.correct_answer;
                         } else if (question.answer_type === 'fill in the blank') {
