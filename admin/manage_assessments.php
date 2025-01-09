@@ -68,60 +68,60 @@
             </div>
         </nav>
     </header>    
-    <main>
-    <h1>Manage Assessments</h1>
-    <button onclick="window.location.href='create_assessment.html'">Create New Assessment</button>
-    <button id="deleteSelected">Delete Selected</button>
-    <button id="viewDeleted">View Deleted Assessments</button>
-    <table>
-        <thead>
-            <tr>
-                <th><input type="checkbox" id="selectAll"></th>
-                <th>Assessment ID</th>
-                <th>Assessment Name</th>
-                <th>Timestamp</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            $servername = "localhost";
-            $username = "root";
-            $password = "";
-            $dbname = "techfit";
+        <main>
+        <h1>Manage Assessments</h1>
+        <button onclick="window.location.href='create_assessment.html'">Create New Assessment</button>
+        <button id="deleteSelected">Delete Selected</button>
+        <button id="viewDeleted">View Deleted Assessments</button>
+        <table>
+            <thead>
+                <tr>
+                    <th><input type="checkbox" id="selectAll"></th>
+                    <th>Assessment ID</th>
+                    <th>Assessment Name</th>
+                    <th>Timestamp</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                $servername = "localhost";
+                $username = "root";
+                $password = "";
+                $dbname = "techfit";
 
-            // Create connection
-            $conn = new mysqli($servername, $username, $password, $dbname);
+                // Create connection
+                $conn = new mysqli($servername, $username, $password, $dbname);
 
-            // Check connection
-            if ($conn->connect_error) {
-                die("Connection failed: " . $conn->connect_error);
-            }
-
-            $sql = "SELECT assessment_id, assessment_name, timestamp FROM Assessment_Admin WHERE is_active = 1";
-            $result = $conn->query($sql);
-
-            if ($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()) {
-                    echo "<tr>";
-                    echo "<td><input type='checkbox' class='selectAssessment' value='" . htmlspecialchars($row['assessment_id']) . "'></td>";
-                    echo "<td>" . htmlspecialchars($row['assessment_id']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['assessment_name']) . "</td>";
-                    echo "<td>" . htmlspecialchars($row['timestamp']) . "</td>";
-                    echo "<td><a href='edit_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Edit</a> | <a href='#' class='deleteAssessment' data-id='" . htmlspecialchars($row['assessment_id']) . "'>Delete</a></td>";
-                    echo "</tr>";
+                // Check connection
+                if ($conn->connect_error) {
+                    die("Connection failed: " . $conn->connect_error);
                 }
-            } else {
-                echo "<tr><td colspan='5'>No assessments found</td></tr>";
-            }
 
-            $conn->close();
-            ?>
-        </tbody>
-    </table>
-    <div id="deleted-assessments-popup" style="display:none;">
-        <div id="deleted-assessments"></div>
-    </div>
+                $sql = "SELECT assessment_id, assessment_name, timestamp FROM Assessment_Admin WHERE is_active = 1";
+                $result = $conn->query($sql);
+
+                if ($result->num_rows > 0) {
+                    while($row = $result->fetch_assoc()) {
+                        echo "<tr>";
+                        echo "<td><input type='checkbox' class='selectAssessment' value='" . htmlspecialchars($row['assessment_id']) . "'></td>";
+                        echo "<td>" . htmlspecialchars($row['assessment_id']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['assessment_name']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['timestamp']) . "</td>";
+                        echo "<td><a href='edit_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Edit</a> | <a href='#' class='deleteAssessment' data-id='" . htmlspecialchars($row['assessment_id']) . "'>Delete</a></td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='5'>No assessments found</td></tr>";
+                }
+
+                $conn->close();
+                ?>
+            </tbody>
+        </table>
+        <div id="deleted-assessments-popup" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+            <div id="deleted-assessments"></div>
+        </div>
     </main>
 
     <script>
