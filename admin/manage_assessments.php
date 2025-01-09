@@ -70,21 +70,36 @@
     </header>    
         <main>
         <h1>Manage Assessments</h1>
-        <button onclick="window.location.href='create_assessment.html'">Create New Assessment</button>
-        <button id="deleteSelected">Delete Selected</button>
-        <button id="viewDeleted">View Deleted Assessments</button>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <button onclick="window.location.href='create_assessment.html'">Create New Assessment</button>
+                <button id="deleteSelected">Delete Selected</button>
+                <button id="viewDeleted">View Deleted Assessments</button>
+            </div>
+            <div style="display: flex; align-items: center; padding: 10px;">
+                <select id="sortDropdown">
+                    <option value="none">None</option>
+                    <option value="assessment_id_asc">Assessment ID ASC</option>
+                    <option value="assessment_id_desc">Assessment ID DESC</option>
+                    <option value="admin_id_asc">Admin ID ASC</option>
+                    <option value="admin_id_desc">Admin ID DESC</option>
+                </select>
+                <input type="text" id="searchInput" placeholder="Search..." style="margin-left: 10px;">
+            </div>
+        </div>
         <table>
             <thead>
                 <tr>
                     <th><input type="checkbox" id="selectAll"></th>
-                    <th>Assessment ID</th>
-                    <th>Assessment Name</th>
-                    <th>Description</th>
-                    <th>Timestamp</th>
+                    <th data-column="assessment_id">Assessment ID</th>
+                    <th data-column="admin_id">Admin ID</th>
+                    <th data-column="assessment_name">Assessment Name</th>
+                    <th data-column="description">Description</th>
+                    <th data-column="timestamp">Timestamp</th>
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="assessmentsTableBody">
                 <?php
                 $servername = "localhost";
                 $username = "root";
@@ -99,7 +114,7 @@
                     die("Connection failed: " . $conn->connect_error);
                 }
 
-                $sql = "SELECT assessment_id, assessment_name, description, timestamp FROM Assessment_Admin WHERE is_active = 1";
+                $sql = "SELECT assessment_id, admin_id, assessment_name, description, timestamp FROM Assessment_Admin WHERE is_active = 1";
                 $result = $conn->query($sql);
 
                 if ($result->num_rows > 0) {
@@ -107,6 +122,7 @@
                         echo "<tr>";
                         echo "<td><input type='checkbox' class='selectAssessment' value='" . htmlspecialchars($row['assessment_id']) . "'></td>";
                         echo "<td>" . htmlspecialchars($row['assessment_id']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['admin_id']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['assessment_name']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['description']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['timestamp']) . "</td>";
@@ -114,7 +130,7 @@
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='6'>No assessments found</td></tr>";
+                    echo "<tr><td colspan='7'>No assessments found</td></tr>";
                 }
 
                 $conn->close();
@@ -157,6 +173,11 @@
 
     th {
         background-color: #f2f2f2;
+        cursor: pointer;
+    }
+
+    th[data-column]:hover {
+        background-color: #e0e0e0;
     }
 
     #deleted-assessments-tab {
@@ -260,6 +281,65 @@
             });
         }
     }
+
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const filter = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#assessmentsTableBody tr');
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(filter));
+            row.style.display = match ? '' : 'none';
+        });
+    });
+
+    document.getElementById('sortDropdown').addEventListener('change', function() {
+        const value = this.value;
+        const rows = Array.from(document.querySelectorAll('#assessmentsTableBody tr'));
+        let columnIndex, order;
+
+        switch (value) {
+            case 'assessment_id_asc':
+                columnIndex = 1;
+                order = 1;
+                break;
+            case 'assessment_id_desc':
+                columnIndex = 1;
+                order = -1;
+                break;
+            case 'admin_id_asc':
+                columnIndex = 2;
+                order = 1;
+                break;
+            case 'admin_id_desc':
+                columnIndex = 2;
+                order = -1;
+                break;
+            default:
+                return;
+        }
+
+        rows.sort((a, b) => {
+            const aText = a.querySelector(`td:nth-child(${columnIndex + 1})`).textContent.trim();
+            const bText = b.querySelector(`td:nth-child(${columnIndex + 1})`).textContent.trim();
+            return aText.localeCompare(bText, undefined, {numeric: true}) * order;
+        });
+
+        rows.forEach(row => document.querySelector('#assessmentsTableBody').appendChild(row));
+    });
+
+    document.querySelectorAll('th[data-column]').forEach(th => {
+        th.addEventListener('click', function() {
+            const column = this.getAttribute('data-column');
+            const order = this.dataset.order = -(this.dataset.order || -1);
+            const rows = Array.from(document.querySelectorAll('#assessmentsTableBody tr'));
+            rows.sort((a, b) => {
+                const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
+                const bText = b.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
+                return aText.localeCompare(bText, undefined, {numeric: true}) * order;
+            });
+            rows.forEach(row => document.querySelector('#assessmentsTableBody').appendChild(row));
+        });
+    });
     </script>
 
     <footer>

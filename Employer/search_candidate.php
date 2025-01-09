@@ -82,7 +82,27 @@ session_start();
         }
         .remove-button:hover {
             color: darkred;
-        }        
+        }
+        .remove-button {
+        background: none;
+        border: none;
+        color: red;
+        cursor: pointer;
+        font-size: 16px;
+        }
+        .remove-button:hover {
+            color: darkred;
+        }
+        .view {
+            background: none;
+            border: none;
+            color: black;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .view:hover {
+            color: #555;
+        }
     </style>
 </head>
 <body>
@@ -154,7 +174,6 @@ session_start();
                         <th>Assessment Score</th>
                         <th>Interested?</th>
                     </tr>
-                </thead>
                 <tbody id="active-tab">
                     <?php
                     // Database connection
@@ -196,6 +215,7 @@ session_start();
                             if (isset($row['job_seeker_id'])) {
                                 echo "<button class='accept' onclick='updateInterest(\"" . $row['job_seeker_id'] . "\", \"interested\")'>✔</button>";
                                 echo "<button class='reject' onclick='updateInterest(\"" . $row['job_seeker_id'] . "\", \"uninterested\")'>✖</button>";
+                                echo "<button class='view' onclick='viewProfile(\"" . $row['job_seeker_id'] . "\")'>⋮</button>";
                             }
                             echo "</td>";
                             echo "</tr>";
@@ -235,7 +255,8 @@ session_start();
                             echo "<td>" . $row['score'] . "</td>";
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
-                                echo "<button class='remove-button' onclick='removeInterest(\"" . $row['job_seeker_id'] . "\")'>Remove</button>";
+                                echo "<button class='view' onclick='viewProfile(\"" . $row['job_seeker_id'] . "\")'>⋮</button>";
+                                echo "<button class='remove-button' onclick='removeInterest(\"" . $row['job_seeker_id'] . "\")'>🗑</button>";
                             }
                             echo "</td>";
                             echo "</tr>";
@@ -275,7 +296,8 @@ session_start();
                             echo "<td>" . $row['score'] . "</td>";
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
-                                echo "<button class='remove-button' onclick='removeInterest(\"" . $row['job_seeker_id'] . "\")'>Remove</button>";
+                                echo "<button class='view' onclick='viewProfile(\"" . $row['job_seeker_id'] . "\")'>⋮</button>";
+                                echo "<button class='remove-button' onclick='removeInterest(\"" . $row['job_seeker_id'] . "\")'>🗑</button>";
                             }
                             echo "</td>";
                             echo "</tr>";
@@ -375,10 +397,10 @@ session_start();
                     newRow.innerHTML = row.innerHTML;
 
                     if (interestStatus === 'interested') {
-                        newRow.querySelector('.actions').innerHTML = "<button class='remove-button' onclick='removeInterest(\"" + jobSeekerId + "\")'>Remove</button>";
+                        newRow.querySelector('.actions').innerHTML = "<button class='view' onclick='viewProfile(\"" + jobSeekerId + "\")'>⋮</button><button class='remove-button' onclick='removeInterest(\"" + jobSeekerId + "\")'>🗑</button>";
                         document.getElementById('interested-tab').appendChild(newRow);
                     } else if (interestStatus === 'uninterested') {
-                        newRow.querySelector('.actions').innerHTML = "<button class='remove-button' onclick='removeInterest(\"" + jobSeekerId + "\")'>Remove</button>";
+                        newRow.querySelector('.actions').innerHTML = "<button class='view' onclick='viewProfile(\"" + jobSeekerId + "\")'>⋮</button><button class='remove-button' onclick='removeInterest(\"" + jobSeekerId + "\")'>🗑</button>";
                         document.getElementById('uninterested-tab').appendChild(newRow);
                     }
 
@@ -406,7 +428,7 @@ session_start();
                     var newRow = document.createElement('tr');
                     newRow.id = 'row-' + jobSeekerId;
                     newRow.innerHTML = row.innerHTML;
-                    newRow.querySelector('.actions').innerHTML = "<button class='accept' onclick='updateInterest(\"" + jobSeekerId + "\", \"interested\")'>✔</button><button class='reject' onclick='updateInterest(\"" + jobSeekerId + "\", \"uninterested\")'>✖</button>";
+                    newRow.querySelector('.actions').innerHTML = "<button class='accept' onclick='updateInterest(\"" + jobSeekerId + "\", \"interested\")'>✔</button><button class='reject' onclick='updateInterest(\"" + jobSeekerId + "\", \"uninterested\")'>✖</button><button class='view' onclick='viewProfile(\"" + jobSeekerId + "\")'>⋮</button>";
                     document.getElementById('active-tab').appendChild(newRow);
 
                     // Remove "No candidates found" message if present
@@ -422,6 +444,11 @@ session_start();
             if (noCandidatesRow) {
                 tab.removeChild(noCandidatesRow);
             }
+        }
+
+        function viewProfile(jobSeekerId) {
+            // Implement the logic to view the job seeker's profile
+            alert("Viewing profile of job seeker ID: " + jobSeekerId);
         }
 
         function showTab(tabName) {
