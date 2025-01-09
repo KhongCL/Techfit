@@ -157,7 +157,7 @@
 
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
-                            echo "<tr>";
+                            echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
                             echo "<td><input type='checkbox'></td>";
                             echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
                             echo "<td>" . $row['education_level'] . "</td>";
