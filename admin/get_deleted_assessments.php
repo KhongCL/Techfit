@@ -12,7 +12,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "SELECT assessment_id, assessment_name FROM Assessment_Admin WHERE is_active = 0";
+$sql = "SELECT assessment_id, assessment_name, description, timestamp FROM Assessment_Admin WHERE is_active = 0";
 $result = $conn->query($sql);
 
 $deleted_assessments = array();

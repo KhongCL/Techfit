@@ -79,6 +79,7 @@
                     <th><input type="checkbox" id="selectAll"></th>
                     <th>Assessment ID</th>
                     <th>Assessment Name</th>
+                    <th>Description</th>
                     <th>Timestamp</th>
                     <th>Actions</th>
                 </tr>
@@ -98,7 +99,7 @@
                     die("Connection failed: " . $conn->connect_error);
                 }
 
-                $sql = "SELECT assessment_id, assessment_name, timestamp FROM Assessment_Admin WHERE is_active = 1";
+                $sql = "SELECT assessment_id, assessment_name, description, timestamp FROM Assessment_Admin WHERE is_active = 1";
                 $result = $conn->query($sql);
 
                 if ($result->num_rows > 0) {
@@ -107,22 +108,73 @@
                         echo "<td><input type='checkbox' class='selectAssessment' value='" . htmlspecialchars($row['assessment_id']) . "'></td>";
                         echo "<td>" . htmlspecialchars($row['assessment_id']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['assessment_name']) . "</td>";
+                        echo "<td>" . htmlspecialchars($row['description']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['timestamp']) . "</td>";
                         echo "<td><a href='edit_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Edit</a> | <a href='#' class='deleteAssessment' data-id='" . htmlspecialchars($row['assessment_id']) . "'>Delete</a></td>";
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='5'>No assessments found</td></tr>";
+                    echo "<tr><td colspan='6'>No assessments found</td></tr>";
                 }
 
                 $conn->close();
                 ?>
             </tbody>
         </table>
-        <div id="deleted-assessments-popup" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border: 1px solid #ccc; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-            <div id="deleted-assessments"></div>
+        <div id="deleted-assessments-tab" style="display:none;">
+            <h3>Deleted Assessments</h3>
+            <label><input type="checkbox" id="select-all-deleted"> Select All</label>
+            <form id="restore-form">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Assessment ID</th>
+                            <th>Assessment Name</th>
+                            <th>Description</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deleted-assessments"></tbody>
+                </table>
+                <button type="button" onclick="restoreSelectedAssessments()">Restore Selected Assessments</button>
+            </form>
+            <button type="button" onclick="closeDeletedAssessments()">Close</button>
         </div>
     </main>
+
+    <style>
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f2f2f2;
+    }
+
+    #deleted-assessments-tab {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        padding: 20px;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        max-height: 80vh;
+        overflow-y: auto;
+        z-index: 1000;
+        width: 90%;
+    }
+    </style>
 
     <script>
     document.getElementById('selectAll').addEventListener('click', function() {
@@ -157,20 +209,20 @@
             .then(response => response.json())
             .then(data => {
                 const deletedAssessmentsDiv = document.getElementById('deleted-assessments');
-                deletedAssessmentsDiv.innerHTML = `
-                    <h3>Deleted Assessments</h3>
-                    <label><input type="checkbox" id="select-all-deleted"> Select All</label>
-                    <form id="restore-form">
-                        ${data.map(assessment => `
-                            <div>
-                                <label><input type="checkbox" name="restore_assessments[]" value="${assessment.assessment_id}"> ${assessment.assessment_name}</label>
-                            </div>
-                        `).join('')}
-                        <button type="button" onclick="restoreSelectedAssessments()">Restore Selected Assessments</button>
-                    </form>
-                    <button type="button" onclick="closeDeletedAssessments()">Close</button>
-                `;
-                document.getElementById('deleted-assessments-popup').style.display = 'block';
+                if (data.length > 0) {
+                    deletedAssessmentsDiv.innerHTML = data.map(assessment => `
+                        <tr>
+                            <td><input type="checkbox" name="restore_assessments[]" value="${assessment.assessment_id}"></td>
+                            <td>${assessment.assessment_id}</td>
+                            <td>${assessment.assessment_name}</td>
+                            <td>${assessment.description}</td>
+                            <td>${assessment.timestamp}</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    deletedAssessmentsDiv.innerHTML = '<tr><td colspan="5">No deleted assessments found</td></tr>';
+                }
+                document.getElementById('deleted-assessments-tab').style.display = 'block';
 
                 // Add event listener for select all checkbox
                 document.getElementById('select-all-deleted').addEventListener('change', function() {
@@ -181,7 +233,7 @@
     });
 
     function closeDeletedAssessments() {
-        document.getElementById('deleted-assessments-popup').style.display = 'none';
+        document.getElementById('deleted-assessments-tab').style.display = 'none';
     }
 
     function restoreSelectedAssessments() {
@@ -209,6 +261,7 @@
         }
     }
     </script>
+
     <footer>
         <div class="footer-content">
             <div class="footer-left">
