@@ -71,8 +71,18 @@ session_start();
             color: green;
         }
         .actions .reject:hover {
-            color: red;
+                color: red;
         }
+        .remove-button {
+            background: none;
+            border: none;
+            color: red;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .remove-button:hover {
+            color: darkred;
+        }        
     </style>
 </head>
 <body>
@@ -191,7 +201,7 @@ session_start();
                             echo "</tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No candidates found</td></tr>";
+                        echo "<tr id='no-candidates-active'><td colspan='6'>No candidates found</td></tr>";
                     }
 
                     $conn->close();
@@ -225,13 +235,13 @@ session_start();
                             echo "<td>" . $row['score'] . "</td>";
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
-                                echo "<button class='accept' onclick='removeInterest(\"" . $row['job_seeker_id'] . "\")'>✔</button>";
+                                echo "<button class='remove-button' onclick='removeInterest(\"" . $row['job_seeker_id'] . "\")'>Remove</button>";
                             }
                             echo "</td>";
                             echo "</tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No candidates found</td></tr>";
+                        echo "<tr id='no-candidates-interested'><td colspan='6'>No candidates found</td></tr>";
                     }
 
                     $conn->close();
@@ -265,13 +275,13 @@ session_start();
                             echo "<td>" . $row['score'] . "</td>";
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
-                                echo "<button class='accept' onclick='removeInterest(\"" . $row['job_seeker_id'] . "\")'>✔</button>";
+                                echo "<button class='remove-button' onclick='removeInterest(\"" . $row['job_seeker_id'] . "\")'>Remove</button>";
                             }
                             echo "</td>";
                             echo "</tr>";
                         }
                     } else {
-                        echo "<tr><td colspan='6'>No candidates found</td></tr>";
+                        echo "<tr id='no-candidates-uninterested'><td colspan='6'>No candidates found</td></tr>";
                     }
 
                     $conn->close();
@@ -365,12 +375,16 @@ session_start();
                     newRow.innerHTML = row.innerHTML;
 
                     if (interestStatus === 'interested') {
-                        newRow.querySelector('.actions').innerHTML = "<button class='accept' onclick='removeInterest(\"" + jobSeekerId + "\")'>✔</button>";
+                        newRow.querySelector('.actions').innerHTML = "<button class='remove-button' onclick='removeInterest(\"" + jobSeekerId + "\")'>Remove</button>";
                         document.getElementById('interested-tab').appendChild(newRow);
                     } else if (interestStatus === 'uninterested') {
-                        newRow.querySelector('.actions').innerHTML = "<button class='accept' onclick='removeInterest(\"" + jobSeekerId + "\")'>✔</button>";
+                        newRow.querySelector('.actions').innerHTML = "<button class='remove-button' onclick='removeInterest(\"" + jobSeekerId + "\")'>Remove</button>";
                         document.getElementById('uninterested-tab').appendChild(newRow);
                     }
+
+                    // Remove "No candidates found" message if present
+                    removeNoCandidatesMessage('interested-tab');
+                    removeNoCandidatesMessage('uninterested-tab');
                 }
             };
             xhr.send("job_seeker_id=" + jobSeekerId + "&interest_status=" + interestStatus);
@@ -394,9 +408,20 @@ session_start();
                     newRow.innerHTML = row.innerHTML;
                     newRow.querySelector('.actions').innerHTML = "<button class='accept' onclick='updateInterest(\"" + jobSeekerId + "\", \"interested\")'>✔</button><button class='reject' onclick='updateInterest(\"" + jobSeekerId + "\", \"uninterested\")'>✖</button>";
                     document.getElementById('active-tab').appendChild(newRow);
+
+                    // Remove "No candidates found" message if present
+                    removeNoCandidatesMessage('active-tab');
                 }
             };
             xhr.send("job_seeker_id=" + jobSeekerId);
+        }
+
+        function removeNoCandidatesMessage(tabId) {
+            var tab = document.getElementById(tabId);
+            var noCandidatesRow = tab.querySelector('tr#no-candidates-' + tabId.split('-')[0]);
+            if (noCandidatesRow) {
+                tab.removeChild(noCandidatesRow);
+            }
         }
 
         function showTab(tabName) {
