@@ -393,26 +393,24 @@ session_start();
             fetch(`get_deleted_questions.php?assessment_id=${assessmentId}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Fetched deleted questions:', data); // Log fetched data
                     const deletedQuestionsDiv = document.getElementById('deleted-questions');
                     if (data.length > 0) {
                         deletedQuestionsDiv.innerHTML = `
-                            <h3>Deleted Questions</h3>
                             <label><input type="checkbox" id="select-all-deleted"> Select All</label>
                             <form id="restore-form">
                                 <table>
                                     <thead>
                                         <tr>
                                             <th>Select</th>
-                                            <th>Question ID</th>
-                                            <th>Question Text</th>
-                                            <th>Question Type</th>
-                                            <th>Answer Type</th>
-                                            <th>Correct Answer</th>
-                                            <th>Choices/Test Cases</th>
+                                            <th data-column="question_id">Question ID</th>
+                                            <th data-column="question_text">Question Text</th>
+                                            <th data-column="question_type">Question Type</th>
+                                            <th data-column="answer_type">Answer Type</th>
+                                            <th data-column="correct_answer">Correct Answer</th>
+                                            <th data-column="choices">Choices/Test Cases</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="deletedQuestionsTableBody">
                                         ${data.map(question => `
                                             <tr>
                                                 <td><input type="checkbox" name="restore_questions[]" value="${question.question_id}"></td>
@@ -443,6 +441,32 @@ session_start();
                     document.getElementById('select-all-deleted').addEventListener('change', function() {
                         const checkboxes = document.querySelectorAll('input[name="restore_questions[]"]');
                         checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+                    });
+
+                    // Add search functionality
+                    document.getElementById('searchDeletedQuestions').addEventListener('input', function() {
+                        const filter = this.value.toLowerCase();
+                        const rows = document.querySelectorAll('#deletedQuestionsTableBody tr');
+                        rows.forEach(row => {
+                            const cells = row.querySelectorAll('td');
+                            const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(filter));
+                            row.style.display = match ? '' : 'none';
+                        });
+                    });
+
+                    // Add sort functionality
+                    document.querySelectorAll('#deleted-questions-popup th[data-column]').forEach(th => {
+                        th.addEventListener('click', function() {
+                            const column = this.getAttribute('data-column');
+                            const order = this.dataset.order = -(this.dataset.order || -1);
+                            const rows = Array.from(document.querySelectorAll('#deletedQuestionsTableBody tr'));
+                            rows.sort((a, b) => {
+                                const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
+                                const bText = b.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
+                                return aText.localeCompare(bText, undefined, {numeric: true}) * order;
+                            });
+                            rows.forEach(row => document.querySelector('#deletedQuestionsTableBody').appendChild(row));
+                        });
                     });
                 });
         }
@@ -506,6 +530,11 @@ session_start();
 
         #deleted-questions-popup th {
             background-color: #f2f2f2;
+            cursor: pointer;
+        }
+
+        #deleted-questions-popup th[data-column]:hover {
+            background-color: #e0e0e0;
         }
         </style>
 </head>
@@ -587,6 +616,10 @@ session_start();
         <button type="button" onclick="viewDeletedQuestions()">View Deleted Questions</button>
 
         <div id="deleted-questions-popup">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
+                <h3>Deleted Questions</h3>
+                <input type="text" id="searchDeletedQuestions" placeholder="Search..." style="margin-left: 10px;">
+            </div>
             <div id="deleted-questions"></div>
         </div>
         <form id="questions-form" action="update_questions.php" method="post">
