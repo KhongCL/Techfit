@@ -69,14 +69,48 @@ $conn->close();
         }
 
         .history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
             margin-bottom: 20px;
             padding: 15px;
             border: 1px solid #ddd;
             border-radius: 8px;
             background-color: #fff;
+        }
+
+        .history-item div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-item div h3 {
+            margin: 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .history-item div p {
+            margin: 5px 0 0;
+            font-size: 16px;
+            color: #000;
+        }
+
+        .history-item .actions {
+            grid-column: span 2;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .actions a {
+            text-decoration: none;
+            color: #007BFF;
+            font-size: 14px;
+        }
+
+        .actions a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -137,25 +171,21 @@ $conn->close();
             <?php if (!empty($assessments)): ?>
                 <?php foreach ($assessments as $assessment): ?>
                     <div class="history-item">
-                        <div class="container">
-                            <h3>Assessment ID</h3>
-                            <p><?php echo htmlspecialchars($assessment['assessment_id']); ?></p>
+                        <div>
+                            <h3>Date</h3>
+                            <p><?php echo htmlspecialchars(date('Y-m-d', strtotime($assessment['start_time']))); ?></p>
                         </div>
-                        <div class="container">
-                            <h3>Start Time</h3>
-                            <p><?php echo htmlspecialchars($assessment['start_time']); ?></p>
-                        </div>
-                        <div class="container">
-                            <h3>End Time</h3>
-                            <p><?php echo htmlspecialchars($assessment['end_time']); ?></p>
-                        </div>
-                        <div class="container">
+                        <div class="score">
                             <h3>Score</h3>
                             <p><?php echo htmlspecialchars($assessment['score']); ?></p>
                         </div>
-                        <div class="container">
+                        <div>
                             <h3>Avg Time Used (mins)</h3>
                             <p><?php echo round((strtotime($assessment['end_time']) - strtotime($assessment['start_time'])) / 60, 2); ?></p>
+                        </div>
+                        <div class="actions">
+                            <a href="#" title="Download">&#x2193; Download</a>
+                            <a href="#" title="Edit">&#x270E; Edit</a>
                         </div>
                     </div>
                 <?php endforeach; ?>
