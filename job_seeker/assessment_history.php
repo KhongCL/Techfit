@@ -1,3 +1,30 @@
+<?php
+$host = 'localhost';
+$username = 'root';
+$password = '';
+$database = 'techfit'; 
+
+$conn = new mysqli($host, $username, $password, $database);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+$sql = "SELECT assessment_id, job_seeker_id, start_time, end_time, score FROM Assessment_Job_Seeker";
+$result = $conn->query($sql);
+
+$assessments = [];
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $assessments[] = $row;
+    }
+}
+
+$conn->close();
+?>
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,43 +32,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assessment History - TechFit</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #1e1e1e;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-        .popup h2 {
-            color: #fff;
-        }
-        .popup button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .popup .close-button {
-            background-color: #dc3545;
-            color: #fff;
-        }
-        .popup .cancel-button {
-            background-color: #007bff;
-            color: #fff;
-        }
-        .popup .close-button:hover {
-            background-color: #c82333;
-        }
-        .popup .cancel-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+
 </head>
 <body>
     <header>
@@ -102,51 +93,28 @@
                 <h2>Assessment History</h2>
                 <button class="refresh-btn" title="Refresh">&#x21BB;</button>
             </div>
-    
-            <!-- History Item -->
-            <div class="history-item">
-                <div class="history-info">
-                    <p><strong>Date:</strong> XX/XX/XXXX</p>
-                    <p><strong>Avg time used:</strong> XX.XX</p>
+
+            <!-- History Items -->
+            <?php foreach ($assessments as $assessment): ?>
+                <div class="history-item">
+                    <div class="history-info">
+                        <p><strong>Date:</strong> <?php echo date('d/m/Y', strtotime($assessment['start_time'])); ?></p>
+                        <p><strong>Avg time used:</strong> <?php echo round((strtotime($assessment['end_time']) - strtotime($assessment['start_time'])) / 60, 2); ?> mins</p>
+                    </div>
+                    <div class="history-score">
+                        <p><strong>Score:</strong></p>
+                        <p><?php echo $assessment['score']; ?></p>
+                    </div>
+                    <div class="history-actions">
+                        <button class="download-btn" title="Download">&#x2193;</button>
+                        <button class="share-btn" title="Share">&#x1F517;</button>
+                    </div>
                 </div>
-                <div class="history-score">
-                    <p><strong>Score:</strong></p>
-                    <p>XX/XX</p>
-                </div>
-                <div class="history-actions">
-                    <button class="download-btn" title="Download">
-                        &#x2193;
-                    </button>
-                    <button class="share-btn" title="Share">
-                        &#x1F517;
-                    </button>
-                </div>
-            </div>
-    
-            <!-- Repeatable History Item -->
-            <div class="history-item">
-                <div class="history-info">
-                    <p><strong>Date:</strong> XX/XX/XXXX</p>
-                    <p><strong>Avg time used:</strong> XX.XX</p>
-                </div>
-                <div class="history-score">
-                    <p><strong>Score:</strong></p>
-                    <p>XX/XX</p>
-                </div>
-                <div class="history-actions">
-                    <button class="download-btn" title="Download">
-                        &#x2193;
-                    </button>
-                    <button class="share-btn" title="Share">
-                        &#x1F517;
-                    </button>
-                </div>
-            </div>
+            <?php endforeach; ?>
         </div>
     </section>
-    
-    
 
+    
     <footer>
         <div class="footer-content">
             <div class="footer-left">

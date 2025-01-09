@@ -82,7 +82,7 @@ session_start(); // Start the session to access session variables
                     <li><a href="#">Assessment</a>
                         <ul class="dropdown">
                             <li><a href="start_assessment.html">Start Assessment</a></li>
-                            <li><a href="assessment_history.html">Assessment History</a></li>
+                            <li><a href="assessment_history.php">Assessment History</a></li>
                             <li><a href="assessment_summary.html">Assessment Summary</a></li>
                         </ul>
                     </li>
