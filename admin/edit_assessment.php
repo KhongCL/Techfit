@@ -386,6 +386,65 @@ session_start();
                     });
                 });
         });
+
+        // Function to fetch and display deleted questions
+        function viewDeletedQuestions() {
+            const assessmentId = "<?php echo htmlspecialchars($_GET['assessment_id']); ?>";
+            fetch(`get_deleted_questions.php?assessment_id=${assessmentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    const deletedQuestionsDiv = document.getElementById('deleted-questions');
+                    deletedQuestionsDiv.innerHTML = `
+                        <h3>Deleted Questions</h3>
+                        <label><input type="checkbox" id="select-all-deleted"> Select All</label>
+                        <form id="restore-form">
+                            ${data.map(question => `
+                                <div>
+                                    <label><input type="checkbox" name="restore_questions[]" value="${question.question_id}"> ${question.question_text}</label>
+                                </div>
+                            `).join('')}
+                            <button type="button" onclick="restoreSelectedQuestions()">Restore Selected Questions</button>
+                        </form>
+                        <button type="button" onclick="closeDeletedQuestions()">Close</button>
+                    `;
+                    document.getElementById('deleted-questions-popup').style.display = 'block';
+
+                    // Add event listener for select all checkbox
+                    document.getElementById('select-all-deleted').addEventListener('change', function() {
+                        const checkboxes = document.querySelectorAll('input[name="restore_questions[]"]');
+                        checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+                    });
+                });
+        }
+
+        function closeDeletedQuestions() {
+            document.getElementById('deleted-questions-popup').style.display = 'none';
+        }
+
+        function restoreSelectedQuestions() {
+            if (confirm('Are you sure you want to restore the selected questions?')) {
+                const form = document.getElementById('restore-form');
+                const formData = new FormData(form);
+
+                fetch('restore_questions.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Selected questions restored successfully.');
+                        location.reload(); // Reload the page to update the restored questions
+                    } else {
+                        alert('Failed to restore selected questions.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while restoring the questions.');
+                });
+            }
+        }
     </script>
 </head>
 <body>
@@ -463,6 +522,11 @@ session_start();
             unset($_SESSION['error_message']);
         }
         ?>
+            <button type="button" onclick="viewDeletedQuestions()">View Deleted Questions</button>
+
+            <div id="deleted-questions-popup" style="display:none;">
+                <div id="deleted-questions"></div>
+            </div>
         <form id="questions-form" action="update_questions.php" method="post">
             <input type="hidden" name="assessment_id" value="<?php echo htmlspecialchars($_GET['assessment_id']); ?>">
             <div id="questions"></div>
