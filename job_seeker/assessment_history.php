@@ -1,4 +1,6 @@
 <?php
+session_start(); // Start the session to access session variables
+
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -10,8 +12,27 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$sql = "SELECT assessment_id, job_seeker_id, start_time, end_time, score FROM Assessment_Job_Seeker";
-$result = $conn->query($sql);
+$user_id = $_SESSION['user_id']; // Assuming user_id is stored in session
+
+// Updated SQL query with the required INNER JOINs
+$sql = "
+    SELECT 
+        Assessment_Job_Seeker.assessment_id AS 'assessment_id',
+        Assessment_Job_Seeker.job_seeker_id AS 'job_id',
+        Assessment_Job_Seeker.start_time AS 'start_time',
+        Assessment_Job_Seeker.end_time AS 'end_time',
+        Assessment_Job_Seeker.score AS 'score'
+    FROM Assessment_Job_Seeker
+    INNER JOIN Job_Seeker 
+        ON Assessment_Job_Seeker.job_seeker_id = Job_Seeker.job_seeker_id
+    INNER JOIN User
+        ON Job_Seeker.user_id = User.user_id
+    WHERE User.user_id = ?";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
 
 $assessments = [];
 if ($result->num_rows > 0) {
@@ -19,10 +40,8 @@ if ($result->num_rows > 0) {
         $assessments[] = $row;
     }
 }
-
+$stmt->close();
 $conn->close();
-?>
-
 ?>
 
 <!DOCTYPE html>
@@ -33,44 +52,33 @@ $conn->close();
     <title>Assessment History - TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #1e1e1e;
+        .container {
+            margin: 20px auto;
+            max-width: 800px;
+            background-color: #f9f9f9;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .popup h2 {
-            color: #fff;
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
         }
-        .popup button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .popup .close-button {
-            background-color: #dc3545;
-            color: #fff;
-        }
-        .popup .cancel-button {
-            background-color: #007bff;
-            color: #fff;
-        }
-        .popup .close-button:hover {
-            background-color: #c82333;
-        }
-        .popup .cancel-button:hover {
-            background-color: #0056b3;
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fff;
         }
     </style>
-
-
 </head>
 <body>
     <header>
@@ -117,13 +125,6 @@ $conn->close();
         </nav>
     </header>
 
-    <!-- Logout Popup -->
-    <div id="logout-popup" class="popup">
-        <h2>Are you sure you want to Log Out?</h2>
-        <button class="close-button" onclick="logoutUser()">Yes</button>
-        <button class="cancel-button" onclick="closePopup('logout-popup')">No</button>
-    </div>
-
     <section id="assessment-history">
         <div class="container">
             <!-- Header -->
@@ -133,26 +134,37 @@ $conn->close();
             </div>
 
             <!-- History Items -->
-            <?php foreach ($assessments as $assessment): ?>
-                <div class="history-item">
-                    <div class="history-info">
-                        <p><strong>Date:</strong> <?php echo date('d/m/Y', strtotime($assessment['start_time'])); ?></p>
-                        <p><strong>Avg time used:</strong> <?php echo round((strtotime($assessment['end_time']) - strtotime($assessment['start_time'])) / 60, 2); ?> mins</p>
+            <?php if (!empty($assessments)): ?>
+                <?php foreach ($assessments as $assessment): ?>
+                    <div class="history-item">
+                        <div class="container">
+                            <h3>Assessment ID</h3>
+                            <p><?php echo htmlspecialchars($assessment['assessment_id']); ?></p>
+                        </div>
+                        <div class="container">
+                            <h3>Start Time</h3>
+                            <p><?php echo htmlspecialchars($assessment['start_time']); ?></p>
+                        </div>
+                        <div class="container">
+                            <h3>End Time</h3>
+                            <p><?php echo htmlspecialchars($assessment['end_time']); ?></p>
+                        </div>
+                        <div class="container">
+                            <h3>Score</h3>
+                            <p><?php echo htmlspecialchars($assessment['score']); ?></p>
+                        </div>
+                        <div class="container">
+                            <h3>Avg Time Used (mins)</h3>
+                            <p><?php echo round((strtotime($assessment['end_time']) - strtotime($assessment['start_time'])) / 60, 2); ?></p>
+                        </div>
                     </div>
-                    <div class="history-score">
-                        <p><strong>Score:</strong></p>
-                        <p><?php echo $assessment['score']; ?></p>
-                    </div>
-                    <div class="history-actions">
-                        <button class="download-btn" title="Download">&#x2193;</button>
-                        <button class="share-btn" title="Share">&#x1F517;</button>
-                    </div>
-                </div>
-            <?php endforeach; ?>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <p>No assessment history available.</p>
+            <?php endif; ?>
         </div>
     </section>
 
-    
     <footer>
         <div class="footer-content">
             <div class="footer-left">
@@ -208,7 +220,6 @@ $conn->close();
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
-
 
     <script src="scripts.js?v=1.0"></script>
     <script>
