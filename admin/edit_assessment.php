@@ -393,20 +393,50 @@ session_start();
             fetch(`get_deleted_questions.php?assessment_id=${assessmentId}`)
                 .then(response => response.json())
                 .then(data => {
+                    console.log('Fetched deleted questions:', data); // Log fetched data
                     const deletedQuestionsDiv = document.getElementById('deleted-questions');
-                    deletedQuestionsDiv.innerHTML = `
-                        <h3>Deleted Questions</h3>
-                        <label><input type="checkbox" id="select-all-deleted"> Select All</label>
-                        <form id="restore-form">
-                            ${data.map(question => `
-                                <div>
-                                    <label><input type="checkbox" name="restore_questions[]" value="${question.question_id}"> ${question.question_text}</label>
-                                </div>
-                            `).join('')}
-                            <button type="button" onclick="restoreSelectedQuestions()">Restore Selected Questions</button>
-                        </form>
-                        <button type="button" onclick="closeDeletedQuestions()">Close</button>
-                    `;
+                    if (data.length > 0) {
+                        deletedQuestionsDiv.innerHTML = `
+                            <h3>Deleted Questions</h3>
+                            <label><input type="checkbox" id="select-all-deleted"> Select All</label>
+                            <form id="restore-form">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Select</th>
+                                            <th>Question ID</th>
+                                            <th>Question Text</th>
+                                            <th>Question Type</th>
+                                            <th>Answer Type</th>
+                                            <th>Correct Answer</th>
+                                            <th>Choices/Test Cases</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${data.map(question => `
+                                            <tr>
+                                                <td><input type="checkbox" name="restore_questions[]" value="${question.question_id}"></td>
+                                                <td>${question.question_id}</td>
+                                                <td>${question.question_text}</td>
+                                                <td>${question.question_type || 'N/A'}</td>
+                                                <td>${question.answer_type || 'N/A'}</td>
+                                                <td>${question.correct_answer || 'N/A'}</td>
+                                                <td>
+                                                    ${question.answer_type === 'multiple choice' ? (question.choices.length > 0 ? question.choices.map(choice => `<div>${choice}</div>`).join('') : 'No choices available') : ''}
+                                                    ${question.answer_type === 'code' ? (question.test_cases.length > 0 ? question.test_cases.map(testCase => `<div>Input: ${testCase.input}, Output: ${testCase.expected_output}</div>`).join('') : 'No test cases available') : ''}
+                                                    ${question.answer_type !== 'multiple choice' && question.answer_type !== 'code' ? 'This answer type does not contain choices/test cases' : ''}
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                                <button type="button" onclick="restoreSelectedQuestions()">Restore Selected Questions</button>
+                            </form>
+                            <button type="button" onclick="closeDeletedQuestions()">Close</button>
+                        `;
+                    } else {
+                        deletedQuestionsDiv.innerHTML = '<p>No deleted questions found</p><button type="button" onclick="closeDeletedQuestions()">Close</button>';
+                    }
                     document.getElementById('deleted-questions-popup').style.display = 'block';
 
                     // Add event listener for select all checkbox
@@ -446,6 +476,38 @@ session_start();
             }
         }
     </script>
+        <style>
+        #deleted-questions-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-height: 90vh;
+            overflow-y: auto;
+            z-index: 1000;
+            width: 95%;
+        }
+
+        #deleted-questions-popup table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #deleted-questions-popup th, #deleted-questions-popup td {
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #deleted-questions-popup th {
+            background-color: #f2f2f2;
+        }
+        </style>
 </head>
 <body>
     <header>
@@ -522,11 +584,11 @@ session_start();
             unset($_SESSION['error_message']);
         }
         ?>
-            <button type="button" onclick="viewDeletedQuestions()">View Deleted Questions</button>
+        <button type="button" onclick="viewDeletedQuestions()">View Deleted Questions</button>
 
-            <div id="deleted-questions-popup" style="display:none;">
-                <div id="deleted-questions"></div>
-            </div>
+        <div id="deleted-questions-popup">
+            <div id="deleted-questions"></div>
+        </div>
         <form id="questions-form" action="update_questions.php" method="post">
             <input type="hidden" name="assessment_id" value="<?php echo htmlspecialchars($_GET['assessment_id']); ?>">
             <div id="questions"></div>
