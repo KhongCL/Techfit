@@ -69,53 +69,146 @@
         </nav>
     </header>    
     <main>
-        <h1>Manage Assessments</h1>
-        <button onclick="window.location.href='create_assessment.html'">Create New Assessment</button>
-        <table>
-            <thead>
-                <tr>
-                    <th>Assessment ID</th>
-                    <th>Assessment Name</th>
-                    <th>Timestamp</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $servername = "localhost";
-                $username = "root";
-                $password = "";
-                $dbname = "techfit";
+    <h1>Manage Assessments</h1>
+    <button onclick="window.location.href='create_assessment.html'">Create New Assessment</button>
+    <button id="deleteSelected">Delete Selected</button>
+    <button id="viewDeleted">View Deleted Assessments</button>
+    <table>
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAll"></th>
+                <th>Assessment ID</th>
+                <th>Assessment Name</th>
+                <th>Timestamp</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php
+            $servername = "localhost";
+            $username = "root";
+            $password = "";
+            $dbname = "techfit";
 
-                // Create connection
-                $conn = new mysqli($servername, $username, $password, $dbname);
+            // Create connection
+            $conn = new mysqli($servername, $username, $password, $dbname);
 
-                // Check connection
-                if ($conn->connect_error) {
-                    die("Connection failed: " . $conn->connect_error);
+            // Check connection
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
+
+            $sql = "SELECT assessment_id, assessment_name, timestamp FROM Assessment_Admin WHERE is_active = 1";
+            $result = $conn->query($sql);
+
+            if ($result->num_rows > 0) {
+                while($row = $result->fetch_assoc()) {
+                    echo "<tr>";
+                    echo "<td><input type='checkbox' class='selectAssessment' value='" . htmlspecialchars($row['assessment_id']) . "'></td>";
+                    echo "<td>" . htmlspecialchars($row['assessment_id']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['assessment_name']) . "</td>";
+                    echo "<td>" . htmlspecialchars($row['timestamp']) . "</td>";
+                    echo "<td><a href='edit_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Edit</a> | <a href='#' class='deleteAssessment' data-id='" . htmlspecialchars($row['assessment_id']) . "'>Delete</a></td>";
+                    echo "</tr>";
                 }
+            } else {
+                echo "<tr><td colspan='5'>No assessments found</td></tr>";
+            }
 
-                $sql = "SELECT assessment_id, assessment_name, timestamp FROM Assessment_Admin";
-                $result = $conn->query($sql);
-
-                if ($result->num_rows > 0) {
-                    while($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td>" . htmlspecialchars($row['assessment_id']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['assessment_name']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['timestamp']) . "</td>";
-                        echo "<td><a href='edit_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Edit</a> | <a href='delete_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Delete</a></td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='4'>No assessments found</td></tr>";
-                }
-
-                $conn->close();
-                ?>
-            </tbody>
-        </table>
+            $conn->close();
+            ?>
+        </tbody>
+    </table>
+    <div id="deleted-assessments-popup" style="display:none;">
+        <div id="deleted-assessments"></div>
+    </div>
     </main>
+
+    <script>
+    document.getElementById('selectAll').addEventListener('click', function() {
+        var checkboxes = document.querySelectorAll('.selectAssessment');
+        for (var checkbox of checkboxes) {
+            checkbox.checked = this.checked;
+        }
+    });
+
+    document.querySelectorAll('.deleteAssessment').forEach(function(element) {
+        element.addEventListener('click', function(event) {
+            event.preventDefault();
+            var assessmentId = this.getAttribute('data-id');
+            if (confirm('Are you sure you want to delete this assessment?')) {
+                window.location.href = 'delete_assessment.php?assessment_id=' + assessmentId;
+            }
+        });
+    });
+
+    document.getElementById('deleteSelected').addEventListener('click', function() {
+        var selected = [];
+        document.querySelectorAll('.selectAssessment:checked').forEach(function(checkbox) {
+            selected.push(checkbox.value);
+        });
+        if (selected.length > 0 && confirm('Are you sure you want to delete the selected assessments?')) {
+            window.location.href = 'delete_assessment.php?assessment_ids=' + selected.join(',');
+        }
+    });
+
+    document.getElementById('viewDeleted').addEventListener('click', function() {
+        fetch('get_deleted_assessments.php')
+            .then(response => response.json())
+            .then(data => {
+                const deletedAssessmentsDiv = document.getElementById('deleted-assessments');
+                deletedAssessmentsDiv.innerHTML = `
+                    <h3>Deleted Assessments</h3>
+                    <label><input type="checkbox" id="select-all-deleted"> Select All</label>
+                    <form id="restore-form">
+                        ${data.map(assessment => `
+                            <div>
+                                <label><input type="checkbox" name="restore_assessments[]" value="${assessment.assessment_id}"> ${assessment.assessment_name}</label>
+                            </div>
+                        `).join('')}
+                        <button type="button" onclick="restoreSelectedAssessments()">Restore Selected Assessments</button>
+                    </form>
+                    <button type="button" onclick="closeDeletedAssessments()">Close</button>
+                `;
+                document.getElementById('deleted-assessments-popup').style.display = 'block';
+
+                // Add event listener for select all checkbox
+                document.getElementById('select-all-deleted').addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('input[name="restore_assessments[]"]');
+                    checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+                });
+            });
+    });
+
+    function closeDeletedAssessments() {
+        document.getElementById('deleted-assessments-popup').style.display = 'none';
+    }
+
+    function restoreSelectedAssessments() {
+        if (confirm('Are you sure you want to restore the selected assessments?')) {
+            const form = document.getElementById('restore-form');
+            const formData = new FormData(form);
+
+            fetch('restore_assessments.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Selected assessments restored successfully.');
+                    location.reload(); // Reload the page to update the restored assessments
+                } else {
+                    alert('Failed to restore selected assessments.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while restoring the assessments.');
+            });
+        }
+    }
+    </script>
     <footer>
         <div class="footer-content">
             <div class="footer-left">
