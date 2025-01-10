@@ -300,7 +300,7 @@ $conn->close();
 <body>
 
 <div class="logo">
-        <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+        <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
     </div>
     <div class="container">
         <h2 style="margin-top: -25px;">Admin Register</h2> <!-- Move title up by 25px -->

@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['role'] = $row['role'];
 
             // Redirect to admin dashboard
-            header("Location: admin/index.html");
+            header("Location: admin/index.php");
             exit();
         } else {
             $_SESSION['error_message'] = "Invalid password.";
@@ -143,7 +143,7 @@ $conn->close();
     
     <main>
     <div class="logo">
-            <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+            <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
         <div class="container">
         

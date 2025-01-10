@@ -1,21 +1,28 @@
 <?php
 session_start(); // Start the session to access session variables
 
+// Function to display the message and options
+function displayLoginMessage() {
+    echo '<script>
+        if (confirm("You need to log in to access this page. Go to Home Page? Click cancel to go to login page.")) {
+            window.location.href = "../index.html";
+        } else {
+            window.location.href = "../login.php";
+        }
+    </script>';
+    exit();
+}
+
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login.php"); // Redirect to login page if not logged in
-    exit();
+    displayLoginMessage(); // Display message and options if not logged in
 }
 
 // Check if the user has the correct role
 if ($_SESSION['role'] !== 'Employer') {
-    header("Location: ../login.php"); // Redirect to login page if the role is not Employer
-    exit();
+    displayLoginMessage(); // Display message and options if the role is not Employer
 }
 
-// Check if the employer ID is set
-if (!isset($_SESSION['employer_id'])) {
-    header("Location: ../login.php"); // Redirect to login page if employer ID is not set
-    exit();
-}
+// Close the session
+session_write_close();
 ?>
