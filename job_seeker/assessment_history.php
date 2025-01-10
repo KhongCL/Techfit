@@ -146,7 +146,7 @@ $conn->close();
                 padding: 4px 8px;
                 border: 1px solid #007BFF;
                 border-radius: 4px;
-                background-color: #f9f9f9;
+                background-color:rgb(202, 200, 200);
                 transition: background-color 0.3s, color 0.3s;
             }
             .actions a:hover {
@@ -229,8 +229,8 @@ $conn->close();
                             <p><?php echo htmlspecialchars($assessment['score']); ?></p>
                         </div>
                         <div class="actions">
-                            <a href="#" title="Download">&#x2193; Download</a>
-                            <a href="#" title="Share">&#x1F517; Share</a> 
+                            <a href="#" title="Download">Download</a>
+                            <a href="#" title="Share"><i class="fas fa-share-square"></i> Share</a> 
                         </div>
                     </div>
 
