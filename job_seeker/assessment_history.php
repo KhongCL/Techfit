@@ -85,83 +85,81 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assessment History - TechFit</title>
     <link rel="stylesheet" href="styles.css">
-        <style>
-        .container {
-            margin: 20px auto;
-            max-width: 800px;
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .history-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .history-item {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #fff;
-            position: relative;
-        }
-
-        .history-item div {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .history-item div h3 {
-            margin: 0;
-            font-size: 14px;
-            color: #555;
-        }
-
-        .history-item div p {
-            margin: 5px 0 0;
-            font-size: 16px;
-            color: #000;
-        }
-
-        .history-item .score {
-            position: absolute;
-            right: 50px;
-            top: 50%;
-            transform: translateY(-50%);
-            text-align: right;
-        }
-
-        .history-item .actions {
-            grid-column: span 2;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        .actions a {
-            text-decoration: none;
-            color: #007BFF;
-            font-size: 14px;
-        }
-
-        .actions a:hover {
-            text-decoration: underline;
-        }
-
-        .history-item .date-time {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-        }
-    </style>
+    <style>
+            .history-item {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                width: 45%; /* Shrinking the box width to 60% of its original size (40% shrink) */
+                margin: 0 auto 14px auto; /* Center-align the box with reduced margin */
+                padding: 5px 10px; /* Adjusted padding to fit the smaller box */
+                border: 2px solid rgb(41, 40, 40);
+                border-radius: 8px;
+                background-color: #555; /* Medium gray color */
+                color: #fff; /* White text color for contrast */
+                position: relative; /* Ensure that child absolute elements are positioned relative to this */
+            }
+            .date-time {
+                grid-column: 1 / span 2;
+                align-self: auto;
+                justify-self: auto;
+                text-align: left;
+                margin-bottom: 8px;
+                margin-left: 10px; /* Move 10px to the right */
+                margin-top: 10px; /* Move 10px down */
+            }
+            .score {
+                position: absolute;
+                right: 50px; /* Adjust distance from the main box */
+                top: 50%;
+                transform: translateY(-50%);
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 4px;
+                background-color: rgba(0, 0, 0, 0.3); /* Dark background */
+                color: #fff;
+                padding: 5px 25px;
+                border: 1px solid #555;
+                border-radius: 10px;
+                box-shadow: 0 2px 6px rgba(86, 85, 85, 0.3);
+                min-width: 80px; /* Ensures consistent size */
+            }
+            .score h3 {
+                margin-bottom: -10px; /* Close gap between Score label and score mark */
+            }
+            .actions {
+                grid-column: 1 / span 2;
+                display: flex;
+                justify-content: flex-start;
+                gap: 8px;
+                margin-top: 10px;
+                position: relative;
+                top: -15px; /* Negative value moves the buttons upwards */
+                left: 10px;
+            }
+            .actions a {
+                text-decoration: none;
+                color: #007BFF;
+                font-size: 12px;
+                padding: 4px 8px;
+                border: 1px solid #007BFF;
+                border-radius: 4px;
+                background-color: #f9f9f9;
+                transition: background-color 0.3s, color 0.3s;
+            }
+            .actions a:hover {
+                background-color: #007BFF;
+                color: #fff;
+            }
+            .history-header {
+                display: flex;
+                align-items: center; /* Align vertically to the center */
+                justify-content: space-between; /* Ensures balanced spacing between elements */
+                margin-bottom: 10px;
+            }
+        </style>
 
 </head>
 <body>
@@ -214,7 +212,6 @@ $conn->close();
             <!-- Header -->
             <div class="history-header">
                 <h2>Assessment History</h2>
-                <button class="refresh-btn" title="Refresh">&#x21BB;</button>
             </div>
 
             <!-- History Items -->
@@ -222,10 +219,10 @@ $conn->close();
                 <?php foreach ($assessments as $assessment): ?>
                     <div class="history-item">
                         <div class="date-time">
-                            <h3>Date</h3>
-                            <p><?php echo htmlspecialchars(date('Y-m-d', strtotime($assessment['start_time']))); ?></p>
-                            <h3>Avg Time Used (mins)</h3>
-                            <p><?php echo round((strtotime($assessment['end_time']) - strtotime($assessment['start_time'])) / 60, 2); ?></p>
+                            <p>
+                                <strong>Date:</strong> <?php echo htmlspecialchars(date('Y-m-d', strtotime($assessment['start_time']))); ?> 
+                                <br><strong>Avg Time Used (mins):</strong> <?php echo round((strtotime($assessment['end_time']) - strtotime($assessment['start_time'])) / 60, 2); ?>
+                            </p>
                         </div>
                         <div class="score">
                             <h3>Score</h3>
@@ -233,9 +230,11 @@ $conn->close();
                         </div>
                         <div class="actions">
                             <a href="#" title="Download">&#x2193; Download</a>
-                            <a href="#" title="Edit">&#x270E; Edit</a>
+                            <a href="#" title="Share">&#x1F517; Share</a> 
                         </div>
                     </div>
+
+
                 <?php endforeach; ?>
             <?php else: ?>
                 <p>No assessment history available.</p>
