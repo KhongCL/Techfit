@@ -51,7 +51,7 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assessment History - TechFit</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
+        <style>
         .container {
             margin: 20px auto;
             max-width: 800px;
@@ -77,6 +77,7 @@ $conn->close();
             border: 1px solid #ddd;
             border-radius: 8px;
             background-color: #fff;
+            position: relative;
         }
 
         .history-item div {
@@ -96,6 +97,14 @@ $conn->close();
             color: #000;
         }
 
+        .history-item .score {
+            position: absolute;
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: right;
+        }
+
         .history-item .actions {
             grid-column: span 2;
             display: flex;
@@ -112,7 +121,14 @@ $conn->close();
         .actions a:hover {
             text-decoration: underline;
         }
+
+        .history-item .date-time {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
     </style>
+
 </head>
 <body>
     <header>
@@ -171,17 +187,15 @@ $conn->close();
             <?php if (!empty($assessments)): ?>
                 <?php foreach ($assessments as $assessment): ?>
                     <div class="history-item">
-                        <div>
+                        <div class="date-time">
                             <h3>Date</h3>
                             <p><?php echo htmlspecialchars(date('Y-m-d', strtotime($assessment['start_time']))); ?></p>
+                            <h3>Avg Time Used (mins)</h3>
+                            <p><?php echo round((strtotime($assessment['end_time']) - strtotime($assessment['start_time'])) / 60, 2); ?></p>
                         </div>
                         <div class="score">
                             <h3>Score</h3>
                             <p><?php echo htmlspecialchars($assessment['score']); ?></p>
-                        </div>
-                        <div>
-                            <h3>Avg Time Used (mins)</h3>
-                            <p><?php echo round((strtotime($assessment['end_time']) - strtotime($assessment['start_time'])) / 60, 2); ?></p>
                         </div>
                         <div class="actions">
                             <a href="#" title="Download">&#x2193; Download</a>
@@ -191,7 +205,7 @@ $conn->close();
                 <?php endforeach; ?>
             <?php else: ?>
                 <p>No assessment history available.</p>
-            <?php endif; ?>
+<?php endif; ?>
         </div>
     </section>
 
