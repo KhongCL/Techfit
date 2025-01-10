@@ -1,3 +1,32 @@
+<?php
+session_start(); // Start the session to access session variables
+
+// Function to display the message and options
+function displayLoginMessage() {
+    echo '<script>
+        if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
+            window.location.href = "../login.php";
+        } else {
+            window.location.href = "../index.php";
+        }
+    </script>';
+    exit();
+}
+
+// Check if the user is logged in
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage(); // Display message and options if not logged in
+}
+
+// Check if the user has the correct role
+if ($_SESSION['role'] !== 'Employer') {
+    displayLoginMessage(); // Display message and options if the role is not Employer
+}
+
+// Close the session
+session_write_close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +38,7 @@
 <body>
     <header>
         <div class="logo">
-            <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+            <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
         <nav>
             <div class="nav-container">
@@ -17,12 +46,12 @@
                     <li><a href="#">Candidates</a></li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
-                            <li><a href="useful_links.html">Useful Links</a></li>
-                            <li><a href="faq.html">FAQ</a></li>
-                            <li><a href="sitemap.html">Sitemap</a></li>
+                            <li><a href="useful_links.php">Useful Links</a></li>
+                            <li><a href="faq.php">FAQ</a></li>
+                            <li><a href="sitemap.php">Sitemap</a></li>
                         </ul>
                     </li>
-                    <li><a href="about.html">About</a></li>
+                    <li><a href="about.php">About</a></li>
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
@@ -200,7 +229,7 @@
         <div class="footer-content">
             <div class="footer-left">
                 <div class="footer-logo">
-                    <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+                    <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
                 </div>
                 <div class="social-media">
                     <p>Keep up with TechFit:</p>
@@ -217,30 +246,30 @@
                 <div class="footer-column">
                     <h3>Candidate</h3>
                     <ul>
-                        <li><a href="candidates.html">Candidates</a></li>
+                        <li><a href="candidates.php">Candidates</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.html">Useful Links</a></li>
-                        <li><a href="faq.html">FAQ</a></li>
-                        <li><a href="sitemap.html">Sitemap</a></li>
-                        <li><a href="about.html">About</a></li>
+                        <li><a href="useful_links.php">Useful Links</a></li>
+                        <li><a href="faq.php">FAQ</a></li>
+                        <li><a href="sitemap.php">Sitemap</a></li>
+                        <li><a href="about.php">About</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Contact</h3>
                     <ul>
-                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="contact.php">Contact Us</a></li>
                         <li><a href="feedback.php">Feedback</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Legal</h3>
                     <ul>
-                        <li><a href="terms.html">Terms of Service</a></li>
-                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.php">Terms of Service</a></li>
+                        <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>

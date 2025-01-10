@@ -32,11 +32,11 @@ session_write_close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechFit - Home</title>
-    <link rel="stylesheet" href="styles.css?v=2.0">
+    <title>About Us - TechFit</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header>
+    <header>
         <div class="logo">
             <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
@@ -73,28 +73,58 @@ session_write_close();
             </div>
         </nav>
     </header>
+    
+    <section class="about-us">
+        <div class="container">
+          <h1>About Us</h1>
+          
+          <!-- Mission Section -->
+            <div class="about-block">
+            <div class="text-left">
+                <h2>Our Mission</h2>
+                <p>We are committed to helping job seekers achieve their goals by offering effective, skill-assessing tools that match them with the right opportunities.</p>
+            </div>
+            <div class="image-right">
+                <img src="https://picsum.photos/500/300?random=1" alt="Our Mission in Action">
+            </div>
+            </div>
 
-    <section id="feedback-section" class="form-section">
-        <h2 id="feedback-title">Feedback</h2>
-        <div id="feedback-container" class="feedback-container">
-            <?php
-            session_start();
-            if (isset($_SESSION['success_message'])) {
-                echo '<p class="success-message">' . $_SESSION['success_message'] . '</p>';
-                unset($_SESSION['success_message']);
-            }
-            ?>
-            <form action="submit_feedback.php" method="post" id="feedback-form" class="feedback-form">
-                <div id="feedback-group" class="form-group">
-                    <label for="feedback_text" id="feedback-label">Your Feedback:</label>
-                    <textarea id="feedback_text" name="feedback_text" required></textarea>
+            <!-- Vision Section --> 
+            <div class="about-block">
+                <div class="image-left">
+                    <img src="https://picsum.photos/1600/900?random=2" alt="Vision Image">
                 </div>
-                <button type="submit" id="feedback-submit" class="submit-button">Submit</button>
-            </form>
-        </div>
-    </section>
+                <div class="text-right">
+                    <h2>Our Vision</h2>
+                    <p>Our vision is to revolutionize the way people interact with technology, creating a future where innovation and sustainability go hand in hand. We aim to lead the way in providing cutting-edge solutions that empower businesses and individuals alike.</p>
+                </div>
+            </div>
 
-    <footer>
+          
+            <!-- Values Section-->
+            <h2>Our Values</h2>
+            <div class="values-gallery">
+            <div class="value-item">
+                <img src="https://picsum.photos/300/300?random=1" alt="Innovation">
+                <p>Innovation</p>
+            </div>
+            <div class="value-item">
+                <img src="https://picsum.photos/300/300?random=2" alt="Integrity">
+                <p>Integrity</p>
+            </div>
+            <div class="value-item">
+                <img src="https://picsum.photos/300/300?random=3" alt="Collaboration">
+                <p>Collaboration</p>
+            </div>
+            <div class="value-item">
+                <img src="https://picsum.photos/300/300?random=4" alt="Excellence">
+                <p>Excellence</p>
+            </div>
+            </div>
+            </div>
+      </section>   
+
+      <footer>
         <div class="footer-content">
             <div class="footer-left">
                 <div class="footer-logo">
