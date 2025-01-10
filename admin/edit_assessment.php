@@ -418,47 +418,25 @@ session_start();
             fetch(`get_deleted_questions.php?assessment_id=${assessmentId}`)
                 .then(response => response.json())
                 .then(data => {
-                    const deletedQuestionsDiv = document.getElementById('deleted-questions');
+                    const deletedQuestionsTableBody = document.getElementById('deletedQuestionsTableBody');
                     if (data.length > 0) {
-                        deletedQuestionsDiv.innerHTML = `
-                            <label><input type="checkbox" id="select-all-deleted"> Select All</label>
-                            <form id="restore-form">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Select</th>
-                                            <th data-column="question_id">Question ID</th>
-                                            <th data-column="question_text">Question Text</th>
-                                            <th data-column="question_type">Question Type</th>
-                                            <th data-column="answer_type">Answer Type</th>
-                                            <th data-column="correct_answer">Correct Answer</th>
-                                            <th data-column="choices">Choices/Test Cases</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="deletedQuestionsTableBody">
-                                        ${data.map(question => `
-                                            <tr>
-                                                <td><input type="checkbox" name="restore_questions[]" value="${question.question_id}"></td>
-                                                <td>${question.question_id}</td>
-                                                <td>${question.question_text}</td>
-                                                <td>${question.question_type || 'N/A'}</td>
-                                                <td>${question.answer_type || 'N/A'}</td>
-                                                <td>${question.correct_answer || 'N/A'}</td>
-                                                <td>
-                                                    ${question.answer_type === 'multiple choice' ? (question.choices.length > 0 ? question.choices.map(choice => `<div>${choice}</div>`).join('') : 'No choices available') : ''}
-                                                    ${question.answer_type === 'code' ? (question.test_cases.length > 0 ? question.test_cases.map(testCase => `<div>Input: ${testCase.input}, Output: ${testCase.expected_output}</div>`).join('') : 'No test cases available') : ''}
-                                                    ${question.answer_type !== 'multiple choice' && question.answer_type !== 'code' ? 'This answer type does not contain choices/test cases' : ''}
-                                                </td>
-                                            </tr>
-                                        `).join('')}
-                                    </tbody>
-                                </table>
-                                <button type="button" onclick="restoreSelectedQuestions()">Restore Selected Questions</button>
-                            </form>
-                            <button type="button" onclick="closeDeletedQuestions()">Close</button>
-                        `;
+                        deletedQuestionsTableBody.innerHTML = data.map(question => `
+                            <tr>
+                                <td><input type="checkbox" name="restore_questions[]" value="${question.question_id}"></td>
+                                <td>${question.question_id}</td>
+                                <td>${question.question_text}</td>
+                                <td>${question.question_type || 'N/A'}</td>
+                                <td>${question.answer_type || 'N/A'}</td>
+                                <td>${question.correct_answer || 'N/A'}</td>
+                                <td>
+                                    ${question.answer_type === 'multiple choice' ? (question.choices.length > 0 ? question.choices.map(choice => `<div>${choice}</div>`).join('') : 'No choices available') : ''}
+                                    ${question.answer_type === 'code' ? (question.test_cases.length > 0 ? question.test_cases.map(testCase => `<div>Input: ${testCase.input}, Output: ${testCase.expected_output}</div>`).join('') : 'No test cases available') : ''}
+                                    ${question.answer_type !== 'multiple choice' && question.answer_type !== 'code' ? 'This answer type does not contain choices/test cases' : ''}
+                                </td>
+                            </tr>
+                        `).join('');
                     } else {
-                        deletedQuestionsDiv.innerHTML = '<p>No deleted questions found</p><button type="button" onclick="closeDeletedQuestions()">Close</button>';
+                        deletedQuestionsTableBody.innerHTML = '<tr><td colspan="7">No deleted questions found</td></tr>';
                     }
                     document.getElementById('deleted-questions-popup').style.display = 'block';
 
@@ -472,11 +450,46 @@ session_start();
                     document.getElementById('searchDeletedQuestions').addEventListener('input', function() {
                         const filter = this.value.toLowerCase();
                         const rows = document.querySelectorAll('#deletedQuestionsTableBody tr');
+                        let matchFound = false;
                         rows.forEach(row => {
                             const cells = row.querySelectorAll('td');
                             const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(filter));
                             row.style.display = match ? '' : 'none';
+                            if (match) matchFound = true;
                         });
+                        const noMatchesPopup = document.getElementById('deletedNoMatchesPopup');
+                        if (!matchFound) {
+                            noMatchesPopup.style.display = 'block';
+                            noMatchesPopup.style.opacity = '1';
+                        } else {
+                            noMatchesPopup.style.display = 'none';
+                        }
+                        document.getElementById('deletedClearSearch').style.display = filter ? 'block' : 'none';
+                    });
+
+                    document.getElementById('deletedClearSearch').addEventListener('click', function() {
+                        document.getElementById('searchDeletedQuestions').value = '';
+                        const rows = document.querySelectorAll('#deletedQuestionsTableBody tr');
+                        rows.forEach(row => {
+                            row.style.display = '';
+                        });
+                        this.style.display = 'none';
+                        document.getElementById('deletedNoMatchesPopup').style.display = 'none';
+                    });
+
+                    document.getElementById('searchDeletedQuestions').addEventListener('focus', function() {
+                        const noMatchesPopup = document.getElementById('deletedNoMatchesPopup');
+                        if (this.value && !Array.from(document.querySelectorAll('#deletedQuestionsTableBody tr')).some(row => row.style.display !== 'none')) {
+                            noMatchesPopup.style.display = 'block';
+                            noMatchesPopup.style.opacity = '1';
+                        }
+                    });
+
+                    document.addEventListener('click', function(event) {
+                        const noMatchesPopup = document.getElementById('deletedNoMatchesPopup');
+                        if (!document.getElementById('searchDeletedQuestions').contains(event.target) && !noMatchesPopup.contains(event.target)) {
+                            noMatchesPopup.style.display = 'none';
+                        }
                     });
 
                     // Add sort functionality
@@ -505,6 +518,12 @@ session_start();
         }
 
         function restoreSelectedQuestions() {
+            const selected = document.querySelectorAll('input[name="restore_questions[]"]:checked');
+            if (selected.length === 0) {
+                alert('Please select at least one question to restore.');
+                return;
+            }
+
             if (confirm('Are you sure you want to restore the selected questions?')) {
                 const form = document.getElementById('restore-form');
                 const formData = new FormData(form);
@@ -530,44 +549,148 @@ session_start();
         }
     </script>
         <style>
-            #deleted-questions-popup {
-                display: none;
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: white;
+            /* Color Theme */
+            :root {
+                --primary-color: #007bff; /* Blue */
+                --secondary-color: #1e1e1e; /* Dark Grey */
+                --accent-color: #0056b3; /* Darker Blue */
+                --text-color: #e0e0e0; /* Slightly Darker White */
+                --background-color: #121212; /* Very Dark Grey */
+                --border-color: #333; /* Dark Grey */
+                --hover-background-color: #333; /* Slightly Lighter Dark Grey */
+                --hover-text-color: #fff; /* White */
+                --button-hover-color: #80bdff; /* Lighter Blue */
+                --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
+                --popup-border-color: #444; /* Slightly Lighter Dark Grey */
+            }
+
+            /* General Styles */
+            body {
+                font-family: Arial, sans-serif;
+                color: var(--text-color);
+                background-color: var(--background-color);
+            }
+
+            main {
                 padding: 20px;
-                border: 1px solid #ccc;
-                box-shadow: 0 0 10px rgba(0,0,0,0.1);
-                max-height: 90vh;
-                overflow-y: auto;
-                z-index: 1000;
-                width: 95%;
             }
 
-            #deleted-questions-popup table {
-                width: 100%;
-                border-collapse: collapse;
+            /* Header Controls */
+            .header-controls {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
             }
 
-            #deleted-questions-popup th, #deleted-questions-popup td {
-                text-align: left;
-                padding: 8px;
-                border-bottom: 1px solid #ddd;
+            .action-controls {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 10px;
             }
 
-            #deleted-questions-popup th {
-                background-color: #f2f2f2;
-                cursor: pointer;
+            .deleted-search-container {
+                position: relative;
+                flex-grow: 1;
+                display: flex;
+                justify-content: flex-end;
+            }
+
+            .search-field-container {
                 position: relative;
             }
 
-            #deleted-questions-popup th[data-column]:hover {
-                background-color: #e0e0e0;
+            #searchDeletedQuestions {
+                padding-right: 40px;
+                padding: 10px 10px 10px 40px;
+                border: 1px solid var(--border-color);
+                border-radius: 5px;
+                background: url('images/search_icon.png') no-repeat 10px center;
+                background-size: 20px;
+                transition: border-color 0.3s ease;
+                color: var(--text-color);
+                background-color: var(--secondary-color);
             }
 
-            #deleted-questions-popup th[data-column]::after {
+            #searchDeletedQuestions:hover {
+                border-color: var(--primary-color);
+            }
+
+            #deletedClearSearch {
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                cursor: pointer;
+                display: none;
+            }
+
+            #deletedNoMatchesPopup {
+                display: none;
+                position: absolute;
+                top: calc(100% + 10px);
+                left: 0; /* Ensure left alignment with the search field */
+                background: var(--popup-background-color);
+                color: var(--text-color);
+                padding: 10px;
+                border: 1px solid var(--popup-border-color);
+                border-radius: 5px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                transition: opacity 0.3s ease;
+                z-index: 1000;
+            }
+
+            /* Buttons */
+            button {
+                background-color: var(--primary-color);
+                color: var(--text-color);
+                border: none;
+                padding: 10px 20px;
+                cursor: pointer;
+                transition: background-color 0.3s ease, color 0.3s ease;
+                border-radius: 5px;
+                font-weight: bold;
+            }
+
+            button:hover {
+                background-color: var(--button-hover-color);
+                color: var(--hover-text-color);
+            }
+
+            /* Table */
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+
+            th, td {
+                text-align: left;
+                padding: 12px;
+                border-bottom: 1px solid var(--border-color);
+            }
+
+            th {
+                background-color: var(--secondary-color);
+                cursor: pointer;
+                position: relative;
+                transition: background-color 0.3s ease;
+                padding-right: 20px; /* Add space for chevron */
+            }
+
+            th[data-column]:hover {
+                background-color: var(--hover-background-color);
+                color: var(--hover-text-color);
+            }
+
+            tr:hover {
+                background-color: var (--hover-background-color);
+                color: var(--hover-text-color);
+            }
+
+            /* Chevron */
+            th[data-column]::after {
                 content: '';
                 position: absolute;
                 right: 8px;
@@ -577,24 +700,65 @@ session_start();
                 display: none;
             }
 
-            #deleted-questions-popup th[data-column].asc::after {
+            th[data-column].asc::after {
                 display: inline-block;
-                border-bottom-color: #000;
+                border-bottom-color: var(--text-color);
             }
 
-            #deleted-questions-popup th[data-column].desc::after {
+            th[data-column].desc::after {
                 display: inline-block;
-                border-top-color: #000;
+                border-top-color: var (--text-color);
             }
 
-            #deleted-questions-popup th[data-column]:hover.asc::after {
+            th[data-column]:hover.asc::after {
                 border-bottom-color: transparent;
-                border-top-color: #000;
+                border-top-color: var(--hover-text-color);
             }
 
-            #deleted-questions-popup th[data-column]:hover.desc::after {
+            th[data-column]:hover.desc::after {
                 border-top-color: transparent;
-                border-bottom-color: #000;
+                border-bottom-color: var(--hover-text-color);
+            }
+
+            /* Deleted Questions Popup */
+            #deleted-questions-popup {
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: var(--background-color);
+                padding: 20px;
+                border: 1px solid var(--border-color);
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                max-height: 80vh;
+                overflow-y: auto;
+                z-index: 1000;
+                width: 90%;
+                transition: opacity 0.3s ease;
+            }
+
+            #deleted-questions-popup.show {
+                display: block;
+                opacity: 1;
+            }
+
+            .close-button {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: none;
+                border: none;
+                color: var(--text-color);
+                font-size: 24px;
+                cursor: pointer;
+                transition: color 0.3s ease, transform 0.3s ease; /* Add transition for smooth effect */
+            }
+
+            .close-button:hover {
+                color: var(--accent-color); /* Use a less prominent color for hover */
+                transform: scale(1.1); /* Slightly enlarge the button on hover */
+                background: none; /* Ensure no background color on hover */
             }
         </style>
 </head>
@@ -676,11 +840,38 @@ session_start();
         <button type="button" onclick="viewDeletedQuestions()">View Deleted Questions</button>
 
         <div id="deleted-questions-popup">
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
+            <div class="header-controls">
                 <h3>Deleted Questions</h3>
-                <input type="text" id="searchDeletedQuestions" placeholder="Search..." style="margin-left: 10px;">
             </div>
-            <div id="deleted-questions"></div>
+            <div class="action-controls">
+                <button type="button" onclick="restoreSelectedQuestions()">Restore Selected Questions</button>
+                <div class="deleted-search-container">
+                    <div class="search-field-container">
+                        <input type="text" id="searchDeletedQuestions" placeholder="Search...">
+                        <span id="deletedClearSearch">&#x2715;</span>
+                        <div id="deletedNoMatchesPopup">No matches found.</div>
+                    </div>
+                </div>
+            </div>
+            <form id="restore-form">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="select-all-deleted"></th>
+                            <th data-column="question_id">Question ID</th>
+                            <th data-column="question_text">Question Text</th>
+                            <th data-column="question_type">Question Type</th>
+                            <th data-column="answer_type">Answer Type</th>
+                            <th data-column="correct_answer">Correct Answer</th>
+                            <th data-column="choices">Choices/Test Cases</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deletedQuestionsTableBody">
+                        <!-- Deleted questions will be populated here -->
+                    </tbody>
+                </table>
+            </form>
+            <button type="button" class="close-button" onclick="closeDeletedQuestions()">&#x2715;</button>
         </div>
         <form id="questions-form" action="update_questions.php" method="post">
             <input type="hidden" name="assessment_id" value="<?php echo htmlspecialchars($_GET['assessment_id']); ?>">

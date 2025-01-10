@@ -93,7 +93,7 @@ session_write_close();
             </div>
         </nav>
     </header>    
-    <main>
+        <main>
         <h1>Manage Assessments</h1>
         <div class="header-controls">
             <div>
@@ -111,9 +111,11 @@ session_write_close();
                     <option value="admin_id_desc">Admin ID DESC</option>
                 </select>
                 <div class="search-container">
-                    <input type="text" id="searchInput" placeholder="Search...">
-                    <span id="clearSearch">&#x2715;</span>
-                    <div id="noMatchesPopup">No matches found.</div>
+                    <div class="search-field-container">
+                        <input type="text" id="searchInput" placeholder="Search...">
+                        <span id="clearSearch">&#x2715;</span>
+                        <div id="noMatchesPopup">No matches found.</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -173,9 +175,11 @@ session_write_close();
             <div class="header-controls">
                 <button type="button" id="restoreSelectedButton" onclick="restoreSelectedAssessments()">Restore Selected Assessments</button>
                 <div class="deleted-search-container">
-                    <input type="text" id="deletedSearchInput" placeholder="Search...">
-                    <span id="deletedClearSearch">&#x2715;</span>
-                    <div id="deletedNoMatchesPopup">No matches found.</div>
+                    <div class="search-field-container">
+                        <input type="text" id="deletedSearchInput" placeholder="Search...">
+                        <span id="deletedClearSearch">&#x2715;</span>
+                        <div id="deletedNoMatchesPopup">No matches found.</div>
+                    </div>
                 </div>
             </div>
             <form id="restore-form">
@@ -268,6 +272,10 @@ session_write_close();
             flex-grow: 1;
         }
 
+        .search-field-container {
+            position: relative;
+        }
+
         #searchInput {
             margin-left: 10px;
             padding-right: 40px;
@@ -283,7 +291,7 @@ session_write_close();
         }
 
         #searchInput:hover {
-            border-color: var (--primary-color);
+            border-color: var(--primary-color);
         }
 
         #clearSearch {
@@ -298,9 +306,8 @@ session_write_close();
         #noMatchesPopup {
             display: none;
             position: absolute;
-            top: 100%;
-            left: 0;
-            transform: translateY(10px);
+            top: calc(100% + 10px);
+            left: 10px; /* Ensure left alignment with the search field */
             background: var(--popup-background-color);
             color: var(--text-color);
             padding: 10px;
@@ -446,6 +453,10 @@ session_write_close();
             justify-content: flex-end;
         }
 
+        .search-field-container {
+            position: relative;
+        }
+
         #deletedSearchInput {
             padding-right: 40px;
             padding: 10px 10px 10px 40px;
@@ -474,9 +485,8 @@ session_write_close();
         #deletedNoMatchesPopup {
             display: none;
             position: absolute;
-            top: 100%;
-            left: 0;
-            transform: translateY(10px);
+            top: calc(100% + 10px);
+            left: 10px; /* Ensure left alignment with the search field */
             background: var(--popup-background-color);
             color: var(--text-color);
             padding: 10px;
@@ -506,7 +516,6 @@ session_write_close();
             background: none; /* Ensure no background color on hover */
         }
     </style>
-
     <script>
         document.getElementById('selectAll').addEventListener('click', function() {
             var checkboxes = document.querySelectorAll('.selectAssessment');
