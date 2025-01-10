@@ -23,82 +23,13 @@ if ($_SESSION['role'] !== 'Admin') {
 session_write_close();
 ?>
 
-<?php
-$host = 'localhost';
-$username = 'root';
-$password = '';
-$database = 'techfit'; 
-
-$conn = new mysqli($host, $username, $password, $database);
-
-// Fetch Job Seeker data
-$jobSeekerQuery = "
-    SELECT 
-        job_seeker.user_id AS 'name', 
-        job_seeker.education_level AS 'education level', 
-        job_seeker.year_of_experience AS 'year of experience', 
-        assessment_job_seeker.score AS 'assessment score' 
-    FROM job_seeker 
-    LEFT JOIN assessment_job_seeker 
-    ON job_seeker.job_seeker_id = assessment_job_seeker.job_seeker_id
-    INNER JOIN User
-    ON job_seeker.user_id = User.user_id
-    WHERE User.is_active = 1";
-$jobSeekerResult = $conn->query($jobSeekerQuery);
-
-// Fetch Employer data
-$employerQuery = "
-    SELECT 
-        employer.user_id AS 'name', 
-        employer.company_name AS 'company name', 
-        employer.company_type AS 'company type'
-    FROM employer
-    INNER JOIN User
-    ON employer.user_id = User.user_id
-    WHERE User.is_active = 1";
-$employerResult = $conn->query($employerQuery);
-
-// Fetch inactive users for restoration
-$restoreUserQuery = "
-    SELECT 
-        user_id AS 'name', 
-        role 
-    FROM User
-    WHERE is_active = 0";
-$restoreUserResult = $conn->query($restoreUserQuery);
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['delete'])) {
-        $userIds = $_POST['user_ids'];
-        foreach ($userIds as $userId) {
-            // Set is_active to 0 for the selected users
-            $updateQuery = "UPDATE User SET is_active = 0 WHERE user_id = '$userId'";
-            $conn->query($updateQuery);
-        }
-        // Refresh the page to reflect changes
-        header('Location: manage_users.php');
-        exit();
-    } elseif (isset($_POST['restore'])) {
-        $userIds = $_POST['restore_user_ids'];
-        foreach ($userIds as $userId) {
-            // Set is_active to 1 for the selected users
-            $updateQuery = "UPDATE User SET is_active = 1 WHERE user_id = '$userId'";
-            $conn->query($updateQuery);
-        }
-        // Refresh the page to reflect changes
-        header('Location: manage_users.php');
-        exit();
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Techfit</title>
-    <link rel="stylesheet" href="styles.css">   
+    <title>About Us - TechFit</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
@@ -163,91 +94,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </nav>
     </header>    
 
-    <div class="content">
-        <div class="tabs">
-            <button class="tab active">Manage User</button>
-        </div>
-
-        <form method="POST" action="manage_users.php">
-            <div class="delete_button">
-                <h2 class="section-title">USER <button type="submit" name="delete" class="delete-link">Delete</button></h2>
-
-                <div class="user-section">
-                    <h3 class="user-type">Job Seeker</h3>
-                    <table class="user-table">
-                        <thead>
-                            <tr>
-                                <th>Select</th>
-                                <th>Name</th>
-                                <th>Education Level</th>
-                                <th>Year of Experience</th>
-                                <th>Assessment Score</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $jobSeekerResult->fetch_assoc()) { ?>
-                                <tr>
-                                    <td><input type="checkbox" name="user_ids[]" value="<?php echo htmlspecialchars($row['name']); ?>"></td>
-                                    <td><?php echo htmlspecialchars($row["name"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row['education level']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['year of experience']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['assessment score']); ?></td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
+    <section id="about-us">
+        <div class="container">
+            <h2>About Us</h2>
+    
+            <!-- Mission Section -->
+            <div id="mission" class="about-block">
+                <div id="mission-text" class="text-left">
+                    <h3>Our Mission</h3>
+                    <p>To help job seekers achieve their goals by offering effective, skill-assessing tools that match them with the right employers.</p>
                 </div>
-
-                <div class="user-section">
-                    <h3 class="user-type">Employer</h3>
-                    <table class="user-table">
-                        <thead>
-                            <tr>
-                                <th>Select</th>
-                                <th>Name</th>
-                                <th>Company Name</th>
-                                <th>Company Type</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $employerResult->fetch_assoc()) { ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['company name']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['company type']); ?></td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
-                </div>   
-                
-            <div class="restore_button">
-                <h2 class="section-title">RESTORE USER <button type="submit" name="restore" class="restore-link">Restore</button></h2>
-
-                <div class="user-section">
-                    <h3 class="user-type"></h3>
-                    <table class="user-table">
-                        <thead>
-                            <tr>
-                                <th>Select</th>
-                                <th>Name</th>
-                                <th>Role</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $restoreUserResult->fetch_assoc()) { ?>
-                                <tr>
-                                    <td><input type="checkbox" name="restore_user_ids[]" value="<?php echo htmlspecialchars($row['name']); ?>"></td>
-                                    <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['role']); ?></td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
-                </div>     
+                <div id="mission-image" class="image-right">
+                    <img src="https://picsum.photos/500/300?random=1" alt="Our Mission in Action">
+                </div>
             </div>
-        </form>
-    </div>
+    
+            <!-- Vision Section -->
+            <div id="vision" class="about-block">
+                <div id="vision-image" class="image-left">
+                    <img src="https://picsum.photos/1600/900?random=2" alt="Vision Image">
+                </div>
+                <div id="vision-text" class="text-right">
+                    <h3>Our Vision</h3>
+                    <p>To make job searching and hiring easy and effective for everyone, making meaningful connections that benefit both job seekers and employers.</p>
+                </div>
+            </div>
+    
+            <!-- Values Section -->
+            <h3 id="values-title">Our Values</h3>
+            <div id="values-gallery" class="values-gallery">
+                <div class="value-item">
+                    <img src="https://picsum.photos/300/300?random=1" alt="Innovation">
+                    <p>Innovation</p>
+                </div>
+                <div class="value-item">
+                    <img src="https://picsum.photos/300/300?random=2" alt="Integrity">
+                    <p>Integrity</p>
+                </div>
+                <div class="value-item">
+                    <img src="https://picsum.photos/300/300?random=3" alt="Collaboration">
+                    <p>Collaboration</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <footer>
         <div class="footer-content">

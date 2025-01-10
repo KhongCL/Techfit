@@ -32,11 +32,11 @@ session_write_close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechFit - Home</title>
-    <link rel="stylesheet" href="styles.css?v=2.0">
+    <title>About Us - TechFit</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header>
+    <header>
         <div class="logo">
             <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
@@ -73,24 +73,49 @@ session_write_close();
             </div>
         </nav>
     </header>
-
-    <section id="feedback-section" class="form-section">
-        <h2 id="feedback-title">Feedback</h2>
-        <div id="feedback-container" class="feedback-container">
-            <?php
-            session_start();
-            if (isset($_SESSION['success_message'])) {
-                echo '<p class="success-message">' . $_SESSION['success_message'] . '</p>';
-                unset($_SESSION['success_message']);
-            }
-            ?>
-            <form action="submit_feedback.php" method="post" id="feedback-form" class="feedback-form">
-                <div id="feedback-group" class="form-group">
-                    <label for="feedback_text" id="feedback-label">Your Feedback:</label>
-                    <textarea id="feedback_text" name="feedback_text" required></textarea>
+    
+    <section id="about-us">
+        <div class="container">
+            <h2>About Us</h2>
+    
+            <!-- Mission Section -->
+            <div id="mission" class="about-block">
+                <div id="mission-text" class="text-left">
+                    <h3>Our Mission</h3>
+                    <p>To help job seekers achieve their goals by offering effective, skill-assessing tools that match them with the right employers.</p>
                 </div>
-                <button type="submit" id="feedback-submit" class="submit-button">Submit</button>
-            </form>
+                <div id="mission-image" class="image-right">
+                    <img src="https://picsum.photos/500/300?random=1" alt="Our Mission in Action">
+                </div>
+            </div>
+    
+            <!-- Vision Section -->
+            <div id="vision" class="about-block">
+                <div id="vision-image" class="image-left">
+                    <img src="https://picsum.photos/1600/900?random=2" alt="Vision Image">
+                </div>
+                <div id="vision-text" class="text-right">
+                    <h3>Our Vision</h3>
+                    <p>To make job searching and hiring easy and effective for everyone, making meaningful connections that benefit both job seekers and employers.</p>
+                </div>
+            </div>
+    
+            <!-- Values Section -->
+            <h3 id="values-title">Our Values</h3>
+            <div id="values-gallery" class="values-gallery">
+                <div class="value-item">
+                    <img src="https://picsum.photos/300/300?random=1" alt="Innovation">
+                    <p>Innovation</p>
+                </div>
+                <div class="value-item">
+                    <img src="https://picsum.photos/300/300?random=2" alt="Integrity">
+                    <p>Integrity</p>
+                </div>
+                <div class="value-item">
+                    <img src="https://picsum.photos/300/300?random=3" alt="Collaboration">
+                    <p>Collaboration</p>
+                </div>
+            </div>
         </div>
     </section>
 

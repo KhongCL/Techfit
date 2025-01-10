@@ -23,82 +23,13 @@ if ($_SESSION['role'] !== 'Admin') {
 session_write_close();
 ?>
 
-<?php
-$host = 'localhost';
-$username = 'root';
-$password = '';
-$database = 'techfit'; 
-
-$conn = new mysqli($host, $username, $password, $database);
-
-// Fetch Job Seeker data
-$jobSeekerQuery = "
-    SELECT 
-        job_seeker.user_id AS 'name', 
-        job_seeker.education_level AS 'education level', 
-        job_seeker.year_of_experience AS 'year of experience', 
-        assessment_job_seeker.score AS 'assessment score' 
-    FROM job_seeker 
-    LEFT JOIN assessment_job_seeker 
-    ON job_seeker.job_seeker_id = assessment_job_seeker.job_seeker_id
-    INNER JOIN User
-    ON job_seeker.user_id = User.user_id
-    WHERE User.is_active = 1";
-$jobSeekerResult = $conn->query($jobSeekerQuery);
-
-// Fetch Employer data
-$employerQuery = "
-    SELECT 
-        employer.user_id AS 'name', 
-        employer.company_name AS 'company name', 
-        employer.company_type AS 'company type'
-    FROM employer
-    INNER JOIN User
-    ON employer.user_id = User.user_id
-    WHERE User.is_active = 1";
-$employerResult = $conn->query($employerQuery);
-
-// Fetch inactive users for restoration
-$restoreUserQuery = "
-    SELECT 
-        user_id AS 'name', 
-        role 
-    FROM User
-    WHERE is_active = 0";
-$restoreUserResult = $conn->query($restoreUserQuery);
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if (isset($_POST['delete'])) {
-        $userIds = $_POST['user_ids'];
-        foreach ($userIds as $userId) {
-            // Set is_active to 0 for the selected users
-            $updateQuery = "UPDATE User SET is_active = 0 WHERE user_id = '$userId'";
-            $conn->query($updateQuery);
-        }
-        // Refresh the page to reflect changes
-        header('Location: manage_users.php');
-        exit();
-    } elseif (isset($_POST['restore'])) {
-        $userIds = $_POST['restore_user_ids'];
-        foreach ($userIds as $userId) {
-            // Set is_active to 1 for the selected users
-            $updateQuery = "UPDATE User SET is_active = 1 WHERE user_id = '$userId'";
-            $conn->query($updateQuery);
-        }
-        // Refresh the page to reflect changes
-        header('Location: manage_users.php');
-        exit();
-    }
-}
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Techfit</title>
-    <link rel="stylesheet" href="styles.css">   
+    <title>Terms and Conditions - TechFit</title>
+    <link rel="stylesheet" href="styles.css?v=2.0">
 </head>
 <body>
     <header>
@@ -163,92 +94,115 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </nav>
     </header>    
 
-    <div class="content">
-        <div class="tabs">
-            <button class="tab active">Manage User</button>
-        </div>
-
-        <form method="POST" action="manage_users.php">
-            <div class="delete_button">
-                <h2 class="section-title">USER <button type="submit" name="delete" class="delete-link">Delete</button></h2>
-
-                <div class="user-section">
-                    <h3 class="user-type">Job Seeker</h3>
-                    <table class="user-table">
-                        <thead>
-                            <tr>
-                                <th>Select</th>
-                                <th>Name</th>
-                                <th>Education Level</th>
-                                <th>Year of Experience</th>
-                                <th>Assessment Score</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $jobSeekerResult->fetch_assoc()) { ?>
-                                <tr>
-                                    <td><input type="checkbox" name="user_ids[]" value="<?php echo htmlspecialchars($row['name']); ?>"></td>
-                                    <td><?php echo htmlspecialchars($row["name"]); ?></td>
-                                    <td><?php echo htmlspecialchars($row['education level']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['year of experience']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['assessment score']); ?></td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="user-section">
-                    <h3 class="user-type">Employer</h3>
-                    <table class="user-table">
-                        <thead>
-                            <tr>
-                                <th>Select</th>
-                                <th>Name</th>
-                                <th>Company Name</th>
-                                <th>Company Type</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $employerResult->fetch_assoc()) { ?>
-                                <tr>
-                                    <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['company name']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['company type']); ?></td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
-                </div>   
-                
-            <div class="restore_button">
-                <h2 class="section-title">RESTORE USER <button type="submit" name="restore" class="restore-link">Restore</button></h2>
-
-                <div class="user-section">
-                    <h3 class="user-type"></h3>
-                    <table class="user-table">
-                        <thead>
-                            <tr>
-                                <th>Select</th>
-                                <th>Name</th>
-                                <th>Role</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php while ($row = $restoreUserResult->fetch_assoc()) { ?>
-                                <tr>
-                                    <td><input type="checkbox" name="restore_user_ids[]" value="<?php echo htmlspecialchars($row['name']); ?>"></td>
-                                    <td><?php echo htmlspecialchars($row['name']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['role']); ?></td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
-                </div>     
+    <section id="terms">
+        <div class="container">
+            <h2>TechFit - Terms and Conditions</h2>
+            <div id="last-updated">
+                Last Updated: December 18, 2024
             </div>
-        </form>
-    </div>
-
+            
+            <div id="terms-header">
+                By using our website, you agree to the following terms and conditions:
+            </div>
+    
+            <div id="terms-section">
+                <h3>Content Disclaimer</h3>
+            </div>
+    
+            <div id="terms-text">
+                <ol>
+                    <li>The content on our website is for informational purposes only and should not be construed as legal advice.</li>
+                    <li>We do not warrant the accuracy, reliability, or completeness of any information on our website.</li>
+                    <li>We reserve the right to modify or update these terms and conditions at any time.</li>
+                    <li>By using our website, you agree to be bound by these terms and conditions.</li>
+                    <li>If you have any questions or concerns about these terms and conditions, please contact us.</li>
+                </ol>
+            </div>
+    
+            <div id="terms-section">
+                <h3>Acceptance of Terms</h3>
+            </div>
+    
+            <div id="terms-text">
+                <ol>
+                    <li>The services that TechFit provides to you are subject to the following Terms of Use ("TOU").</li>
+                    <li>TechFit reserves the right to update and modify the TOU at any time without notice to you.</li>
+                    <li>By using the website after a new version of the TOU has been posted, you agree to the terms of such new version.</li>
+                </ol>
+            </div>
+    
+            <div id="terms-section">
+                <h3>Description of Services</h3>
+            </div>
+    
+            <div id="terms-text">
+                <ol>
+                    <li>Through its network of web properties, TechFit provides you with access to a variety of resources, including job postings, employer profiles, and user assessments.</li>
+                    <li>The Services, including any updates, enhancements, and new features, are subject to these TOU.</li>
+                </ol>
+            </div>
+    
+            <div id="terms-section">
+                <h3>Personal and Non-Commercial Use Limitation</h3>
+            </div>
+    
+            <div id="terms-text">
+                <ol>
+                    <li>Unless otherwise specified, the Services are for your personal and non-commercial use.</li>
+                    <li>You may not modify, copy, distribute, transmit, display, perform, reproduce, publish, license, create derivative works from, transfer, or sell any information, software, products, or services obtained from the Services.</li>
+                </ol>
+            </div>
+    
+            <div id="terms-section">
+                <h3>Content</h3>
+            </div>
+    
+            <div id="terms-text">
+                <ol>
+                    <li>All content included in or made available through the Services, such as text, graphics, logos, icons, images, and documents is the exclusive property of TechFit or its content suppliers.</li>
+                    <li>All rights not expressly granted to you in these TOU are reserved and retained by TechFit or its licensors, suppliers, publishers, rightsholders, or other content providers.</li>
+                </ol>
+            </div>
+    
+            <div id="terms-section">
+                <h3>Software</h3>
+            </div>
+    
+            <div id="terms-text">
+                <ol>
+                    <li>Any software that is made available to download from the Services is the copyrighted work of TechFit and/or its suppliers.</li>
+                    <li>Use of the Software is governed by the terms of the end user license agreement, if any, which accompanies or is included with the Software.</li>
+                    <li>Any reproduction or redistribution of the Software not in accordance with the License Agreement is expressly prohibited by law, and may result in severe civil and criminal penalties.</li>
+                    <li>Violators will be prosecuted to the maximum extent possible.</li>
+                </ol>
+            </div>
+    
+            <div id="terms-section">
+                <h3>Documents</h3>
+            </div>
+    
+            <div id="terms-text">
+                <ol>
+                    <li>Permission to use Documents (such as white papers, press releases, datasheets, and FAQs) from the Services is granted, provided that (1) the below copyright notice appears in all copies and that both the copyright notice and this permission notice appear, (2) unless explicitly covered by another license or agreement, use of such Documents from the Services is for informational and non-commercial or personal use only, and (3) no modifications of any Documents are made.</li>
+                    <li>Accredited educational institutions may download and reproduce the Documents for distribution in the classroom. Distribution outside the classroom requires express written permission.</li>
+                </ol>
+            </div>
+    
+            <div id="terms-section">
+                <h3>Representations and Warranties</h3>
+            </div>
+    
+            <div id="terms-text">
+                <ol>
+                    <li>Software is warranted, if at all, only according to the terms of the license agreement.</li>
+                    <li>Except as warranted in the license agreement, TechFit hereby disclaims all warranties and conditions with regard to the software, including all warranties and conditions of merchantability, whether express, implied, or statutory, fitness for a particular purpose, title and non-infringement.</li>
+                    <li>TechFit makes no representations about the suitability of the information contained in the documents and related graphics published as part of the Services for any purpose. All such documents and related graphics are provided "as is" without warranty of any kind.</li>
+                    <li>In no event shall TechFit be liable for any special, indirect or consequential damages or any damages whatsoever resulting from loss of use, data, or profits, whether in an action of contract, negligence, or other tortious action, arising out of or in connection with the use or performance of information available from the Services.</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+    
     <footer>
         <div class="footer-content">
             <div class="footer-left">
@@ -313,6 +267,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
-    <script src="scripts.js"></script>
+
+    <script src="scripts.js?v=1.0"></script>
 </body>
 </html>

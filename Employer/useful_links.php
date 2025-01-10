@@ -32,11 +32,11 @@ session_write_close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechFit - Home</title>
+    <title>Useful Links - TechFit</title>
     <link rel="stylesheet" href="styles.css?v=2.0">
 </head>
 <body>
-<header>
+    <header>
         <div class="logo">
             <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
@@ -74,23 +74,32 @@ session_write_close();
         </nav>
     </header>
 
-    <section id="feedback-section" class="form-section">
-        <h2 id="feedback-title">Feedback</h2>
-        <div id="feedback-container" class="feedback-container">
-            <?php
-            session_start();
-            if (isset($_SESSION['success_message'])) {
-                echo '<p class="success-message">' . $_SESSION['success_message'] . '</p>';
-                unset($_SESSION['success_message']);
-            }
-            ?>
-            <form action="submit_feedback.php" method="post" id="feedback-form" class="feedback-form">
-                <div id="feedback-group" class="form-group">
-                    <label for="feedback_text" id="feedback-label">Your Feedback:</label>
-                    <textarea id="feedback_text" name="feedback_text" required></textarea>
-                </div>
-                <button type="submit" id="feedback-submit" class="submit-button">Submit</button>
-            </form>
+    <section id="resources">
+        <h2>Useful Links</h2>
+        <p>Here are some useful links to help you get started on your career in IT:</p>
+    
+        <div class="resource-columns">
+            <div class="resource-column">
+                <h3>For Job Seekers</h3>
+                <ul>
+                    <li><a href="https://www.upwork.com/">Upwork</a></li>
+                    <li><a href="https://www.linkedin.com/">LinkedIn</a></li>
+                    <li><a href="https://www.foundit.my/">foundit</a></li>
+                    <li><a href="https://malaysia.indeed.com/">Indeed</a></li>
+                    <li><a href="https://www.flexjobs.com/">FlexJobs</a></li>
+                </ul>
+            </div>
+    
+            <div class="resource-column">
+                <h3>For Employers</h3>
+                <ul>
+                    <li><a href="https://www.hired.com/">Hired</a></li>
+                    <li><a href="https://www.workable.com/">Workable</a></li>
+                    <li><a href="https://www.greenhouse.io/">Greenhouse</a></li>
+                    <li><a href="https://www.wayup.com/">WayUp</a></li>
+                    <li><a href="https://www.techcareers.com/">TechCareers</a></li>
+                </ul>
+            </div>
         </div>
     </section>
 

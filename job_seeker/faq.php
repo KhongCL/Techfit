@@ -1,0 +1,355 @@
+<?php
+session_start(); // Start the session to access session variables
+
+// Function to display the message and options
+function displayLoginMessage() {
+    echo '<script>
+        if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
+            window.location.href = "../login.php";
+        } else {
+            window.location.href = "../index.php";
+        }
+    </script>';
+    exit();
+}
+
+// Check if the user is logged in
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage(); // Display message and options if not logged in
+}
+
+// Check if the user has the correct role
+if ($_SESSION['role'] !== 'Job Seeker') {
+    displayLoginMessage(); // Display message and options if the role is not Job Seeker
+}
+
+// Check if the job seeker ID is set
+if (!isset($_SESSION['job_seeker_id'])) {
+    displayLoginMessage(); // Display message and options if job seeker ID is not set
+}
+
+// Close the session
+session_write_close();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - TechFit</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        .popup h2 {
+            color: #fff;
+        }
+        .popup button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .popup .close-button {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        .popup .cancel-button {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .popup .close-button:hover {
+            background-color: #c82333;
+        }
+        .popup .cancel-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+        </div>
+        <nav>
+            <div class="nav-container">
+                <ul class="nav-list">
+                    <li><a href="#">Assessment</a>
+                        <ul class="dropdown">
+                            <li><a href="start_assessment.php">Start Assessment</a></li>
+                            <li><a href="assessment_history.php">Assessment History</a></li>
+                            <li><a href="assessment_summary.php">Assessment Summary</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Resources</a>
+                        <ul class="dropdown">
+                            <li><a href="useful_links.php">Useful Links</a></li>
+                            <li><a href="faq.php">FAQ</a></li>
+                            <li><a href="sitemap.php">Sitemap</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="about.php">About</a></li>
+                    <li>
+                        <a href="#" id="profile-link">
+                            <div class="profile-info">
+                                <span class="username" id="username">Profile</span>
+                                <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
+                            </div>
+                        </a>
+                        <ul class="dropdown" id="profile-dropdown">
+                            <li><a href="profile.php">Settings</a></li>
+                            <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Logout Popup -->
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" onclick="logoutUser()">Yes</button>
+        <button class="cancel-button" onclick="closePopup('logout-popup')">No</button>
+    </div>
+
+    <section id="faq">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-container">
+            <h1 style="text-align: center;">For Job Seekers</h1>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>How does the assessment process work?</span>
+                    <div class="dropdown-arrow-wrapper">
+                        <span class="dropdown-arrow">&#9660;</span> <!-- This is the downward triangle arrow -->
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <p>You’ll complete an assessment comprising a series of questions designed to understand your skills, experiences, and preferences. Based on your answers, our system generates a detailed profile highlighting your strengths.</p>
+                </div>
+            </div>
+    
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Is the assessment free to take?</span>
+                    <div class="dropdown-arrow-wrapper">
+                        <span class="dropdown-arrow">&#9660;</span>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes, the assessment is completely free for job seekers.</p>
+                </div>
+            </div>
+    
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Can I pause the assessment and resume later?</span>
+                    <div class="dropdown-arrow-wrapper">
+                        <span class="dropdown-arrow">&#9660;</span>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes, you can save your progress and resume the assessment at any time.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Will my profile be automatically updated with my new assessment results?</span>
+                    <div class="dropdown-arrow-wrapper">
+                        <span class="dropdown-arrow">&#9660;</span>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes, once you complete a new assessment, your profile will be updated automatically to reflect the latest results.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>How often should I update my profile?</span>
+                    <div class="dropdown-arrow-wrapper">
+                        <span class="dropdown-arrow">&#9660;</span>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <p>We recommend updating your profile every six months or whenever you acquire new skills or experience to keep it relevant and up-to-date.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Is my data safe on your platform?</span>
+                    <div class="dropdown-arrow-wrapper">
+                        <span class="dropdown-arrow">&#9660;</span>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <p>Absolutely, we take data security seriously and use advanced encryption methods to protect your information.</p>
+                </div>
+            </div>
+
+            <h1 style="text-align: center;">For Employers</h1>
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>How can I view candidate profiles?</span>
+                    <div class="dropdown-arrow-wrapper">
+                        <span class="dropdown-arrow">&#9660;</span> <!-- This is the downward triangle arrow -->
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <p>After registering and logging in as an employer, you’ll have access to our database of candidate profiles. You can search for candidates based on various criteria like skills, experience, and assessment results.</p>
+                </div>
+            </div>
+    
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>Is there a fee to access candidate profiles?</span>
+                    <div class="dropdown-arrow-wrapper">
+                        <span class="dropdown-arrow">&#9660;</span>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <p>Access to candidate profiles is completely free of charge.</p>
+                </div>
+            </div>
+    
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>How do I contact candidates I’m interested in?</span>
+                    <div class="dropdown-arrow-wrapper">
+                        <span class="dropdown-arrow">&#9660;</span>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <p>You can either contact them via a third-party app or send messages directly through our platform to candidates you’re interested in. They will receive a notification and can respond via the platform.</p>
+                </div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>What type of assessments do candidates complete?</span>
+                    <div class="dropdown-arrow-wrapper">
+                        <span class="dropdown-arrow">&#9660;</span>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <p>Candidates complete a comprehensive assessment that evaluates their skills, experiences, and job preferences. The results help you identify the best matches for your job openings.</p>
+                </div>
+            </div>
+    
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>How can I edit my company profile?</span>
+                    <div class="dropdown-arrow-wrapper">
+                        <span class="dropdown-arrow">&#9660;</span>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <p>You can edit your company profile by logging into your employer account and navigating to the “Profile” section, where you can update your company information, logo, and description.</p>
+                </div>
+            </div>
+    
+            <div class="faq-item">
+                <div class="faq-question">
+                    <span>How often is your candidate database updated?</span>
+                    <div class="dropdown-arrow-wrapper">
+                        <span class="dropdown-arrow">&#9660;</span>
+                    </div>
+                </div>
+                <div class="faq-answer">
+                    <p>Our candidate database is continuously updated as new job seekers join and existing profiles are refreshed.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+        
+    <footer>
+        <div class="footer-content">
+            <div class="footer-left">
+                <div class="footer-logo">
+                    <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+                </div>
+                <div class="social-media">
+                    <p>Keep up with TechFit:</p>
+                    <div class="social-icons">
+                        <a href="https://facebook.com"><img src="images/facebook.png" alt="Facebook"></a>
+                        <a href="https://twitter.com"><img src="images/twitter.png" alt="Twitter"></a>
+                        <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
+                        <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
+                    </div>
+                    <p>techfit@gmail.com</p>
+                </div>
+            </div>
+            <div class="footer-right">
+                <div class="footer-column">
+                    <h3>Assessment</h3>
+                    <ul>
+                        <li><a href="start_assessment.php">Start Assessment</a></li>
+                        <li><a href="assessment_history.php">Assessment History</a></li>
+                        <li><a href="assessment_summary.php">Assessment Summary</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="useful_links.php">Useful Links</a></li>
+                        <li><a href="faq.php">FAQ</a></li>
+                        <li><a href="sitemap.php">Sitemap</a></li>
+                        <li><a href="about.php">About</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li><a href="contact.php">Contact Us</a></li>
+                        <li><a href="feedback.php">Feedback</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul>
+                        <li><a href="terms.php">Terms of Service</a></li>
+                        <li><a href="privacy.php">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
+        </div>
+    </footer>
+
+
+    <script src="scripts.js?v=1.0"></script>
+    <script>
+        function openPopup(popupId) {
+            document.getElementById(popupId).style.display = 'block';
+        }
+
+        function closePopup(popupId) {
+            document.getElementById(popupId).style.display = 'none';
+        }
+
+        function logoutUser() {
+            window.location.href = '/Techfit'; // Redirect to the root directory
+        }
+    </script>
+</body>
+</html>

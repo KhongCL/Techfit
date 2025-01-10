@@ -1,4 +1,29 @@
 <?php
+session_start(); // Start the session to access session variables
+
+// Function to display the message
+function displayLoginMessage() {
+    echo '<script>
+        alert("You need to log in to access this page.");
+    </script>';
+    exit();
+}
+
+// Check if the user is logged in
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage(); // Display message if not logged in
+}
+
+// Check if the user has the correct role
+if ($_SESSION['role'] !== 'Admin') {
+    displayLoginMessage(); // Display message if the role is not Admin
+}
+
+// Close the session
+session_write_close();
+?>
+
+<?php
 session_start();
 ?>
 <!DOCTYPE html>
@@ -393,26 +418,24 @@ session_start();
             fetch(`get_deleted_questions.php?assessment_id=${assessmentId}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Fetched deleted questions:', data); // Log fetched data
                     const deletedQuestionsDiv = document.getElementById('deleted-questions');
                     if (data.length > 0) {
                         deletedQuestionsDiv.innerHTML = `
-                            <h3>Deleted Questions</h3>
                             <label><input type="checkbox" id="select-all-deleted"> Select All</label>
                             <form id="restore-form">
                                 <table>
                                     <thead>
                                         <tr>
                                             <th>Select</th>
-                                            <th>Question ID</th>
-                                            <th>Question Text</th>
-                                            <th>Question Type</th>
-                                            <th>Answer Type</th>
-                                            <th>Correct Answer</th>
-                                            <th>Choices/Test Cases</th>
+                                            <th data-column="question_id">Question ID</th>
+                                            <th data-column="question_text">Question Text</th>
+                                            <th data-column="question_type">Question Type</th>
+                                            <th data-column="answer_type">Answer Type</th>
+                                            <th data-column="correct_answer">Correct Answer</th>
+                                            <th data-column="choices">Choices/Test Cases</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody id="deletedQuestionsTableBody">
                                         ${data.map(question => `
                                             <tr>
                                                 <td><input type="checkbox" name="restore_questions[]" value="${question.question_id}"></td>
@@ -443,6 +466,36 @@ session_start();
                     document.getElementById('select-all-deleted').addEventListener('change', function() {
                         const checkboxes = document.querySelectorAll('input[name="restore_questions[]"]');
                         checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+                    });
+
+                    // Add search functionality
+                    document.getElementById('searchDeletedQuestions').addEventListener('input', function() {
+                        const filter = this.value.toLowerCase();
+                        const rows = document.querySelectorAll('#deletedQuestionsTableBody tr');
+                        rows.forEach(row => {
+                            const cells = row.querySelectorAll('td');
+                            const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(filter));
+                            row.style.display = match ? '' : 'none';
+                        });
+                    });
+
+                    // Add sort functionality
+                    document.querySelectorAll('#deleted-questions-popup th[data-column]').forEach(th => {
+                        th.addEventListener('click', function() {
+                            const column = this.getAttribute('data-column');
+                            const order = this.dataset.order = -(this.dataset.order || -1);
+                            const rows = Array.from(document.querySelectorAll('#deletedQuestionsTableBody tr'));
+                            rows.sort((a, b) => {
+                                const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
+                                const bText = b.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
+                                return aText.localeCompare(bText, undefined, {numeric: true}) * order;
+                            });
+                            rows.forEach(row => document.querySelector('#deletedQuestionsTableBody').appendChild(row));
+
+                            // Update chevron
+                            document.querySelectorAll('#deleted-questions-popup th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
+                            this.classList.add(order === 1 ? 'asc' : 'desc');
+                        });
                     });
                 });
         }
@@ -477,42 +530,78 @@ session_start();
         }
     </script>
         <style>
-        #deleted-questions-popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border: 1px solid #ccc;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            max-height: 90vh;
-            overflow-y: auto;
-            z-index: 1000;
-            width: 95%;
-        }
+            #deleted-questions-popup {
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 20px;
+                border: 1px solid #ccc;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                max-height: 90vh;
+                overflow-y: auto;
+                z-index: 1000;
+                width: 95%;
+            }
 
-        #deleted-questions-popup table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+            #deleted-questions-popup table {
+                width: 100%;
+                border-collapse: collapse;
+            }
 
-        #deleted-questions-popup th, #deleted-questions-popup td {
-            text-align: left;
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-        }
+            #deleted-questions-popup th, #deleted-questions-popup td {
+                text-align: left;
+                padding: 8px;
+                border-bottom: 1px solid #ddd;
+            }
 
-        #deleted-questions-popup th {
-            background-color: #f2f2f2;
-        }
+            #deleted-questions-popup th {
+                background-color: #f2f2f2;
+                cursor: pointer;
+                position: relative;
+            }
+
+            #deleted-questions-popup th[data-column]:hover {
+                background-color: #e0e0e0;
+            }
+
+            #deleted-questions-popup th[data-column]::after {
+                content: '';
+                position: absolute;
+                right: 8px;
+                top: 50%;
+                transform: translateY(-50%);
+                border: 5px solid transparent;
+                display: none;
+            }
+
+            #deleted-questions-popup th[data-column].asc::after {
+                display: inline-block;
+                border-bottom-color: #000;
+            }
+
+            #deleted-questions-popup th[data-column].desc::after {
+                display: inline-block;
+                border-top-color: #000;
+            }
+
+            #deleted-questions-popup th[data-column]:hover.asc::after {
+                border-bottom-color: transparent;
+                border-top-color: #000;
+            }
+
+            #deleted-questions-popup th[data-column]:hover.desc::after {
+                border-top-color: transparent;
+                border-bottom-color: #000;
+            }
         </style>
 </head>
 <body>
     <header>
         <div class="logo">
-            <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+            <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
         <nav>
             <div class="nav-container">
@@ -524,32 +613,32 @@ session_start();
                 <ul class="nav-list">
                     <li><a href="#">Assessments</a>
                         <ul class="dropdown">
-                            <li><a href="create_assessment.html">Create New Assessment</a></li>
+                            <li><a href="create_assessment.php">Create New Assessment</a></li>
                             <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                            <li><a href="view_assessment_results.html">View Assessment Results</a></li>
+                            <li><a href="view_assessment_results.php">View Assessment Results</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Users</a>
                         <ul class="dropdown">
-                            <li><a href="manage_users.html">Manage Users</a></li>
-                            <li><a href="user_feedback.html">User Feedback</a></li>
+                            <li><a href="manage_users.php">Manage Users</a></li>
+                            <li><a href="user_feedback.php">User Feedback</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Reports</a>
                         <ul class="dropdown">
-                            <li><a href="assessment_performance.html">Assessment Performance</a></li>
-                            <li><a href="user_engagement.html">User Engagement Statistics</a></li>
-                            <li><a href="feedback_analysis.html">Feedback Analysis</a></li>
+                            <li><a href="assessment_performance.php">Assessment Performance</a></li>
+                            <li><a href="user_engagement.php">User Engagement Statistics</a></li>
+                            <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
-                            <li><a href="useful_links.html">Manage Useful Links</a></li>
-                            <li><a href="faq.html">Manage FAQs</a></li>
-                            <li><a href="sitemap.html">Manage Sitemap</a></li>
+                            <li><a href="useful_links.php">Manage Useful Links</a></li>
+                            <li><a href="faq.php">Manage FAQs</a></li>
+                            <li><a href="sitemap.php">Manage Sitemap</a></li>
                         </ul>
                     </li>
-                    <li><a href="about.html">About</a></li>
+                    <li><a href="about.php">About</a></li>
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
@@ -558,13 +647,13 @@ session_start();
                             </div>
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
-                            <li><a href="settings.html">Settings</a>
+                            <li><a href="settings.php">Settings</a>
                                 <ul class="dropdown">
-                                    <li><a href="manage_profile.html">Manage Profile</a></li>
-                                    <li><a href="system_configuration.html">System Configuration Settings</a></li>
+                                    <li><a href="manage_profile.php">Manage Profile</a></li>
+                                    <li><a href="system_configuration.php">System Configuration Settings</a></li>
                                 </ul>
                             </li>
-                            <li><a href="logout.html">Logout</a></li>
+                            <li><a href="logout.php">Logout</a></li>
                         </ul>
                     </li>                    
                 </ul>
@@ -587,6 +676,10 @@ session_start();
         <button type="button" onclick="viewDeletedQuestions()">View Deleted Questions</button>
 
         <div id="deleted-questions-popup">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px;">
+                <h3>Deleted Questions</h3>
+                <input type="text" id="searchDeletedQuestions" placeholder="Search..." style="margin-left: 10px;">
+            </div>
             <div id="deleted-questions"></div>
         </div>
         <form id="questions-form" action="update_questions.php" method="post">
@@ -601,7 +694,7 @@ session_start();
         <div class="footer-content">
             <div class="footer-left">
                 <div class="footer-logo">
-                    <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+                    <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
                 </div>
                 <div class="social-media">
                     <p>Keep up with TechFit:</p>
@@ -618,41 +711,41 @@ session_start();
                 <div class="footer-column">
                     <h3>Assessments</h3>
                     <ul>
-                        <li><a href="create_assessment.html">Create New Assessment</a></li>
+                        <li><a href="create_assessment.php">Create New Assessment</a></li>
                         <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                        <li><a href="view_assessment_results.html">View Assessment Results</a></li>
+                        <li><a href="view_assessment_results.php">View Assessment Results</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Users</h3>
                     <ul>
-                        <li><a href="manage_users.html">Manage Users</a></li>
-                        <li><a href="user_feedback.html">User Feedback</a></li>
+                        <li><a href="manage_users.php">Manage Users</a></li>
+                        <li><a href="user_feedback.php">User Feedback</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Reports</h3>
                     <ul>
-                        <li><a href="assessment_performance.html">Assessment Performance</a></li>
-                        <li><a href="user_engagement.html">User Engagement Statistics</a></li>
-                        <li><a href="feedback_analysis.html">Feedback Analysis</a></li>
+                        <li><a href="assessment_performance.php">Assessment Performance</a></li>
+                        <li><a href="user_engagement.php">User Engagement Statistics</a></li>
+                        <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.html">Manage Useful Links</a></li>
-                        <li><a href="faq.html">Manage FAQs</a></li>
-                        <li><a href="sitemap.html">Manage Sitemap</a></li>
+                        <li><a href="useful_links.php">Manage Useful Links</a></li>
+                        <li><a href="faq.php">Manage FAQs</a></li>
+                        <li><a href="sitemap.php">Manage Sitemap</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>About</h3>
                     <ul>
-                        <li><a href="about.html">About</a></li>
-                        <li><a href="contact.html">Contact Us</a></li>
-                        <li><a href="terms.html">Terms & Condition</a></li>
-                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="about.php">About</a></li>
+                        <li><a href="contact.php">Contact Us</a></li>
+                        <li><a href="terms.php">Terms & Condition</a></li>
+                        <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>

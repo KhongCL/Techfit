@@ -32,11 +32,12 @@ session_write_close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechFit - Home</title>
-    <link rel="stylesheet" href="styles.css?v=2.0">
+    <title>Contact Us - TechFit</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
-<header>
+    <header>
         <div class="logo">
             <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
@@ -73,27 +74,33 @@ session_write_close();
             </div>
         </nav>
     </header>
-
-    <section id="feedback-section" class="form-section">
-        <h2 id="feedback-title">Feedback</h2>
-        <div id="feedback-container" class="feedback-container">
-            <?php
-            session_start();
-            if (isset($_SESSION['success_message'])) {
-                echo '<p class="success-message">' . $_SESSION['success_message'] . '</p>';
-                unset($_SESSION['success_message']);
-            }
-            ?>
-            <form action="submit_feedback.php" method="post" id="feedback-form" class="feedback-form">
-                <div id="feedback-group" class="form-group">
-                    <label for="feedback_text" id="feedback-label">Your Feedback:</label>
-                    <textarea id="feedback_text" name="feedback_text" required></textarea>
+    
+    <section id="contact-us">
+        <div class="container">
+            <h2>Contact Us</h2>
+            <div id="contact-block">
+                <div class="contact-box">
+                    <h3><i class="fas fa-phone-alt icon fa-flip-horizontal"></i> Phone</h3>
+                    <p>+123 456 7890</p>
+                    <p>+987 654 3210</p>
+                    <p>+135 792 4680</p>
                 </div>
-                <button type="submit" id="feedback-submit" class="submit-button">Submit</button>
-            </form>
-        </div>
-    </section>
+                <div class="contact-box">
+                    <h3><i class="fas fa-envelope icon"></i> Email</h3>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
+                    <p><a href="mailto:techfit.business@gmail.com">techfit.business@gmail.com</a></p>
+                    <p><a href="mailto:techfit.backup@gmail.com">techfit.backup@gmail.com</a></p>
 
+                </div>
+                <div class="contact-box">
+                    <h3><i class="fas fa-map-marker-alt icon"></i> Location</h3>
+                    <p>Jalan Teknologi 5, Taman Teknologi Malaysia, 57000 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur, Malaysia</p>
+                </div>
+            </div>
+        </div>
+        <div style="height: 75px;"></div>
+    </section>
+    
     <footer>
         <div class="footer-content">
             <div class="footer-left">

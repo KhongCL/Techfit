@@ -19,8 +19,13 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 // Check if the user has the correct role
-if ($_SESSION['role'] !== 'Employer') {
-    displayLoginMessage(); // Display message and options if the role is not Employer
+if ($_SESSION['role'] !== 'Job Seeker') {
+    displayLoginMessage(); // Display message and options if the role is not Job Seeker
+}
+
+// Check if the job seeker ID is set
+if (!isset($_SESSION['job_seeker_id'])) {
+    displayLoginMessage(); // Display message and options if job seeker ID is not set
 }
 
 // Close the session
@@ -32,18 +37,61 @@ session_write_close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechFit - Home</title>
-    <link rel="stylesheet" href="styles.css?v=2.0">
+    <title>Assessment History - TechFit</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        .popup h2 {
+            color: #fff;
+        }
+        .popup button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .popup .close-button {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        .popup .cancel-button {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .popup .close-button:hover {
+            background-color: #c82333;
+        }
+        .popup .cancel-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-<header>
+    <header>
         <div class="logo">
             <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
         <nav>
             <div class="nav-container">
                 <ul class="nav-list">
-                    <li><a href="#">Candidates</a></li>
+                    <li><a href="#">Assessment</a>
+                        <ul class="dropdown">
+                            <li><a href="start_assessment.php">Start Assessment</a></li>
+                            <li><a href="assessment_history.php">Assessment History</a></li>
+                            <li><a href="assessment_summary.php">Assessment Summary</a></li>
+                        </ul>
+                    </li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
                             <li><a href="useful_links.php">Useful Links</a></li>
@@ -55,15 +103,15 @@ session_write_close();
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
-                                <span class="username" id="username">Employer</span>
+                                <span class="username" id="username">Profile</span>
                                 <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
                             </div>
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
                             <li><a href="profile.php">Settings</a></li>
-                            <li><a href="logout.php">Logout</a></li>
+                            <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li>
                         </ul>
-                    </li> 
+                    </li>
                 </ul>
                 <div class="hamburger" id="hamburger">
                     <span></span>
@@ -74,26 +122,22 @@ session_write_close();
         </nav>
     </header>
 
-    <section id="feedback-section" class="form-section">
-        <h2 id="feedback-title">Feedback</h2>
-        <div id="feedback-container" class="feedback-container">
-            <?php
-            session_start();
-            if (isset($_SESSION['success_message'])) {
-                echo '<p class="success-message">' . $_SESSION['success_message'] . '</p>';
-                unset($_SESSION['success_message']);
-            }
-            ?>
-            <form action="submit_feedback.php" method="post" id="feedback-form" class="feedback-form">
-                <div id="feedback-group" class="form-group">
-                    <label for="feedback_text" id="feedback-label">Your Feedback:</label>
-                    <textarea id="feedback_text" name="feedback_text" required></textarea>
-                </div>
-                <button type="submit" id="feedback-submit" class="submit-button">Submit</button>
-            </form>
+    <!-- Logout Popup -->
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" onclick="logoutUser()">Yes</button>
+        <button class="cancel-button" onclick="closePopup('logout-popup')">No</button>
+    </div>
+
+    <section id="sitemap">
+        <h2>Sitemap</h2>
+        <p>Explore the structure of our website:</p>
+        <div class="sitemap-container">
+            <img src="images/job_seeker_nav.png" alt="Website Sitemap" class="sitemap-image" />
         </div>
     </section>
-
+         
+    
     <footer>
         <div class="footer-content">
             <div class="footer-left">
@@ -113,9 +157,11 @@ session_write_close();
             </div>
             <div class="footer-right">
                 <div class="footer-column">
-                    <h3>Candidate</h3>
+                    <h3>Assessment</h3>
                     <ul>
-                        <li><a href="candidates.php">Candidates</a></li>
+                        <li><a href="start_assessment.php">Start Assessment</a></li>
+                        <li><a href="assessment_history.php">Assessment History</a></li>
+                        <li><a href="assessment_summary.php">Assessment Summary</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -147,6 +193,21 @@ session_write_close();
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
-    <script src="scripts.js"></script>
+
+
+    <script src="scripts.js?v=1.0"></script>
+    <script>
+        function openPopup(popupId) {
+            document.getElementById(popupId).style.display = 'block';
+        }
+
+        function closePopup(popupId) {
+            document.getElementById(popupId).style.display = 'none';
+        }
+
+        function logoutUser() {
+            window.location.href = '../'; // Redirect to the root directory
+        }
+    </script>
 </body>
 </html>

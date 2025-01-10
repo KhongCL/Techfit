@@ -36,7 +36,7 @@ session_write_close();
     <link rel="stylesheet" href="styles.css?v=2.0">
 </head>
 <body>
-<header>
+    <header>
         <div class="logo">
             <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
@@ -74,23 +74,11 @@ session_write_close();
         </nav>
     </header>
 
-    <section id="feedback-section" class="form-section">
-        <h2 id="feedback-title">Feedback</h2>
-        <div id="feedback-container" class="feedback-container">
-            <?php
-            session_start();
-            if (isset($_SESSION['success_message'])) {
-                echo '<p class="success-message">' . $_SESSION['success_message'] . '</p>';
-                unset($_SESSION['success_message']);
-            }
-            ?>
-            <form action="submit_feedback.php" method="post" id="feedback-form" class="feedback-form">
-                <div id="feedback-group" class="form-group">
-                    <label for="feedback_text" id="feedback-label">Your Feedback:</label>
-                    <textarea id="feedback_text" name="feedback_text" required></textarea>
-                </div>
-                <button type="submit" id="feedback-submit" class="submit-button">Submit</button>
-            </form>
+    <section id="sitemap">
+        <h2>Sitemap</h2>
+        <p>Explore the structure of our website:</p>
+        <div class="sitemap-container">
+            <img src="images/employer_nav.png" alt="Website Sitemap" class="sitemap-image" />
         </div>
     </section>
 

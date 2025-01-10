@@ -32,8 +32,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['email'] = $row['email'];
             $_SESSION['role'] = $row['role'];
 
-            // Check if the user is an employer and store the employer ID
-            if ($row['role'] == 'Employer') {
+            // Check if the user is a job seeker and store the job seeker ID
+            if ($row['role'] == 'Job Seeker') {
+                $stmt = $conn->prepare("SELECT job_seeker_id FROM Job_Seeker WHERE user_id=?");
+                $stmt->bind_param("s", $row['user_id']);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                if ($result->num_rows > 0) {
+                    $job_seeker_row = $result->fetch_assoc();
+                    $_SESSION['job_seeker_id'] = $job_seeker_row['job_seeker_id'];
+                }
+                header("Location: job_seeker/index.php");
+            } else if ($row['role'] == 'Employer') {
                 $stmt = $conn->prepare("SELECT employer_id FROM Employer WHERE user_id=?");
                 $stmt->bind_param("s", $row['user_id']);
                 $stmt->execute();
@@ -42,15 +52,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $employer_row = $result->fetch_assoc();
                     $_SESSION['employer_id'] = $employer_row['employer_id'];
                 }
-            }
-
-            // Redirect based on role
-            if ($row['role'] == 'Job Seeker') {
-                header("Location: job_seeker/index.php");
-            } else if ($row['role'] == 'Employer') {
-                header("Location: employer/index.html");
+                header("Location: employer/index.php");
             } else if ($row['role'] == 'Admin') {
-                header("Location: admin/index.html");
+                header("Location: admin/index.php");
             }
             exit();
         } else {
@@ -152,7 +156,7 @@ $conn->close();
 </head>
 <body>
     <div class="logo">
-        <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+        <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
     </div>
     <div class="container">
         <h2>Login</h2>
