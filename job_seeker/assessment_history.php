@@ -1,6 +1,40 @@
 <?php
 session_start(); // Start the session to access session variables
 
+// Function to display the message and options
+function displayLoginMessage() {
+    echo '<script>
+        if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
+            window.location.href = "../login.php";
+        } else {
+            window.location.href = "../index.php";
+        }
+    </script>';
+    exit();
+}
+
+// Check if the user is logged in
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage(); // Display message and options if not logged in
+}
+
+// Check if the user has the correct role
+if ($_SESSION['role'] !== 'Job Seeker') {
+    displayLoginMessage(); // Display message and options if the role is not Job Seeker
+}
+
+// Check if the job seeker ID is set
+if (!isset($_SESSION['job_seeker_id'])) {
+    displayLoginMessage(); // Display message and options if job seeker ID is not set
+}
+
+// Close the session
+session_write_close();
+?>
+
+<?php
+session_start(); // Start the session to access session variables
+
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -124,19 +158,19 @@ $conn->close();
                 <ul class="nav-list">
                     <li><a href="#">Assessment</a>
                         <ul class="dropdown">
-                            <li><a href="start_assessment.html">Start Assessment</a></li>
-                            <li><a href="assessment_history.html">Assessment History</a></li>
-                            <li><a href="assessment_summary.html">Assessment Summary</a></li>
+                            <li><a href="start_assessment.php">Start Assessment</a></li>
+                            <li><a href="assessment_history.php">Assessment History</a></li>
+                            <li><a href="assessment_summary.php">Assessment Summary</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
-                            <li><a href="useful_links.html">Useful Links</a></li>
-                            <li><a href="faq.html">FAQ</a></li>
-                            <li><a href="sitemap.html">Sitemap</a></li>
+                            <li><a href="useful_links.php">Useful Links</a></li>
+                            <li><a href="faq.php">FAQ</a></li>
+                            <li><a href="sitemap.php">Sitemap</a></li>
                         </ul>
                     </li>
-                    <li><a href="about.html">About</a></li>
+                    <li><a href="about.php">About</a></li>
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
@@ -216,32 +250,32 @@ $conn->close();
                 <div class="footer-column">
                     <h3>Assessment</h3>
                     <ul>
-                        <li><a href="start_assessment.html">Start Assessment</a></li>
-                        <li><a href="assessment_history.html">Assessment History</a></li>
-                        <li><a href="assessment_summary.html">Assessment Summary</a></li>
+                        <li><a href="start_assessment.php">Start Assessment</a></li>
+                        <li><a href="assessment_history.php">Assessment History</a></li>
+                        <li><a href="assessment_summary.php">Assessment Summary</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.html">Useful Links</a></li>
-                        <li><a href="faq.html">FAQ</a></li>
-                        <li><a href="sitemap.html">Sitemap</a></li>
-                        <li><a href="about.html">About</a></li>
+                        <li><a href="useful_links.php">Useful Links</a></li>
+                        <li><a href="faq.php">FAQ</a></li>
+                        <li><a href="sitemap.php">Sitemap</a></li>
+                        <li><a href="about.php">About</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Contact</h3>
                     <ul>
-                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="contact.php">Contact Us</a></li>
                         <li><a href="feedback.php">Feedback</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Legal</h3>
                     <ul>
-                        <li><a href="terms.html">Terms of Service</a></li>
-                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.php">Terms of Service</a></li>
+                        <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>

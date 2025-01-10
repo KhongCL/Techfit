@@ -1,9 +1,43 @@
+<?php
+session_start(); // Start the session to access session variables
+
+// Function to display the message and options
+function displayLoginMessage() {
+    echo '<script>
+        if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
+            window.location.href = "../login.php";
+        } else {
+            window.location.href = "../index.php";
+        }
+    </script>';
+    exit();
+}
+
+// Check if the user is logged in
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage(); // Display message and options if not logged in
+}
+
+// Check if the user has the correct role
+if ($_SESSION['role'] !== 'Job Seeker') {
+    displayLoginMessage(); // Display message and options if the role is not Job Seeker
+}
+
+// Check if the job seeker ID is set
+if (!isset($_SESSION['job_seeker_id'])) {
+    displayLoginMessage(); // Display message and options if job seeker ID is not set
+}
+
+// Close the session
+session_write_close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assessment History - TechFit</title>
+    <title>About Us - TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         .popup {
@@ -53,19 +87,19 @@
                 <ul class="nav-list">
                     <li><a href="#">Assessment</a>
                         <ul class="dropdown">
-                            <li><a href="start_assessment.html">Start Assessment</a></li>
-                            <li><a href="assessment_history.html">Assessment History</a></li>
-                            <li><a href="assessment_summary.html">Assessment Summary</a></li>
+                            <li><a href="start_assessment.php">Start Assessment</a></li>
+                            <li><a href="assessment_history.php">Assessment History</a></li>
+                            <li><a href="assessment_summary.php">Assessment Summary</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
-                            <li><a href="useful_links.html">Useful Links</a></li>
-                            <li><a href="faq.html">FAQ</a></li>
-                            <li><a href="sitemap.html">Sitemap</a></li>
+                            <li><a href="useful_links.php">Useful Links</a></li>
+                            <li><a href="faq.php">FAQ</a></li>
+                            <li><a href="sitemap.php">Sitemap</a></li>
                         </ul>
                     </li>
-                    <li><a href="about.html">About</a></li>
+                    <li><a href="about.php">About</a></li>
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
@@ -94,15 +128,51 @@
         <button class="close-button" onclick="logoutUser()">Yes</button>
         <button class="cancel-button" onclick="closePopup('logout-popup')">No</button>
     </div>
-
-    <section id="sitemap">
-        <h2>Sitemap</h2>
-        <p>Explore the structure of our website:</p>
-        <div class="sitemap-container">
-            <img src="images/job_seeker_nav.png" alt="Website Sitemap" class="sitemap-image" />
+    
+    <section id="about-us">
+        <div class="container">
+            <h2>About Us</h2>
+    
+            <!-- Mission Section -->
+            <div id="mission" class="about-block">
+                <div id="mission-text" class="text-left">
+                    <h3>Our Mission</h3>
+                    <p>To help job seekers achieve their goals by offering effective, skill-assessing tools that match them with the right employers.</p>
+                </div>
+                <div id="mission-image" class="image-right">
+                    <img src="https://picsum.photos/500/300?random=1" alt="Our Mission in Action">
+                </div>
+            </div>
+    
+            <!-- Vision Section -->
+            <div id="vision" class="about-block">
+                <div id="vision-image" class="image-left">
+                    <img src="https://picsum.photos/1600/900?random=2" alt="Vision Image">
+                </div>
+                <div id="vision-text" class="text-right">
+                    <h3>Our Vision</h3>
+                    <p>To make job searching and hiring easy and effective for everyone, making meaningful connections that benefit both job seekers and employers.</p>
+                </div>
+            </div>
+    
+            <!-- Values Section -->
+            <h3 id="values-title">Our Values</h3>
+            <div id="values-gallery" class="values-gallery">
+                <div class="value-item">
+                    <img src="https://picsum.photos/300/300?random=1" alt="Innovation">
+                    <p>Innovation</p>
+                </div>
+                <div class="value-item">
+                    <img src="https://picsum.photos/300/300?random=2" alt="Integrity">
+                    <p>Integrity</p>
+                </div>
+                <div class="value-item">
+                    <img src="https://picsum.photos/300/300?random=3" alt="Collaboration">
+                    <p>Collaboration</p>
+                </div>
+            </div>
         </div>
     </section>
-         
     
     <footer>
         <div class="footer-content">
@@ -125,32 +195,32 @@
                 <div class="footer-column">
                     <h3>Assessment</h3>
                     <ul>
-                        <li><a href="start_assessment.html">Start Assessment</a></li>
-                        <li><a href="assessment_history.html">Assessment History</a></li>
-                        <li><a href="assessment_summary.html">Assessment Summary</a></li>
+                        <li><a href="start_assessment.php">Start Assessment</a></li>
+                        <li><a href="assessment_history.php">Assessment History</a></li>
+                        <li><a href="assessment_summary.php">Assessment Summary</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.html">Useful Links</a></li>
-                        <li><a href="faq.html">FAQ</a></li>
-                        <li><a href="sitemap.html">Sitemap</a></li>
-                        <li><a href="about.html">About</a></li>
+                        <li><a href="useful_links.php">Useful Links</a></li>
+                        <li><a href="faq.php">FAQ</a></li>
+                        <li><a href="sitemap.php">Sitemap</a></li>
+                        <li><a href="about.php">About</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Contact</h3>
                     <ul>
-                        <li><a href="contact.html">Contact Us</a></li>
+                        <li><a href="contact.php">Contact Us</a></li>
                         <li><a href="feedback.php">Feedback</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Legal</h3>
                     <ul>
-                        <li><a href="terms.html">Terms of Service</a></li>
-                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.php">Terms of Service</a></li>
+                        <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
@@ -159,9 +229,7 @@
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
-
-
-    <script src="scripts.js?v=1.0"></script>
+    <script src="scripts.js"></script>
     <script>
         function openPopup(popupId) {
             document.getElementById(popupId).style.display = 'block';

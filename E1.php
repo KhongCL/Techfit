@@ -4,10 +4,10 @@ session_start(); // Start the session to access session variables
 // Function to display the message and options
 function displayLoginMessage() {
     echo '<script>
-        if (confirm("You need to log in to access this page. Go to Home Page? Click cancel to go to login page.")) {
-            window.location.href = "../index.html";
-        } else {
+        if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
             window.location.href = "../login.php";
+        } else {
+            window.location.href = "../index.php";
         }
     </script>';
     exit();
