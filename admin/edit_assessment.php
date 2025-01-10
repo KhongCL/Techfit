@@ -466,6 +466,10 @@ session_start();
                                 return aText.localeCompare(bText, undefined, {numeric: true}) * order;
                             });
                             rows.forEach(row => document.querySelector('#deletedQuestionsTableBody').appendChild(row));
+
+                            // Update chevron
+                            document.querySelectorAll('#deleted-questions-popup th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
+                            this.classList.add(order === 1 ? 'asc' : 'desc');
                         });
                     });
                 });
@@ -501,41 +505,72 @@ session_start();
         }
     </script>
         <style>
-        #deleted-questions-popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            padding: 20px;
-            border: 1px solid #ccc;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            max-height: 90vh;
-            overflow-y: auto;
-            z-index: 1000;
-            width: 95%;
-        }
+            #deleted-questions-popup {
+                display: none;
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 20px;
+                border: 1px solid #ccc;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                max-height: 90vh;
+                overflow-y: auto;
+                z-index: 1000;
+                width: 95%;
+            }
 
-        #deleted-questions-popup table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+            #deleted-questions-popup table {
+                width: 100%;
+                border-collapse: collapse;
+            }
 
-        #deleted-questions-popup th, #deleted-questions-popup td {
-            text-align: left;
-            padding: 8px;
-            border-bottom: 1px solid #ddd;
-        }
+            #deleted-questions-popup th, #deleted-questions-popup td {
+                text-align: left;
+                padding: 8px;
+                border-bottom: 1px solid #ddd;
+            }
 
-        #deleted-questions-popup th {
-            background-color: #f2f2f2;
-            cursor: pointer;
-        }
+            #deleted-questions-popup th {
+                background-color: #f2f2f2;
+                cursor: pointer;
+                position: relative;
+            }
 
-        #deleted-questions-popup th[data-column]:hover {
-            background-color: #e0e0e0;
-        }
+            #deleted-questions-popup th[data-column]:hover {
+                background-color: #e0e0e0;
+            }
+
+            #deleted-questions-popup th[data-column]::after {
+                content: '';
+                position: absolute;
+                right: 8px;
+                top: 50%;
+                transform: translateY(-50%);
+                border: 5px solid transparent;
+                display: none;
+            }
+
+            #deleted-questions-popup th[data-column].asc::after {
+                display: inline-block;
+                border-bottom-color: #000;
+            }
+
+            #deleted-questions-popup th[data-column].desc::after {
+                display: inline-block;
+                border-top-color: #000;
+            }
+
+            #deleted-questions-popup th[data-column]:hover.asc::after {
+                border-bottom-color: transparent;
+                border-top-color: #000;
+            }
+
+            #deleted-questions-popup th[data-column]:hover.desc::after {
+                border-top-color: transparent;
+                border-bottom-color: #000;
+            }
         </style>
 </head>
 <body>

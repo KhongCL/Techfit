@@ -76,16 +76,17 @@
                 <button id="deleteSelected">Delete Selected</button>
                 <button id="viewDeleted">View Deleted Assessments</button>
             </div>
-            <div style="display: flex; align-items: center; padding: 10px;">
-                <select id="sortDropdown">
-                    <option value="none">None</option>
-                    <option value="assessment_id_asc">Assessment ID ASC</option>
-                    <option value="assessment_id_desc">Assessment ID DESC</option>
-                    <option value="admin_id_asc">Admin ID ASC</option>
-                    <option value="admin_id_desc">Admin ID DESC</option>
-                </select>
-                <input type="text" id="searchInput" placeholder="Search..." style="margin-left: 10px;">
-            </div>
+            <div style="display: flex; align-items: center; padding: 10px; flex-wrap: nowrap;">
+            <span style="margin-right: 10px; white-space: nowrap;">Sort by key:</span>
+            <select id="sortDropdown" style="margin-right: 10px;">
+                <option value="none">None</option>
+                <option value="assessment_id_asc">Assessment ID ASC</option>
+                <option value="assessment_id_desc">Assessment ID DESC</option>
+                <option value="admin_id_asc">Admin ID ASC</option>
+                <option value="admin_id_desc">Admin ID DESC</option>
+            </select>
+            <input type="text" id="searchInput" placeholder="Search..." style="margin-left: 10px; padding-right: 20px; flex-grow: 1;">
+        </div>
         </div>
         <table>
             <thead>
@@ -123,8 +124,8 @@
                         echo "<td><input type='checkbox' class='selectAssessment' value='" . htmlspecialchars($row['assessment_id']) . "'></td>";
                         echo "<td>" . htmlspecialchars($row['assessment_id']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['admin_id']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['assessment_name']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['description']) . "</td>";
+                        echo "<td class='editable' data-id='" . htmlspecialchars($row['assessment_id']) . "' data-column='assessment_name'>" . htmlspecialchars($row['assessment_name']) . "</td>";
+                        echo "<td class='editable' data-id='" . htmlspecialchars($row['assessment_id']) . "' data-column='description'>" . htmlspecialchars($row['description']) . "</td>";
                         echo "<td>" . htmlspecialchars($row['timestamp']) . "</td>";
                         echo "<td><a href='edit_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Edit</a> | <a href='#' class='deleteAssessment' data-id='" . htmlspecialchars($row['assessment_id']) . "'>Delete</a></td>";
                         echo "</tr>";
@@ -160,6 +161,11 @@
     </main>
 
     <style>
+    #searchInput {
+            padding-right: 60px;
+        }
+
+
     table {
         width: 100%;
         border-collapse: collapse;
@@ -174,10 +180,41 @@
     th {
         background-color: #f2f2f2;
         cursor: pointer;
+        position: relative;
     }
 
     th[data-column]:hover {
         background-color: #e0e0e0;
+    }
+
+    th[data-column]::after {
+        content: '';
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: 5px solid transparent;
+        display: none;
+    }
+
+    th[data-column].asc::after {
+        display: inline-block;
+        border-bottom-color: #000;
+    }
+
+    th[data-column].desc::after {
+        display: inline-block;
+        border-top-color: #000;
+    }
+
+    th[data-column]:hover.asc::after {
+        border-bottom-color: transparent;
+        border-top-color: #000;
+    }
+
+    th[data-column]:hover.desc::after {
+        border-top-color: transparent;
+        border-bottom-color: #000;
     }
 
     #deleted-assessments-tab {
@@ -338,10 +375,65 @@
                 return aText.localeCompare(bText, undefined, {numeric: true}) * order;
             });
             rows.forEach(row => document.querySelector('#assessmentsTableBody').appendChild(row));
+
+            // Update chevron
+            document.querySelectorAll('th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
+            this.classList.add(order === 1 ? 'asc' : 'desc');
+        });
+    });
+
+    // Editable cells
+    document.querySelectorAll('.editable').forEach(cell => {
+        cell.addEventListener('dblclick', function() {
+            const originalText = this.textContent;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = originalText;
+            input.style.width = '100%';
+            this.textContent = '';
+            this.appendChild(input);
+            input.focus();
+
+            input.addEventListener('blur', () => {
+                this.textContent = originalText;
+            });
+
+            input.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    const newValue = input.value;
+                    const assessmentId = this.getAttribute('data-id');
+                    const column = this.getAttribute('data-column');
+
+                    fetch('update_assessment.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            assessment_id: assessmentId,
+                            column: column,
+                            value: newValue
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            this.textContent = newValue;
+                        } else {
+                            this.textContent = originalText;
+                            alert('Failed to update assessment.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        this.textContent = originalText;
+                        alert('An error occurred while updating the assessment.');
+                    });
+                }
+            });
         });
     });
     </script>
-
     <footer>
         <div class="footer-content">
             <div class="footer-left">
