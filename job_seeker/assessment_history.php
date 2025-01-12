@@ -95,7 +95,7 @@ $conn->close();
                 padding: 5px 10px; /* Adjusted padding to fit the smaller box */
                 border: 2px solid rgb(41, 40, 40);
                 border-radius: 8px;
-                background-color: #555; /* Medium gray color */
+                background-color: rgb(76, 76, 76); /* Medium gray color */
                 color: #fff; /* White text color for contrast */
                 position: relative; /* Ensure that child absolute elements are positioned relative to this */
             }
