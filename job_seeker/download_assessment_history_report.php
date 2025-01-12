@@ -40,8 +40,6 @@ Job Seeker ID: {$row['job_seeker_id']}
 Start Time: {$row['start_time']}
 End Time: {$row['end_time']}
 Score: {$row['score']}
-Summary: Excellent performance
-Feedback: Keep up the good work!
 ";
 
 // Serve the file as a download
