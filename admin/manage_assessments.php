@@ -98,7 +98,7 @@ session_write_close();
         <div class="header-controls">
             <div>
                 <button onclick="window.location.href='create_assessment.php'">Create New Assessment</button>
-                <button id="deleteSelected">Delete Selected</button>
+                <button id="deleteSelected" class="danger">Delete Selected Assessment</button>
                 <button id="viewDeleted">View Deleted Assessments</button>
             </div>
             <div class="search-sort-controls">
@@ -173,7 +173,7 @@ session_write_close();
             <h3>Deleted Assessments</h3>
             <button type="button" class="close-button" onclick="closeDeletedAssessments()">&#x2715;</button>
             <div class="header-controls">
-                <button type="button" id="restoreSelectedButton" onclick="restoreSelectedAssessments()">Restore Selected Assessments</button>
+                <button type="button" id="restoreSelectedButton" class="success" onclick="restoreSelectedAssessments()">Restore Selected Assessments</button>
                 <div class="deleted-search-container">
                     <div class="search-field-container">
                         <input type="text" id="deletedSearchInput" placeholder="Search...">
@@ -202,18 +202,22 @@ session_write_close();
     <style>
         /* Color Theme */
         :root {
-            --primary-color: #007bff; /* Blue */
-            --secondary-color: #1e1e1e; /* Dark Grey */
-            --accent-color: #0056b3; /* Darker Blue */
-            --text-color: #e0e0e0; /* Slightly Darker White */
-            --background-color: #121212; /* Very Dark Grey */
-            --border-color: #333; /* Dark Grey */
-            --hover-background-color: #333; /* Slightly Lighter Dark Grey */
-            --hover-text-color: #fff; /* White */
-            --button-hover-color: #80bdff; /* Lighter Blue */
-            --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
-            --popup-border-color: #444; /* Slightly Lighter Dark Grey */
-        }
+                --primary-color: #007bff; /* Blue */
+                --secondary-color: #1e1e1e; /* Dark Grey */
+                --accent-color: #0056b3; /* Darker Blue */
+                --text-color: #e0e0e0; /* Slightly Darker White */
+                --background-color: #121212; /* Very Dark Grey */
+                --border-color: #333; /* Dark Grey */
+                --hover-background-color: #333; /* Slightly Lighter Dark Grey */
+                --hover-text-color: #fff; /* White */
+                --button-hover-color: #80bdff; /* Lighter Blue */
+                --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
+                --popup-border-color: #444; /* Slightly Lighter Dark Grey */
+                --danger-color: #dc3545; /* Red */
+                --danger-hover-color: #c82333; /* Darker Red */
+                --success-color: #28a745; /* Green */
+                --success-hover-color: #218838; /* Darker Green */
+            }
 
         /* General Styles */
         body {
@@ -335,6 +339,39 @@ session_write_close();
             color: var(--hover-text-color);
         }
 
+        button.danger {
+            background-color: var(--danger-color);
+        }
+
+        button.danger:hover {
+            background-color: var(--danger-hover-color);
+        }
+
+        button.success {
+            background-color: var(--success-color);
+        }
+
+        button.success:hover {
+            background-color: var(--success-hover-color);
+        }
+
+        /* Specific Buttons */
+        #deleteSelected {
+            background-color: var(--danger-color);
+        }
+
+        #deleteSelected:hover {
+            background-color: var(--danger-hover-color);
+        }
+
+        #restoreSelectedButton {
+            background-color: var(--success-color);
+        }
+
+        #restoreSelectedButton:hover {
+            background-color: var(--success-hover-color);
+        }
+
         /* Table */
         table {
             width: 100%;
@@ -384,27 +421,12 @@ session_write_close();
             color: var(--text-color);
         }
 
-        /* Tooltip for Column Headers */
-        th[data-column] {
-            position: relative; /* Ensure the tooltip is positioned relative to the header */
+        td a.deleteAssessment {
+            color: var(--danger-color);
         }
 
-        th[data-column]:hover::after {
-            content: 'Click to sort';
-            position: absolute;
-            background: var(--popup-background-color);
-            color: var(--text-color);
-            padding: 5px;
-            border-radius: 5px;
-            font-size: 12px;
-            top: 100%;
-            left: 50%;
-            transform: translateX(-50%);
-            white-space: nowrap;
-            z-index: 1000;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            opacity: 1; /* Ensure the tooltip is visible */
-            visibility: visible; /* Ensure the tooltip is visible */
+        td a.deleteAssessment:hover {
+            color: var(--danger-hover-color);
         }
 
         /* Chevron */
@@ -645,6 +667,35 @@ session_write_close();
 
                         // Add event listeners for sorting columns
                         document.querySelectorAll('#deleted-assessments-tab th[data-column]').forEach(th => {
+                            th.addEventListener('mouseenter', function() {
+                                const tooltip = document.createElement('div');
+                                tooltip.className = 'tooltip';
+                                tooltip.textContent = 'Click to sort';
+                                tooltip.style.position = 'absolute';
+                                tooltip.style.background = 'var(--popup-background-color)';
+                                tooltip.style.color = 'var(--text-color)';
+                                tooltip.style.padding = '5px';
+                                tooltip.style.borderRadius = '5px';
+                                tooltip.style.fontSize = '12px';
+                                tooltip.style.top = '100%';
+                                tooltip.style.left = '50%';
+                                tooltip.style.transform = 'translateX(-50%)';
+                                tooltip.style.whiteSpace = 'nowrap';
+                                tooltip.style.zIndex = '1000';
+                                tooltip.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
+                                tooltip.style.opacity = '1';
+                                tooltip.style.visibility = 'visible';
+                                tooltip.style.pointerEvents = 'none';
+                                this.appendChild(tooltip);
+                            });
+
+                            th.addEventListener('mouseleave', function() {
+                                const tooltip = this.querySelector('.tooltip');
+                                if (tooltip) {
+                                    tooltip.remove();
+                                }
+                            });
+
                             th.addEventListener('click', function() {
                                 const column = this.getAttribute('data-column');
                                 const order = this.dataset.order = -(this.dataset.order || -1);
@@ -695,12 +746,42 @@ session_write_close();
 
             // Add event listeners for sorting columns in the main table
             document.querySelectorAll('th[data-column]').forEach(th => {
+                th.addEventListener('mouseenter', function() {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip';
+                    tooltip.textContent = 'Click to sort';
+                    tooltip.style.position = 'absolute';
+                    tooltip.style.background = 'var(--popup-background-color)';
+                    tooltip.style.color = 'var(--text-color)';
+                    tooltip.style.padding = '5px';
+                    tooltip.style.borderRadius = '5px';
+                    tooltip.style.fontSize = '12px';
+                    tooltip.style.top = '100%';
+                    tooltip.style.left = '50%';
+                    tooltip.style.transform = 'translateX(-50%)';
+                    tooltip.style.whiteSpace = 'nowrap';
+                    tooltip.style.zIndex = '1000';
+                    tooltip.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
+                    tooltip.style.opacity = '1';
+                    tooltip.style.visibility = 'visible';
+                    tooltip.style.pointerEvents = 'none';
+                    this.appendChild(tooltip);
+                });
+
+                th.addEventListener('mouseleave', function() {
+                    const tooltip = this.querySelector('.tooltip');
+                    if (tooltip) {
+                        tooltip.remove();
+                    }
+                });
+
                 th.addEventListener('click', function() {
                     if (this.closest('#deleted-assessments-tab')) {
                         return; // Skip sorting for deleted assessments table
                     }
                     const column = this.getAttribute('data-column');
-                    const order = this.dataset.order = -(this.dataset.order || -1);
+                    const currentOrder = this.dataset.order || -1;
+                    const order = this.dataset.order = currentOrder * -1; // Toggle order
                     console.log(`Sorting main table column: ${column}, Order: ${order}`); // Debug log
                     const rows = Array.from(document.querySelectorAll('#assessmentsTableBody tr'));
                     rows.sort((a, b) => {

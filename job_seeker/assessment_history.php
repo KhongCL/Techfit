@@ -230,7 +230,7 @@ $conn->close();
                         </div>
                         <div class="actions">
                             <a href="download_assessment_history_report.php?assessment_id=<?php echo urlencode($assessment['assessment_id']); ?>" title="Download">Download</a>
-                            <a href="#" title="Share"><i class="fas fa-share-square"></i> Share</a>
+                            <a href="share_assessment_history.php?assessment_id=<?= urlencode($assessment['assessment_id']); ?>" title="Share">Share</a>
                         </div>
 
                     </div>
