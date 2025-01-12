@@ -98,7 +98,7 @@ session_write_close();
         <div class="header-controls">
             <div>
                 <button onclick="window.location.href='create_assessment.php'">Create New Assessment</button>
-                <button id="deleteSelected">Delete Selected</button>
+                <button id="deleteSelected" class="danger">Delete Selected Assessment</button>
                 <button id="viewDeleted">View Deleted Assessments</button>
             </div>
             <div class="search-sort-controls">
@@ -173,7 +173,7 @@ session_write_close();
             <h3>Deleted Assessments</h3>
             <button type="button" class="close-button" onclick="closeDeletedAssessments()">&#x2715;</button>
             <div class="header-controls">
-                <button type="button" id="restoreSelectedButton" onclick="restoreSelectedAssessments()">Restore Selected Assessments</button>
+                <button type="button" id="restoreSelectedButton" class="success" onclick="restoreSelectedAssessments()">Restore Selected Assessments</button>
                 <div class="deleted-search-container">
                     <div class="search-field-container">
                         <input type="text" id="deletedSearchInput" placeholder="Search...">
@@ -202,18 +202,22 @@ session_write_close();
     <style>
         /* Color Theme */
         :root {
-            --primary-color: #007bff; /* Blue */
-            --secondary-color: #1e1e1e; /* Dark Grey */
-            --accent-color: #0056b3; /* Darker Blue */
-            --text-color: #e0e0e0; /* Slightly Darker White */
-            --background-color: #121212; /* Very Dark Grey */
-            --border-color: #333; /* Dark Grey */
-            --hover-background-color: #333; /* Slightly Lighter Dark Grey */
-            --hover-text-color: #fff; /* White */
-            --button-hover-color: #80bdff; /* Lighter Blue */
-            --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
-            --popup-border-color: #444; /* Slightly Lighter Dark Grey */
-        }
+                --primary-color: #007bff; /* Blue */
+                --secondary-color: #1e1e1e; /* Dark Grey */
+                --accent-color: #0056b3; /* Darker Blue */
+                --text-color: #e0e0e0; /* Slightly Darker White */
+                --background-color: #121212; /* Very Dark Grey */
+                --border-color: #333; /* Dark Grey */
+                --hover-background-color: #333; /* Slightly Lighter Dark Grey */
+                --hover-text-color: #fff; /* White */
+                --button-hover-color: #80bdff; /* Lighter Blue */
+                --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
+                --popup-border-color: #444; /* Slightly Lighter Dark Grey */
+                --danger-color: #dc3545; /* Red */
+                --danger-hover-color: #c82333; /* Darker Red */
+                --success-color: #28a745; /* Green */
+                --success-hover-color: #218838; /* Darker Green */
+            }
 
         /* General Styles */
         body {
@@ -335,6 +339,39 @@ session_write_close();
             color: var(--hover-text-color);
         }
 
+        button.danger {
+            background-color: var(--danger-color);
+        }
+
+        button.danger:hover {
+            background-color: var(--danger-hover-color);
+        }
+
+        button.success {
+            background-color: var(--success-color);
+        }
+
+        button.success:hover {
+            background-color: var(--success-hover-color);
+        }
+
+        /* Specific Buttons */
+        #deleteSelected {
+            background-color: var(--danger-color);
+        }
+
+        #deleteSelected:hover {
+            background-color: var(--danger-hover-color);
+        }
+
+        #restoreSelectedButton {
+            background-color: var(--success-color);
+        }
+
+        #restoreSelectedButton:hover {
+            background-color: var(--success-hover-color);
+        }
+
         /* Table */
         table {
             width: 100%;
@@ -382,6 +419,14 @@ session_write_close();
         .action-separator {
             margin: 0 10px;
             color: var(--text-color);
+        }
+
+        td a.deleteAssessment {
+            color: var(--danger-color);
+        }
+
+        td a.deleteAssessment:hover {
+            color: var(--danger-hover-color);
         }
 
         /* Chevron */

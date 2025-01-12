@@ -299,6 +299,7 @@ session_start();
             removeButton.type = 'button';
             removeButton.className = 'remove-icon';
             removeButton.innerHTML = '&#x2715;'; // Unicode for 'X' symbol
+            removeButton.title = 'Remove Choice'; // Tooltip text
             removeButton.onclick = function() {
                 choiceContainer.remove();
                 updateCorrectChoiceDropdown(id);
@@ -351,6 +352,7 @@ session_start();
             removeButton.type = 'button';
             removeButton.className = 'remove-icon';
             removeButton.innerHTML = '&#x2715;'; // Unicode for 'X' symbol
+            removeButton.title = 'Remove Test Case'; // Tooltip text
             removeButton.onclick = function() {
                 testCaseContainer.remove();
                 isFormDirty = true;
@@ -894,6 +896,7 @@ session_start();
                 justify-content: space-between;
                 gap: 20px;
                 margin-bottom: 10px;
+                width: 100%; /* Match the width of the question text input field */
             }
 
             .dropdown-item {
@@ -909,6 +912,23 @@ session_start();
 
             .choice-container input, .test-case-container textarea {
                 flex-grow: 1;
+            }
+
+            /* Tooltip */
+            button.remove-icon[title]:hover::after {
+                content: attr(title);
+                position: absolute;
+                background: var(--popup-background-color);
+                color: var(--text-color);
+                padding: 5px;
+                border-radius: 5px;
+                font-size: 12px;
+                top: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                white-space: nowrap;
+                z-index: 1000;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
             }
 
             /* Spacing */
