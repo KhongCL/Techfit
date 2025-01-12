@@ -52,31 +52,37 @@ session_start();
             questionDiv.id = `question-${questionCount}`;
             questionDiv.innerHTML = `
                 <input type="hidden" id="question_id_${questionCount}" name="question_id[]" value="">
+                <p>Question ID: <strong id="display_question_id_${questionCount}"></strong></p>
                 <label for="question_text_${questionCount}">Question Text:</label>
                 <textarea id="question_text_${questionCount}" name="question_text[]" required></textarea><br>
 
-                <label for="question_type_${questionCount}">Question Type:</label>
-                <select id="question_type_${questionCount}" name="question_type[]" required>
-                    <option value="preliminary">Preliminary</option>
-                    <option value="experience">Experience</option>
-                    <option value="employer_score">Employer Score</option>
-                    <option value="detailed">Detailed</option>
-                    <option value="technical">Technical</option>
-                </select><br>
-
-                <label for="answer_type_${questionCount}">Answer Type:</label>
-                <select id="answer_type_${questionCount}" name="answer_type[]" onchange="showAnswerOptions(${questionCount})" required>
-                    <option value="multiple choice">Multiple Choice</option>
-                    <option value="true/false">True/False</option>
-                    <option value="fill in the blank">Fill in the Blank</option>
-                    <option value="essay">Essay</option>
-                    <option value="code">Code</option>
-                </select><br>
+                <div class="dropdown-container">
+                    <div class="dropdown-item">
+                        <label for="question_type_${questionCount}">Question Type:</label>
+                        <select id="question_type_${questionCount}" name="question_type[]" required>
+                            <option value="preliminary">Preliminary</option>
+                            <option value="experience">Experience</option>
+                            <option value="employer_score">Employer Score</option>
+                            <option value="detailed">Detailed</option>
+                            <option value="technical">Technical</option>
+                        </select>
+                    </div>
+                    <div class="dropdown-item">
+                        <label for="answer_type_${questionCount}">Answer Type:</label>
+                        <select id="answer_type_${questionCount}" name="answer_type[]" onchange="showAnswerOptions(${questionCount})" required>
+                            <option value="multiple choice">Multiple Choice</option>
+                            <option value="true/false">True/False</option>
+                            <option value="fill in the blank">Fill in the Blank</option>
+                            <option value="essay">Essay</option>
+                            <option value="code">Code</option>
+                        </select>
+                    </div>
+                </div>
 
                 <div id="answer_options_${questionCount}">
                     ${getMultipleChoiceOptions(questionCount, false)}
                 </div>
-                <button type="button" onclick="removeQuestion(${questionCount})">Remove Question</button>
+                <button type="button" class="danger" onclick="removeQuestion(${questionCount})">Remove Question</button>
                 <hr>
             `;
             document.getElementById('questions').appendChild(questionDiv);
@@ -277,6 +283,7 @@ session_start();
         function addChoice(id, choiceId = '', choiceText = '') {
             const choicesDiv = document.getElementById(`choices_${id}`);
             const choiceContainer = document.createElement('div');
+            choiceContainer.className = 'choice-container';
             const input = document.createElement('input');
             input.type = 'text';
             input.name = `choices_${id}[]`;
@@ -290,7 +297,8 @@ session_start();
 
             const removeButton = document.createElement('button');
             removeButton.type = 'button';
-            removeButton.textContent = 'Remove Choice';
+            removeButton.className = 'remove-icon';
+            removeButton.innerHTML = '&#x2715;'; // Unicode for 'X' symbol
             removeButton.onclick = function() {
                 choiceContainer.remove();
                 updateCorrectChoiceDropdown(id);
@@ -319,6 +327,9 @@ session_start();
                 return;
             }
 
+            const testCaseContainer = document.createElement('div');
+            testCaseContainer.className = 'test-case-container';
+
             const input = document.createElement('textarea');
             input.name = `test_cases_${id}[]`;
             input.placeholder = 'Input';
@@ -338,19 +349,19 @@ session_start();
 
             const removeButton = document.createElement('button');
             removeButton.type = 'button';
-            removeButton.textContent = 'Remove Test Case';
+            removeButton.className = 'remove-icon';
+            removeButton.innerHTML = '&#x2715;'; // Unicode for 'X' symbol
             removeButton.onclick = function() {
-                input.remove();
-                output.remove();
-                testCaseIdInput.remove();
-                removeButton.remove();
+                testCaseContainer.remove();
                 isFormDirty = true;
             };
 
-            testCasesDiv.insertBefore(input, testCasesDiv.lastElementChild);
-            testCasesDiv.insertBefore(output, testCasesDiv.lastElementChild);
-            testCasesDiv.insertBefore(testCaseIdInput, testCasesDiv.lastElementChild);
-            testCasesDiv.insertBefore(removeButton, testCasesDiv.lastElementChild);
+            testCaseContainer.appendChild(input);
+            testCaseContainer.appendChild(output);
+            testCaseContainer.appendChild(testCaseIdInput);
+            testCaseContainer.appendChild(removeButton);
+            testCasesDiv.insertBefore(testCaseContainer, testCasesDiv.lastElementChild);
+
             isFormDirty = true;
             console.log('addTestCase:', { inputText, outputText, testCaseId }); // Log the added test case
         }
@@ -381,6 +392,7 @@ session_start();
                     data.forEach(question => {
                         addQuestion();
                         document.getElementById(`question_id_${questionCount}`).value = question.question_id;
+                        document.getElementById(`display_question_id_${questionCount}`).textContent = question.question_id;
                         document.getElementById(`question_text_${questionCount}`).value = question.question_text;
                         document.getElementById(`question_type_${questionCount}`).value = question.question_type;
                         document.getElementById(`answer_type_${questionCount}`).value = question.answer_type;
@@ -412,6 +424,7 @@ session_start();
                 });
         });
 
+
         // Function to fetch and display deleted questions
         function viewDeletedQuestions() {
             const assessmentId = "<?php echo htmlspecialchars($_GET['assessment_id']); ?>";
@@ -422,9 +435,9 @@ session_start();
                     if (data.length > 0) {
                         deletedQuestionsTableBody.innerHTML = data.map(question => `
                             <tr>
-                                <td><input type="checkbox" name="restore_questions[]" value="${question.question_id}"></td>
+                                <td><input type="checkbox" class="selectDeletedQuestion" name="restore_questions[]" value="${question.question_id}"></td>
                                 <td>${question.question_id}</td>
-                                <td>${question.question_text}</td>
+                                <td class="editable">${question.question_text}</td>
                                 <td>${question.question_type || 'N/A'}</td>
                                 <td>${question.answer_type || 'N/A'}</td>
                                 <td>${question.correct_answer || 'N/A'}</td>
@@ -494,6 +507,35 @@ session_start();
 
                     // Add sort functionality
                     document.querySelectorAll('#deleted-questions-popup th[data-column]').forEach(th => {
+                        th.addEventListener('mouseenter', function() {
+                            const tooltip = document.createElement('div');
+                            tooltip.className = 'tooltip';
+                            tooltip.textContent = 'Click to sort';
+                            tooltip.style.position = 'absolute';
+                            tooltip.style.background = 'var(--popup-background-color)';
+                            tooltip.style.color = 'var(--text-color)';
+                            tooltip.style.padding = '5px';
+                            tooltip.style.borderRadius = '5px';
+                            tooltip.style.fontSize = '12px';
+                            tooltip.style.top = '100%';
+                            tooltip.style.left = '50%';
+                            tooltip.style.transform = 'translateX(-50%)';
+                            tooltip.style.whiteSpace = 'nowrap';
+                            tooltip.style.zIndex = '1000';
+                            tooltip.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
+                            tooltip.style.opacity = '1';
+                            tooltip.style.visibility = 'visible';
+                            tooltip.style.pointerEvents = 'none';
+                            this.appendChild(tooltip);
+                        });
+
+                        th.addEventListener('mouseleave', function() {
+                            const tooltip = this.querySelector('.tooltip');
+                            if (tooltip) {
+                                tooltip.remove();
+                            }
+                        });
+
                         th.addEventListener('click', function() {
                             const column = this.getAttribute('data-column');
                             const order = this.dataset.order = -(this.dataset.order || -1);
@@ -508,6 +550,28 @@ session_start();
                             // Update chevron
                             document.querySelectorAll('#deleted-questions-popup th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
                             this.classList.add(order === 1 ? 'asc' : 'desc');
+                        });
+                    });
+
+                    // Add shift-click selection for deleted questions
+                    let lastDeletedChecked = null;
+                    document.querySelectorAll('.selectDeletedQuestion').forEach(function(checkbox) {
+                        checkbox.addEventListener('click', function(event) {
+                            if (!lastDeletedChecked) {
+                                lastDeletedChecked = this;
+                                return;
+                            }
+
+                            if (event.shiftKey) {
+                                let checkboxes = Array.from(document.querySelectorAll('.selectDeletedQuestion'));
+                                let start = checkboxes.indexOf(this);
+                                let end = checkboxes.indexOf(lastDeletedChecked);
+
+                                checkboxes.slice(Math.min(start, end), Math.max(start, end) + 1)
+                                    .forEach(checkbox => checkbox.checked = lastDeletedChecked.checked);
+                            }
+
+                            lastDeletedChecked = this;
                         });
                     });
                 });
@@ -562,6 +626,10 @@ session_start();
                 --button-hover-color: #80bdff; /* Lighter Blue */
                 --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
                 --popup-border-color: #444; /* Slightly Lighter Dark Grey */
+                --danger-color: #dc3545; /* Red */
+                --danger-hover-color: #c82333; /* Darker Red */
+                --success-color: #28a745; /* Green */
+                --success-hover-color: #218838; /* Darker Green */
             }
 
             /* General Styles */
@@ -581,6 +649,14 @@ session_start();
                 justify-content: space-between;
                 align-items: center;
                 margin-bottom: 10px;
+            }
+
+            .header-controls p {
+                margin: 0;
+            }
+
+            .header-controls button {
+                margin-left: 20px;
             }
 
             .action-controls {
@@ -658,6 +734,37 @@ session_start();
                 color: var(--hover-text-color);
             }
 
+            button.danger {
+                background-color: var(--danger-color);
+            }
+
+            button.danger:hover {
+                background-color: var(--danger-hover-color);
+            }
+
+            button.success {
+                background-color: var(--success-color);
+            }
+
+            button.success:hover {
+                background-color: var(--success-hover-color);
+            }
+
+            button.remove-icon {
+                background: none;
+                border: none;
+                color: var(--danger-color);
+                font-size: 16px;
+                cursor: pointer;
+                margin-left: 10px;
+                vertical-align: middle;
+            }
+
+            button.remove-icon:hover {
+                color: var(--danger-hover-color);
+            }
+
+
             /* Table */
             table {
                 width: 100%;
@@ -685,7 +792,7 @@ session_start();
             }
 
             tr:hover {
-                background-color: var (--hover-background-color);
+                background-color: var(--hover-background-color);
                 color: var(--hover-text-color);
             }
 
@@ -707,7 +814,7 @@ session_start();
 
             th[data-column].desc::after {
                 display: inline-block;
-                border-top-color: var (--text-color);
+                border-top-color: var(--text-color);
             }
 
             th[data-column]:hover.asc::after {
@@ -759,6 +866,54 @@ session_start();
                 color: var(--accent-color); /* Use a less prominent color for hover */
                 transform: scale(1.1); /* Slightly enlarge the button on hover */
                 background: none; /* Ensure no background color on hover */
+            }
+
+            /* Input Fields and Dropdowns */
+            input[type="text"], textarea, select {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 10px;
+                border: 1px solid var(--border-color);
+                border-radius: 5px;
+                background-color: var(--secondary-color);
+                color: var(--text-color);
+                transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+            }
+
+            input[type="text"]:hover, textarea:hover, select:hover {
+                border-color: var(--primary-color);
+            }
+
+            textarea {
+                resize: vertical;
+            }
+
+            /* Dropdown Container */
+            .dropdown-container {
+                display: flex;
+                justify-content: space-between;
+                gap: 20px;
+                margin-bottom: 10px;
+            }
+
+            .dropdown-item {
+                flex: 1;
+            }
+
+            /* Choice and Test Case Containers */
+            .choice-container, .test-case-container {
+                display: flex;
+                align-items: center;
+                margin-bottom: 10px;
+            }
+
+            .choice-container input, .test-case-container textarea {
+                flex-grow: 1;
+            }
+
+            /* Spacing */
+            .form-group {
+                margin-bottom: 20px;
             }
         </style>
 </head>
@@ -826,7 +981,10 @@ session_start();
     </header>    
         <main>
         <h1>Edit Questions for Assessment</h1>
-        <p>Assessment ID: <strong><?php echo htmlspecialchars($_GET['assessment_id']); ?></strong></p>
+        <div class="header-controls">
+            <p>Assessment ID: <strong><?php echo htmlspecialchars($_GET['assessment_id']); ?></strong></p>
+            <button type="button" onclick="viewDeletedQuestions()">View Deleted Questions</button>
+        </div>
         <?php
         if (isset($_SESSION['success_message'])) {
             echo '<p class="success-message">' . $_SESSION['success_message'] . '</p>';
@@ -837,14 +995,12 @@ session_start();
             unset($_SESSION['error_message']);
         }
         ?>
-        <button type="button" onclick="viewDeletedQuestions()">View Deleted Questions</button>
-
         <div id="deleted-questions-popup">
             <div class="header-controls">
                 <h3>Deleted Questions</h3>
             </div>
             <div class="action-controls">
-                <button type="button" onclick="restoreSelectedQuestions()">Restore Selected Questions</button>
+                <button type="button" class="success" onclick="restoreSelectedQuestions()">Restore Selected Questions</button>
                 <div class="deleted-search-container">
                     <div class="search-field-container">
                         <input type="text" id="searchDeletedQuestions" placeholder="Search...">
@@ -877,7 +1033,7 @@ session_start();
             <input type="hidden" name="assessment_id" value="<?php echo htmlspecialchars($_GET['assessment_id']); ?>">
             <div id="questions"></div>
             <button type="button" onclick="addQuestion()">Add Question</button>
-            <button type="button" onclick="saveAssessment()">Save Assessment</button>
+            <button type="button" class="success" onclick="saveAssessment()">Save Assessment</button>
         </form>
     </main>
     
