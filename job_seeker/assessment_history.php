@@ -229,9 +229,10 @@ $conn->close();
                             <p><?php echo htmlspecialchars($assessment['score']); ?></p>
                         </div>
                         <div class="actions">
-                            <a href="#" title="Download">Download</a>
-                            <a href="#" title="Share"><i class="fas fa-share-square"></i> Share</a> 
+                            <a href="download_assessment_history_report.php?assessment_id=<?php echo urlencode($assessment['assessment_id']); ?>" title="Download">Download</a>
+                            <a href="#" title="Share"><i class="fas fa-share-square"></i> Share</a>
                         </div>
+
                     </div>
 
 
