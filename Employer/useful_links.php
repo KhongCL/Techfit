@@ -77,27 +77,37 @@ session_write_close();
     <section id="resources">
         <h2>Useful Links</h2>
         <p>Here are some useful links to help you get started on your career in IT:</p>
-    
+
         <div class="resource-columns">
             <div class="resource-column">
                 <h3>For Job Seekers</h3>
                 <ul>
-                    <li><a href="https://www.upwork.com/">Upwork</a></li>
-                    <li><a href="https://www.linkedin.com/">LinkedIn</a></li>
-                    <li><a href="https://www.foundit.my/">foundit</a></li>
-                    <li><a href="https://malaysia.indeed.com/">Indeed</a></li>
-                    <li><a href="https://www.flexjobs.com/">FlexJobs</a></li>
+                    <?php 
+                    $jobSeekerLinks = array_filter($usefulLinks, fn($link) => $link['category'] === 'jobSeeker');
+                    if ($jobSeekerLinks):
+                        foreach ($jobSeekerLinks as $link): ?>
+                            <li><a href="<?= htmlspecialchars($link['link']) ?>"><?= htmlspecialchars($link['title']) ?></a></li>
+                        <?php endforeach;
+                        
+                    else: ?>
+                        <li style="color: grey; font-style: italic;">No useful links yet for this category.</li>
+                    <?php endif; ?>
                 </ul>
             </div>
-    
+
             <div class="resource-column">
                 <h3>For Employers</h3>
                 <ul>
-                    <li><a href="https://www.hired.com/">Hired</a></li>
-                    <li><a href="https://www.workable.com/">Workable</a></li>
-                    <li><a href="https://www.greenhouse.io/">Greenhouse</a></li>
-                    <li><a href="https://www.wayup.com/">WayUp</a></li>
-                    <li><a href="https://www.techcareers.com/">TechCareers</a></li>
+                    <?php 
+                    $employerLinks = array_filter($usefulLinks, fn($link) => $link['category'] === 'employer');
+                    if ($employerLinks):
+                        foreach ($employerLinks as $link): ?>
+                            <li><a href="<?= htmlspecialchars($link['link']) ?>"><?= htmlspecialchars($link['title']) ?></a></li>
+                        <?php endforeach;
+                    else: ?>
+                        <li style="color: grey; font-style: italic;">No useful links yet for this category.</li>
+                        <li style="height: 149px;"></li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
