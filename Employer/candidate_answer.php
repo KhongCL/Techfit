@@ -161,16 +161,26 @@ session_start();
             margin-top: 30px; /* Space from the header */
             margin-bottom: 15px; /* Space from the footer */
         }
+        /* Existing styles... */
         .score-time {
             position: absolute;
             top: 100px; /* Adjust as needed */
             right: -120px; /* Adjust as needed */
             text-align: right;
+            display: flex;
+            flex-direction: column; /* Stack elements vertically */
+            align-items: flex-end; /* Align items to the right */
         }
         .score-time .score, .score-time .time-used {
             font-size: 18px;
             font-weight: bold;
             margin-bottom: 10px;
+        }
+        .score-time .divider {
+            width: 100%; /* Full width */
+            height: 2px; /* Adjust height as needed */
+            background-color: #ccc;
+            margin: 10px 0; /* Adjust spacing as needed */
         }
     </style>
 </head>
@@ -343,6 +353,7 @@ session_start();
             ?>
             <div class="score-time">
                 <div class="score">Score: <?php echo $score; ?></div>
+                <div class="divider"></div>
                 <div class="time-used">Time Used: <?php echo $time_used; ?></div>
             </div>
         </div>
