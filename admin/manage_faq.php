@@ -91,65 +91,56 @@ $faqs = $result->fetch_all(MYSQLI_ASSOC);
 </head>
 <header>
         <div class="logo">
-            <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+            <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
         <nav>
             <div class="nav-container">
+                <ul class="nav-list">
+                    <li><a href="#">Assessment</a>
+                        <ul class="dropdown">
+                            <li><a href="start_assessment.php">Start Assessment</a></li>
+                            <li><a href="assessment_history.php">Assessment History</a></li>
+                            <li><a href="assessment_summary.php">Assessment Summary</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Resources</a>
+                        <ul class="dropdown">
+                            <li><a href="useful_links.php">Useful Links</a></li>
+                            <li><a href="faq.php">FAQ</a></li>
+                            <li><a href="sitemap.php">Sitemap</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="about.php">About</a></li>
+                    <li>
+                        <a href="#" id="profile-link">
+                            <div class="profile-info">
+                                <span class="username" id="username">
+                                    <?php
+                                    // Check if the user is logged in and display their username
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  // Display the username from session
+                                    } else {
+                                        echo "Guest";  // Default if not logged in
+                                    }
+                                    ?>
+                                </span>
+                                <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
+                            </div>
+                        </a>
+                        <ul class="dropdown" id="profile-dropdown">
+                            <li><a href="profile.php">Settings</a></li>
+                            <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
                 <div class="hamburger" id="hamburger">
                     <span></span>
                     <span></span>
                     <span></span>
                 </div>
-                <ul class="nav-list">
-                    <li><a href="#">Assessments</a>
-                        <ul class="dropdown">
-                            <li><a href="create_assessment.html">Create New Assessment</a></li>
-                            <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                            <li><a href="view_assessment_results.html">View Assessment Results</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#">Users</a>
-                        <ul class="dropdown">
-                            <li><a href="manage_users.php">Manage Users</a></li>
-                            <li><a href="user_feedback.html">User Feedback</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#">Reports</a>
-                        <ul class="dropdown">
-                            <li><a href="assessment_performance.html">Assessment Performance</a></li>
-                            <li><a href="user_engagement.html">User Engagement Statistics</a></li>
-                            <li><a href="feedback_analysis.html">Feedback Analysis</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#">Resources</a>
-                        <ul class="dropdown">
-                            <li><a href="useful_links.html">Manage Useful Links</a></li>
-                            <li><a href="faq.html">Manage FAQs</a></li>
-                            <li><a href="sitemap.html">Manage Sitemap</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="about.html">About</a></li>
-                    <li>
-                        <a href="#" id="profile-link">
-                            <div class="profile-info">
-                                <span class="username" id="username">Admin</span>
-                                <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
-                            </div>
-                        </a>
-                        <ul class="dropdown" id="profile-dropdown">
-                            <li><a href="settings.html">Settings</a>
-                                <ul class="dropdown">
-                                    <li><a href="manage_profile.html">Manage Profile</a></li>
-                                    <li><a href="system_configuration.html">System Configuration Settings</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="logout.html">Logout</a></li>
-                        </ul>
-                    </li>                    
-                </ul>
             </div>
         </nav>
-    </header>  
+    </header>
 <body>
     <h1 style="text-align: center; padding-top: 60px;">Manage FAQs</h1>
     <form id="faqForm">

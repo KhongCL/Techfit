@@ -262,13 +262,19 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
     <script src="scripts.js"></script>
     <script>
         function submitSitemap() {
+            const submitButton = document.querySelector('button[type="button"]');
+            submitButton.disabled = true; // Disable the button to prevent multiple submissions
             const formData = new FormData(document.getElementById('faqForm'));
             fetch('manage_sitemap.php', { method: 'POST', body: formData })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    if (data.status === 'success') location.reload();
-                });
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.status === 'success') location.reload();
+                else submitButton.disabled = false; // Re-enable the button if there was an error
+            })
+            .catch(() => {
+                submitButton.disabled = false; // Re-enable the button if there was an error
+            });
         }
         function editSitemap(id) {
             // Find the Sitemap item using the data-id attribute

@@ -279,14 +279,21 @@ $usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
     <script src="scripts.js"></script>
     <script>
         function submitUsefulLink() {
+            const submitButton = document.getElementById('submitBtn');
+            submitButton.disabled = true; // Disable the button to prevent multiple submissions
             const formData = new FormData(document.getElementById('faqForm'));
             fetch('manage_useful_links.php', { method: 'POST', body: formData })
                 .then(response => response.json())
                 .then(data => {
                     alert(data.message);
                     if (data.status === 'success') location.reload();
+                    else submitButton.disabled = false; // Re-enable the button if there was an error
+                })
+                .catch(() => {
+                    submitButton.disabled = false; // Re-enable the button if there was an error
                 });
         }
+        
         function editUsefulLink(id) {
             const usefulLinkItem = document.querySelector(`.faq-item[data-id="${id}"]`);
             const title = usefulLinkItem.querySelector('strong:nth-of-type(1)').nextSibling.textContent.trim();
