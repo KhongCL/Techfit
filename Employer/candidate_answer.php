@@ -122,6 +122,66 @@ session_start();
         .candidate-info .details a:hover {
             text-decoration: underline;
         }
+        .assessment-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            position: relative;
+            left: -50px; /* Move the title 50px to the left */
+        }
+        .assessment-dropdown {
+            position: relative;
+            left: 150px; /* Position the dropdown 150px to the right of the title */
+            margin-top: -30px; /* Adjust the vertical alignment */
+        }
+        .questions-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 50px;
+            margin-left: -670px; /* Align to the left but not beyond the divider */
+        }
+        .questions-container {
+            margin-top: 10px;
+            margin-left: 190px; /* Align to the left but not beyond the divider */
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            max-width: 70%; /* Reduce the size of the container */
+        }
+        .middle-section::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 150px; /* Move the divider 20px to the left */
+            bottom: 0;
+            width: 4px; /* Increase the thickness of the divider */
+            background-color: #ccc;
+            margin-top: 30px; /* Space from the header */
+            margin-bottom: 15px; /* Space from the footer */
+        }
+        /* Existing styles... */
+        .score-time {
+            position: absolute;
+            top: 100px; /* Adjust as needed */
+            right: -120px; /* Adjust as needed */
+            text-align: right;
+            display: flex;
+            flex-direction: column; /* Stack elements vertically */
+            align-items: flex-end; /* Align items to the right */
+        }
+        .score-time .score, .score-time .time-used {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .score-time .divider {
+            width: 100%; /* Full width */
+            height: 2px; /* Adjust height as needed */
+            background-color: #ccc;
+            margin: 10px 0; /* Adjust spacing as needed */
+        }
     </style>
 </head>
 <body>
@@ -175,7 +235,57 @@ session_start();
     </div>
 
     <div class="container">
-        <div class="main-content">
+        <div class="main-content middle-section">
+            <div class="assessment-title">Assessment</div>
+            <div class="assessment-dropdown">
+                <select id="assessment-select" onchange="updateAssessment()">
+                    <?php
+                    // Database connection
+                    $servername = "localhost";
+                    $username = "root";
+                    $password = "";
+                    $dbname = "techfit";
+
+                    $conn = new mysqli($servername, $username, $password, $dbname);
+
+                    if ($conn->connect_error) {
+                        die("Connection failed: " . $conn->connect_error);
+                    }
+
+                    if (!isset($_SESSION['employer_id'])) {
+                        die("Employer not logged in.");
+                    }
+
+                    $job_seeker_id = $_GET['job_seeker_id'];
+                    $assessment_id = isset($_GET['assessment_id']) ? $_GET['assessment_id'] : null;
+
+                    $sql = "SELECT aj.assessment_id, aa.assessment_name 
+                            FROM Assessment_Job_Seeker aj
+                            JOIN Assessment_Admin aa ON aj.assessment_id = aa.assessment_id
+                            WHERE aj.job_seeker_id = '$job_seeker_id'";
+                    $result = $conn->query($sql);
+
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            $selected = ($row['assessment_id'] == $assessment_id) ? 'selected' : '';
+                            echo "<option value='" . $row['assessment_id'] . "' $selected>" . $row['assessment_name'] . "</option>";
+                        }
+                    } else {
+                        echo "<option>No assessments found</option>";
+                    }
+
+                    $conn->close();
+                    ?>
+                </select>
+            </div>
+            <div class="questions-title">Questions</div>
+            <div class="questions-container">
+                <!-- Questions content will go here -->
+                 Test Question 1<br>
+                 Test Question 2<br>
+                 Test Question 3<br>
+                 Test Question 4<br>
+            </div>
             <?php
             // Database connection
             $servername = "localhost";
@@ -194,6 +304,7 @@ session_start();
             }
 
             $job_seeker_id = $_GET['job_seeker_id'];
+            $assessment_id = isset($_GET['assessment_id']) ? $_GET['assessment_id'] : null;
 
             $sql = "SELECT u.first_name, u.last_name, js.education_level, js.year_of_experience, js.linkedin_link 
                     FROM User u
@@ -218,8 +329,33 @@ session_start();
                 echo "<h1>Candidate not found</h1>";
             }
 
+            // Fetch score and time used
+            if ($assessment_id) {
+                $sql = "SELECT score, TIMEDIFF(end_time, start_time) AS time_used 
+                        FROM Assessment_Job_Seeker 
+                        WHERE job_seeker_id = '$job_seeker_id' AND assessment_id = '$assessment_id'";
+                $result = $conn->query($sql);
+
+                if ($result->num_rows > 0) {
+                    $row = $result->fetch_assoc();
+                    $score = $row['score'];
+                    $time_used = $row['time_used'];
+                } else {
+                    $score = "N/A";
+                    $time_used = "N/A";
+                }
+            } else {
+                $score = "N/A";
+                $time_used = "N/A";
+            }
+
             $conn->close();
             ?>
+            <div class="score-time">
+                <div class="score">Score: <?php echo $score; ?></div>
+                <div class="divider"></div>
+                <div class="time-used">Time Used: <?php echo $time_used; ?></div>
+            </div>
         </div>
     </div>
 
@@ -287,6 +423,14 @@ session_start();
 
         function logoutUser() {
             window.location.href = '/Techfit'; // Redirect to the root directory
+        }
+
+        function updateAssessment() {
+            const assessmentSelect = document.getElementById('assessment-select');
+            const selectedAssessmentId = assessmentSelect.value;
+            const urlParams = new URLSearchParams(window.location.search);
+            urlParams.set('assessment_id', selectedAssessmentId);
+            window.location.search = urlParams.toString();
         }
     </script>
 </body>

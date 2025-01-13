@@ -179,8 +179,6 @@ session_start();
                 <button class="active" onclick="showTab('active')">Active</button>
                 <button onclick="showTab('interested')">Interested</button>
                 <button onclick="showTab('uninterested')">Uninterested</button>
-                <button>Reviewed</button>
-                <button class="import">Import Candidates</button>
             </div>
             <table>
                 <thead>

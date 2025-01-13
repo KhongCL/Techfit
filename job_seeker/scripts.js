@@ -92,3 +92,26 @@ document.addEventListener('DOMContentLoaded', function() {
         window.location.href = 'preliminary_questions.html';
     });
 });
+
+function createFaqElement(faq) {
+    const faqItem = document.createElement('div');
+    faqItem.classList.add('faq-item');
+    faqItem.innerHTML = `
+        <button class="faq-question" aria-expanded="false">
+            <span>${faq.question}</span>
+            <span class="dropdown-arrow">&#9660;</span>
+        </button>
+        <div class="faq-answer" aria-hidden="true">
+            <p>${faq.answer}</p>
+        </div>
+    `;
+    return faqItem;
+}
+
+function createLinkElement(link) {
+    const linkElement = document.createElement('a');
+    linkElement.href = link.link; //access link directly
+    linkElement.textContent = link.title || link.link;
+    linkElement.target = "_blank";
+    return linkElement;
+}   

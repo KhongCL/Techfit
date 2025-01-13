@@ -78,8 +78,31 @@ session_write_close();
         <h2>Sitemap</h2>
         <p>Explore the structure of our website:</p>
         <div class="sitemap-container">
-            <img src="images/employer_nav.png" alt="Website Sitemap" class="sitemap-image" />
+            <?php
+            $servername = "localhost";
+            $username = "root";
+            $password = "";
+            $dbname = "techfit";
+
+            $mysqli = new mysqli($servername, $username, $password, $dbname);
+
+            if ($mysqli->connect_error) {
+                die("Database connection failed: " . $mysqli->connect_error);
+            }
+
+            $result = $mysqli->query("SELECT * FROM resource WHERE type = 'sitemap' AND category = 'employer' ORDER BY resource_id DESC LIMIT 1");
+            $sitemap = $result->fetch_assoc();
+
+            if ($sitemap) {
+                echo '<img src="data:image/jpeg;base64,' . base64_encode($sitemap['image']) . '" alt="Website Sitemap" class="sitemap-image" />';
+            } else {
+                echo '<p>No sitemap available for Job Seekers.</p>';
+            }
+
+            $mysqli->close();
+            ?>
         </div>
+        <div style="height: 205px;"></div>
     </section>
 
     <footer>

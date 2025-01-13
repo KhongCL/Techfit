@@ -75,3 +75,43 @@ document.querySelectorAll('.faq-question').forEach(item => {
         }
     });
 });
+
+// Preliminary questions
+document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('agree');
+    checkbox.checked = false;
+
+    const startButton = document.getElementById('start-assessment-button');
+    startButton.disabled = true;
+
+    checkbox.addEventListener('change', function() {
+        startButton.disabled = !this.checked;
+    });
+
+    startButton.addEventListener('click', function() {
+        window.location.href = 'preliminary_questions.html';
+    });
+});
+
+function createFaqElement(faq) {
+    const faqItem = document.createElement('div');
+    faqItem.classList.add('faq-item');
+    faqItem.innerHTML = `
+        <button class="faq-question" aria-expanded="false">
+            <span>${faq.question}</span>
+            <span class="dropdown-arrow">&#9660;</span>
+        </button>
+        <div class="faq-answer" aria-hidden="true">
+            <p>${faq.answer}</p>
+        </div>
+    `;
+    return faqItem;
+}
+
+function createLinkElement(link) {
+    const linkElement = document.createElement('a');
+    linkElement.href = link.link; //access link directly
+    linkElement.textContent = link.title || link.link;
+    linkElement.target = "_blank";
+    return linkElement;
+}   

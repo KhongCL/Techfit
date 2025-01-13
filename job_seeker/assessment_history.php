@@ -188,7 +188,16 @@ $conn->close();
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
-                                <span class="username" id="username">Profile</span>
+                                <span class="username" id="username">
+                                    <?php
+                                    // Check if the user is logged in and display their username
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  // Display the username from session
+                                    } else {
+                                        echo "Guest";  // Default if not logged in
+                                    }
+                                    ?>
+                                </span>
                                 <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
                             </div>
                         </a>
