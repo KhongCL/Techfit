@@ -729,6 +729,7 @@ session_start();
                 transition: background-color 0.3s ease, color 0.3s ease;
                 border-radius: 5px;
                 font-weight: bold;
+                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
             }
 
             button:hover {
@@ -760,10 +761,15 @@ session_start();
                 cursor: pointer;
                 margin-left: 10px;
                 vertical-align: middle;
+                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
             }
 
             button.remove-icon:hover {
                 color: var(--danger-hover-color);
+            }
+
+            button[type="button"] {
+                margin-right: 10px; /* Add horizontal spacing between buttons */
             }
 
 
@@ -872,7 +878,7 @@ session_start();
 
             /* Input Fields and Dropdowns */
             input[type="text"], textarea, select {
-                width: 100%;
+                width: 100%; /* Ensure full width */
                 padding: 10px;
                 margin-bottom: 10px;
                 border: 1px solid var(--border-color);
@@ -880,6 +886,7 @@ session_start();
                 background-color: var(--secondary-color);
                 color: var(--text-color);
                 transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
             }
 
             input[type="text"]:hover, textarea:hover, select:hover {
@@ -890,28 +897,46 @@ session_start();
                 resize: vertical;
             }
 
+            label, textarea, select, input[type="text"], button {
+                margin-bottom: 15px; /* Add vertical spacing */
+            }
+
             /* Dropdown Container */
             .dropdown-container {
                 display: flex;
                 justify-content: space-between;
                 gap: 20px;
-                margin-bottom: 10px;
+                margin-bottom: 15px; /* Add vertical spacing */
                 width: 100%; /* Match the width of the question text input field */
+                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+                padding: 0; /* Remove padding to align with the question text input field */
             }
 
             .dropdown-item {
                 flex: 1;
+                margin: 0; /* Remove margin to align with the question text input field */
+            }
+
+            .dropdown-item select {
+                width: 100%; /* Ensure the dropdowns take the full width of their container */
+                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
             }
 
             /* Choice and Test Case Containers */
             .choice-container, .test-case-container {
                 display: flex;
                 align-items: center;
-                margin-bottom: 10px;
+                margin-bottom: 15px; /* Add vertical spacing */
+                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
             }
 
             .choice-container input, .test-case-container textarea {
                 flex-grow: 1;
+                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+            }
+
+            .test-case-container textarea {
+                margin-right: 10px; /* Add horizontal spacing between test case input and expected output field */
             }
 
             /* Tooltip */
@@ -929,6 +954,7 @@ session_start();
                 white-space: nowrap;
                 z-index: 1000;
                 box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
             }
 
             /* Spacing */

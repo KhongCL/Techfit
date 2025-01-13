@@ -1,3 +1,21 @@
+:root {
+    --primary-color: #007bff; /* Blue */
+    --secondary-color: #1e1e1e; /* Dark Grey */
+    --accent-color: #0056b3; /* Darker Blue */
+    --text-color: #e0e0e0; /* Slightly Darker White */
+    --background-color: #121212; /* Very Dark Grey */
+    --border-color: #333; /* Dark Grey */
+    --hover-background-color: #333; /* Slightly Lighter Dark Grey */
+    --hover-text-color: #fff; /* White */
+    --button-hover-color: #80bdff; /* Lighter Blue */
+    --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
+    --popup-border-color: #444; /* Slightly Lighter Dark Grey */
+    --danger-color: #dc3545; /* Red */
+    --danger-hover-color: #c82333; /* Darker Red */
+    --success-color: #28a745; /* Green */
+    --success-hover-color: #218838; /* Darker Green */
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -1336,7 +1354,6 @@ footer {
     max-width: 1000px;
     margin: 10px auto;
     padding: 40px;
-    background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -1348,15 +1365,15 @@ footer {
 
 #create-assessment-title {
     font-size: 2.0rem;
-    color: #333;
+    color: var(--text-color);
     text-align: center;
     margin-bottom: 20px;
 }
 
 #create-assessment-section {
     width: 100%;
-    background-color: #fff;
     border-radius: 8px;
+    color:var(--popup-background-color);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
 }
@@ -1402,7 +1419,6 @@ footer {
 #submit-button {
     padding: 12px 20px;
     font-size: 1.2rem;
-    color: #fff;
     background-color: #007BFF;
     border: none;
     border-radius: 4px;

@@ -48,34 +48,41 @@ session_write_close();
             const questionDiv = document.createElement('div');
             questionDiv.id = `question-${questionCount}`;
             questionDiv.innerHTML = `
+                <p>Question ${questionCount}:</p>
                 <label for="question_text_${questionCount}">Question Text:</label>
                 <textarea id="question_text_${questionCount}" name="question_text[]" required></textarea><br>
 
-                <label for="question_type_${questionCount}">Question Type:</label>
-                <select id="question_type_${questionCount}" name="question_type[]" required>
-                    <option value="preliminary">Preliminary</option>
-                    <option value="experience">Experience</option>
-                    <option value="employer_score">Employer Score</option>
-                    <option value="detailed">Detailed</option>
-                    <option value="technical">Technical</option>
-                </select><br>
-
-                <label for="answer_type_${questionCount}">Answer Type:</label>
-                <select id="answer_type_${questionCount}" name="answer_type[]" onchange="showAnswerOptions(${questionCount})" required>
-                    <option value="multiple choice">Multiple Choice</option>
-                    <option value="true/false">True/False</option>
-                    <option value="fill in the blank">Fill in the Blank</option>
-                    <option value="essay">Essay</option>
-                    <option value="code">Code</option>
-                </select><br>
+                <div class="dropdown-container">
+                    <div class="dropdown-item">
+                        <label for="question_type_${questionCount}">Question Type:</label>
+                        <select id="question_type_${questionCount}" name="question_type[]" required>
+                            <option value="preliminary">Preliminary</option>
+                            <option value="experience">Experience</option>
+                            <option value="employer_score">Employer Score</option>
+                            <option value="detailed">Detailed</option>
+                            <option value="technical">Technical</option>
+                        </select>
+                    </div>
+                    <div class="dropdown-item">
+                        <label for="answer_type_${questionCount}">Answer Type:</label>
+                        <select id="answer_type_${questionCount}" name="answer_type[]" onchange="showAnswerOptions(${questionCount})" required>
+                            <option value="multiple choice">Multiple Choice</option>
+                            <option value="true/false">True/False</option>
+                            <option value="fill in the blank">Fill in the Blank</option>
+                            <option value="essay">Essay</option>
+                            <option value="code">Code</option>
+                        </select>
+                    </div>
+                </div>
 
                 <div id="answer_options_${questionCount}">
-                    ${getMultipleChoiceOptions(questionCount)}
+                    ${getMultipleChoiceOptions(questionCount, true)}
                 </div>
-                <button type="button" onclick="removeQuestion(${questionCount})">Remove Question</button>
+                <button type="button" class="danger" onclick="removeQuestion(${questionCount})">Remove Question</button>
                 <hr>
             `;
             document.getElementById('questions').appendChild(questionDiv);
+            updateCorrectChoiceDropdown(questionCount); // Ensure the dropdown is updated initially
         }
 
         function removeQuestion(id) {
@@ -83,16 +90,26 @@ session_write_close();
                 const questionDiv = document.getElementById(`question-${id}`);
                 questionDiv.remove();
                 isFormDirty = true;
+                updateQuestionNumbers();
             }
         }
 
-        function showAnswerOptions(id) {
+        function updateQuestionNumbers() {
+            const questionDivs = document.querySelectorAll('div[id^="question-"]');
+            questionDivs.forEach((div, index) => {
+                const questionNumber = index + 1;
+                div.querySelector('p').textContent = `Question ${questionNumber}:`;
+            });
+        }
+
+        function showAnswerOptions(id, includeEmptyChoice = true) {
             const answerType = document.getElementById(`answer_type_${id}`).value;
             const answerOptionsDiv = document.getElementById(`answer_options_${id}`);
             answerOptionsDiv.innerHTML = '';
 
             if (answerType === 'multiple choice') {
-                answerOptionsDiv.innerHTML = getMultipleChoiceOptions(id);
+                answerOptionsDiv.innerHTML = getMultipleChoiceOptions(id, includeEmptyChoice);
+                updateCorrectChoiceDropdown(id); // Ensure the dropdown is updated initially
             } else if (answerType === 'true/false') {
                 answerOptionsDiv.innerHTML = `
                     <label for="true_false_${id}">Answer:</label>
@@ -112,24 +129,34 @@ session_write_close();
                     <textarea id="essay_${id}" name="correct_choice[]" required></textarea>
                 `;
             } else if (answerType === 'code') {
-                answerOptionsDiv.innerHTML = getCodeQuestionOptions(id);
+                answerOptionsDiv.innerHTML = getCodeQuestionOptions(id, includeEmptyChoice);
             }
         }
 
-        function getMultipleChoiceOptions(id) {
-            return `
+        function getMultipleChoiceOptions(id, includeEmptyChoice = true) {
+            let choicesHtml = `
                 <label for="choices_${id}">Choices:</label>
                 <div id="choices_${id}">
-                    <input type="text" name="choices_${id}[]" required>
+            `;
+            if (includeEmptyChoice) {
+                choicesHtml += `
+                    <div class="choice-container">
+                        <input type="text" name="choices_${id}[]" required oninput="updateCorrectChoiceDropdown(${id})">
+                        <button type="button" class="remove-icon" title="Remove Choice" onclick="removeChoice(this, ${id})">&#x2715;</button>
+                    </div>
+                `;
+            }
+            choicesHtml += `
                     <button type="button" onclick="addChoice(${id})">Add Choice</button>
                 </div>
                 <label for="correct_choice_${id}">Correct Choice:</label>
                 <select id="correct_choice_${id}" name="correct_choice[]" required></select>
             `;
+            return choicesHtml;
         }
 
-        function getCodeQuestionOptions(id) {
-            return `
+        function getCodeQuestionOptions(id, includeEmptyTestCase = true) {
+            let testCasesHtml = `
                 <label for="code_language_${id}">Select Language:</label>
                 <select id="code_language_${id}" name="code_language_${id}" required>
                     <option value="python">Python</option>
@@ -143,24 +170,40 @@ session_write_close();
 
                 <label for="test_cases_${id}">Test Cases:</label>
                 <div id="test_cases_${id}">
-                    <textarea name="test_cases_${id}[]" placeholder="Input" required></textarea>
-                    <textarea name="expected_output_${id}[]" placeholder="Expected Output" required></textarea>
+            `;
+            if (includeEmptyTestCase) {
+                testCasesHtml += `
+                    <div class="test-case-container">
+                        <textarea name="test_cases_${id}[]" placeholder="Input" required></textarea>
+                        <textarea name="expected_output_${id}[]" placeholder="Expected Output" required></textarea>
+                        <button type="button" class="remove-icon" title="Remove Test Case" onclick="removeTestCase(this, ${id})">&#x2715;</button>
+                    </div>
+                `;
+            }
+            testCasesHtml += `
                     <button type="button" onclick="addTestCase(${id})">Add Test Case</button>
                 </div>
             `;
+            return testCasesHtml;
         }
 
         function addChoice(id) {
             const choicesDiv = document.getElementById(`choices_${id}`);
             const choiceContainer = document.createElement('div');
+            choiceContainer.className = 'choice-container';
             const input = document.createElement('input');
             input.type = 'text';
             input.name = `choices_${id}[]`;
             input.required = true;
+            input.oninput = function() {
+                updateCorrectChoiceDropdown(id);
+            };
 
             const removeButton = document.createElement('button');
             removeButton.type = 'button';
-            removeButton.textContent = 'Remove Choice';
+            removeButton.className = 'remove-icon';
+            removeButton.innerHTML = '&#x2715;'; // Unicode for 'X' symbol
+            removeButton.title = 'Remove Choice'; // Tooltip text
             removeButton.onclick = function() {
                 choiceContainer.remove();
                 updateCorrectChoiceDropdown(id);
@@ -171,17 +214,16 @@ session_write_close();
             choiceContainer.appendChild(removeButton);
             choicesDiv.insertBefore(choiceContainer, choicesDiv.lastElementChild);
 
-            // Update the correct choice dropdown after adding the new choice
-            input.addEventListener('input', function() {
-                updateCorrectChoiceDropdown(id);
-            });
-
+            // Update the correct choice dropdown
             updateCorrectChoiceDropdown(id);
             isFormDirty = true;
         }
-        
+
         function addTestCase(id) {
             const testCasesDiv = document.getElementById(`test_cases_${id}`);
+            const testCaseContainer = document.createElement('div');
+            testCaseContainer.className = 'test-case-container';
+
             const input = document.createElement('textarea');
             input.name = `test_cases_${id}[]`;
             input.placeholder = 'Input';
@@ -194,17 +236,32 @@ session_write_close();
 
             const removeButton = document.createElement('button');
             removeButton.type = 'button';
-            removeButton.textContent = 'Remove Test Case';
+            removeButton.className = 'remove-icon';
+            removeButton.innerHTML = '&#x2715;'; // Unicode for 'X' symbol
+            removeButton.title = 'Remove Test Case'; // Tooltip text
             removeButton.onclick = function() {
-                input.remove();
-                output.remove();
-                removeButton.remove();
+                testCaseContainer.remove();
                 isFormDirty = true;
             };
 
-            testCasesDiv.insertBefore(input, testCasesDiv.lastElementChild);
-            testCasesDiv.insertBefore(output, testCasesDiv.lastElementChild);
-            testCasesDiv.insertBefore(removeButton, testCasesDiv.lastElementChild);
+            testCaseContainer.appendChild(input);
+            testCaseContainer.appendChild(output);
+            testCaseContainer.appendChild(removeButton);
+            testCasesDiv.insertBefore(testCaseContainer, testCasesDiv.lastElementChild);
+
+            isFormDirty = true;
+        }
+
+        function removeChoice(button, id) {
+            const choiceContainer = button.parentElement;
+            choiceContainer.remove();
+            updateCorrectChoiceDropdown(id);
+            isFormDirty = true;
+        }
+
+        function removeTestCase(button, id) {
+            const testCaseContainer = button.parentElement;
+            testCaseContainer.remove();
             isFormDirty = true;
         }
 
@@ -214,10 +271,12 @@ session_write_close();
             correctChoiceDropdown.innerHTML = '';
 
             choices.forEach((choice, index) => {
-                const option = document.createElement('option');
-                option.value = choice.value;
-                option.text = choice.value;
-                correctChoiceDropdown.appendChild(option);
+                if (choice.value.trim() !== '') { // Only add non-empty choices
+                    const option = document.createElement('option');
+                    option.value = choice.value;
+                    option.text = choice.value;
+                    correctChoiceDropdown.appendChild(option);
+                }
             });
         }
 
@@ -226,20 +285,31 @@ session_write_close();
                 const form = document.getElementById('questions-form');
                 
                 // Client-side validation
-                const questionTexts = form.querySelectorAll('textarea[name="question_text[]"]');
-                const questionTypes = form.querySelectorAll('select[name="question_type[]"]');
-                const answerTypes = form.querySelectorAll('select[name="answer_type[]"]');
-                const correctChoices = form.querySelectorAll('textarea[name="correct_choice[]"], input[name="correct_choice[]"], select[name="correct_choice[]"]');
-                
-                for (let i = 0; i < questionTexts.length; i++) {
-                    if (questionTexts[i].value.trim() === '' || questionTypes[i].value.trim() === '' || answerTypes[i].value.trim() === '' || correctChoices[i].value.trim() === '') {
+                const questionDivs = form.querySelectorAll('div[id^="question-"]');
+                const removedQuestions = form.querySelectorAll('input[name="removed_questions[]"]');
+                const removedQuestionIds = Array.from(removedQuestions).map(input => input.value);
+
+                for (let i = 0; i < questionDivs.length; i++) {
+                    const questionDiv = questionDivs[i];
+                    const questionId = questionDiv.id.split('-')[1];
+
+                    if (removedQuestionIds.includes(questionId)) {
+                        continue; // Skip validation for removed questions
+                    }
+
+                    const questionText = questionDiv.querySelector('textarea[name="question_text[]"]');
+                    const questionType = questionDiv.querySelector('select[name="question_type[]"]');
+                    const answerType = questionDiv.querySelector('select[name="answer_type[]"]');
+                    const correctChoice = questionDiv.querySelector('textarea[name="correct_choice[]"], input[name="correct_choice[]"], select[name="correct_choice[]"]');
+
+                    if (questionText.value.trim() === '' || questionType.value.trim() === '' || answerType.value.trim() === '' || correctChoice.value.trim() === '') {
                         alert('All fields are required.');
                         return;
                     }
 
                     // Additional validation for multiple choice questions
-                    if (answerTypes[i].value === 'multiple choice') {
-                        const choices = form.querySelectorAll(`input[name="choices_${i + 1}[]"]`);
+                    if (answerType.value === 'multiple choice') {
+                        const choices = questionDiv.querySelectorAll(`input[name="choices_${i + 1}[]"]`);
                         for (let choice of choices) {
                             if (choice.value.trim() === '') {
                                 alert('All choice fields are required.');
@@ -249,9 +319,9 @@ session_write_close();
                     }
 
                     // Additional validation for code questions
-                    if (answerTypes[i].value === 'code') {
-                        const testCases = form.querySelectorAll(`textarea[name="test_cases_${i + 1}[]"]`);
-                        const expectedOutputs = form.querySelectorAll(`textarea[name="expected_output_${i + 1}[]"]`);
+                    if (answerType.value === 'code') {
+                        const testCases = questionDiv.querySelectorAll(`textarea[name="test_cases_${i + 1}[]"]`);
+                        const expectedOutputs = questionDiv.querySelectorAll(`textarea[name="expected_output_${i + 1}[]"]`);
                         for (let j = 0; j < testCases.length; j++) {
                             if (testCases[j].value.trim() === '' || expectedOutputs[j].value.trim() === '') {
                                 alert('All test case fields are required.');
@@ -264,8 +334,179 @@ session_write_close();
                 isFormDirty = false;
                 form.submit();
             }
-            }
+        }
     </script>
+
+        <style>
+            /* Color Theme */
+            :root {
+                --primary-color: #007bff; /* Blue */
+                --secondary-color: #1e1e1e; /* Dark Grey */
+                --accent-color: #0056b3; /* Darker Blue */
+                --text-color: #e0e0e0; /* Slightly Darker White */
+                --background-color: #121212; /* Very Dark Grey */
+                --border-color: #333; /* Dark Grey */
+                --hover-background-color: #333; /* Slightly Lighter Dark Grey */
+                --hover-text-color: #fff; /* White */
+                --button-hover-color: #80bdff; /* Lighter Blue */
+                --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
+                --popup-border-color: #444; /* Slightly Lighter Dark Grey */
+                --danger-color: #dc3545; /* Red */
+                --danger-hover-color: #c82333; /* Darker Red */
+                --success-color: #28a745; /* Green */
+                --success-hover-color: #218838; /* Darker Green */
+            }
+
+            /* General Styles */
+            body {
+                font-family: Arial, sans-serif;
+                color: var(--text-color);
+                background-color: var(--background-color);
+            }
+
+            main {
+                padding: 20px;
+            }
+
+            /* Buttons */
+            button {
+                background-color: var(--primary-color);
+                color: var(--text-color);
+                border: none;
+                padding: 10px 20px;
+                cursor: pointer;
+                transition: background-color 0.3s ease, color 0.3s ease;
+                border-radius: 5px;
+                font-weight: bold;
+                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+            }
+
+            button:hover {
+                background-color: var(--button-hover-color);
+                color: var(--hover-text-color);
+            }
+
+            button.danger {
+                background-color: var(--danger-color);
+            }
+
+            button.danger:hover {
+                background-color: var(--danger-hover-color);
+            }
+
+            button.success {
+                background-color: var(--success-color);
+            }
+
+            button.success:hover {
+                background-color: var(--success-hover-color);
+            }
+
+            button.remove-icon {
+                background: none;
+                border: none;
+                color: var(--danger-color);
+                font-size: 16px;
+                cursor: pointer;
+                margin-left: 10px;
+                vertical-align: middle;
+                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+            }
+
+            button.remove-icon:hover {
+                color: var(--danger-hover-color);
+            }
+
+            button[type="button"] {
+                margin-right: 10px; /* Add horizontal spacing between buttons */
+            }
+
+            /* Input Fields and Dropdowns */
+            input[type="text"], textarea, select {
+                width: 100%; /* Ensure full width */
+                padding: 10px;
+                margin-bottom: 10px;
+                border: 1px solid var(--border-color);
+                border-radius: 5px;
+                background-color: var(--secondary-color);
+                color: var(--text-color);
+                transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+            }
+
+            input[type="text"]:hover, textarea:hover, select:hover {
+                border-color: var(--primary-color);
+            }
+
+            textarea {
+                resize: vertical;
+            }
+
+            label, textarea, select, input[type="text"], button {
+                margin-bottom: 15px; /* Add vertical spacing */
+            }
+
+            /* Dropdown Container */
+            .dropdown-container {
+                display: flex;
+                justify-content: space-between;
+                gap: 20px;
+                margin-bottom: 15px; /* Add vertical spacing */
+                width: 100%; /* Match the width of the question text input field */
+                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+                padding: 0; /* Remove padding to align with the question text input field */
+            }
+
+            .dropdown-item {
+                flex: 1;
+                margin: 0; /* Remove margin to align with the question text input field */
+            }
+
+            .dropdown-item select {
+                width: 100%; /* Ensure the dropdowns take the full width of their container */
+                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+            }
+
+            /* Choice and Test Case Containers */
+            .choice-container, .test-case-container {
+                display: flex;
+                align-items: center;
+                margin-bottom: 15px; /* Add vertical spacing */
+                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+            }
+
+            .choice-container input, .test-case-container textarea {
+                flex-grow: 1;
+                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+            }
+
+            .test-case-container textarea {
+                margin-right: 10px; /* Add horizontal spacing between test case input and expected output field */
+            }
+
+            /* Tooltip */
+            button.remove-icon[title]:hover::after {
+                content: attr(title);
+                position: absolute;
+                background: var(--popup-background-color);
+                color: var(--text-color);
+                padding: 5px;
+                border-radius: 5px;
+                font-size: 12px;
+                top: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                white-space: nowrap;
+                z-index: 1000;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+            }
+
+            /* Spacing */
+            .form-group {
+                margin-bottom: 20px;
+            }
+        </style>
 </head>
 <body>
 <header>
@@ -346,7 +587,7 @@ session_write_close();
             <input type="hidden" name="assessment_id" value="<?php echo htmlspecialchars($_GET['assessment_id']); ?>">
             <div id="questions"></div>
             <button type="button" onclick="addQuestion()">Add Question</button>
-            <button type="button" onclick="saveAssessment()">Save Assessment</button>
+            <button type="button" class="success" onclick="saveAssessment()">Save Assessment</button>
         </form>
     </main>
     
