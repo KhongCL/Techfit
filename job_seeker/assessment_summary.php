@@ -166,7 +166,7 @@ $result = $stmt->get_result();
 
 </head>
 <body>
-    <header>
+<header>
         <div class="logo">
             <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
@@ -191,7 +191,16 @@ $result = $stmt->get_result();
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
-                                <span class="username" id="username">Profile</span>
+                                <span class="username" id="username">
+                                    <?php
+                                    // Check if the user is logged in and display their username
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  // Display the username from session
+                                    } else {
+                                        echo "Guest";  // Default if not logged in
+                                    }
+                                    ?>
+                                </span>
                                 <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
                             </div>
                         </a>

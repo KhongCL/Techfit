@@ -53,14 +53,15 @@ CREATE TABLE Assessment_Admin (
 );
 
 CREATE TABLE Assessment_Job_Seeker (
-    assessment_id VARCHAR(5) PRIMARY KEY,
-    job_seeker_id VARCHAR(5) NOT NULL,
-    start_time DATETIME NOT NULL,
-    end_time DATETIME NOT NULL,
-    score FLOAT,
+    assessment_id VARCHAR(5),
+    job_seeker_id VARCHAR(5),
+    start_time DATETIME,
+    end_time DATETIME,
+    score INT,
     summary TEXT,
     feedback TEXT,
-    FOREIGN KEY (assessment_id) REFERENCES Assessment_Admin(assessment_id),
+    PRIMARY KEY (assessment_id, job_seeker_id),
+    FOREIGN KEY (assessment_id) REFERENCES Assessment(assessment_id),
     FOREIGN KEY (job_seeker_id) REFERENCES Job_Seeker(job_seeker_id)
 );
 

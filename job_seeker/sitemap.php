@@ -1,5 +1,87 @@
 <?php
 session_start(); // Start the session to access session variables
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "techfit";
+
+$mysqli = new mysqli($servername, $username, $password, $dbname);
+
+if ($mysqli->connect_error) {
+    die("Database connection failed: " . $mysqli->connect_error);
+}
+
+// Function to Generate Custom Resource IDs
+function generateResourceId($mysqli) {
+    // Fetch the last ID
+    $result = $mysqli->query("SELECT resource_id FROM resource ORDER BY resource_id DESC LIMIT 1");
+    $lastId = $result->fetch_assoc()['resource_id'];
+
+    // Determine the numeric part and increment it
+    $prefix = "R";
+    $newId = 1; // Default for the first entry
+    if ($lastId) {
+        $numericPart = intval(substr($lastId, strlen($prefix)));
+        $newId = $numericPart + 1;
+    }
+
+    // Return the new ID
+    return $prefix . str_pad($newId, 2, "0", STR_PAD_LEFT);
+}
+
+// Handle Add/Edit/Delete Actions
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['action'])) {
+        $action = $_POST['action'];
+        if ($action === 'add') {
+            $title = trim($_POST['title']);
+            $link = trim($_POST['link']);
+            $category = trim($_POST['category']);
+
+            if ($title && $link && $category) {
+                $resourceId = generateResourceId($mysqli);
+                $stmt = $mysqli->prepare("INSERT INTO resource (resource_id, type, title, link, category) VALUES (?, 'usefulLink', ?, ?, ?)");
+                $stmt->bind_param("ssss", $resourceId, $title, $link, $category);
+                $stmt->execute();
+                echo json_encode(['status' => 'success', 'message' => 'Useful link added successfully']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'All fields are required.']);
+            }
+        } elseif ($action === 'edit') {
+            $id = $_POST['id'];
+            $title = trim($_POST['title']);
+            $link = trim($_POST['link']);
+            $category = trim($_POST['category']);
+
+            if ($id && $title && $link && $category) {
+                $stmt = $mysqli->prepare("UPDATE resource SET title = ?, link = ?, category = ? WHERE resource_id = ?");
+                $stmt->bind_param("ssss", $title, $link, $category, $id);
+                $stmt->execute();
+                echo json_encode(['status' => 'success', 'message' => 'Useful link updated successfully']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'All fields are required.']);
+            }
+        } elseif ($action === 'delete') {
+            $id = $_POST['id'];
+            if ($id) {
+                $stmt = $mysqli->prepare("DELETE FROM resource WHERE resource_id = ?");
+                $stmt->bind_param("s", $id);
+                $stmt->execute();
+                echo json_encode(['status' => 'success', 'message' => 'Useful link deleted successfully']);
+            } else {
+                echo json_encode(['status' => 'error', 'message' => 'Invalid ID.']);
+            }
+        }
+        exit;
+    }
+}
+
+// Fetch Useful Links for Display
+$result = $mysqli->query("SELECT * FROM resource WHERE type = 'usefulLink' ORDER BY category, resource_id");
+$usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
 
 // Function to display the message and options
 function displayLoginMessage() {
@@ -103,7 +185,16 @@ session_write_close();
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
-                                <span class="username" id="username">Profile</span>
+                                <span class="username" id="username">
+                                    <?php
+                                    // Check if the user is logged in and display their username
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  // Display the username from session
+                                    } else {
+                                        echo "Guest";  // Default if not logged in
+                                    }
+                                    ?>
+                                </span>
                                 <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
                             </div>
                         </a>
@@ -133,11 +224,33 @@ session_write_close();
         <h2>Sitemap</h2>
         <p>Explore the structure of our website:</p>
         <div class="sitemap-container">
-            <img src="images/job_seeker_nav.png" alt="Website Sitemap" class="sitemap-image" />
+            <?php
+            $servername = "localhost";
+            $username = "root";
+            $password = "";
+            $dbname = "techfit";
+
+            $mysqli = new mysqli($servername, $username, $password, $dbname);
+
+            if ($mysqli->connect_error) {
+                die("Database connection failed: " . $mysqli->connect_error);
+            }
+
+            $result = $mysqli->query("SELECT * FROM resource WHERE type = 'sitemap' AND category = 'jobSeeker' ORDER BY resource_id DESC LIMIT 1");
+            $sitemap = $result->fetch_assoc();
+
+            if ($sitemap) {
+                echo '<img src="data:image/jpeg;base64,' . base64_encode($sitemap['image']) . '" alt="Website Sitemap" class="sitemap-image" />';
+            } else {
+                echo '<p>No sitemap available for Job Seekers.</p>';
+            }
+
+            $mysqli->close();
+            ?>
         </div>
+        <div style="height: 205px;"></div>
     </section>
          
-    
     <footer>
         <div class="footer-content">
             <div class="footer-left">
