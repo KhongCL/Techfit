@@ -32,53 +32,141 @@ if (!isset($_SESSION['job_seeker_id'])) {
 session_write_close();
 ?>
 
+<?php
+session_start(); // Start the session
+
+// Database connection
+$host = 'localhost';
+$username = 'root';
+$password = '';
+$database = 'techfit';
+
+$conn = new mysqli($host, $username, $password, $database);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Retrieve job seeker ID from session
+$job_seeker_id = $_SESSION['job_seeker_id'];
+
+// Fetch assessment summaries for the job seeker
+$sql = "
+    SELECT Assessment_Job_Seeker.end_time AS assessment_date, 
+    COUNT(Question.question_id) AS number_of_questions, 
+    SUM(CASE WHEN Answer.is_correct = TRUE THEN 1 ELSE 0 END) AS correct_answers,
+    SUM(CASE WHEN Answer.is_correct = FALSE THEN 1 ELSE 0 END) AS wrong_answers,
+    Assessment_Job_Seeker.score
+    FROM Assessment_Job_Seeker
+    JOIN Question ON Question.assessment_id = Assessment_Job_Seeker.assessment_id
+    LEFT JOIN Answer ON Answer.job_seeker_id = Assessment_Job_Seeker.job_seeker_id AND Answer.question_id = Question.question_id
+    WHERE Assessment_Job_Seeker.job_seeker_id = ?
+    GROUP BY Assessment_Job_Seeker.assessment_id
+    ORDER BY Assessment_Job_Seeker.end_time DESC";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $job_seeker_id);
+$stmt->execute();
+$result = $stmt->get_result();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us - TechFit</title>
+    <title>TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #1e1e1e;
-            padding: 20px;
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Full viewport height */
+            margin: 0;
+        }
+
+        header {
+            flex-shrink: 0; /* Header stays at the top */
+        }
+
+        #assessment-summary {
+            flex-grow: 1; /* Main section grows to fill space between header and footer */
+            margin: 20px 0; /* Optional spacing around the container */
+            background-color: #f8f8f8;
+            padding: 20px 0;
+        }
+
+        .container_a_s {
+            width: 90%;
+            max-width: 800px;
+            margin: auto; /* Center horizontally */
+            background-color: #fff;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
         }
-        .popup h2 {
-            color: #fff;
+
+        .summary_header {
+            padding: 20px;
+            text-align: left;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+            border-bottom: 2px solid #ddd;
         }
-        .popup button {
+
+        .scrollable {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .summary-item h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .summary-item p {
+            margin: 5px 0;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .summary-details {
+            flex-grow: 1;
+        }
+
+        .view-answers-button {
+            display: inline-block;
             padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .popup .close-button {
-            background-color: #dc3545;
-            color: #fff;
-        }
-        .popup .cancel-button {
             background-color: #007bff;
             color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
         }
-        .popup .close-button:hover {
-            background-color: #c82333;
-        }
-        .popup .cancel-button:hover {
+
+        .view-answers-button:hover {
             background-color: #0056b3;
         }
     </style>
+
 </head>
 <body>
-    <header>
+<header>
         <div class="logo">
             <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
@@ -103,7 +191,16 @@ session_write_close();
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
-                                <span class="username" id="username">Profile</span>
+                                <span class="username" id="username">
+                                    <?php
+                                    // Check if the user is logged in and display their username
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  // Display the username from session
+                                    } else {
+                                        echo "Guest";  // Default if not logged in
+                                    }
+                                    ?>
+                                </span>
                                 <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
                             </div>
                         </a>
@@ -129,10 +226,27 @@ session_write_close();
         <button class="cancel-button" onclick="closePopup('logout-popup')">No</button>
     </div>
 
-    <section id="home">
-        <h2>Assessment Summary</h2>
-        <p>Bridging the Gap Between IT Talent and Top Employers.</p>
-        
+    <section id="assessment-summary">
+        <div class="container_a_s">
+            <div class="summary_header">Assessment Summary</div>
+            <div class="scrollable">
+                <?php if ($result->num_rows > 0): ?>
+                    <?php while ($row = $result->fetch_assoc()): ?>
+                        <div class="summary-item">
+                            <div class="summary-details">
+                                <h3>Date: <?= date('d/m/Y', strtotime($row['assessment_date'])); ?></h3>
+                                <p>Score: <?= $row['score']; ?></p>
+                                <p>Correct answers: <?= $row['correct_answers']; ?></p>
+                                <p>Wrong answers: <?= $row['wrong_answers']; ?></p>
+                            </div>
+                            <a href="view_answers.php?assessment_date=<?= urlencode($row['assessment_date']); ?>" class="view-answers-button">View answers</a>
+                        </div>
+                    <?php endwhile; ?>
+                <?php else: ?>
+                    <p>No assessments found.</p>
+                <?php endif; ?>
+            </div>
+        </div>
     </section>
 
     <footer>

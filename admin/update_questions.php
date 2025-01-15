@@ -201,6 +201,15 @@ foreach ($_POST['question_id'] as $index => $question_id) {
     }
 }
 
+// Update the last_modified column in the Assessment_Admin table
+$update_last_modified_sql = "UPDATE Assessment_Admin SET last_modified = NOW() WHERE assessment_id = ?";
+$update_last_modified_stmt = $conn->prepare($update_last_modified_sql);
+$update_last_modified_stmt->bind_param("s", $_POST['assessment_id']);
+if (!$update_last_modified_stmt->execute()) {
+    $response['success'] = false;
+    $response['error'] = $update_last_modified_stmt->error;
+}
+
 $stmt->close();
 $conn->close();
 

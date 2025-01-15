@@ -1,3 +1,21 @@
+:root {
+    --primary-color: #007bff; /* Blue */
+    --secondary-color: #1e1e1e; /* Dark Grey */
+    --accent-color: #0056b3; /* Darker Blue */
+    --text-color: #e0e0e0; /* Slightly Darker White */
+    --background-color: #121212; /* Very Dark Grey */
+    --border-color: #333; /* Dark Grey */
+    --hover-background-color: #333; /* Slightly Lighter Dark Grey */
+    --hover-text-color: #fff; /* White */
+    --button-hover-color: #80bdff; /* Lighter Blue */
+    --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
+    --popup-border-color: #444; /* Slightly Lighter Dark Grey */
+    --danger-color: #dc3545; /* Red */
+    --danger-hover-color: #c82333; /* Darker Red */
+    --success-color: #28a745; /* Green */
+    --success-hover-color: #218838; /* Darker Green */
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -1123,6 +1141,7 @@ footer {
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s;
+    border-bottom: none;
 }
 
 .faq-item:hover {
@@ -1172,6 +1191,127 @@ footer {
     padding: 10px 20px;
 }
 
+#manage_faq_button {
+    display: inline-block; /* Makes it behave like a block element but inline */
+    padding: 10px 20px;
+    background-color: #4CAF50; /* Green */
+    color: white;
+    text-decoration: none; /* Remove underline */
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+#manage_faq_button:hover {
+    background-color: #45a049; /* Darker green on hover */
+}
+
+/* Optional: Center the button */
+.faq-button-container {
+    text-align: center; /* Centers the content within the container */
+    margin-top: 20px; /* Adds some spacing above the button */
+}
+
+/* Form Styling */
+form#faqForm {
+    max-width: 600px;
+    margin: 0 auto 40px;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+form#faqForm label {
+    font-weight: bold;
+    display: block;
+    margin: 10px 0 5px;
+}
+
+form#faqForm textarea,
+form#faqForm select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+form#faqForm textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+form#faqForm button {
+    display: block;
+    margin: 20px auto 0;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+form#faqForm button:hover {
+    background-color: #45a049;
+}
+
+.faq-category {
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.faq-category h3 {
+    font-size: 20px;
+    color: #555;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+}
+
+.faq-item strong {
+    color: #222;
+}
+
+.faq-item button {
+    margin: 10px 5px 0 0;
+    padding: 6px 12px;
+    font-size: 14px;
+    color: #fff;
+    background-color: #007BFF;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.faq-item button:hover {
+    background-color: #0056b3;
+}
+
+.faq-item button:nth-child(2) {
+    background-color: #dc3545;
+}
+
+.faq-item button:nth-child(2):hover {
+    background-color: #c82333;
+}
+
+/* Empty State Message */
+.faq-category p {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    margin: 10px 0;
+}
+
 @media (max-width: 768px) {
     #faq {
         padding: 20px;
@@ -1208,6 +1348,7 @@ footer {
         padding: 10px 20px;
     }
 }
+
 /* Sitemap Styles */
 #sitemap {
     width: 100%;
@@ -1336,7 +1477,6 @@ footer {
     max-width: 1000px;
     margin: 10px auto;
     padding: 40px;
-    background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -1348,15 +1488,15 @@ footer {
 
 #create-assessment-title {
     font-size: 2.0rem;
-    color: #333;
+    color: var(--text-color);
     text-align: center;
     margin-bottom: 20px;
 }
 
 #create-assessment-section {
     width: 100%;
-    background-color: #fff;
     border-radius: 8px;
+    color:var(--popup-background-color);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
 }
@@ -1402,7 +1542,6 @@ footer {
 #submit-button {
     padding: 12px 20px;
     font-size: 1.2rem;
-    color: #fff;
     background-color: #007BFF;
     border: none;
     border-radius: 4px;

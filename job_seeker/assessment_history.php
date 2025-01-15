@@ -188,7 +188,16 @@ $conn->close();
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
-                                <span class="username" id="username">Profile</span>
+                                <span class="username" id="username">
+                                    <?php
+                                    // Check if the user is logged in and display their username
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  // Display the username from session
+                                    } else {
+                                        echo "Guest";  // Default if not logged in
+                                    }
+                                    ?>
+                                </span>
                                 <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
                             </div>
                         </a>
@@ -207,6 +216,13 @@ $conn->close();
         </nav>
     </header>
 
+    <!-- Logout Popup -->
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" onclick="logoutUser()">Yes</button>
+        <button class="cancel-button" onclick="closePopup('logout-popup')">No</button>
+    </div>
+    
     <section id="assessment-history">
         <div class="container">
             <!-- Header -->
@@ -229,9 +245,10 @@ $conn->close();
                             <p><?php echo htmlspecialchars($assessment['score']); ?></p>
                         </div>
                         <div class="actions">
-                            <a href="#" title="Download">Download</a>
-                            <a href="#" title="Share"><i class="fas fa-share-square"></i> Share</a> 
+                            <a href="download_assessment_history_report.php?assessment_id=<?php echo urlencode($assessment['assessment_id']); ?>" title="Download">Download</a>
+                            <a href="share_assessment_history.php?assessment_id=<?= urlencode($assessment['assessment_id']); ?>" title="Share">Share</a>
                         </div>
+
                     </div>
 
 

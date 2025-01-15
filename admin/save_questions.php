@@ -128,7 +128,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    $_SESSION['success_message'] = "Questions added successfully.";
+    // Update the last_modified column in the Assessment_Admin table
+    $update_last_modified_sql = "UPDATE Assessment_Admin SET last_modified = NOW() WHERE assessment_id = '$assessment_id'";
+    if ($conn->query($update_last_modified_sql) !== TRUE) {
+        $_SESSION['error_message'] = "Error updating last modified date: " . $conn->error;
+        header("Location: create_questions.php?assessment_id=$assessment_id");
+        exit();
+    }
+
     header("Location: manage_assessments.php");
     exit();
 }

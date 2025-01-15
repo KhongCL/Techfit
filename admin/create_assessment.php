@@ -77,7 +77,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if ($conn->query($sql) === TRUE) {
         // Redirect to create_questions.php with the assessment_id
-        $_SESSION['success_message'] = "Assessment created successfully.";
         header("Location: create_questions.php?assessment_id=$assessment_id");
         exit();
     } else {
@@ -97,6 +96,142 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Assessment - TechFit</title>
     <link rel="stylesheet" href="styles.css">
+        <style>
+        /* Color Theme */
+        :root {
+            --primary-color: #007bff; /* Blue */
+            --secondary-color: #1e1e1e; /* Dark Grey */
+            --accent-color: #0056b3; /* Darker Blue */
+            --text-color: #e0e0e0; /* Slightly Darker White */
+            --background-color: #121212; /* Very Dark Grey */
+            --border-color: #333; /* Dark Grey */
+            --hover-background-color: #333; /* Slightly Lighter Dark Grey */
+            --hover-text-color: #fff; /* White */
+            --button-hover-color: #80bdff; /* Lighter Blue */
+            --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
+            --popup-border-color: #444; /* Slightly Lighter Dark Grey */
+            --danger-color: #dc3545; /* Red */
+            --danger-hover-color: #c82333; /* Darker Red */
+            --success-color: #28a745; /* Green */
+            --success-hover-color: #218838; /* Darker Green */
+            --lighter-text-color: #f5f5f5; /* Lighter White */
+        }
+
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            color: var(--text-color);
+            background-color: var(--background-color);
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        /* Header Controls */
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .header-controls p {
+            margin: 0;
+        }
+
+        .header-controls button {
+            margin-left: 20px;
+        }
+
+        .action-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        /* Buttons */
+        button {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border-radius: 5px;
+            font-weight: bold;
+            box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+        }
+
+        button:hover {
+            background-color: var(--button-hover-color);
+            color: var(--hover-text-color);
+        }
+
+        button.danger {
+            background-color: var(--danger-color);
+        }
+
+        button.danger:hover {
+            background-color: var(--danger-hover-color);
+        }
+
+        button.success {
+            background-color: var (--success-color);
+        }
+
+        button.success:hover {
+            background-color: var(--success-hover-color);
+        }
+
+        button[type="button"] {
+            margin-right: 10px; /* Add horizontal spacing between buttons */
+        }
+
+        /* Input Fields and Dropdowns */
+        input[type="text"], textarea, select {
+            width: 100%; /* Ensure full width */
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+            box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+        }
+
+        input[type="text"]:hover, textarea:hover, select:hover {
+            border-color: var(--primary-color);
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        label, textarea, select, input[type="text"], button {
+            margin-bottom: 15px; /* Add vertical spacing */
+        }
+
+        /* Form Container */
+        #create-assessment-form {
+            background-color: var(--secondary-color); /* Use secondary color for the form */
+            padding: 20px;
+            border-radius: 5px;
+            box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+        }
+
+        /* Lighter Text for Labels */
+        #assessment-name-label, #description-label {
+            color: var(--lighter-text-color); /* Make the label text lighter */
+        }
+
+        /* Spacing */
+        .form-group {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
     <header>

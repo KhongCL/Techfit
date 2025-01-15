@@ -94,126 +94,133 @@ session_write_close();
         </nav>
     </header>    
         <main>
-        <h1>Manage Assessments</h1>
-        <div class="header-controls">
-            <div>
-                <button onclick="window.location.href='create_assessment.php'">Create New Assessment</button>
-                <button id="deleteSelected">Delete Selected</button>
-                <button id="viewDeleted">View Deleted Assessments</button>
-            </div>
-            <div class="search-sort-controls">
-                <span>Sort by key:</span>
-                <select id="sortDropdown">
-                    <option value="none">None</option>
-                    <option value="assessment_id_asc">Assessment ID ASC</option>
-                    <option value="assessment_id_desc">Assessment ID DESC</option>
-                    <option value="admin_id_asc">Admin ID ASC</option>
-                    <option value="admin_id_desc">Admin ID DESC</option>
-                </select>
-                <div class="search-container">
-                    <div class="search-field-container">
-                        <input type="text" id="searchInput" placeholder="Search...">
-                        <span id="clearSearch">&#x2715;</span>
-                        <div id="noMatchesPopup">No matches found.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <table>
-            <thead>
-                <tr>
-                    <th><input type="checkbox" id="selectAll"></th>
-                    <th data-column="assessment_id">Assessment ID</th>
-                    <th data-column="admin_id">Admin ID</th>
-                    <th data-column="assessment_name">Assessment Name</th>
-                    <th data-column="description">Description</th>
-                    <th data-column="timestamp">Timestamp</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="assessmentsTableBody">
-                <?php
-                $servername = "localhost";
-                $username = "root";
-                $password = "";
-                $dbname = "techfit";
-
-                // Create connection
-                $conn = new mysqli($servername, $username, $password, $dbname);
-
-                // Check connection
-                if ($conn->connect_error) {
-                    die("Connection failed: " . $conn->connect_error);
-                }
-
-                $sql = "SELECT assessment_id, admin_id, assessment_name, description, timestamp FROM Assessment_Admin WHERE is_active = 1";
-                $result = $conn->query($sql);
-
-                if ($result->num_rows > 0) {
-                    while($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td><input type='checkbox' class='selectAssessment' value='" . htmlspecialchars($row['assessment_id']) . "'></td>";
-                        echo "<td>" . htmlspecialchars($row['assessment_id']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['admin_id']) . "</td>";
-                        echo "<td class='editable' data-id='" . htmlspecialchars($row['assessment_id']) . "' data-column='assessment_name'>" . htmlspecialchars($row['assessment_name']) . "</td>";
-                        echo "<td class='editable' data-id='" . htmlspecialchars($row['assessment_id']) . "' data-column='description'>" . htmlspecialchars($row['description']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['timestamp']) . "</td>";
-                        echo "<td><a href='edit_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Edit</a> <span class='action-separator'>|</span> <a href='#' class='deleteAssessment' data-id='" . htmlspecialchars($row['assessment_id']) . "'>Delete</a></td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='7'>No assessments found</td></tr>";
-                }
-
-                $conn->close();
-                ?>
-            </tbody>
-        </table>
-        <div id="deleted-assessments-tab" style="display:none;">
-            <h3>Deleted Assessments</h3>
-            <button type="button" class="close-button" onclick="closeDeletedAssessments()">&#x2715;</button>
+            <h1>Manage Assessments</h1>
             <div class="header-controls">
-                <button type="button" id="restoreSelectedButton" onclick="restoreSelectedAssessments()">Restore Selected Assessments</button>
-                <div class="deleted-search-container">
-                    <div class="search-field-container">
-                        <input type="text" id="deletedSearchInput" placeholder="Search...">
-                        <span id="deletedClearSearch">&#x2715;</span>
-                        <div id="deletedNoMatchesPopup">No matches found.</div>
+                <div>
+                    <button onclick="window.location.href='create_assessment.php'">Create New Assessment</button>
+                    <button id="deleteSelected" class="danger">Delete Selected Assessment</button>
+                    <button id="viewDeleted">View Deleted Assessments</button>
+                </div>
+                <div class="search-sort-controls">
+                    <span>Sort by key:</span>
+                    <select id="sortDropdown">
+                        <option value="none">None</option>
+                        <option value="assessment_id_asc">Assessment ID ASC</option>
+                        <option value="assessment_id_desc">Assessment ID DESC</option>
+                        <option value="admin_id_asc">Admin ID ASC</option>
+                        <option value="admin_id_desc">Admin ID DESC</option>
+                    </select>
+                    <div class="search-container">
+                        <div class="search-field-container">
+                            <input type="text" id="searchInput" placeholder="Search...">
+                            <span id="clearSearch">&#x2715;</span>
+                            <div id="noMatchesPopup">No matches found.</div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <form id="restore-form">
-                <table>
-                    <thead>
-                        <tr>
-                            <th><input type="checkbox" id="select-all-deleted"></th>
-                            <th data-column="assessment_id">Assessment ID</th>
-                            <th data-column="assessment_name">Assessment Name</th>
-                            <th data-column="description">Description</th>
-                            <th data-column="timestamp">Timestamp</th>
-                        </tr>
-                    </thead>
-                    <tbody id="deleted-assessments"></tbody>
-                </table>
-            </form>
-        </div>
-    </main>
+            <table>
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAll"></th>
+                        <th data-column="assessment_id">Assessment ID</th>
+                        <th data-column="admin_id">Admin ID</th>
+                        <th data-column="assessment_name">Assessment Name</th>
+                        <th data-column="description">Description</th>
+                        <th data-column="last_modified">Last Modified</th>
+                        <th data-column="timestamp">Timestamp</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="assessmentsTableBody">
+                    <?php
+                    $servername = "localhost";
+                    $username = "root";
+                    $password = "";
+                    $dbname = "techfit";
+
+                    // Create connection
+                    $conn = new mysqli($servername, $username, $password, $dbname);
+
+                    // Check connection
+                    if ($conn->connect_error) {
+                        die("Connection failed: " . $conn->connect_error);
+                    }
+
+                    $sql = "SELECT assessment_id, admin_id, assessment_name, description, timestamp, last_modified FROM Assessment_Admin WHERE is_active = 1";
+                    $result = $conn->query($sql);
+
+                    if ($result->num_rows > 0) {
+                        while($row = $result->fetch_assoc()) {
+                            echo "<tr>";
+                            echo "<td><input type='checkbox' class='selectAssessment' value='" . htmlspecialchars($row['assessment_id']) . "'></td>";
+                            echo "<td>" . htmlspecialchars($row['assessment_id']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['admin_id']) . "</td>";
+                            echo "<td class='editable' data-id='" . htmlspecialchars($row['assessment_id']) . "' data-column='assessment_name'>" . htmlspecialchars($row['assessment_name']) . "</td>";
+                            echo "<td class='editable' data-id='" . htmlspecialchars($row['assessment_id']) . "' data-column='description'>" . htmlspecialchars($row['description']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['last_modified']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['timestamp']) . "</td>";
+                            echo "<td><a href='edit_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Edit</a> <span class='action-separator'>|</span> <a href='#' class='deleteAssessment' data-id='" . htmlspecialchars($row['assessment_id']) . "'>Delete</a></td>";
+                            echo "</tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='8'>No assessments found</td></tr>";
+                    }
+
+                    $conn->close();
+                    ?>
+                </tbody>
+            </table>
+            <div id="deleted-assessments-tab" style="display:none;">
+                <h3>Deleted Assessments</h3>
+                <button type="button" class="close-button" onclick="closeDeletedAssessments()">&#x2715;</button>
+                <div class="header-controls">
+                    <button type="button" id="restoreSelectedButton" class="success" onclick="restoreSelectedAssessments()">Restore Selected Assessments</button>
+                    <div class="deleted-search-container">
+                        <div class="search-field-container">
+                            <input type="text" id="deletedSearchInput" placeholder="Search...">
+                            <span id="deletedClearSearch">&#x2715;</span>
+                            <div id="deletedNoMatchesPopup">No matches found.</div>
+                        </div>
+                    </div>
+                </div>
+                <form id="restore-form">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="select-all-deleted"></th>
+                                <th data-column="assessment_id">Assessment ID</th>
+                                <th data-column="assessment_name">Assessment Name</th>
+                                <th data-column="description">Description</th>
+                                <th data-column="timestamp">Timestamp</th>
+                                <th data-column="last_modified">Last Modified</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deleted-assessments"></tbody>
+                    </table>
+                </form>
+            </div>
+        </main>
 
     <style>
         /* Color Theme */
         :root {
-            --primary-color: #007bff; /* Blue */
-            --secondary-color: #1e1e1e; /* Dark Grey */
-            --accent-color: #0056b3; /* Darker Blue */
-            --text-color: #e0e0e0; /* Slightly Darker White */
-            --background-color: #121212; /* Very Dark Grey */
-            --border-color: #333; /* Dark Grey */
-            --hover-background-color: #333; /* Slightly Lighter Dark Grey */
-            --hover-text-color: #fff; /* White */
-            --button-hover-color: #80bdff; /* Lighter Blue */
-            --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
-            --popup-border-color: #444; /* Slightly Lighter Dark Grey */
-        }
+                --primary-color: #007bff; /* Blue */
+                --secondary-color: #1e1e1e; /* Dark Grey */
+                --accent-color: #0056b3; /* Darker Blue */
+                --text-color: #e0e0e0; /* Slightly Darker White */
+                --background-color: #121212; /* Very Dark Grey */
+                --border-color: #333; /* Dark Grey */
+                --hover-background-color: #333; /* Slightly Lighter Dark Grey */
+                --hover-text-color: #fff; /* White */
+                --button-hover-color: #80bdff; /* Lighter Blue */
+                --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
+                --popup-border-color: #444; /* Slightly Lighter Dark Grey */
+                --danger-color: #dc3545; /* Red */
+                --danger-hover-color: #c82333; /* Darker Red */
+                --success-color: #28a745; /* Green */
+                --success-hover-color: #218838; /* Darker Green */
+            }
 
         /* General Styles */
         body {
@@ -335,11 +342,45 @@ session_write_close();
             color: var(--hover-text-color);
         }
 
+        button.danger {
+            background-color: var(--danger-color);
+        }
+
+        button.danger:hover {
+            background-color: var(--danger-hover-color);
+        }
+
+        button.success {
+            background-color: var(--success-color);
+        }
+
+        button.success:hover {
+            background-color: var(--success-hover-color);
+        }
+
+        /* Specific Buttons */
+        #deleteSelected {
+            background-color: var(--danger-color);
+        }
+
+        #deleteSelected:hover {
+            background-color: var(--danger-hover-color);
+        }
+
+        #restoreSelectedButton {
+            background-color: var(--success-color);
+        }
+
+        #restoreSelectedButton:hover {
+            background-color: var(--success-hover-color);
+        }
+
         /* Table */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            table-layout: fixed; /* Ensure fixed table layout */
         }
 
         th, td {
@@ -366,13 +407,55 @@ session_write_close();
             color: var(--hover-text-color);
         }
 
+        /* Column Resizer */
+        .resizer {
+            display: inline-block;
+            width: 5px;
+            cursor: col-resize;
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 1;
+        }
+
+        /* Set specific column widths */
+        th:first-child, td:first-child {
+            width: 50px; /* Set fixed width for the checkbox column */
+        }
+
+        th[data-column="description"], td[data-column="description"] {
+            max-width: 150px; /* Reduce the width of the description column */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative; /* Ensure resizer is positioned correctly */
+        }
+
+        th[data-column="assessment_name"], td[data-column="assessment_name"] {
+            max-width: 150px; /* Reduce the width of the assessment name column */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative; /* Ensure resizer is positioned correctly */
+        }
+
+        th[data-column="actions"], td[data-column="actions"] {
+            width: 200px; /* Set a fixed width for the Actions column */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative; /* Ensure resizer is positioned correctly */
+        }
+
         /* Actions Column Links */
         td a {
             color: var(--primary-color);
             text-decoration: none;
             font-weight: bold;
-            margin-right: 10px;
+            margin-right: 5px; /* Reduced margin */
             transition: color 0.3s ease;
+            display: inline-block; /* Ensure inline-block display */
         }
 
         td a:hover {
@@ -380,8 +463,17 @@ session_write_close();
         }
 
         .action-separator {
-            margin: 0 10px;
-            color: var(--text-color);
+            margin: 0 5px; /* Reduced margin */
+            color: var (--text-color);
+            display: inline-block; /* Ensure inline-block display */
+        }
+
+        td a.deleteAssessment {
+            color: var(--danger-color);
+        }
+
+        td a.deleteAssessment:hover {
+            color: var(--danger-hover-color);
         }
 
         /* Chevron */
@@ -402,7 +494,7 @@ session_write_close();
 
         th[data-column].desc::after {
             display: inline-block;
-            border-top-color: var (--text-color);
+            border-top-color: var(--text-color); /* Corrected from var (--text-color) to var(--text-color) */
         }
 
         th[data-column]:hover.asc::after {
@@ -413,6 +505,29 @@ session_write_close();
         th[data-column]:hover.desc::after {
             border-top-color: transparent;
             border-bottom-color: var(--hover-text-color);
+        }
+
+        /* Editable Cell Tooltip */
+        .editable {
+            position: relative; /* Ensure the tooltip is positioned relative to the cell */
+        }
+
+        .editable:hover::after {
+            content: 'Double-click to edit';
+            position: absolute;
+            background: var(--popup-background-color);
+            color: var(--text-color);
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            opacity: 1; /* Ensure the tooltip is visible */
+            visibility: visible; /* Ensure the tooltip is visible */
         }
 
         /* Deleted Assessments Tab */
@@ -517,344 +632,505 @@ session_write_close();
         }
     </style>
     <script>
-        document.getElementById('selectAll').addEventListener('click', function() {
-            var checkboxes = document.querySelectorAll('.selectAssessment');
-            for (var checkbox of checkboxes) {
-                checkbox.checked = this.checked;
-            }
-        });
+        document.addEventListener('DOMContentLoaded', function() {
+            let lastChecked = null;
 
-        document.querySelectorAll('.deleteAssessment').forEach(function(element) {
-            element.addEventListener('click', function(event) {
-                event.preventDefault();
-                var assessmentId = this.getAttribute('data-id');
-                if (confirm('Are you sure you want to delete this assessment?')) {
-                    window.location.href = 'delete_assessment.php?assessment_id=' + assessmentId;
+            document.getElementById('selectAll').addEventListener('click', function() {
+                var checkboxes = document.querySelectorAll('.selectAssessment');
+                for (var checkbox of checkboxes) {
+                    checkbox.checked = this.checked;
                 }
             });
-        });
 
-        document.getElementById('deleteSelected').addEventListener('click', function() {
-            var selected = [];
-            document.querySelectorAll('.selectAssessment:checked').forEach(function(checkbox) {
-                selected.push(checkbox.value);
-            });
-            if (selected.length > 0) {
-                if (confirm('Are you sure you want to delete the selected assessments?')) {
-                    window.location.href = 'delete_assessment.php?assessment_ids=' + selected.join(',');
-                }
-            } else {
-                alert('Please select at least one assessment to delete.');
-            }
-        });
-
-        document.getElementById('viewDeleted').addEventListener('click', function() {
-            fetch('get_deleted_assessments.php')
-                .then(response => response.json())
-                .then(data => {
-                    const deletedAssessmentsDiv = document.getElementById('deleted-assessments');
-                    if (data.length > 0) {
-                        deletedAssessmentsDiv.innerHTML = data.map(assessment => `
-                            <tr>
-                                <td><input type="checkbox" name="restore_assessments[]" value="${assessment.assessment_id}"></td>
-                                <td>${assessment.assessment_id}</td>
-                                <td>${assessment.assessment_name}</td>
-                                <td>${assessment.description}</td>
-                                <td>${assessment.timestamp}</td>
-                            </tr>
-                        `).join('');
-                    } else {
-                        deletedAssessmentsDiv.innerHTML = '<tr><td colspan="5">No deleted assessments found</td></tr>';
+            document.querySelectorAll('.selectAssessment').forEach(function(checkbox) {
+                checkbox.addEventListener('click', function(event) {
+                    if (!lastChecked) {
+                        lastChecked = this;
+                        return;
                     }
-                    document.getElementById('deleted-assessments-tab').style.display = 'block';
 
-                    // Add event listener for select all checkbox
-                    document.getElementById('select-all-deleted').addEventListener('change', function() {
-                        const checkboxes = document.querySelectorAll('input[name="restore_assessments[]"]');
-                        checkboxes.forEach(checkbox => checkbox.checked = this.checked);
-                    });
+                    if (event.shiftKey) {
+                        let checkboxes = Array.from(document.querySelectorAll('.selectAssessment'));
+                        let start = checkboxes.indexOf(this);
+                        let end = checkboxes.indexOf(lastChecked);
 
-                    // Add event listeners for sorting columns
-                    document.querySelectorAll('#deleted-assessments-tab th[data-column]').forEach(th => {
-                        th.addEventListener('click', function() {
-                            const column = this.getAttribute('data-column');
-                            const order = this.dataset.order = -(this.dataset.order || -1);
-                            console.log(`Sorting deleted assessments column: ${column}, Order: ${order}`); // Debug log
-                            const rows = Array.from(document.querySelectorAll('#deleted-assessments tr'));
-                            rows.sort((a, b) => {
-                                const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
-                                const bText = b.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
-                                return aText.localeCompare(bText, undefined, {numeric: true}) * order;
+                        checkboxes.slice(Math.min(start, end), Math.max(start, end) + 1)
+                            .forEach(checkbox => checkbox.checked = lastChecked.checked);
+                    }
+
+                    lastChecked = this;
+                });
+            });
+
+            document.querySelectorAll('.deleteAssessment').forEach(function(element) {
+                element.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    var assessmentId = this.getAttribute('data-id');
+                    if (confirm('Are you sure you want to delete this assessment?')) {
+                        window.location.href = 'delete_assessment.php?assessment_id=' + assessmentId;
+                    }
+                });
+            });
+
+            document.getElementById('deleteSelected').addEventListener('click', function() {
+                var selected = [];
+                document.querySelectorAll('.selectAssessment:checked').forEach(function(checkbox) {
+                    selected.push(checkbox.value);
+                });
+                if (selected.length > 0) {
+                    if (confirm('Are you sure you want to delete the selected assessments?')) {
+                        window.location.href = 'delete_assessment.php?assessment_ids=' + selected.join(',');
+                    }
+                } else {
+                    alert('Please select at least one assessment to delete.');
+                }
+            });
+
+            document.getElementById('viewDeleted').addEventListener('click', function() {
+                fetch('get_deleted_assessments.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        const deletedAssessmentsDiv = document.getElementById('deleted-assessments');
+                        if (data.length > 0) {
+                            deletedAssessmentsDiv.innerHTML = data.map(assessment => `
+                                <tr>
+                                    <td><input type="checkbox" class="selectDeletedAssessment" name="restore_assessments[]" value="${assessment.assessment_id}"></td>
+                                    <td>${assessment.assessment_id}</td>
+                                    <td>${assessment.assessment_name}</td>
+                                    <td>${assessment.description}</td>
+                                    <td>${assessment.timestamp}</td>
+                                </tr>
+                            `).join('');
+                        } else {
+                            deletedAssessmentsDiv.innerHTML = '<tr><td colspan="5">No deleted assessments found</td></tr>';
+                        }
+                        document.getElementById('deleted-assessments-tab').style.display = 'block';
+
+                        // Add event listener for select all checkbox
+                        document.getElementById('select-all-deleted').addEventListener('change', function() {
+                            const checkboxes = document.querySelectorAll('input[name="restore_assessments[]"]');
+                            checkboxes.forEach(checkbox => checkbox.checked = this.checked);
+                        });
+
+                        // Add event listeners for sorting columns
+                        document.querySelectorAll('#deleted-assessments-tab th[data-column]').forEach(th => {
+                            th.addEventListener('mouseenter', function() {
+                                const tooltip = document.createElement('div');
+                                tooltip.className = 'tooltip';
+                                tooltip.textContent = 'Click to sort';
+                                tooltip.style.position = 'absolute';
+                                tooltip.style.background = 'var(--popup-background-color)';
+                                tooltip.style.color = 'var(--text-color)';
+                                tooltip.style.padding = '5px';
+                                tooltip.style.borderRadius = '5px';
+                                tooltip.style.fontSize = '12px';
+                                tooltip.style.top = '100%';
+                                tooltip.style.left = '50%';
+                                tooltip.style.transform = 'translateX(-50%)';
+                                tooltip.style.whiteSpace = 'nowrap';
+                                tooltip.style.zIndex = '1000';
+                                tooltip.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
+                                tooltip.style.opacity = '1';
+                                tooltip.style.visibility = 'visible';
+                                tooltip.style.pointerEvents = 'none';
+                                this.appendChild(tooltip);
                             });
-                            rows.forEach(row => document.querySelector('#deleted-assessments').appendChild(row));
 
-                            // Update chevron
-                            document.querySelectorAll('#deleted-assessments-tab th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
-                            this.classList.add(order === 1 ? 'asc' : 'desc');
+                            th.addEventListener('mouseleave', function() {
+                                const tooltip = this.querySelector('.tooltip');
+                                if (tooltip) {
+                                    tooltip.remove();
+                                }
+                            });
+
+                            th.addEventListener('click', function() {
+                                const column = this.getAttribute('data-column');
+                                const order = this.dataset.order = -(this.dataset.order || -1);
+                                console.log(`Sorting deleted assessments column: ${column}, Order: ${order}`); // Debug log
+                                const rows = Array.from(document.querySelectorAll('#deleted-assessments tr'));
+                                rows.sort((a, b) => {
+                                    const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
+                                    const bText = b.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
+                                    return aText.localeCompare(bText, undefined, {numeric: true}) * order;
+                                });
+                                rows.forEach(row => document.querySelector('#deleted-assessments').appendChild(row));
+
+                                // Update chevron
+                                document.querySelectorAll('#deleted-assessments-tab th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
+                                this.classList.add(order === 1 ? 'asc' : 'desc');
+                            });
                         });
+
+                        // Add shift-click selection for deleted assessments
+                        let lastDeletedChecked = null;
+                        document.querySelectorAll('.selectDeletedAssessment').forEach(function(checkbox) {
+                            checkbox.addEventListener('click', function(event) {
+                                if (!lastDeletedChecked) {
+                                    lastDeletedChecked = this;
+                                    return;
+                                }
+
+                                if (event.shiftKey) {
+                                    let checkboxes = Array.from(document.querySelectorAll('.selectDeletedAssessment'));
+                                    let start = checkboxes.indexOf(this);
+                                    let end = checkboxes.indexOf(lastDeletedChecked);
+
+                                    checkboxes.slice(Math.min(start, end), Math.max(start, end) + 1)
+                                        .forEach(checkbox => checkbox.checked = lastDeletedChecked.checked);
+                                }
+
+                                lastDeletedChecked = this;
+                            });
+                        });
+
+                        // Add event listener for close button
+                        document.querySelector('.close-button').addEventListener('click', closeDeletedAssessments);
+
+                        // Add event listener for restore selected button
+                        document.getElementById('restoreSelectedButton').addEventListener('click', restoreSelectedAssessments);
+                    });
+            });
+
+            // Add event listeners for sorting columns in the main table
+            document.querySelectorAll('th[data-column]').forEach(th => {
+                th.addEventListener('mouseenter', function() {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip';
+                    tooltip.textContent = 'Click to sort';
+                    tooltip.style.position = 'absolute';
+                    tooltip.style.background = 'var(--popup-background-color)';
+                    tooltip.style.color = 'var(--text-color)';
+                    tooltip.style.padding = '5px';
+                    tooltip.style.borderRadius = '5px';
+                    tooltip.style.fontSize = '12px';
+                    tooltip.style.top = '100%';
+                    tooltip.style.left = '50%';
+                    tooltip.style.transform = 'translateX(-50%)';
+                    tooltip.style.whiteSpace = 'nowrap';
+                    tooltip.style.zIndex = '1000';
+                    tooltip.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
+                    tooltip.style.opacity = '1';
+                    tooltip.style.visibility = 'visible';
+                    tooltip.style.pointerEvents = 'none';
+                    this.appendChild(tooltip);
+                });
+
+                th.addEventListener('mouseleave', function() {
+                    const tooltip = this.querySelector('.tooltip');
+                    if (tooltip) {
+                        tooltip.remove();
+                    }
+                });
+
+                th.addEventListener('click', function() {
+                    if (this.closest('#deleted-assessments-tab')) {
+                        return; // Skip sorting for deleted assessments table
+                    }
+                    const column = this.getAttribute('data-column');
+                    const currentOrder = this.dataset.order || -1;
+                    const order = this.dataset.order = currentOrder * -1; // Toggle order
+                    console.log(`Sorting main table column: ${column}, Order: ${order}`); // Debug log
+                    const rows = Array.from(document.querySelectorAll('#assessmentsTableBody tr'));
+                    rows.sort((a, b) => {
+                        const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
+                        const bText = b.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
+                        return aText.localeCompare(bText, undefined, {numeric: true}) * order;
+                    });
+                    rows.forEach(row => document.querySelector('#assessmentsTableBody').appendChild(row));
+
+                    // Update chevron
+                    document.querySelectorAll('th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
+                    this.classList.add(order === 1 ? 'asc' : 'desc');
+                });
+            });
+
+            document.getElementById('deletedSearchInput').addEventListener('input', function() {
+                const filter = this.value.toLowerCase();
+                const rows = document.querySelectorAll('#deleted-assessments tr');
+                let matchFound = false;
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(filter));
+                    row.style.display = match ? '' : 'none';
+                    if (match) matchFound = true;
+                });
+                const noMatchesPopup = document.getElementById('deletedNoMatchesPopup');
+                if (!matchFound) {
+                    noMatchesPopup.style.display = 'block';
+                    noMatchesPopup.style.opacity = '1';
+                } else {
+                    noMatchesPopup.style.display = 'none';
+                }
+                document.getElementById('deletedClearSearch').style.display = filter ? 'block' : 'none';
+            });
+
+            document.getElementById('deletedClearSearch').addEventListener('click', function() {
+                document.getElementById('deletedSearchInput').value = '';
+                const rows = document.querySelectorAll('#deleted-assessments tr');
+                rows.forEach(row => {
+                    row.style.display = '';
+                });
+                this.style.display = 'none';
+                document.getElementById('deletedNoMatchesPopup').style.display = 'none';
+            });
+
+            document.getElementById('deletedSearchInput').addEventListener('focus', function() {
+                const noMatchesPopup = document.getElementById('deletedNoMatchesPopup');
+                if (this.value && !Array.from(document.querySelectorAll('#deleted-assessments tr')).some(row => row.style.display !== 'none')) {
+                    noMatchesPopup.style.display = 'block';
+                    noMatchesPopup.style.opacity = '1';
+                }
+            });
+
+            document.addEventListener('click', function(event) {
+                const noMatchesPopup = document.getElementById('deletedNoMatchesPopup');
+                if (!document.getElementById('deletedSearchInput').contains(event.target) && !noMatchesPopup.contains(event.target)) {
+                    noMatchesPopup.style.display = 'none';
+                }
+            });
+
+            function closeDeletedAssessments() {
+                const closeButton = document.querySelector('.close-button');
+                closeButton.style.backgroundColor = 'transparent'; // Ensure no background color
+                document.getElementById('deleted-assessments-tab').style.display = 'none';
+            }
+
+            function restoreSelectedAssessments() {
+                const selected = document.querySelectorAll('input[name="restore_assessments[]"]:checked');
+                if (selected.length === 0) {
+                    alert('Please select at least one assessment to restore.');
+                    return;
+                }
+
+                if (confirm('Are you sure you want to restore the selected assessments?')) {
+                    const form = document.getElementById('restore-form');
+                    const formData = new FormData(form);
+
+                    fetch('restore_assessments.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Selected assessments restored successfully.');
+                            location.reload(); // Reload the page to update the restored assessments
+                        } else {
+                            alert('Failed to restore selected assessments.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while restoring the assessments.');
+                    });
+                }
+            }
+
+            document.getElementById('searchInput').addEventListener('input', function() {
+                const filter = this.value.toLowerCase();
+                const rows = document.querySelectorAll('#assessmentsTableBody tr');
+                let matchFound = false;
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(filter));
+                    row.style.display = match ? '' : 'none';
+                    if (match) matchFound = true;
+                });
+                const noMatchesPopup = document.getElementById('noMatchesPopup');
+                if (!matchFound) {
+                    noMatchesPopup.style.display = 'block';
+                    noMatchesPopup.style.opacity = '1';
+                } else {
+                    noMatchesPopup.style.display = 'none';
+                }
+                document.getElementById('clearSearch').style.display = filter ? 'block' : 'none';
+            });
+
+            document.getElementById('clearSearch').addEventListener('click', function() {
+                document.getElementById('searchInput').value = '';
+                const rows = document.querySelectorAll('#assessmentsTableBody tr');
+                rows.forEach(row => {
+                    row.style.display = '';
+                });
+                this.style.display = 'none';
+                document.getElementById('noMatchesPopup').style.display = 'none';
+            });
+
+            document.getElementById('searchInput').addEventListener('focus', function() {
+                const noMatchesPopup = document.getElementById('noMatchesPopup');
+                if (this.value && !Array.from(document.querySelectorAll('#assessmentsTableBody tr')).some(row => row.style.display !== 'none')) {
+                    noMatchesPopup.style.display = 'block';
+                    noMatchesPopup.style.opacity = '1';
+                }
+            });
+
+            document.addEventListener('click', function(event) {
+                const noMatchesPopup = document.getElementById('noMatchesPopup');
+                if (!document.getElementById('searchInput').contains(event.target) && !noMatchesPopup.contains(event.target)) {
+                    noMatchesPopup.style.display = 'none';
+                }
+            });
+
+            document.getElementById('sortDropdown').addEventListener('change', function() {
+                const value = this.value;
+                const rows = Array.from(document.querySelectorAll('#assessmentsTableBody tr'));
+                let columnIndex, order;
+
+                switch (value) {
+                    case 'assessment_id_asc':
+                        columnIndex = 1;
+                        order = 1;
+                        break;
+                    case 'assessment_id_desc':
+                        columnIndex = 1;
+                        order = -1;
+                        break;
+                    case 'admin_id_asc':
+                        columnIndex = 2;
+                        order = 1;
+                        break;
+                    case 'admin_id_desc':
+                        columnIndex = 2;
+                        order = -1;
+                        break;
+                    case 'last_modified_asc':
+                        columnIndex = 6;
+                        order = 1;
+                        break;
+                    case 'last_modified_desc':
+                        columnIndex = 6;
+                        order = -1;
+                        break;
+                    default:
+                        return;
+                }
+
+                rows.sort((a, b) => {
+                    const aText = a.querySelector(`td:nth-child(${columnIndex + 1})`).textContent.trim();
+                    const bText = b.querySelector(`td:nth-child(${columnIndex + 1})`).textContent.trim();
+                    return aText.localeCompare(bText, undefined, {numeric: true}) * order;
+                });
+
+                rows.forEach(row => document.querySelector('#assessmentsTableBody').appendChild(row));
+            });
+
+            document.querySelectorAll('th[data-column]').forEach(th => {
+                th.addEventListener('click', function() {
+                    if (this.closest('#deleted-assessments-tab')) {
+                        return; // Skip sorting for deleted assessments table
+                    }
+                    const column = this.getAttribute('data-column');
+                    const currentOrder = this.dataset.order || -1;
+                    const order = this.dataset.order = currentOrder * -1; // Toggle order
+                    console.log(`Sorting main table column: ${column}, Order: ${order}`); // Debug log
+                    const rows = Array.from(document.querySelectorAll('#assessmentsTableBody tr'));
+                    rows.sort((a, b) => {
+                        const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
+                        const bText = b.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
+                        return aText.localeCompare(bText, undefined, {numeric: true}) * order;
+                    });
+                    rows.forEach(row => document.querySelector('#assessmentsTableBody').appendChild(row));
+
+                    // Update chevron
+                    document.querySelectorAll('th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
+                    this.classList.add(order === 1 ? 'asc' : 'desc');
+                }, { once: true }); // Ensure the event listener is added only once
+            });
+
+            // Editable cells
+            document.querySelectorAll('.editable').forEach(cell => {
+                cell.addEventListener('dblclick', function() {
+                    const originalText = this.textContent;
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = originalText;
+                    input.style.width = '100%';
+                    this.textContent = '';
+                    this.appendChild(input);
+                    input.focus();
+
+                    input.addEventListener('blur', () => {
+                        this.textContent = originalText;
+                    });
+
+                    input.addEventListener('keydown', (event) => {
+                        if (event.key === 'Enter') {
+                            const newValue = input.value;
+                            const assessmentId = this.getAttribute('data-id');
+                            const column = this.getAttribute('data-column');
+
+                            fetch('update_assessment.php', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    assessment_id: assessmentId,
+                                    column: column,
+                                    value: newValue
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    this.textContent = newValue;
+                                } else {
+                                    this.textContent = originalText;
+                                    alert('Failed to update assessment.');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                this.textContent = originalText;
+                                alert('An error occurred while updating the assessment.');
+                            });
+                        }
                     });
                 });
+            });
         });
 
-        // Add event listeners for sorting columns in the main table
-        document.querySelectorAll('th[data-column]').forEach(th => {
-            th.addEventListener('click', function() {
-                if (this.closest('#deleted-assessments-tab')) {
-                    return; // Skip sorting for deleted assessments table
+            // Add resizers to each column header
+            document.querySelectorAll('th').forEach(th => {
+                const resizer = document.createElement('div');
+                resizer.classList.add('resizer');
+                th.appendChild(resizer);
+                resizer.addEventListener('mousedown', initResize);
+            });
+
+            let startX, startWidth, resizer;
+
+            function initResize(e) {
+                startX = e.clientX;
+                resizer = e.target;
+                startWidth = resizer.parentElement.offsetWidth;
+                document.addEventListener('mousemove', resizeColumn);
+                document.addEventListener('mouseup', stopResize);
+            }
+
+            function resizeColumn(e) {
+                const newWidth = startWidth + (e.clientX - startX);
+                const maxWidth = 500; // Set a maximum width for the columns
+                const minWidth = 50; // Set a minimum width for the columns
+                if (newWidth > maxWidth) {
+                    resizer.parentElement.style.width = maxWidth + 'px';
+                    resizer.parentElement.style.minWidth = maxWidth + 'px';
+                    resizer.parentElement.style.maxWidth = maxWidth + 'px';
+                } else if (newWidth < minWidth) {
+                    resizer.parentElement.style.width = minWidth + 'px';
+                    resizer.parentElement.style.minWidth = minWidth + 'px';
+                    resizer.parentElement.style.maxWidth = minWidth + 'px';
+                } else {
+                    resizer.parentElement.style.width = newWidth + 'px';
+                    resizer.parentElement.style.minWidth = newWidth + 'px';
+                    resizer.parentElement.style.maxWidth = newWidth + 'px';
                 }
-                const column = this.getAttribute('data-column');
-                const order = this.dataset.order = -(this.dataset.order || -1);
-                console.log(`Sorting main table column: ${column}, Order: ${order}`); // Debug log
-                const rows = Array.from(document.querySelectorAll('#assessmentsTableBody tr'));
-                rows.sort((a, b) => {
-                    const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
-                    const bText = b.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
-                    return aText.localeCompare(bText, undefined, {numeric: true}) * order;
-                });
-                rows.forEach(row => document.querySelector('#assessmentsTableBody').appendChild(row));
-
-                // Update chevron
-                document.querySelectorAll('th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
-                this.classList.add(order === 1 ? 'asc' : 'desc');
-            });
-        });
-
-        document.getElementById('deletedSearchInput').addEventListener('input', function() {
-            const filter = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#deleted-assessments tr');
-            let matchFound = false;
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(filter));
-                row.style.display = match ? '' : 'none';
-                if (match) matchFound = true;
-            });
-            const noMatchesPopup = document.getElementById('deletedNoMatchesPopup');
-            if (!matchFound) {
-                noMatchesPopup.style.display = 'block';
-                noMatchesPopup.style.opacity = '1';
-            } else {
-                noMatchesPopup.style.display = 'none';
-            }
-            document.getElementById('deletedClearSearch').style.display = filter ? 'block' : 'none';
-        });
-
-        document.getElementById('deletedClearSearch').addEventListener('click', function() {
-            document.getElementById('deletedSearchInput').value = '';
-            const rows = document.querySelectorAll('#deleted-assessments tr');
-            rows.forEach(row => {
-                row.style.display = '';
-            });
-            this.style.display = 'none';
-            document.getElementById('deletedNoMatchesPopup').style.display = 'none';
-        });
-
-        document.getElementById('deletedSearchInput').addEventListener('focus', function() {
-            const noMatchesPopup = document.getElementById('deletedNoMatchesPopup');
-            if (this.value && !Array.from(document.querySelectorAll('#deleted-assessments tr')).some(row => row.style.display !== 'none')) {
-                noMatchesPopup.style.display = 'block';
-                noMatchesPopup.style.opacity = '1';
-            }
-        });
-
-        document.addEventListener('click', function(event) {
-            const noMatchesPopup = document.getElementById('deletedNoMatchesPopup');
-            if (!document.getElementById('deletedSearchInput').contains(event.target) && !noMatchesPopup.contains(event.target)) {
-                noMatchesPopup.style.display = 'none';
-            }
-        });
-
-        function closeDeletedAssessments() {
-            const closeButton = document.querySelector('.close-button');
-            closeButton.style.backgroundColor = 'transparent'; // Ensure no background color
-            document.getElementById('deleted-assessments-tab').style.display = 'none';
-        }
-
-        function restoreSelectedAssessments() {
-            const selected = document.querySelectorAll('input[name="restore_assessments[]"]:checked');
-            if (selected.length === 0) {
-                alert('Please select at least one assessment to restore.');
-                return;
             }
 
-            if (confirm('Are you sure you want to restore the selected assessments?')) {
-                const form = document.getElementById('restore-form');
-                const formData = new FormData(form);
-
-                fetch('restore_assessments.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Selected assessments restored successfully.');
-                        location.reload(); // Reload the page to update the restored assessments
-                    } else {
-                        alert('Failed to restore selected assessments.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while restoring the assessments.');
-                });
+            function stopResize() {
+                document.removeEventListener('mousemove', resizeColumn);
+                document.removeEventListener('mouseup', stopResize);
             }
-        }
-
-        document.getElementById('searchInput').addEventListener('input', function() {
-            const filter = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#assessmentsTableBody tr');
-            let matchFound = false;
-            rows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(filter));
-                row.style.display = match ? '' : 'none';
-                if (match) matchFound = true;
-            });
-            const noMatchesPopup = document.getElementById('noMatchesPopup');
-            if (!matchFound) {
-                noMatchesPopup.style.display = 'block';
-                noMatchesPopup.style.opacity = '1';
-            } else {
-                noMatchesPopup.style.display = 'none';
-            }
-            document.getElementById('clearSearch').style.display = filter ? 'block' : 'none';
-        });
-
-        document.getElementById('clearSearch').addEventListener('click', function() {
-            document.getElementById('searchInput').value = '';
-            const rows = document.querySelectorAll('#assessmentsTableBody tr');
-            rows.forEach(row => {
-                row.style.display = '';
-            });
-            this.style.display = 'none';
-            document.getElementById('noMatchesPopup').style.display = 'none';
-        });
-
-        document.getElementById('searchInput').addEventListener('focus', function() {
-            const noMatchesPopup = document.getElementById('noMatchesPopup');
-            if (this.value && !Array.from(document.querySelectorAll('#assessmentsTableBody tr')).some(row => row.style.display !== 'none')) {
-                noMatchesPopup.style.display = 'block';
-                noMatchesPopup.style.opacity = '1';
-            }
-        });
-
-        document.addEventListener('click', function(event) {
-            const noMatchesPopup = document.getElementById('noMatchesPopup');
-            if (!document.getElementById('searchInput').contains(event.target) && !noMatchesPopup.contains(event.target)) {
-                noMatchesPopup.style.display = 'none';
-            }
-        });
-
-        document.getElementById('sortDropdown').addEventListener('change', function() {
-            const value = this.value;
-            const rows = Array.from(document.querySelectorAll('#assessmentsTableBody tr'));
-            let columnIndex, order;
-
-            switch (value) {
-                case 'assessment_id_asc':
-                    columnIndex = 1;
-                    order = 1;
-                    break;
-                case 'assessment_id_desc':
-                    columnIndex = 1;
-                    order = -1;
-                    break;
-                case 'admin_id_asc':
-                    columnIndex = 2;
-                    order = 1;
-                    break;
-                case 'admin_id_desc':
-                    columnIndex = 2;
-                    order = -1;
-                    break;
-                default:
-                    return;
-            }
-
-            rows.sort((a, b) => {
-                const aText = a.querySelector(`td:nth-child(${columnIndex + 1})`).textContent.trim();
-                const bText = b.querySelector(`td:nth-child(${columnIndex + 1})`).textContent.trim();
-                return aText.localeCompare(bText, undefined, {numeric: true}) * order;
-            });
-
-            rows.forEach(row => document.querySelector('#assessmentsTableBody').appendChild(row));
-        });
-
-        // Add event listeners for sorting columns in the main table
-        document.querySelectorAll('th[data-column]').forEach(th => {
-            th.addEventListener('click', function() {
-                if (this.closest('#deleted-assessments-tab')) {
-                    return; // Skip sorting for deleted assessments table
-                }
-                const column = this.getAttribute('data-column');
-                const order = this.dataset.order = -(this.dataset.order || -1);
-                console.log(`Sorting main table column: ${column}, Order: ${order}`); // Debug log
-                const rows = Array.from(document.querySelectorAll('#assessmentsTableBody tr'));
-                rows.sort((a, b) => {
-                    const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
-                    const bText = b.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
-                    return aText.localeCompare(bText, undefined, {numeric: true}) * order;
-                });
-                rows.forEach(row => document.querySelector('#assessmentsTableBody').appendChild(row));
-
-                // Update chevron
-                document.querySelectorAll('th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
-                this.classList.add(order === 1 ? 'asc' : 'desc');
-            });
-        });
-
-        // Editable cells
-        document.querySelectorAll('.editable').forEach(cell => {
-            cell.addEventListener('dblclick', function() {
-                const originalText = this.textContent;
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.value = originalText;
-                input.style.width = '100%';
-                this.textContent = '';
-                this.appendChild(input);
-                input.focus();
-
-                input.addEventListener('blur', () => {
-                    this.textContent = originalText;
-                });
-
-                input.addEventListener('keydown', (event) => {
-                    if (event.key === 'Enter') {
-                        const newValue = input.value;
-                        const assessmentId = this.getAttribute('data-id');
-                        const column = this.getAttribute('data-column');
-
-                        fetch('update_assessment.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                assessment_id: assessmentId,
-                                column: column,
-                                value: newValue
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                this.textContent = newValue;
-                            } else {
-                                this.textContent = originalText;
-                                alert('Failed to update assessment.');
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            this.textContent = originalText;
-                            alert('An error occurred while updating the assessment.');
-                        });
-                    }
-                });
-            });
-        });
     </script>
     <footer>
         <div class="footer-content">

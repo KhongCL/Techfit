@@ -1,33 +1,4 @@
 <?php
-session_start(); // Start the session to access session variables
-
-// Function to display the message and options
-function displayLoginMessage() {
-    echo '<script>
-        if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
-            window.location.href = "../login.php";
-        } else {
-            window.location.href = "../index.php";
-        }
-    </script>';
-    exit();
-}
-
-// Check if the user is logged in
-if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message and options if not logged in
-}
-
-// Check if the user has the correct role
-if ($_SESSION['role'] !== 'Employer') {
-    displayLoginMessage(); // Display message and options if the role is not Employer
-}
-
-// Close the session
-session_write_close();
-?>
-
-<?php
 session_start();
 ?>
 
@@ -128,16 +99,34 @@ session_start();
             color: black;
             cursor: pointer;
             font-size: 16px;
+            text-decoration: none; /* Remove underline */
         }
         .view:hover {
             color: #555;
+        }
+        .actions {
+        display: flex;
+        align-items: center; /* Align items vertically */
+        gap: 10px; /* Add some space between the icons */
+        }
+        .accept, .reject {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .accept:hover {
+            color: green;
+        }
+        .reject:hover {
+            color: red;
         }
     </style>
 </head>
 <body>
     <header>
         <div class="logo">
-            <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+            <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
         <nav>
             <div class="nav-container">
@@ -149,12 +138,12 @@ session_start();
                     </li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
-                            <li><a href="useful_links.php">Useful Links</a></li>
-                            <li><a href="faq.php">FAQ</a></li>
-                            <li><a href="sitemap.php">Sitemap</a></li>
+                            <li><a href="useful_links.html">Useful Links</a></li>
+                            <li><a href="faq.html">FAQ</a></li>
+                            <li><a href="sitemap.html">Sitemap</a></li>
                         </ul>
                     </li>
-                    <li><a href="about.php">About</a></li>
+                    <li><a href="about.html">About</a></li>
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
@@ -190,8 +179,6 @@ session_start();
                 <button class="active" onclick="showTab('active')">Active</button>
                 <button onclick="showTab('interested')">Interested</button>
                 <button onclick="showTab('uninterested')">Uninterested</button>
-                <button>Reviewed</button>
-                <button class="import">Import Candidates</button>
             </div>
             <table>
                 <thead>
@@ -203,141 +190,143 @@ session_start();
                         <th>Assessment Score</th>
                         <th>Interested?</th>
                     </tr>
-                <tbody id="active-tab">
-                    <?php
-                    // Database connection
-                    $servername = "localhost";
-                    $username = "root";
-                    $password = "";
-                    $dbname = "techfit";
+                    <tbody id="active-tab">
+                        <?php
+                        // Database connection
+                        $servername = "localhost";
+                        $username = "root";
+                        $password = "";
+                        $dbname = "techfit";
 
-                    $conn = new mysqli($servername, $username, $password, $dbname);
+                        $conn = new mysqli($servername, $username, $password, $dbname);
 
-                    if ($conn->connect_error) {
-                        die("Connection failed: " . $conn->connect_error);
-                    }
-
-                    if (!isset($_SESSION['employer_id'])) {
-                        die("Employer not logged in.");
-                    }
-
-                    $employer_id = $_SESSION['employer_id']; // Get the logged-in employer's ID from the session
-
-                    $sql = "SELECT ajs.score, js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id
-                            FROM Assessment_Job_Seeker ajs
-                            JOIN Job_Seeker js ON ajs.job_seeker_id = js.job_seeker_id
-                            JOIN User u ON js.user_id = u.user_id
-                            LEFT JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id AND ei.employer_id = '$employer_id'
-                            WHERE ei.interest_status IS NULL
-                            LIMIT 8"; // Limit to 8 rows
-                    $result = $conn->query($sql);
-
-                    if ($result->num_rows > 0) {
-                        while($row = $result->fetch_assoc()) {
-                            echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
-                            echo "<td><input type='checkbox'></td>";
-                            echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
-                            echo "<td>" . $row['education_level'] . "</td>";
-                            echo "<td>" . $row['year_of_experience'] . "</td>";
-                            echo "<td>" . $row['score'] . "</td>";
-                            echo "<td class='actions'>";
-                            if (isset($row['job_seeker_id'])) {
-                                echo "<button class='accept' onclick='updateInterest(\"" . $row['job_seeker_id'] . "\", \"interested\")'>✔</button>";
-                                echo "<button class='reject' onclick='updateInterest(\"" . $row['job_seeker_id'] . "\", \"uninterested\")'>✖</button>";
-                                echo "<button class='view' onclick='viewProfile(\"" . $row['job_seeker_id'] . "\")'>⋮</button>";
-                            }
-                            echo "</td>";
-                            echo "</tr>";
+                        if ($conn->connect_error) {
+                            die("Connection failed: " . $conn->connect_error);
                         }
-                    } else {
-                        echo "<tr id='no-candidates-active'><td colspan='6'>No candidates found</td></tr>";
-                    }
 
-                    $conn->close();
-                    ?>
-                </tbody>
-                <tbody id="interested-tab" style="display:none;">
-                    <?php
-                    // Database connection
-                    $conn = new mysqli($servername, $username, $password, $dbname);
-
-                    if ($conn->connect_error) {
-                        die("Connection failed: " . $conn->connect_error);
-                    }
-
-                    $sql = "SELECT ajs.score, js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id
-                            FROM Assessment_Job_Seeker ajs
-                            JOIN Job_Seeker js ON ajs.job_seeker_id = js.job_seeker_id
-                            JOIN User u ON js.user_id = u.user_id
-                            JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
-                            WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'interested'
-                            LIMIT 8"; // Limit to 8 rows
-                    $result = $conn->query($sql);
-
-                    if ($result->num_rows > 0) {
-                        while($row = $result->fetch_assoc()) {
-                            echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
-                            echo "<td><input type='checkbox'></td>";
-                            echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
-                            echo "<td>" . $row['education_level'] . "</td>";
-                            echo "<td>" . $row['year_of_experience'] . "</td>";
-                            echo "<td>" . $row['score'] . "</td>";
-                            echo "<td class='actions'>";
-                            if (isset($row['job_seeker_id'])) {
-                                echo "<button class='view' onclick='viewProfile(\"" . $row['job_seeker_id'] . "\")'>⋮</button>";
-                                echo "<button class='remove-button' onclick='removeInterest(\"" . $row['job_seeker_id'] . "\")'>🗑</button>";
-                            }
-                            echo "</td>";
-                            echo "</tr>";
+                        if (!isset($_SESSION['employer_id'])) {
+                            die("Employer not logged in.");
                         }
-                    } else {
-                        echo "<tr id='no-candidates-interested'><td colspan='6'>No candidates found</td></tr>";
-                    }
 
-                    $conn->close();
-                    ?>
-                </tbody>
-                <tbody id="uninterested-tab" style="display:none;">
-                    <?php
-                    // Database connection
-                    $conn = new mysqli($servername, $username, $password, $dbname);
+                        $employer_id = $_SESSION['employer_id']; // Get the logged-in employer's ID from the session
 
-                    if ($conn->connect_error) {
-                        die("Connection failed: " . $conn->connect_error);
-                    }
+                        $sql = "SELECT ajs.score, js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id
+                                FROM Assessment_Job_Seeker ajs
+                                JOIN Job_Seeker js ON ajs.job_seeker_id = js.job_seeker_id
+                                JOIN User u ON js.user_id = u.user_id
+                                LEFT JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id AND ei.employer_id = '$employer_id'
+                                WHERE ei.interest_status IS NULL
+                                LIMIT 8"; // Limit to 8 rows
+                        $result = $conn->query($sql);
 
-                    $sql = "SELECT ajs.score, js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id
-                            FROM Assessment_Job_Seeker ajs
-                            JOIN Job_Seeker js ON ajs.job_seeker_id = js.job_seeker_id
-                            JOIN User u ON js.user_id = u.user_id
-                            JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
-                            WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'uninterested'
-                            LIMIT 8"; // Limit to 8 rows
-                    $result = $conn->query($sql);
-
-                    if ($result->num_rows > 0) {
-                        while($row = $result->fetch_assoc()) {
-                            echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
-                            echo "<td><input type='checkbox'></td>";
-                            echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
-                            echo "<td>" . $row['education_level'] . "</td>";
-                            echo "<td>" . $row['year_of_experience'] . "</td>";
-                            echo "<td>" . $row['score'] . "</td>";
-                            echo "<td class='actions'>";
-                            if (isset($row['job_seeker_id'])) {
-                                echo "<button class='view' onclick='viewProfile(\"" . $row['job_seeker_id'] . "\")'>⋮</button>";
-                                echo "<button class='remove-button' onclick='removeInterest(\"" . $row['job_seeker_id'] . "\")'>🗑</button>";
+                        if ($result->num_rows > 0) {
+                            while($row = $result->fetch_assoc()) {
+                                echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
+                                echo "<td><input type='checkbox'></td>";
+                                echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
+                                echo "<td>" . $row['education_level'] . "</td>";
+                                echo "<td>" . $row['year_of_experience'] . "</td>";
+                                echo "<td>" . $row['score'] . "</td>";
+                                echo "<td class='actions'>";
+                                if (isset($row['job_seeker_id'])) {
+                                    echo "<button class='accept' onclick='updateInterest(\"" . $row['job_seeker_id'] . "\", \"interested\")'>✔</button>";
+                                    echo "<button class='reject' onclick='updateInterest(\"" . $row['job_seeker_id'] . "\", \"uninterested\")'>✖</button>";
+                                    echo "<a href='candidate_answer.php?job_seeker_id=" . $row['job_seeker_id'] . "' class='view'>⋮</a>";
+                                }
+                                echo "</td>";
+                                echo "</tr>";
                             }
-                            echo "</td>";
-                            echo "</tr>";
+                        } else {
+                            echo "<tr id='no-candidates-active'><td colspan='6'>No candidates found</td></tr>";
                         }
-                    } else {
-                        echo "<tr id='no-candidates-uninterested'><td colspan='6'>No candidates found</td></tr>";
-                    }
 
-                    $conn->close();
-                    ?>
-                </tbody>
+                        $conn->close();
+                        ?>
+                    </tbody>
+
+                    <tbody id="interested-tab" style="display:none;">
+                        <?php
+                        // Database connection
+                        $conn = new mysqli($servername, $username, $password, $dbname);
+
+                        if ($conn->connect_error) {
+                            die("Connection failed: " . $conn->connect_error);
+                        }
+
+                        $sql = "SELECT ajs.score, js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id
+                                FROM Assessment_Job_Seeker ajs
+                                JOIN Job_Seeker js ON ajs.job_seeker_id = js.job_seeker_id
+                                JOIN User u ON js.user_id = u.user_id
+                                JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
+                                WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'interested'
+                                LIMIT 8"; // Limit to 8 rows
+                        $result = $conn->query($sql);
+
+                        if ($result->num_rows > 0) {
+                            while($row = $result->fetch_assoc()) {
+                                echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
+                                echo "<td><input type='checkbox'></td>";
+                                echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
+                                echo "<td>" . $row['education_level'] . "</td>";
+                                echo "<td>" . $row['year_of_experience'] . "</td>";
+                                echo "<td>" . $row['score'] . "</td>";
+                                echo "<td class='actions'>";
+                                if (isset($row['job_seeker_id'])) {
+                                    echo "<a href='candidate_answer.php?job_seeker_id=" . $row['job_seeker_id'] . "' class='view'>⋮</a>";
+                                    echo "<button class='remove-button' onclick='removeInterest(\"" . $row['job_seeker_id'] . "\")'>🗑</button>";
+                                }
+                                echo "</td>";
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr id='no-candidates-interested'><td colspan='6'>No candidates found</td></tr>";
+                        }
+
+                        $conn->close();
+                        ?>
+                    </tbody>
+
+                    <tbody id="uninterested-tab" style="display:none;">
+                        <?php
+                        // Database connection
+                        $conn = new mysqli($servername, $username, $password, $dbname);
+
+                        if ($conn->connect_error) {
+                            die("Connection failed: " . $conn->connect_error);
+                        }
+
+                        $sql = "SELECT ajs.score, js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id
+                                FROM Assessment_Job_Seeker ajs
+                                JOIN Job_Seeker js ON ajs.job_seeker_id = js.job_seeker_id
+                                JOIN User u ON js.user_id = u.user_id
+                                JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
+                                WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'uninterested'
+                                LIMIT 8"; // Limit to 8 rows
+                        $result = $conn->query($sql);
+
+                        if ($result->num_rows > 0) {
+                            while($row = $result->fetch_assoc()) {
+                                echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
+                                echo "<td><input type='checkbox'></td>";
+                                echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
+                                echo "<td>" . $row['education_level'] . "</td>";
+                                echo "<td>" . $row['year_of_experience'] . "</td>";
+                                echo "<td>" . $row['score'] . "</td>";
+                                echo "<td class='actions'>";
+                                if (isset($row['job_seeker_id'])) {
+                                    echo "<a href='candidate_answer.php?job_seeker_id=" . $row['job_seeker_id'] . "' class='view'>⋮</a>";
+                                    echo "<button class='remove-button' onclick='removeInterest(\"" . $row['job_seeker_id'] . "\")'>🗑</button>";
+                                }
+                                echo "</td>";
+                                echo "</tr>";
+                            }
+                        } else {
+                            echo "<tr id='no-candidates-uninterested'><td colspan='6'>No candidates found</td></tr>";
+                        }
+
+                        $conn->close();
+                        ?>
+                    </tbody>
             </table>
         </div>
     </div>
@@ -346,7 +335,7 @@ session_start();
         <div class="footer-content">
             <div class="footer-left">
                 <div class="footer-logo">
-                    <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+                    <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
                 </div>
                 <div class="social-media">
                     <p>Keep up with TechFit:</p>
@@ -369,24 +358,24 @@ session_start();
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.php">Useful Links</a></li>
-                        <li><a href="faq.php">FAQ</a></li>
-                        <li><a href="sitemap.php">Sitemap</a></li>
-                        <li><a href="about.php">About</a></li>
+                        <li><a href="useful_links.html">Useful Links</a></li>
+                        <li><a href="faq.html">FAQ</a></li>
+                        <li><a href="sitemap.html">Sitemap</a></li>
+                        <li><a href="about.html">About</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Contact</h3>
                     <ul>
-                        <li><a href="contact.php">Contact Us</a></li>
+                        <li><a href="contact.html">Contact Us</a></li>
                         <li><a href="feedback.php">Feedback</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Legal</h3>
                     <ul>
-                        <li><a href="terms.php">Terms of Service</a></li>
-                        <li><a href="privacy.php">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
@@ -426,10 +415,10 @@ session_start();
                     newRow.innerHTML = row.innerHTML;
 
                     if (interestStatus === 'interested') {
-                        newRow.querySelector('.actions').innerHTML = "<button class='view' onclick='viewProfile(\"" + jobSeekerId + "\")'>⋮</button><button class='remove-button' onclick='removeInterest(\"" + jobSeekerId + "\")'>🗑</button>";
+                        newRow.querySelector('.actions').innerHTML = "<a href='candidate_answer.php?job_seeker_id=" + jobSeekerId + "' class='view'>⋮</a><button class='remove-button' onclick='removeInterest(\"" + jobSeekerId + "\")'>🗑</button>";
                         document.getElementById('interested-tab').appendChild(newRow);
                     } else if (interestStatus === 'uninterested') {
-                        newRow.querySelector('.actions').innerHTML = "<button class='view' onclick='viewProfile(\"" + jobSeekerId + "\")'>⋮</button><button class='remove-button' onclick='removeInterest(\"" + jobSeekerId + "\")'>🗑</button>";
+                        newRow.querySelector('.actions').innerHTML = "<a href='candidate_answer.php?job_seeker_id=" + jobSeekerId + "' class='view'>⋮</a><button class='remove-button' onclick='removeInterest(\"" + jobSeekerId + "\")'>🗑</button>";
                         document.getElementById('uninterested-tab').appendChild(newRow);
                     }
 
@@ -457,7 +446,7 @@ session_start();
                     var newRow = document.createElement('tr');
                     newRow.id = 'row-' + jobSeekerId;
                     newRow.innerHTML = row.innerHTML;
-                    newRow.querySelector('.actions').innerHTML = "<button class='accept' onclick='updateInterest(\"" + jobSeekerId + "\", \"interested\")'>✔</button><button class='reject' onclick='updateInterest(\"" + jobSeekerId + "\", \"uninterested\")'>✖</button><button class='view' onclick='viewProfile(\"" + jobSeekerId + "\")'>⋮</button>";
+                    newRow.querySelector('.actions').innerHTML = "<button class='accept' onclick='updateInterest(\"" + jobSeekerId + "\", \"interested\")'>✔</button><button class='reject' onclick='updateInterest(\"" + jobSeekerId + "\", \"uninterested\")'>✖</button><a href='candidate_answer.php?job_seeker_id=" + jobSeekerId + "' class='view'>⋮</a>";
                     document.getElementById('active-tab').appendChild(newRow);
 
                     // Remove "No candidates found" message if present
@@ -473,11 +462,6 @@ session_start();
             if (noCandidatesRow) {
                 tab.removeChild(noCandidatesRow);
             }
-        }
-
-        function viewProfile(jobSeekerId) {
-            // Implement the logic to view the job seeker's profile
-            alert("Viewing profile of job seeker ID: " + jobSeekerId);
         }
 
         function showTab(tabName) {
