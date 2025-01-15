@@ -280,11 +280,50 @@ session_start();
             </div>
             <div class="questions-title">Questions</div>
             <div class="questions-container">
-                <!-- Questions content will go here -->
-                 Test Question 1<br>
-                 Test Question 2<br>
-                 Test Question 3<br>
-                 Test Question 4<br>
+                <?php
+                // Database connection
+                $servername = "localhost";
+                $username = "root";
+                $password = "";
+                $dbname = "techfit";
+
+                $conn = new mysqli($servername, $username, $password, $dbname);
+
+                if ($conn->connect_error) {
+                    die("Connection failed: " . $conn->connect_error);
+                }
+
+                if (!isset($_SESSION['employer_id'])) {
+                    die("Employer not logged in.");
+                }
+
+                $job_seeker_id = $_GET['job_seeker_id'];
+                $assessment_id = isset($_GET['assessment_id']) ? $_GET['assessment_id'] : null;
+
+                if ($assessment_id) {
+                    // Fetch questions and correct answers based on the selected assessment ID
+                    $sql = "SELECT q.question_text, q.correct_answer 
+                            FROM question q
+                            JOIN assessment_job_seeker aq ON q.question_id
+                            WHERE q.assessment_id = '$assessment_id'";
+                    $result = $conn->query($sql);
+
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            echo "<div class='question'>";
+                            echo "<div class='question-text'><strong>Question:</strong> " . $row['question_text'] . "</div>";
+                            echo "<div class='correct-answer'><strong>Correct Answer:</strong> " . $row['correct_answer'] . "</div>";
+                            echo "</div>";
+                        }
+                    } else {
+                        echo "<div>No questions found for this assessment.</div>";
+                    }
+                } else {
+                    echo "<div>Please select an assessment to view questions.</div>";
+                }
+
+                $conn->close();
+                ?>
             </div>
             <?php
             // Database connection
