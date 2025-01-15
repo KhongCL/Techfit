@@ -94,31 +94,31 @@ session_write_close();
         </nav>
     </header>    
         <main>
-            <h1>Manage Assessments</h1>
-            <div class="header-controls">
-                <div>
-                    <button onclick="window.location.href='create_assessment.php'">Create New Assessment</button>
-                    <button id="deleteSelected" class="danger">Delete Selected Assessment</button>
-                    <button id="viewDeleted">View Deleted Assessments</button>
-                </div>
-                <div class="search-sort-controls">
-                    <span>Sort by key:</span>
-                    <select id="sortDropdown">
-                        <option value="none">None</option>
-                        <option value="assessment_id_asc">Assessment ID ASC</option>
-                        <option value="assessment_id_desc">Assessment ID DESC</option>
-                        <option value="admin_id_asc">Admin ID ASC</option>
-                        <option value="admin_id_desc">Admin ID DESC</option>
-                    </select>
-                    <div class="search-container">
-                        <div class="search-field-container">
-                            <input type="text" id="searchInput" placeholder="Search...">
-                            <span id="clearSearch">&#x2715;</span>
-                            <div id="noMatchesPopup">No matches found.</div>
-                        </div>
+        <h1>Manage Assessments</h1>
+        <div class="header-controls">
+            <div class="button-group">
+                <button onclick="window.location.href='create_assessment.php'">Create New Assessment</button>
+                <button id="deleteSelected" class="danger">Delete Selected Assessment</button>
+                <button id="viewDeleted">View Deleted Assessments</button>
+            </div>
+            <div class="search-sort-controls">
+                <span>Sort by key:</span>
+                <select id="sortDropdown">
+                    <option value="none">None</option>
+                    <option value="assessment_id_asc">Assessment ID ASC</option>
+                    <option value="assessment_id_desc">Assessment ID DESC</option>
+                    <option value="admin_id_asc">Admin ID ASC</option>
+                    <option value="admin_id_desc">Admin ID DESC</option>
+                </select>
+                <div class="search-container">
+                    <div class="search-field-container">
+                        <input type="text" id="searchInput" placeholder="Search...">
+                        <span id="clearSearch">&#x2715;</span>
+                        <div id="noMatchesPopup">No matches found.</div>
                     </div>
                 </div>
             </div>
+        </div>
             <table>
                 <thead>
                     <tr>
@@ -192,8 +192,9 @@ session_write_close();
                                 <th data-column="assessment_id">Assessment ID</th>
                                 <th data-column="assessment_name">Assessment Name</th>
                                 <th data-column="description">Description</th>
-                                <th data-column="timestamp">Timestamp</th>
                                 <th data-column="last_modified">Last Modified</th>
+                                <th data-column="timestamp">Timestamp</th>
+
                             </tr>
                         </thead>
                         <tbody id="deleted-assessments"></tbody>
@@ -238,6 +239,11 @@ session_write_close();
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px; /* Add spacing between buttons */
         }
 
         .search-sort-controls {
@@ -507,6 +513,22 @@ session_write_close();
             border-bottom-color: var(--hover-text-color);
         }
 
+        /* Tooltip */
+        .tooltip {
+            position: absolute; /* Ensure the tooltip is positioned relative to the element */
+            background: var(--popup-background-color);
+            color: var(--text-color);
+            padding: 5px;
+            border-radius: 5px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            opacity: 1;
+            visibility: visible;
+            pointer-events: none;
+        }
+
         /* Editable Cell Tooltip */
         .editable {
             position: relative; /* Ensure the tooltip is positioned relative to the cell */
@@ -528,6 +550,20 @@ session_write_close();
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             opacity: 1; /* Ensure the tooltip is visible */
             visibility: visible; /* Ensure the tooltip is visible */
+            pointer-events: none; /* Ensure the tooltip does not interfere with mouse events */
+        }
+
+        /* Input Field for Editable Cells */
+        .editable input {
+            /* Add styles for the input field */
+            width: 100%;
+            padding: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            resize: vertical; /* Allow vertical resizing */
+            box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
         }
 
         /* Deleted Assessments Tab */
@@ -698,6 +734,7 @@ session_write_close();
                                     <td>${assessment.assessment_id}</td>
                                     <td>${assessment.assessment_name}</td>
                                     <td>${assessment.description}</td>
+                                    <td>${assessment.last_modified}</td>
                                     <td>${assessment.timestamp}</td>
                                 </tr>
                             `).join('');
@@ -710,55 +747,6 @@ session_write_close();
                         document.getElementById('select-all-deleted').addEventListener('change', function() {
                             const checkboxes = document.querySelectorAll('input[name="restore_assessments[]"]');
                             checkboxes.forEach(checkbox => checkbox.checked = this.checked);
-                        });
-
-                        // Add event listeners for sorting columns
-                        document.querySelectorAll('#deleted-assessments-tab th[data-column]').forEach(th => {
-                            th.addEventListener('mouseenter', function() {
-                                const tooltip = document.createElement('div');
-                                tooltip.className = 'tooltip';
-                                tooltip.textContent = 'Click to sort';
-                                tooltip.style.position = 'absolute';
-                                tooltip.style.background = 'var(--popup-background-color)';
-                                tooltip.style.color = 'var(--text-color)';
-                                tooltip.style.padding = '5px';
-                                tooltip.style.borderRadius = '5px';
-                                tooltip.style.fontSize = '12px';
-                                tooltip.style.top = '100%';
-                                tooltip.style.left = '50%';
-                                tooltip.style.transform = 'translateX(-50%)';
-                                tooltip.style.whiteSpace = 'nowrap';
-                                tooltip.style.zIndex = '1000';
-                                tooltip.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
-                                tooltip.style.opacity = '1';
-                                tooltip.style.visibility = 'visible';
-                                tooltip.style.pointerEvents = 'none';
-                                this.appendChild(tooltip);
-                            });
-
-                            th.addEventListener('mouseleave', function() {
-                                const tooltip = this.querySelector('.tooltip');
-                                if (tooltip) {
-                                    tooltip.remove();
-                                }
-                            });
-
-                            th.addEventListener('click', function() {
-                                const column = this.getAttribute('data-column');
-                                const order = this.dataset.order = -(this.dataset.order || -1);
-                                console.log(`Sorting deleted assessments column: ${column}, Order: ${order}`); // Debug log
-                                const rows = Array.from(document.querySelectorAll('#deleted-assessments tr'));
-                                rows.sort((a, b) => {
-                                    const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
-                                    const bText = b.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
-                                    return aText.localeCompare(bText, undefined, {numeric: true}) * order;
-                                });
-                                rows.forEach(row => document.querySelector('#deleted-assessments').appendChild(row));
-
-                                // Update chevron
-                                document.querySelectorAll('#deleted-assessments-tab th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
-                                this.classList.add(order === 1 ? 'asc' : 'desc');
-                            });
                         });
 
                         // Add shift-click selection for deleted assessments
@@ -788,37 +776,47 @@ session_write_close();
 
                         // Add event listener for restore selected button
                         document.getElementById('restoreSelectedButton').addEventListener('click', restoreSelectedAssessments);
+
+                        // Add event listeners for sorting columns in the deleted assessments table
+                        document.querySelectorAll('#deleted-assessments-tab th[data-column]').forEach(th => {
+                            th.addEventListener('click', function() {
+                                const column = this.getAttribute('data-column');
+                                const currentOrder = this.dataset.order || -1;
+                                const order = this.dataset.order = currentOrder * -1; // Toggle order
+                                console.log(`Sorting deleted assessments table column: ${column}, Order: ${order}`); // Debug log
+                                const rows = Array.from(document.querySelectorAll('#deleted-assessments tr'));
+                                rows.sort((a, b) => {
+                                    const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
+                                    const bText = b.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
+                                    return aText.localeCompare(bText, undefined, {numeric: true}) * order;
+                                });
+                                rows.forEach(row => document.querySelector('#deleted-assessments').appendChild(row));
+
+                                // Update chevron
+                                document.querySelectorAll('#deleted-assessments-tab th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
+                                this.classList.add(order === 1 ? 'asc' : 'desc');
+                            });
+                        });
                     });
             });
 
             // Add event listeners for sorting columns in the main table
             document.querySelectorAll('th[data-column]').forEach(th => {
-                th.addEventListener('mouseenter', function() {
+                th.addEventListener('mouseenter', function(event) {
                     const tooltip = document.createElement('div');
                     tooltip.className = 'tooltip';
                     tooltip.textContent = 'Click to sort';
-                    tooltip.style.position = 'absolute';
-                    tooltip.style.background = 'var(--popup-background-color)';
-                    tooltip.style.color = 'var(--text-color)';
-                    tooltip.style.padding = '5px';
-                    tooltip.style.borderRadius = '5px';
-                    tooltip.style.fontSize = '12px';
-                    tooltip.style.top = '100%';
-                    tooltip.style.left = '50%';
-                    tooltip.style.transform = 'translateX(-50%)';
-                    tooltip.style.whiteSpace = 'nowrap';
-                    tooltip.style.zIndex = '1000';
-                    tooltip.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
-                    tooltip.style.opacity = '1';
-                    tooltip.style.visibility = 'visible';
-                    tooltip.style.pointerEvents = 'none';
-                    this.appendChild(tooltip);
+                    document.body.appendChild(tooltip);
+                    const rect = th.getBoundingClientRect();
+                    tooltip.style.top = `${rect.bottom + window.scrollY}px`; // Position below the header
+                    tooltip.style.left = `${rect.left + window.scrollX}px`; // Align with the header
+                    th._tooltip = tooltip; // Store reference to tooltip
                 });
 
                 th.addEventListener('mouseleave', function() {
-                    const tooltip = this.querySelector('.tooltip');
-                    if (tooltip) {
-                        tooltip.remove();
+                    if (th._tooltip) {
+                        th._tooltip.remove();
+                        th._tooltip = null;
                     }
                 });
 
@@ -893,6 +891,9 @@ session_write_close();
                 const closeButton = document.querySelector('.close-button');
                 closeButton.style.backgroundColor = 'transparent'; // Ensure no background color
                 document.getElementById('deleted-assessments-tab').style.display = 'none';
+
+                // Remove all tooltips when closing the deleted assessments tab
+                document.querySelectorAll('.tooltip').forEach(tooltip => tooltip.remove());
             }
 
             function restoreSelectedAssessments() {
@@ -1039,10 +1040,27 @@ session_write_close();
 
             // Editable cells
             document.querySelectorAll('.editable').forEach(cell => {
+                cell.addEventListener('mouseenter', function(event) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip';
+                    tooltip.textContent = 'Double-click to edit';
+                    document.body.appendChild(tooltip);
+                    const rect = cell.getBoundingClientRect();
+                    tooltip.style.top = `${rect.bottom + window.scrollY}px`; // Position below the cell
+                    tooltip.style.left = `${rect.left + window.scrollX}px`; // Align with the cell
+                    cell._tooltip = tooltip; // Store reference to tooltip
+                });
+
+                cell.addEventListener('mouseleave', function() {
+                    if (cell._tooltip) {
+                        cell._tooltip.remove();
+                        cell._tooltip = null;
+                    }
+                });
+
                 cell.addEventListener('dblclick', function() {
                     const originalText = this.textContent;
-                    const input = document.createElement('input');
-                    input.type = 'text';
+                    const input = document.createElement('textarea'); // Changed from input to textarea
                     input.value = originalText;
                     input.style.width = '100%';
                     this.textContent = '';
