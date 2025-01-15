@@ -40,40 +40,157 @@ session_write_close();
     <title>Assessment History - TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <style>
+        /* Color Theme */
+        :root {
+            --primary-color: #007bff; /* Blue */
+            --secondary-color: #1e1e1e; /* Dark Grey */
+            --accent-color: #0056b3; /* Darker Blue */
+            --text-color: #e0e0e0; /* Slightly Darker White */
+            --background-color: #121212; /* Very Dark Grey */
+            --border-color: #333; /* Dark Grey */
+            --hover-background-color: #333; /* Slightly Lighter Dark Grey */
+            --hover-text-color: #fff; /* White */
+            --button-hover-color: #80bdff; /* Lighter Blue */
+            --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
+            --popup-border-color: #444; /* Slightly Lighter Dark Grey */
+            --danger-color: #dc3545; /* Red */
+            --danger-hover-color: #c82333; /* Darker Red */
+            --success-color: #28a745; /* Green */
+            --success-hover-color: #218838; /* Darker Green */
+            --lighter-text-color: #f5f5f5; /* Lighter White */
+        }
+
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            color: var(--text-color);
+            background-color: var(--background-color);
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        /* Popup Styles */
         .popup {
             display: none;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: #1e1e1e;
+            background-color: var(--popup-background-color);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             z-index: 1000;
         }
         .popup h2 {
-            color: #fff;
+            color: var(--lighter-text-color);
         }
         .popup button {
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            font-weight: bold;
         }
         .popup .close-button {
-            background-color: #dc3545;
-            color: #fff;
+            background-color: var(--danger-color);
+            color: var(--hover-text-color);
         }
         .popup .cancel-button {
-            background-color: #007bff;
-            color: #fff;
+            background-color: var(--primary-color);
+            color: var(--hover-text-color);
         }
         .popup .close-button:hover {
-            background-color: #c82333;
+            background-color: var(--danger-hover-color);
         }
         .popup .cancel-button:hover {
-            background-color: #0056b3;
+            background-color: var(--accent-color);
+        }
+
+        /* Start Assessment */
+        #start-assessment-container {
+            background-color: var(--secondary-color);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 700px;
+            margin: 20px auto;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #start-assessment-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: var(--lighter-text-color);
+        }
+
+        #start-assessment-container h2 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--lighter-text-color);
+        }
+
+        #start-assessment-container h3 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--lighter-text-color);
+        }
+
+        #start-assessment-rules {
+            text-align: left;
+            font-size: 1.0rem;
+            color: var(--text-color);
+            margin-bottom: 40px;
+        }
+
+        #start-assessment-rules ul {
+            list-style-type: disc;
+            margin-left: 20px;
+            margin-bottom: 30px;
+        }
+
+        #agree-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        #agree-checkbox input {
+            margin-right: 15px;
+        }
+
+        #start-assessment-button {
+            background-color: var(--primary-color);
+            color: var(--hover-text-color);
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            align-self: flex-end;
+            margin-top: auto;
+            font-size: 1.1rem;
+        }
+
+        #start-assessment-button:disabled {
+            background-color: var(--border-color);
+            cursor: not-allowed;
+        }
+
+        #start-assessment-button:hover:not(:disabled) {
+            background-color: var(--button-hover-color);
+            color: var(--hover-text-color);
         }
     </style>
 </head>
@@ -156,7 +273,7 @@ session_write_close();
             <label for="agree">I have read and understood the rules and regulations.</label>
         </div>
         <button id="start-assessment-button" disabled>Start Assessment</button>
-    </section>    
+    </section> 
 
     <footer>
         <div class="footer-content">

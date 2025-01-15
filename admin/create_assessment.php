@@ -77,7 +77,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if ($conn->query($sql) === TRUE) {
         // Redirect to create_questions.php with the assessment_id
-        $_SESSION['success_message'] = "Assessment created successfully.";
         header("Location: create_questions.php?assessment_id=$assessment_id");
         exit();
     } else {

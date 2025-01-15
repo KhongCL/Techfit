@@ -268,8 +268,11 @@ session_start();
             `;
             if (includeEmptyTestCase) {
                 testCasesHtml += `
-                    <textarea name="test_cases_${id}[]" placeholder="Input" required></textarea>
-                    <textarea name="expected_output_${id}[]" placeholder="Expected Output" required></textarea>
+                    <div class="test-case-container">
+                        <textarea name="test_cases_${id}[]" placeholder="Input" required></textarea>
+                        <textarea name="expected_output_${id}[]" placeholder="Expected Output" required></textarea>
+                        <button type="button" class="remove-icon" title="Remove Test Case" onclick="removeTestCase(this, ${id})">&#x2715;</button>
+                    </div>
                 `;
             }
             testCasesHtml += `
@@ -278,6 +281,12 @@ session_start();
             `;
             console.log('getCodeQuestionOptions:', testCasesHtml); // Log the generated HTML
             return testCasesHtml;
+        }
+
+        function removeTestCase(button, id) {
+            const testCaseContainer = button.parentElement;
+            testCaseContainer.remove();
+            isFormDirty = true;
         }
 
         function addChoice(id, choiceId = '', choiceText = '') {
