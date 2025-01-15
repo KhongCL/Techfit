@@ -53,11 +53,12 @@ $job_seeker_id = $_SESSION['job_seeker_id'];
 $sql = "
     SELECT 
     Assessment_Job_Seeker.end_time AS assessment_date, 
-    Assessment_Job_Seeker.assessment_id,
+    Assessment_Job_Seeker.assessment_id AS assessment_id,
     COUNT(Question.question_id) AS number_of_questions, 
     SUM(CASE WHEN Answer.is_correct = TRUE THEN 1 ELSE 0 END) AS correct_answers,
     SUM(CASE WHEN Answer.is_correct = FALSE THEN 1 ELSE 0 END) AS wrong_answers,
     Assessment_Job_Seeker.score
+    
     FROM Assessment_Job_Seeker
     JOIN Question ON Question.assessment_id = Assessment_Job_Seeker.assessment_id
     LEFT JOIN Answer ON Answer.job_seeker_id = Assessment_Job_Seeker.job_seeker_id AND Answer.question_id = Question.question_id
@@ -236,7 +237,8 @@ $result = $stmt->get_result();
                     <?php while ($row = $result->fetch_assoc()): ?>
                         <div class="summary-item">
                             <div class="summary-details">
-                                <h3>Date: <?= date('d/m/Y', strtotime($row['assessment_date'])); ?></h3>
+                                <h3>Assessment <?= $row['assessment_id']; ?></h3>
+                                <p>Date: <?= date('d/m/Y', strtotime($row['assessment_date'])); ?></p>
                                 <p>Score: <?= $row['score']; ?></p>
                                 <p>Correct answers: <?= $row['correct_answers']; ?></p>
                                 <p>Wrong answers: <?= $row['wrong_answers']; ?></p>

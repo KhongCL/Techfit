@@ -54,6 +54,7 @@ $sql = "
     Answer.answer_text AS user_answer,
     Question.correct_answer,
     Answer.is_correct
+    
     FROM Assessment_Job_Seeker
     JOIN Question ON Question.assessment_id = Assessment_Job_Seeker.assessment_id
     LEFT JOIN Answer ON Answer.job_seeker_id = Assessment_Job_Seeker.job_seeker_id AND Answer.question_id = Question.question_id
@@ -247,6 +248,7 @@ $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
             <div class="summary_header">
                 <h2>View Answers</h2>
                 <?php if (!empty($assessment_details)): ?>
+                    <p>Assessment ID: <?= $assessment_id; ?></p>
                     <p>Assessment Date: <?= date('d/m/Y', strtotime($assessment_details[0]['assessment_date'])); ?></p>
                     <p>Score: <?= $assessment_details[0]['score']; ?>%</p>
                 <?php endif; ?>
