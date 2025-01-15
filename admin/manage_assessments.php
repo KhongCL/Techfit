@@ -94,110 +94,113 @@ session_write_close();
         </nav>
     </header>    
         <main>
-        <h1>Manage Assessments</h1>
-        <div class="header-controls">
-            <div>
-                <button onclick="window.location.href='create_assessment.php'">Create New Assessment</button>
-                <button id="deleteSelected" class="danger">Delete Selected Assessment</button>
-                <button id="viewDeleted">View Deleted Assessments</button>
-            </div>
-            <div class="search-sort-controls">
-                <span>Sort by key:</span>
-                <select id="sortDropdown">
-                    <option value="none">None</option>
-                    <option value="assessment_id_asc">Assessment ID ASC</option>
-                    <option value="assessment_id_desc">Assessment ID DESC</option>
-                    <option value="admin_id_asc">Admin ID ASC</option>
-                    <option value="admin_id_desc">Admin ID DESC</option>
-                </select>
-                <div class="search-container">
-                    <div class="search-field-container">
-                        <input type="text" id="searchInput" placeholder="Search...">
-                        <span id="clearSearch">&#x2715;</span>
-                        <div id="noMatchesPopup">No matches found.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <table>
-            <thead>
-                <tr>
-                    <th><input type="checkbox" id="selectAll"></th>
-                    <th data-column="assessment_id">Assessment ID</th>
-                    <th data-column="admin_id">Admin ID</th>
-                    <th data-column="assessment_name">Assessment Name</th>
-                    <th data-column="description">Description</th>
-                    <th data-column="timestamp">Timestamp</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="assessmentsTableBody">
-                <?php
-                $servername = "localhost";
-                $username = "root";
-                $password = "";
-                $dbname = "techfit";
-
-                // Create connection
-                $conn = new mysqli($servername, $username, $password, $dbname);
-
-                // Check connection
-                if ($conn->connect_error) {
-                    die("Connection failed: " . $conn->connect_error);
-                }
-
-                $sql = "SELECT assessment_id, admin_id, assessment_name, description, timestamp FROM Assessment_Admin WHERE is_active = 1";
-                $result = $conn->query($sql);
-
-                if ($result->num_rows > 0) {
-                    while($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td><input type='checkbox' class='selectAssessment' value='" . htmlspecialchars($row['assessment_id']) . "'></td>";
-                        echo "<td>" . htmlspecialchars($row['assessment_id']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['admin_id']) . "</td>";
-                        echo "<td class='editable' data-id='" . htmlspecialchars($row['assessment_id']) . "' data-column='assessment_name'>" . htmlspecialchars($row['assessment_name']) . "</td>";
-                        echo "<td class='editable' data-id='" . htmlspecialchars($row['assessment_id']) . "' data-column='description'>" . htmlspecialchars($row['description']) . "</td>";
-                        echo "<td>" . htmlspecialchars($row['timestamp']) . "</td>";
-                        echo "<td><a href='edit_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Edit</a> <span class='action-separator'>|</span> <a href='#' class='deleteAssessment' data-id='" . htmlspecialchars($row['assessment_id']) . "'>Delete</a></td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='7'>No assessments found</td></tr>";
-                }
-
-                $conn->close();
-                ?>
-            </tbody>
-        </table>
-        <div id="deleted-assessments-tab" style="display:none;">
-            <h3>Deleted Assessments</h3>
-            <button type="button" class="close-button" onclick="closeDeletedAssessments()">&#x2715;</button>
+            <h1>Manage Assessments</h1>
             <div class="header-controls">
-                <button type="button" id="restoreSelectedButton" class="success" onclick="restoreSelectedAssessments()">Restore Selected Assessments</button>
-                <div class="deleted-search-container">
-                    <div class="search-field-container">
-                        <input type="text" id="deletedSearchInput" placeholder="Search...">
-                        <span id="deletedClearSearch">&#x2715;</span>
-                        <div id="deletedNoMatchesPopup">No matches found.</div>
+                <div>
+                    <button onclick="window.location.href='create_assessment.php'">Create New Assessment</button>
+                    <button id="deleteSelected" class="danger">Delete Selected Assessment</button>
+                    <button id="viewDeleted">View Deleted Assessments</button>
+                </div>
+                <div class="search-sort-controls">
+                    <span>Sort by key:</span>
+                    <select id="sortDropdown">
+                        <option value="none">None</option>
+                        <option value="assessment_id_asc">Assessment ID ASC</option>
+                        <option value="assessment_id_desc">Assessment ID DESC</option>
+                        <option value="admin_id_asc">Admin ID ASC</option>
+                        <option value="admin_id_desc">Admin ID DESC</option>
+                    </select>
+                    <div class="search-container">
+                        <div class="search-field-container">
+                            <input type="text" id="searchInput" placeholder="Search...">
+                            <span id="clearSearch">&#x2715;</span>
+                            <div id="noMatchesPopup">No matches found.</div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <form id="restore-form">
-                <table>
-                    <thead>
-                        <tr>
-                            <th><input type="checkbox" id="select-all-deleted"></th>
-                            <th data-column="assessment_id">Assessment ID</th>
-                            <th data-column="assessment_name">Assessment Name</th>
-                            <th data-column="description">Description</th>
-                            <th data-column="timestamp">Timestamp</th>
-                        </tr>
-                    </thead>
-                    <tbody id="deleted-assessments"></tbody>
-                </table>
-            </form>
-        </div>
-    </main>
+            <table>
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAll"></th>
+                        <th data-column="assessment_id">Assessment ID</th>
+                        <th data-column="admin_id">Admin ID</th>
+                        <th data-column="assessment_name">Assessment Name</th>
+                        <th data-column="description">Description</th>
+                        <th data-column="last_modified">Last Modified</th>
+                        <th data-column="timestamp">Timestamp</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="assessmentsTableBody">
+                    <?php
+                    $servername = "localhost";
+                    $username = "root";
+                    $password = "";
+                    $dbname = "techfit";
+
+                    // Create connection
+                    $conn = new mysqli($servername, $username, $password, $dbname);
+
+                    // Check connection
+                    if ($conn->connect_error) {
+                        die("Connection failed: " . $conn->connect_error);
+                    }
+
+                    $sql = "SELECT assessment_id, admin_id, assessment_name, description, timestamp, last_modified FROM Assessment_Admin WHERE is_active = 1";
+                    $result = $conn->query($sql);
+
+                    if ($result->num_rows > 0) {
+                        while($row = $result->fetch_assoc()) {
+                            echo "<tr>";
+                            echo "<td><input type='checkbox' class='selectAssessment' value='" . htmlspecialchars($row['assessment_id']) . "'></td>";
+                            echo "<td>" . htmlspecialchars($row['assessment_id']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['admin_id']) . "</td>";
+                            echo "<td class='editable' data-id='" . htmlspecialchars($row['assessment_id']) . "' data-column='assessment_name'>" . htmlspecialchars($row['assessment_name']) . "</td>";
+                            echo "<td class='editable' data-id='" . htmlspecialchars($row['assessment_id']) . "' data-column='description'>" . htmlspecialchars($row['description']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['last_modified']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['timestamp']) . "</td>";
+                            echo "<td><a href='edit_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Edit</a> <span class='action-separator'>|</span> <a href='#' class='deleteAssessment' data-id='" . htmlspecialchars($row['assessment_id']) . "'>Delete</a></td>";
+                            echo "</tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='8'>No assessments found</td></tr>";
+                    }
+
+                    $conn->close();
+                    ?>
+                </tbody>
+            </table>
+            <div id="deleted-assessments-tab" style="display:none;">
+                <h3>Deleted Assessments</h3>
+                <button type="button" class="close-button" onclick="closeDeletedAssessments()">&#x2715;</button>
+                <div class="header-controls">
+                    <button type="button" id="restoreSelectedButton" class="success" onclick="restoreSelectedAssessments()">Restore Selected Assessments</button>
+                    <div class="deleted-search-container">
+                        <div class="search-field-container">
+                            <input type="text" id="deletedSearchInput" placeholder="Search...">
+                            <span id="deletedClearSearch">&#x2715;</span>
+                            <div id="deletedNoMatchesPopup">No matches found.</div>
+                        </div>
+                    </div>
+                </div>
+                <form id="restore-form">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="select-all-deleted"></th>
+                                <th data-column="assessment_id">Assessment ID</th>
+                                <th data-column="assessment_name">Assessment Name</th>
+                                <th data-column="description">Description</th>
+                                <th data-column="timestamp">Timestamp</th>
+                                <th data-column="last_modified">Last Modified</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deleted-assessments"></tbody>
+                    </table>
+                </form>
+            </div>
+        </main>
 
     <style>
         /* Color Theme */
@@ -377,6 +380,7 @@ session_write_close();
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            table-layout: fixed; /* Ensure fixed table layout */
         }
 
         th, td {
@@ -403,13 +407,55 @@ session_write_close();
             color: var(--hover-text-color);
         }
 
+        /* Column Resizer */
+        .resizer {
+            display: inline-block;
+            width: 5px;
+            cursor: col-resize;
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            z-index: 1;
+        }
+
+        /* Set specific column widths */
+        th:first-child, td:first-child {
+            width: 50px; /* Set fixed width for the checkbox column */
+        }
+
+        th[data-column="description"], td[data-column="description"] {
+            max-width: 150px; /* Reduce the width of the description column */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative; /* Ensure resizer is positioned correctly */
+        }
+
+        th[data-column="assessment_name"], td[data-column="assessment_name"] {
+            max-width: 150px; /* Reduce the width of the assessment name column */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative; /* Ensure resizer is positioned correctly */
+        }
+
+        th[data-column="actions"], td[data-column="actions"] {
+            width: 200px; /* Set a fixed width for the Actions column */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative; /* Ensure resizer is positioned correctly */
+        }
+
         /* Actions Column Links */
         td a {
             color: var(--primary-color);
             text-decoration: none;
             font-weight: bold;
-            margin-right: 10px;
+            margin-right: 5px; /* Reduced margin */
             transition: color 0.3s ease;
+            display: inline-block; /* Ensure inline-block display */
         }
 
         td a:hover {
@@ -417,8 +463,9 @@ session_write_close();
         }
 
         .action-separator {
-            margin: 0 10px;
-            color: var(--text-color);
+            margin: 0 5px; /* Reduced margin */
+            color: var (--text-color);
+            display: inline-block; /* Ensure inline-block display */
         }
 
         td a.deleteAssessment {
@@ -946,6 +993,14 @@ session_write_close();
                         columnIndex = 2;
                         order = -1;
                         break;
+                    case 'last_modified_asc':
+                        columnIndex = 6;
+                        order = 1;
+                        break;
+                    case 'last_modified_desc':
+                        columnIndex = 6;
+                        order = -1;
+                        break;
                     default:
                         return;
                 }
@@ -1034,6 +1089,48 @@ session_write_close();
                 });
             });
         });
+
+            // Add resizers to each column header
+            document.querySelectorAll('th').forEach(th => {
+                const resizer = document.createElement('div');
+                resizer.classList.add('resizer');
+                th.appendChild(resizer);
+                resizer.addEventListener('mousedown', initResize);
+            });
+
+            let startX, startWidth, resizer;
+
+            function initResize(e) {
+                startX = e.clientX;
+                resizer = e.target;
+                startWidth = resizer.parentElement.offsetWidth;
+                document.addEventListener('mousemove', resizeColumn);
+                document.addEventListener('mouseup', stopResize);
+            }
+
+            function resizeColumn(e) {
+                const newWidth = startWidth + (e.clientX - startX);
+                const maxWidth = 500; // Set a maximum width for the columns
+                const minWidth = 50; // Set a minimum width for the columns
+                if (newWidth > maxWidth) {
+                    resizer.parentElement.style.width = maxWidth + 'px';
+                    resizer.parentElement.style.minWidth = maxWidth + 'px';
+                    resizer.parentElement.style.maxWidth = maxWidth + 'px';
+                } else if (newWidth < minWidth) {
+                    resizer.parentElement.style.width = minWidth + 'px';
+                    resizer.parentElement.style.minWidth = minWidth + 'px';
+                    resizer.parentElement.style.maxWidth = minWidth + 'px';
+                } else {
+                    resizer.parentElement.style.width = newWidth + 'px';
+                    resizer.parentElement.style.minWidth = newWidth + 'px';
+                    resizer.parentElement.style.maxWidth = newWidth + 'px';
+                }
+            }
+
+            function stopResize() {
+                document.removeEventListener('mousemove', resizeColumn);
+                document.removeEventListener('mouseup', stopResize);
+            }
     </script>
     <footer>
         <div class="footer-content">
