@@ -207,6 +207,13 @@ $conn->close();
         </nav>
     </header>
 
+    <!-- Logout Popup -->
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" onclick="logoutUser()">Yes</button>
+        <button class="cancel-button" onclick="closePopup('logout-popup')">No</button>
+    </div>
+    
     <section id="assessment-history">
         <div class="container">
             <!-- Header -->
