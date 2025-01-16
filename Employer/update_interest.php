@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -16,12 +15,21 @@ if (!isset($_SESSION['employer_id'])) {
     die("Employer not logged in.");
 }
 
-$employer_id = $_SESSION['employer_id']; // Get the logged-in employer's ID from the session
+$employer_id = $_SESSION['employer_id'];
 $job_seeker_id = $_POST['job_seeker_id'];
 $interest_status = $_POST['interest_status'];
 
-$sql = "INSERT INTO Employer_Interest (employer_id, job_seeker_id, interest_status) VALUES ('$employer_id', '$job_seeker_id', '$interest_status')
-        ON DUPLICATE KEY UPDATE interest_status='$interest_status'";
+// Check if the record exists
+$sql = "SELECT * FROM Employer_Interest WHERE employer_id = '$employer_id' AND job_seeker_id = '$job_seeker_id'";
+$result = $conn->query($sql);
+
+if ($result->num_rows > 0) {
+    // Update the existing record
+    $sql = "UPDATE Employer_Interest SET interest_status = '$interest_status', is_active = 1 WHERE employer_id = '$employer_id' AND job_seeker_id = '$job_seeker_id'";
+} else {
+    // Insert a new record
+    $sql = "INSERT INTO Employer_Interest (employer_id, job_seeker_id, interest_status, is_active) VALUES ('$employer_id', '$job_seeker_id', '$interest_status', 1)";
+}
 
 if ($conn->query($sql) === TRUE) {
     echo "Record updated successfully";
