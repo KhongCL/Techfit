@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($title && $link && $category) {
                 $resourceId = generateResourceId($mysqli);
-                $stmt = $mysqli->prepare("INSERT INTO resource (resource_id, type, title, link, category) VALUES (?, 'usefulLink', ?, ?, ?)");
+                $stmt = $mysqli->prepare("INSERT INTO resource (resource_id, type, title, link, category) VALUES (?, '$useful_link', ?, ?, ?)");
                 $stmt->bind_param("ssss", $resourceId, $title, $link, $category);
                 $stmt->execute();
                 echo json_encode(['status' => 'success', 'message' => 'Useful link added successfully']);
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Fetch Useful Links for Display
-$result = $mysqli->query("SELECT * FROM resource WHERE type = 'usefulLink' ORDER BY category, resource_id");
+$result = $mysqli->query("SELECT * FROM resource WHERE type = 'useful_link' ORDER BY category, resource_id");
 $usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>

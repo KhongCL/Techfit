@@ -116,11 +116,11 @@ try {
                 die("Database connection failed: " . $mysqli->connect_error);
             }
 
-            $result = $mysqli->query("SELECT * FROM resource WHERE type = 'sitemap' AND category = 'jobSeeker' ORDER BY resource_id DESC LIMIT 1");
-            $sitemap = $result->fetch_assoc();
-
-            if ($sitemap) {
-                echo '<img src="data:image/jpeg;base64,' . base64_encode($sitemap['image']) . '" alt="Website Sitemap" class="sitemap-image" />';
+            $result = $mysqli->query("SELECT * FROM resource WHERE type = 'sitemap' AND category = 'jobSeeker' ORDER BY resource_id DESC");
+            if ($result->num_rows > 0) {
+                while ($sitemap = $result->fetch_assoc()) {
+                    echo '<img src="data:image/jpeg;base64,' . base64_encode($sitemap['image']) . '" alt="Website Sitemap" class="sitemap-image" />';
+                }
             } else {
                 echo '<p>No sitemap available for Job Seekers.</p>';
             }
@@ -142,13 +142,13 @@ try {
                 die("Database connection failed: " . $mysqli->connect_error);
             }
 
-            $result = $mysqli->query("SELECT * FROM resource WHERE type = 'sitemap' AND category = 'employer' ORDER BY resource_id DESC LIMIT 1");
-            $sitemap = $result->fetch_assoc();
-
-            if ($sitemap) {
-                echo '<img src="data:image/jpeg;base64,' . base64_encode($sitemap['image']) . '" alt="Website Sitemap" class="sitemap-image" />';
+            $result = $mysqli->query("SELECT * FROM resource WHERE type = 'sitemap' AND category = 'employer' ORDER BY resource_id DESC");
+            if ($result->num_rows > 0) {
+                while ($sitemap = $result->fetch_assoc()) {
+                    echo '<img src="data:image/jpeg;base64,' . base64_encode($sitemap['image']) . '" alt="Website Sitemap" class="sitemap-image" />';
+                }
             } else {
-                echo '<p>No sitemap available for Job Seekers.</p>';
+                echo '<p>No sitemap available for Employers.</p>';
             }
 
             $mysqli->close();
