@@ -150,6 +150,40 @@ session_start();
             border: 1px solid #ccc;
             border-radius: 5px;
         }
+        .search-container {
+            position: relative;
+            margin-left: 10px;
+        }
+
+        #searchInput {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding-right: 30px; /* Add space for the clear button */
+        }
+
+        #clearSearch {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            display: none;
+        }
+
+        #noMatchesPopup {
+            display: none;
+            position: absolute;
+            top: calc(100% + 10px);
+            left: 0;
+            background: #1e1e1e;
+            color: #fff;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
         
     </style>
 </head>
@@ -205,20 +239,25 @@ session_start();
 
     <div class="container">
         <div class="table-container">
-        <div class="sort-controls">
-            <span>Sort by:</span>
-            <select id="sortDropdown">
-                <option value="none">None</option>
-                <option value="name_asc">Name ASC</option>
-                <option value="name_desc">Name DESC</option>
-                <option value="education_level_asc">Education Level ASC</option>
-                <option value="education_level_desc">Education Level DESC</option>
-                <option value="years_of_experience_asc">Years of Experience ASC</option>
-                <option value="years_of_experience_desc">Years of Experience DESC</option>
-                <option value="assessment_scores_asc">Assessment Scores ASC</option>
-                <option value="assessment_scores_desc">Assessment Scores DESC</option>
-            </select>
-        </div>
+            <div class="sort-controls">
+                <span>Sort by:</span>
+                <select id="sortDropdown">
+                    <option value="none">None</option>
+                    <option value="name_asc">Name ASC</option>
+                    <option value="name_desc">Name DESC</option>
+                    <option value="education_level_asc">Education Level ASC</option>
+                    <option value="education_level_desc">Education Level DESC</option>
+                    <option value="years_of_experience_asc">Years of Experience ASC</option>
+                    <option value="years_of_experience_desc">Years of Experience DESC</option>
+                    <option value="assessment_scores_asc">Assessment Scores ASC</option>
+                    <option value="assessment_scores_desc">Assessment Scores DESC</option>
+                </select>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search...">
+                    <span id="clearSearch">&#x2715;</span>
+                    <div id="noMatchesPopup">No matches found.</div>
+                </div>
+            </div>
             <div class="tabs">
                 <button class="active" onclick="showTab('active')">Active</button>
                 <button onclick="showTab('interested')">Interested</button>
@@ -228,10 +267,10 @@ session_start();
                 <thead>
                     <tr>
                         <th><input type="checkbox"></th>
-                        <th>Name</th>
-                        <th>Education Level</th>
-                        <th>Years of Experience</th>
-                        <th>Assessment Scores</th>
+                        <th data-column="name">Name</th>
+                        <th data-column="education_level">Education Level</th>
+                        <th data-column="years_of_experience">Years of Experience</th>
+                        <th data-column="assessment_scores">Assessment Scores</th>
                         <th>Interested?</th>
                     </tr>
                 </thead>
@@ -524,6 +563,7 @@ session_start();
             document.querySelector(`.tabs button[onclick="showTab('${tabName}')"]`).classList.add('active');
         }
         document.addEventListener('DOMContentLoaded', function() {
+            // Existing sorting function for the dropdown
             document.getElementById('sortDropdown').addEventListener('change', function() {
                 const value = this.value;
                 const activeTab = document.getElementById('active-tab');
@@ -590,6 +630,96 @@ session_start();
                 const scores = scoresText.split(', ').map(Number);
                 return scores.reduce((sum, score) => sum + score, 0) / scores.length;
             }
+
+            // Add event listeners for sorting columns in the table
+            document.querySelectorAll('th[data-column]').forEach(th => {
+                th.addEventListener('mouseenter', function(event) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'tooltip';
+                    tooltip.textContent = 'Click to sort';
+                    document.body.appendChild(tooltip);
+                    const rect = th.getBoundingClientRect();
+                    tooltip.style.top = `${rect.bottom + window.scrollY}px`; // Position below the header
+                    tooltip.style.left = `${rect.left + window.scrollX}px`; // Align with the header
+                    th._tooltip = tooltip; // Store reference to tooltip
+                });
+
+                th.addEventListener('mouseleave', function() {
+                    if (th._tooltip) {
+                        th._tooltip.remove();
+                        th._tooltip = null;
+                    }
+                });
+
+                th.addEventListener('click', function() {
+                    const column = this.getAttribute('data-column');
+                    const currentOrder = this.dataset.order || -1;
+                    const order = this.dataset.order = currentOrder * -1; // Toggle order
+                    console.log(`Sorting table column: ${column}, Order: ${order}`); // Debug log
+                    const rows = Array.from(document.querySelectorAll('#active-tab tr, #interested-tab tr, #uninterested-tab tr'));
+                    rows.sort((a, b) => {
+                        const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
+                        const bText = b.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
+                        if (column === 'years_of_experience' || column === 'assessment_scores') { // For numerical values
+                            const aValue = column === 'assessment_scores' ? calculateAverage(aText) : parseFloat(aText);
+                            const bValue = column === 'assessment_scores' ? calculateAverage(bText) : parseFloat(bText);
+                            return (aValue - bValue) * order;
+                        }
+                        return aText.localeCompare(bText, undefined, {numeric: true}) * order;
+                    });
+                    rows.forEach(row => row.parentNode.appendChild(row));
+
+                    // Update chevron
+                    document.querySelectorAll('th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
+                    this.classList.add(order === 1 ? 'asc' : 'desc');
+                });
+            });
+
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', function() {
+                const filter = this.value.toLowerCase();
+                const rows = document.querySelectorAll('#active-tab tr, #interested-tab tr, #uninterested-tab tr');
+                let matchFound = false;
+                rows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(filter));
+                    row.style.display = match ? '' : 'none';
+                    if (match) matchFound = true;
+                });
+                const noMatchesPopup = document.getElementById('noMatchesPopup');
+                if (!matchFound) {
+                    noMatchesPopup.style.display = 'block';
+                    noMatchesPopup.style.opacity = '1';
+                } else {
+                    noMatchesPopup.style.display = 'none';
+                }
+                document.getElementById('clearSearch').style.display = filter ? 'block' : 'none';
+            });
+
+            document.getElementById('clearSearch').addEventListener('click', function() {
+                document.getElementById('searchInput').value = '';
+                const rows = document.querySelectorAll('#active-tab tr, #interested-tab tr, #uninterested-tab tr');
+                rows.forEach(row => {
+                    row.style.display = '';
+                });
+                this.style.display = 'none';
+                document.getElementById('noMatchesPopup').style.display = 'none';
+            });
+
+            document.getElementById('searchInput').addEventListener('focus', function() {
+                const noMatchesPopup = document.getElementById('noMatchesPopup');
+                if (this.value && !Array.from(document.querySelectorAll('#active-tab tr, #interested-tab tr, #uninterested-tab tr')).some(row => row.style.display !== 'none')) {
+                    noMatchesPopup.style.display = 'block';
+                    noMatchesPopup.style.opacity = '1';
+                }
+            });
+
+            document.addEventListener('click', function(event) {
+                const noMatchesPopup = document.getElementById('noMatchesPopup');
+                if (!document.getElementById('searchInput').contains(event.target) && !noMatchesPopup.contains(event.target)) {
+                    noMatchesPopup.style.display = 'none';
+                }
+            });
         });
     </script>
 </body>
