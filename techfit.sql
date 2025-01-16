@@ -193,15 +193,6 @@ CREATE TABLE Assessment_Settings (
     allowed_question_types TEXT NOT NULL -- JSON array (e.g., ["Multiple Choice", "Essay"])
 );
 
-CREATE TABLE Security_Settings (
-    setting_id VARCHAR(5) PRIMARY KEY,
-    min_password_length INT NOT NULL,
-    require_special_char BOOLEAN NOT NULL,
-    require_uppercase BOOLEAN NOT NULL,
-    require_numbers BOOLEAN NOT NULL,
-    password_expiration_days INT NOT NULL
-);
-
 CREATE TABLE Notification_Settings (
     setting_id VARCHAR(5) PRIMARY KEY,
     event_name VARCHAR(100) NOT NULL,
