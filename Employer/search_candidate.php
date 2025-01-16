@@ -134,6 +134,23 @@ session_start();
             color: #0056b3; /* Darker blue on hover */
             text-decoration: underline; /* Underline on hover */
         }
+        .sort-controls {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .sort-controls span {
+            margin-right: 10px;
+        }
+
+        #sortDropdown {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
     </style>
 </head>
 <body>
@@ -188,6 +205,20 @@ session_start();
 
     <div class="container">
         <div class="table-container">
+        <div class="sort-controls">
+            <span>Sort by:</span>
+            <select id="sortDropdown">
+                <option value="none">None</option>
+                <option value="name_asc">Name ASC</option>
+                <option value="name_desc">Name DESC</option>
+                <option value="education_level_asc">Education Level ASC</option>
+                <option value="education_level_desc">Education Level DESC</option>
+                <option value="years_of_experience_asc">Years of Experience ASC</option>
+                <option value="years_of_experience_desc">Years of Experience DESC</option>
+                <option value="assessment_scores_asc">Assessment Scores ASC</option>
+                <option value="assessment_scores_desc">Assessment Scores DESC</option>
+            </select>
+        </div>
             <div class="tabs">
                 <button class="active" onclick="showTab('active')">Active</button>
                 <button onclick="showTab('interested')">Interested</button>
@@ -224,15 +255,17 @@ session_start();
 
                     $employer_id = $_SESSION['employer_id']; // Get the logged-in employer's ID from the session
 
-                    $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id, GROUP_CONCAT(ajs.score ORDER BY ajs.assessment_id SEPARATOR ', ') AS scores
+                    $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id, 
+                                GROUP_CONCAT(ajs.score ORDER BY ajs.assessment_id SEPARATOR ', ') AS scores,
+                                AVG(ajs.score) AS avg_score
                             FROM Assessment_Job_Seeker ajs
                             JOIN Job_Seeker js ON ajs.job_seeker_id = js.job_seeker_id
                             JOIN User u ON js.user_id = u.user_id
                             LEFT JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id AND ei.employer_id = '$employer_id'
                             WHERE ei.interest_status IS NULL
-                            GROUP BY js.job_seeker_id"; // Removed LIMIT 8
+                            GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
-                    
+
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
                             echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
@@ -267,14 +300,15 @@ session_start();
                         die("Connection failed: " . $conn->connect_error);
                     }
 
-                    $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id, GROUP_CONCAT(ajs.score ORDER BY ajs.assessment_id SEPARATOR ', ') AS scores
+                    $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id, 
+                                GROUP_CONCAT(ajs.score ORDER BY ajs.assessment_id SEPARATOR ', ') AS scores,
+                                AVG(ajs.score) AS avg_score
                             FROM Assessment_Job_Seeker ajs
                             JOIN Job_Seeker js ON ajs.job_seeker_id = js.job_seeker_id
                             JOIN User u ON js.user_id = u.user_id
                             JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
                             WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'interested'
-                            GROUP BY js.job_seeker_id
-                            LIMIT 8"; // Limit to 8 rows
+                            GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
 
                     if ($result->num_rows > 0) {
@@ -310,14 +344,15 @@ session_start();
                         die("Connection failed: " . $conn->connect_error);
                     }
 
-                    $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id, GROUP_CONCAT(ajs.score ORDER BY ajs.assessment_id SEPARATOR ', ') AS scores
+                    $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id, 
+                                GROUP_CONCAT(ajs.score ORDER BY ajs.assessment_id SEPARATOR ', ') AS scores,
+                                AVG(ajs.score) AS avg_score
                             FROM Assessment_Job_Seeker ajs
                             JOIN Job_Seeker js ON ajs.job_seeker_id = js.job_seeker_id
                             JOIN User u ON js.user_id = u.user_id
                             JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
                             WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'uninterested'
-                            GROUP BY js.job_seeker_id
-                            LIMIT 8"; // Limit to 8 rows
+                            GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
 
                     if ($result->num_rows > 0) {
@@ -488,6 +523,74 @@ session_start();
             document.querySelectorAll('.tabs button').forEach(button => button.classList.remove('active'));
             document.querySelector(`.tabs button[onclick="showTab('${tabName}')"]`).classList.add('active');
         }
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('sortDropdown').addEventListener('change', function() {
+                const value = this.value;
+                const activeTab = document.getElementById('active-tab');
+                const interestedTab = document.getElementById('interested-tab');
+                const uninterestedTab = document.getElementById('uninterested-tab');
+                const tabs = [activeTab, interestedTab, uninterestedTab];
+
+                let columnIndex, order;
+
+                switch (value) {
+                    case 'name_asc':
+                        columnIndex = 2;
+                        order = 1;
+                        break;
+                    case 'name_desc':
+                        columnIndex = 2;
+                        order = -1;
+                        break;
+                    case 'education_level_asc':
+                        columnIndex = 3;
+                        order = 1;
+                        break;
+                    case 'education_level_desc':
+                        columnIndex = 3;
+                        order = -1;
+                        break;
+                    case 'years_of_experience_asc':
+                        columnIndex = 4;
+                        order = 1;
+                        break;
+                    case 'years_of_experience_desc':
+                        columnIndex = 4;
+                        order = -1;
+                        break;
+                    case 'assessment_scores_asc':
+                        columnIndex = 5;
+                        order = 1;
+                        break;
+                    case 'assessment_scores_desc':
+                        columnIndex = 5;
+                        order = -1;
+                        break;
+                    default:
+                        return;
+                }
+
+                tabs.forEach(tab => {
+                    const rows = Array.from(tab.querySelectorAll('tr'));
+                    rows.sort((a, b) => {
+                        const aText = a.querySelector(`td:nth-child(${columnIndex})`).textContent.trim();
+                        const bText = b.querySelector(`td:nth-child(${columnIndex})`).textContent.trim();
+                        if (columnIndex === 4 || columnIndex === 5) { // For numerical values
+                            const aValue = columnIndex === 5 ? calculateAverage(aText) : parseFloat(aText);
+                            const bValue = columnIndex === 5 ? calculateAverage(bText) : parseFloat(bText);
+                            return (aValue - bValue) * order;
+                        }
+                        return aText.localeCompare(bText, undefined, {numeric: true}) * order;
+                    });
+                    rows.forEach(row => tab.appendChild(row));
+                });
+            });
+
+            function calculateAverage(scoresText) {
+                const scores = scoresText.split(', ').map(Number);
+                return scores.reduce((sum, score) => sum + score, 0) / scores.length;
+            }
+        });
     </script>
 </body>
 </html>
