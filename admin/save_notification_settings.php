@@ -24,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $result = $conn->query("SELECT MAX(CAST(SUBSTRING(setting_id, 3) AS UNSIGNED)) AS max_id FROM Notification_Settings");
     $row = $result->fetch_assoc();
     $setting_id_num = $row['max_id'] ? $row['max_id'] + 1 : 1;
-    $setting_id = sprintf("SE%02d", $setting_id_num);
 
     foreach ($email_templates as $event => $template) {
         $is_enabled = in_array($event, $notification_events) ? 1 : 0;
@@ -33,26 +32,52 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt_update->bind_param("iss", $is_enabled, $template, $event);
         $stmt_update->execute();
 
-        // If no rows were affected, insert a new setting
+        // If no rows were affected, check if the record exists
         if ($stmt_update->affected_rows === 0) {
-            $stmt_insert->bind_param("ssis", $setting_id, $event, $is_enabled, $template);
-            $stmt_insert->execute();
-            $setting_id_num++;
-            $setting_id = sprintf("SE%02d", $setting_id_num);
+            $stmt_check = $conn->prepare("SELECT COUNT(*) FROM Notification_Settings WHERE event_name = ?");
+            $stmt_check->bind_param("s", $event);
+            $stmt_check->execute();
+            $stmt_check->bind_result($count);
+            $stmt_check->fetch();
+            $stmt_check->close();
+
+            // If the record does not exist, insert a new setting
+            if ($count == 0) {
+                $stmt_check_template = $conn->prepare("SELECT COUNT(*) FROM Notification_Settings WHERE event_name = ? AND email_template = ?");
+                $stmt_check_template->bind_param("ss", $event, $template);
+                $stmt_check_template->execute();
+                $stmt_check_template->bind_result($template_count);
+                $stmt_check_template->fetch();
+                $stmt_check_template->close();
+            
+                if ($template_count == 0) {
+                    $setting_id = sprintf("SE%02d", $setting_id_num);
+                    $stmt_insert->bind_param("ssis", $setting_id, $event, $is_enabled, $template);
+                    if (!$stmt_insert->execute()) {
+                        echo '<script>
+                            alert("Failed to insert new notification setting: ' . $stmt_insert->error . '");
+                            window.location.href = "system_configuration.php";
+                        </script>';
+                        exit();
+                    }
+                    $setting_id_num++;
+                }
+            }
+        } else {
+            if ($stmt_update->affected_rows === 0) {
+                echo '<script>
+                    alert("Failed to update notification setting: ' . $stmt_update->error . '");
+                    window.location.href = "system_configuration.php";
+                </script>';
+                exit();
+            }
         }
     }
 
-    if ($stmt_update->affected_rows > 0 || $stmt_insert->affected_rows > 0) {
-        echo '<script>
-            alert("Notification settings saved successfully.");
-            window.location.href = "system_configuration.php";
-        </script>';
-    } else {
-        echo '<script>
-            alert("Failed to save notification settings.");
-            window.location.href = "system_configuration.php";
-        </script>';
-    }
+    echo '<script>
+        alert("Notification settings saved successfully.");
+        window.location.href = "system_configuration.php";
+    </script>';
 
     $stmt_update->close();
     $stmt_insert->close();
