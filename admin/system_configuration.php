@@ -298,19 +298,20 @@ $conn->close();
                     $events = ['Assessment Results', 'System Issues', 'User Feedback'];
                     foreach ($events as $event) {
                         $is_enabled = false;
+                        $template = '';
                         foreach ($notification_settings as $setting) {
-                            if ($setting['event_name'] == $event && $setting['is_enabled']) {
-                                $is_enabled = true;
+                            if ($setting['event_name'] == $event) {
+                                $is_enabled = $setting['is_enabled'];
+                                $template = $setting['email_template'];
                                 break;
                             }
                         }
                         echo '<input type="checkbox" name="notification_events[]" value="' . $event . '" ' . ($is_enabled ? 'checked' : '') . '> ' . $event . '<br>';
+                        echo '<label for="email-template-' . $event . '">Email Template for ' . $event . ':</label>';
+                        echo '<textarea id="email-template-' . $event . '" name="email_template[' . $event . ']" rows="5">' . htmlspecialchars($template) . '</textarea>';
                     }
                     ?>
                 </div>
-
-                <label for="email-template">Email Template:</label>
-                <textarea id="email-template" name="email_template" rows="5"><?php echo htmlspecialchars($notification_settings[0]['email_template']); ?></textarea>
 
                 <button type="submit">Save Notification Settings</button>
             </form>
