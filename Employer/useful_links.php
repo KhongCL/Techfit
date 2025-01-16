@@ -1,5 +1,18 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start();
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "techfit";
+
+$mysqli = new mysqli($servername, $username, $password, $dbname);
+
+if ($mysqli->connect_error) {
+    die("Database connection failed: " . $mysqli->connect_error);
+}
 
 // Function to display the message and options
 function displayLoginMessage() {
@@ -22,6 +35,8 @@ if (!isset($_SESSION['user_id'])) {
 if ($_SESSION['role'] !== 'Employer') {
     displayLoginMessage(); // Display message and options if the role is not Employer
 }
+$result = $mysqli->query("SELECT * FROM resource WHERE type = 'useful_link' ORDER BY category, resource_id");
+$usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
 
 // Close the session
 session_write_close();
@@ -75,43 +90,48 @@ session_write_close();
     </header>
 
     <section id="resources">
-        <h2>Useful Links</h2>
-        <p>Here are some useful links to help you get started on your career in IT:</p>
+            <h2>Useful Links</h2>
+            <p>Here are some useful links to help you get started on your career in IT:</p>
 
-        <div class="resource-columns">
-            <div class="resource-column">
-                <h3>For Job Seekers</h3>
-                <ul>
-                    <?php 
-                    $jobSeekerLinks = array_filter($usefulLinks, fn($link) => $link['category'] === 'jobSeeker');
-                    if ($jobSeekerLinks):
-                        foreach ($jobSeekerLinks as $link): ?>
-                            <li><a href="<?= htmlspecialchars($link['link']) ?>"><?= htmlspecialchars($link['title']) ?></a></li>
-                        <?php endforeach;
-                        
-                    else: ?>
-                        <li style="color: grey; font-style: italic;">No useful links yet for this category.</li>
-                    <?php endif; ?>
-                </ul>
+            <div class="resource-columns">
+                <div class="resource-column">
+                    <h3>For Job Seekers</h3>
+                    <ul>
+                        <?php 
+                        $jobSeekerLinks = array_filter($usefulLinks, function($link) {
+                            return $link['category'] === 'jobSeeker';
+                        });
+                        if ($jobSeekerLinks):
+                            foreach ($jobSeekerLinks as $link): ?>
+                                <li><a href="<?= htmlspecialchars($link['link']) ?>"><?= htmlspecialchars($link['title']) ?></a></li>
+                                <div style="height: 145px;"></div>
+                                <?php endforeach;
+                        else: ?>
+                            <li style="color: grey; font-style: italic;">No useful links yet for this category.</li>
+                            <li style="height: 170px;"></li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
+                    
+                    <div class="resource-column">
+                        <h3>For Employers</h3>
+                        <ul>
+                            <?php 
+                        $employerLinks = array_filter($usefulLinks, function($link) {
+                            return $link['category'] === 'employer';
+                        });
+                        if ($employerLinks):
+                            foreach ($employerLinks as $link): ?>
+                                <li><a href="<?= htmlspecialchars($link['link']) ?>"><?= htmlspecialchars($link['title']) ?></a></li>
+                                <div style="height: 145px;"></div>
+                                <?php endforeach;
+                        else: ?>
+                            <li style="color: grey; font-style: italic;">No useful links yet for this category.</li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
             </div>
-
-            <div class="resource-column">
-                <h3>For Employers</h3>
-                <ul>
-                    <?php 
-                    $employerLinks = array_filter($usefulLinks, fn($link) => $link['category'] === 'employer');
-                    if ($employerLinks):
-                        foreach ($employerLinks as $link): ?>
-                            <li><a href="<?= htmlspecialchars($link['link']) ?>"><?= htmlspecialchars($link['title']) ?></a></li>
-                        <?php endforeach;
-                    else: ?>
-                        <li style="color: grey; font-style: italic;">No useful links yet for this category.</li>
-                        <li style="height: 149px;"></li>
-                    <?php endif; ?>
-                </ul>
-            </div>
-        </div>
-    </section>
+        </section>
 
     <footer>
         <div class="footer-content">

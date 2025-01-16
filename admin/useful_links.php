@@ -151,47 +151,49 @@ $usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
         </nav>
     </header>  
 <body>
-    <section id="resources">
-        <h2>Useful Links</h2>
-        <p>Here are some useful links to help you get started on your career in IT:</p>
+        <section id="resources">
+            <h2>Useful Links</h2>
+            <p>Here are some useful links to help you get started on your career in IT:</p>
 
-        <div class="resource-columns">
-            <div class="resource-column">
-                <h3>For Job Seekers</h3>
-                <ul>
-                    <?php 
-                    $jobSeekerLinks = array_filter($usefulLinks, fn($link) => $link['category'] === 'jobSeeker');
-                    if ($jobSeekerLinks):
-                        foreach ($jobSeekerLinks as $link): ?>
-                            <li><a href="<?= htmlspecialchars($link['link']) ?>"><?= htmlspecialchars($link['title']) ?></a></li>
-                        <?php endforeach;
-                        
-                    else: ?>
-                        <li style="color: grey; font-style: italic;">No useful links yet for this category.</li>
-                    <?php endif; ?>
-                </ul>
-            </div>
+            <div class="resource-columns">
+                <div class="resource-column">
+                    <h3>For Job Seekers</h3>
+                    <ul>
+                        <?php 
+                        $jobSeekerLinks = array_filter($usefulLinks, function($link) {
+                            return $link['category'] === 'jobSeeker';
+                        });
+                        if ($jobSeekerLinks):
+                            foreach ($jobSeekerLinks as $link): ?>
+                                <li><a href="<?= htmlspecialchars($link['link']) ?>"><?= htmlspecialchars($link['title']) ?></a></li>
+                            <?php endforeach;
+                        else: ?>
+                            <li style="color: grey; font-style: italic;">No useful links yet for this category.</li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
 
-            <div class="resource-column">
-                <h3>For Employers</h3>
-                <ul>
-                    <?php 
-                    $employerLinks = array_filter($usefulLinks, fn($link) => $link['category'] === 'employer');
-                    if ($employerLinks):
-                        foreach ($employerLinks as $link): ?>
-                            <li><a href="<?= htmlspecialchars($link['link']) ?>"><?= htmlspecialchars($link['title']) ?></a></li>
-                        <?php endforeach;
-                    else: ?>
-                        <li style="color: grey; font-style: italic;">No useful links yet for this category.</li>
-                        <li style="height: 89px;"></li>
-                    <?php endif; ?>
-                </ul>
+                <div class="resource-column">
+                    <h3>For Employers</h3>
+                    <ul>
+                        <?php 
+                        $employerLinks = array_filter($usefulLinks, function($link) {
+                            return $link['category'] === 'employer';
+                        });
+                        if ($employerLinks):
+                            foreach ($employerLinks as $link): ?>
+                                <li><a href="<?= htmlspecialchars($link['link']) ?>"><?= htmlspecialchars($link['title']) ?></a></li>
+                            <?php endforeach;
+                        else: ?>
+                            <li style="color: grey; font-style: italic;">No useful links yet for this category.</li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
     <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
         <a href="manage_useful_links.php" id="manage_useful_links_button" style="background-color: #4CAF50; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Manage Useful Links</a>
-        <div style="height: 80px;"></div>
+        <div style="height: 110px;"></div>
     </div>
     <footer>
         <div class="footer-content">

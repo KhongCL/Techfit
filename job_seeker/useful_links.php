@@ -79,8 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch Useful Links for Display
-$result = $mysqli->query("SELECT * FROM resource WHERE type = 'usefulLink' ORDER BY category, resource_id");
+$result = $mysqli->query("SELECT * FROM resource WHERE type = 'useful_link' ORDER BY category, resource_id");
 $usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
 
 // Function to display the message and options
@@ -221,43 +220,48 @@ session_write_close();
     </div>
 
     <section id="resources">
-        <h2>Useful Links</h2>
-        <p>Here are some useful links to help you get started on your career in IT:</p>
-        <div class="resource-columns">
-            <div class="resource-column">
-                <h3>For Job Seekers</h3>
-                <ul>
-                    <?php 
-                    $jobSeekerLinks = array_filter($usefulLinks, fn($link) => $link['category'] === 'jobSeeker');
-                    if ($jobSeekerLinks):
-                        foreach ($jobSeekerLinks as $link): ?>
-                            <li><a href="<?= htmlspecialchars($link['link']) ?>"><?= htmlspecialchars($link['title']) ?></a></li>
-                        <?php endforeach;
-                        
-                    else: ?>
-                        <li style="color: grey; font-style: italic;">No useful links yet for this category.</li>
-                        <li style="height: 168px;"></li>
-                    <?php endif; ?>
-                </ul>
-            </div>
+            <h2>Useful Links</h2>
+            <p>Here are some useful links to help you get started on your career in IT:</p>
 
-            <div class="resource-column">
-                <h3>For Employers</h3>
-                <ul>
-                    <?php 
-                    $employerLinks = array_filter($usefulLinks, fn($link) => $link['category'] === 'employer');
-                    if ($employerLinks):
-                        foreach ($employerLinks as $link): ?>
-                            <li><a href="<?= htmlspecialchars($link['link']) ?>"><?= htmlspecialchars($link['title']) ?></a></li>
-                        <?php endforeach;
-                    else: ?>
-                        <li style="color: grey; font-style: italic;">No useful links yet for this category.</li>
-                        <li style="height: 168px;"></li>
-                    <?php endif; ?>
-                </ul>
+            <div class="resource-columns">
+                <div class="resource-column">
+                    <h3>For Job Seekers</h3>
+                    <ul>
+                        <?php 
+                        $jobSeekerLinks = array_filter($usefulLinks, function($link) {
+                            return $link['category'] === 'jobSeeker';
+                        });
+                        if ($jobSeekerLinks):
+                            foreach ($jobSeekerLinks as $link): ?>
+                                <li><a href="<?= htmlspecialchars($link['link']) ?>"><?= htmlspecialchars($link['title']) ?></a></li>
+                                <div style="height: 145px;"></div>
+                                <?php endforeach;
+                        else: ?>
+                            <li style="color: grey; font-style: italic;">No useful links yet for this category.</li>
+                            <li style="height: 170px;"></li>
+                            <?php endif; ?>
+                        </ul>
+                    </div>
+                    
+                    <div class="resource-column">
+                        <h3>For Employers</h3>
+                        <ul>
+                            <?php 
+                        $employerLinks = array_filter($usefulLinks, function($link) {
+                            return $link['category'] === 'employer';
+                        });
+                        if ($employerLinks):
+                            foreach ($employerLinks as $link): ?>
+                                <li><a href="<?= htmlspecialchars($link['link']) ?>"><?= htmlspecialchars($link['title']) ?></a></li>
+                                <div style="height: 145px;"></div>
+                                <?php endforeach;
+                        else: ?>
+                            <li style="color: grey; font-style: italic;">No useful links yet for this category.</li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
     <footer>
         <div class="footer-content">

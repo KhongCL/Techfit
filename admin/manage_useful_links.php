@@ -36,10 +36,16 @@ if (empty($admin_id)) {
 }
 
 // Fetch Useful Links from the database
-$usefulLinksDescription = [];
+$usefulLinks = [];
 $result = $mysqli->query("SELECT resource_id, title, link, category FROM resource WHERE type = 'useful_link'");
 while ($row = $result->fetch_assoc()) {
-    $usefulLinksDescription[] = $row;
+    $usefulLinks[] = $row;
+}
+
+$usefulLinkDescriptions = [];
+$result = $mysqli->query("SELECT resource_id, description FROM admin_resource");
+while ($row = $result->fetch_assoc()) {
+    $usefulLinkDescriptions[$row['resource_id']] = $row['description'];
 }
 
 function generateResourceId($mysqli) {
@@ -292,14 +298,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="faq-category">
                 <h3>For <?= ucfirst($category) ?>s</h3>
                 <?php 
-                $categoryLinks = array_filter($usefulLinksDescription, fn($usefulLink) => $usefulLink['category'] === $category);
+                $categoryLinks = array_filter($usefulLinks, fn($usefulLink) => $usefulLink['category'] === $category);
                 if ($categoryLinks): 
                     foreach ($categoryLinks as $usefulLink): ?>
                         <div class="faq-item" data-id="<?= $usefulLink['resource_id'] ?>">
                             <strong>Title:</strong> <?= htmlspecialchars($usefulLink['title']) ?><br><br>
                             <strong>Link:</strong> <?= htmlspecialchars($usefulLink['link']) ?><br><br>
                             <p style="margin: 0; color: #555; font-size: 14px; text-align: justify;">
-                                <strong>Description:</strong> <?= htmlspecialchars($usefulLinksDescription[$usefulLink['resource_id']] ?? 'No description available', ENT_QUOTES, 'UTF-8') ?>
+                                <strong>Description:</strong> <?= htmlspecialchars($usefulLinkDescriptions[$usefulLink['resource_id']] ?? 'No description available', ENT_QUOTES, 'UTF-8') ?>
                             </p>
                             <div style="text-align: center; margin-top: 10px;">
                                 <button style="background-color: green; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer;" onclick="editUsefulLink('<?= $usefulLink['resource_id'] ?>')">Edit</button>
@@ -409,7 +415,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             const title = usefulLinkItem.querySelector('strong:nth-of-type(1)').nextSibling.textContent.trim();
             const link = usefulLinkItem.querySelector('strong:nth-of-type(2)').nextSibling.textContent.trim();
-            const category = usefulLinkItem.closest('.faq-category').querySelector('h3').textContent.includes('Job Seeker') ? 'jobSeeker' : 'employer';
+            const category = usefulLinkItem.closest('.faq-category').querySelector('h3').textContent.toLowerCase().includes('job') ? 'jobSeeker' : 'employer';
+            const description = usefulLinkItem.querySelector('p').textContent.replace('Description:', '').trim();
 
             // Populate the form with the Useful Link details
             const form = document.getElementById('faqForm');
@@ -417,6 +424,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             form.querySelector('[name="title"]').value = title;
             form.querySelector('[name="link"]').value = link;
             form.querySelector('[name="category"]').value = category;
+            form.querySelector('[name="description"]').value = description;
 
             // Enable the category and description fields
             form.querySelector('[name="category"]').removeAttribute('disabled');
