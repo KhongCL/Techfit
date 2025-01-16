@@ -30,10 +30,6 @@ if (!isset($_SESSION['job_seeker_id'])) {
 
 // Close the session
 session_write_close();
-?>
-
-<?php
-session_start(); // Start the session
 
 // Database connection
 $host = 'localhost';
@@ -46,30 +42,30 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Retrieve job seeker ID from session
-$job_seeker_id = $_SESSION['job_seeker_id'];
+// Retrieve assessment ID from query parameter
+$assessment_id = $_GET['assessment_id'];
 
-// Fetch assessment summaries for the job seeker
+// Fetch assessment details and answers
 $sql = "
     SELECT 
     Assessment_Job_Seeker.end_time AS assessment_date, 
-    Assessment_Job_Seeker.assessment_id AS assessment_id,
-    COUNT(Question.question_id) AS number_of_questions, 
-    SUM(CASE WHEN Answer.is_correct = TRUE THEN 1 ELSE 0 END) AS correct_answers,
-    SUM(CASE WHEN Answer.is_correct = FALSE THEN 1 ELSE 0 END) AS wrong_answers,
-    Assessment_Job_Seeker.score
+    Assessment_Job_Seeker.score,
+    Question.question_text,
+    Answer.answer_text AS user_answer,
+    Question.correct_answer,
+    Answer.is_correct
     
     FROM Assessment_Job_Seeker
     JOIN Question ON Question.assessment_id = Assessment_Job_Seeker.assessment_id
     LEFT JOIN Answer ON Answer.job_seeker_id = Assessment_Job_Seeker.job_seeker_id AND Answer.question_id = Question.question_id
-    WHERE Assessment_Job_Seeker.job_seeker_id = ?
-    GROUP BY Assessment_Job_Seeker.assessment_id
-    ORDER BY Assessment_Job_Seeker.end_time DESC";
+    WHERE Assessment_Job_Seeker.assessment_id = ? AND Assessment_Job_Seeker.job_seeker_id = ?";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $job_seeker_id);
+$stmt->bind_param("ss", $assessment_id, $_SESSION['job_seeker_id']);
 $stmt->execute();
 $result = $stmt->get_result();
+
+$assessment_details = $result->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -80,91 +76,109 @@ $result = $stmt->get_result();
     <title>TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh; /* Full viewport height */
-            margin: 0;
-        }
-
-        header {
-            flex-shrink: 0; /* Header stays at the top */
-        }
-
         #assessment-summary {
-            flex-grow: 1; /* Main section grows to fill space between header and footer */
-            margin: 20px 0; /* Optional spacing around the container */
-            background-color: #f8f8f8;
-            padding: 20px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            font-family: Arial, sans-serif;
         }
 
         .container_a_s {
-            width: 90%;
             max-width: 800px;
-            margin: auto; /* Center horizontally */
-            background-color: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
             overflow: hidden;
         }
 
+        /* Header styling */
         .summary_header {
             padding: 20px;
-            text-align: left;
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #333;
-            border-bottom: 2px solid #ddd;
+            border-bottom: 2px solid #e0e0e0;
+            text-align: center;
         }
 
+        .summary_header h2 {
+            margin: 0;
+            color: #333;
+            font-size: 1.5em;
+        }
+
+        .summary_header p {
+            margin: 5px 0;
+            color: #666;
+            font-size: 1em;
+        }
+
+        /* Scrollable area styling */
         .scrollable {
             max-height: 400px;
             overflow-y: auto;
+            padding: 20px;
         }
 
+        /* Individual summary items */
         .summary-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px;
-            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
         }
 
         .summary-item:last-child {
             border-bottom: none;
         }
 
-        .summary-item h3 {
+        .summary-details h3 {
             margin: 0;
-            font-size: 1.2rem;
-            font-weight: bold;
             color: #333;
+            font-size: 1.2em;
         }
 
-        .summary-item p {
+        .summary-details p {
             margin: 5px 0;
-            font-size: 1rem;
             color: #555;
+            font-size: 1em;
         }
 
-        .summary-details {
-            flex-grow: 1;
+        /* Badge styling */
+        .summary-item span {
+            font-size: 0.9em;
+            padding: 5px 15px;
+            border-radius: 15px;
+            color: white;
+            font-weight: bold;
         }
 
-        .view-answers-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 0.9rem;
-            transition: background-color 0.3s;
+        .summary-item span.green {
+            background-color: #4caf50;
         }
 
-        .view-answers-button:hover {
-            background-color: #0056b3;
+        .summary-item span.red {
+            background-color: #f44336;
         }
+
+        /* Scrollbar styling (optional) */
+        .scrollable::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .scrollable::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .scrollable::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        .scrollable::-webkit-scrollbar-thumb:hover {
+            background: #888;
+        }
+
     </style>
 
 </head>
@@ -231,23 +245,32 @@ $result = $stmt->get_result();
 
     <section id="assessment-summary">
         <div class="container_a_s">
-            <div class="summary_header">Assessment Summary</div>
+            <div class="summary_header">
+                <h2>View Answers</h2>
+                <?php if (!empty($assessment_details)): ?>
+                    <p>Assessment ID: <?= $assessment_id; ?></p>
+                    <p>Assessment Date: <?= date('d/m/Y', strtotime($assessment_details[0]['assessment_date'])); ?></p>
+                    <p>Score: <?= $assessment_details[0]['score']; ?>%</p>
+                <?php endif; ?>
+            </div>
             <div class="scrollable">
-                <?php if ($result->num_rows > 0): ?>
-                    <?php while ($row = $result->fetch_assoc()): ?>
+                <?php if (!empty($assessment_details)): ?>
+                    <?php foreach ($assessment_details as $detail): ?>
                         <div class="summary-item">
                             <div class="summary-details">
-                                <h3>Assessment <?= $row['assessment_id']; ?></h3>
-                                <p>Date: <?= date('d/m/Y', strtotime($row['assessment_date'])); ?></p>
-                                <p>Score: <?= $row['score']; ?></p>
-                                <p>Correct answers: <?= $row['correct_answers']; ?></p>
-                                <p>Wrong answers: <?= $row['wrong_answers']; ?></p>
+                                <h3>Question: <?= htmlspecialchars($detail['question_text']); ?></h3>
+                                <p>Your Answer: <?= htmlspecialchars($detail['user_answer']); ?></p>
+                                <p>Correct Answer: <?= htmlspecialchars($detail['correct_answer']); ?></p>
                             </div>
-                            <a href="view_answers.php?assessment_id=<?= urlencode($row['assessment_id']); ?>" class="view-answers-button">View answers</a>
+                            <div>
+                                <span class="<?= $detail['is_correct'] ? 'green' : 'red'; ?>">
+                                    <?= $detail['is_correct'] ? 'Correct' : 'Incorrect'; ?>
+                                </span>
+                            </div>
                         </div>
-                    <?php endwhile; ?>
+                    <?php endforeach; ?>
                 <?php else: ?>
-                    <p>No assessments found.</p>
+                    <p>No answers found for this assessment.</p>
                 <?php endif; ?>
             </div>
         </div>
@@ -308,7 +331,6 @@ $result = $stmt->get_result();
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
-
 
     <script src="scripts.js?v=1.0"></script>
     <script>

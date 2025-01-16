@@ -1,10 +1,3 @@
-
-
-<!-- Note: This file is used to download the assessment history report of a job seeker. 
-This file does not have an interface, it is used to generate and download the report.
--->
-
-
 <?php
 session_start();
 $host = 'localhost';

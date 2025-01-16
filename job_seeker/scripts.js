@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     startButton.addEventListener('click', function() {
-        window.location.href = 'preliminary_questions.html';
+        window.location.href = 'assessment_question.php';
     });
 });
 

@@ -188,3 +188,18 @@ CREATE TABLE Employer_Interest (
     FOREIGN KEY (employer_id) REFERENCES Employer(employer_id),
     FOREIGN KEY (job_seeker_id) REFERENCES Job_Seeker(job_seeker_id)
 );
+
+-- New Tables for System Configuration Settings
+CREATE TABLE Assessment_Settings (
+    setting_id VARCHAR(5) PRIMARY KEY,
+    default_time_limit INT NOT NULL,
+    passing_score_percentage INT NOT NULL,
+    allowed_question_types TEXT NOT NULL -- JSON array (e.g., ["Multiple Choice", "Essay"])
+);
+
+CREATE TABLE Notification_Settings (
+    setting_id VARCHAR(5) PRIMARY KEY,
+    event_name VARCHAR(100) NOT NULL,
+    is_enabled BOOLEAN NOT NULL,
+    email_template TEXT NOT NULL
+);
