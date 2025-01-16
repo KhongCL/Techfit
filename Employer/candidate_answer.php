@@ -217,10 +217,11 @@ session_start();
         .back-arrow:hover {
             color: #007bff;
         }
+        
     </style>
 </head>
 <body>
-    <header>
+<header>
         <div class="logo">
             <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
@@ -355,12 +356,14 @@ session_start();
                     $result = $conn->query($sql);
                 
                     if ($result->num_rows > 0) {
+                        $question_counter = 1; // Initialize the question counter
                         while ($row = $result->fetch_assoc()) {
                             echo "<div class='question'>";
-                            echo "<div class='question-text'><strong>Question:</strong> " . $row['question_text'] . "</div>";
+                            echo "<div class='question-text'><strong>Question $question_counter:</strong> " . $row['question_text'] . "</div>";
                             echo "<div class='job-seeker-answer'><strong>Job Seeker's Answer:</strong> </div>"; // Leave blank for now
                             echo "<div class='correct-answer'><strong>Correct Answer:</strong> " . $row['correct_answer'] . "</div>";
                             echo "</div>";
+                            $question_counter++; // Increment the question counter
                         }
                     } else {
                         echo "<div>No questions found for this assessment.</div>";
