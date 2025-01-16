@@ -26,12 +26,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         if (password_verify($password, $row['password'])) {
+            // Check if the user is an admin
+            if ($row['role'] == 'Admin') {
+                $_SESSION['error_message'] = "No Job Seeker or Employer found with that username.";
+                header("Location: login.php");
+                exit();
+            }
+    
             // Start session and set session variables
             $_SESSION['user_id'] = $row['user_id'];
             $_SESSION['username'] = $row['username'];
             $_SESSION['email'] = $row['email'];
             $_SESSION['role'] = $row['role'];
-
+    
             // Check if the user is a job seeker and store the job seeker ID
             if ($row['role'] == 'Job Seeker') {
                 $stmt = $conn->prepare("SELECT job_seeker_id FROM Job_Seeker WHERE user_id=?");
@@ -53,8 +60,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $_SESSION['employer_id'] = $employer_row['employer_id'];
                 }
                 header("Location: employer/index.php");
-            } else if ($row['role'] == 'Admin') {
-                header("Location: admin/index.php");
             }
             exit();
         } else {

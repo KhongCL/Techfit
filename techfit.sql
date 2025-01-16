@@ -62,7 +62,7 @@ CREATE TABLE Assessment_Job_Seeker (
     summary TEXT,
     feedback TEXT,
     PRIMARY KEY (assessment_id, job_seeker_id),
-    FOREIGN KEY (assessment_id) REFERENCES Assessment(assessment_id),
+    FOREIGN KEY (assessment_id) REFERENCES Assessment_Admin(assessment_id),
     FOREIGN KEY (job_seeker_id) REFERENCES Job_Seeker(job_seeker_id)
 );
 
@@ -90,16 +90,20 @@ CREATE TABLE Answer (
 CREATE TABLE Resource (
     resource_id VARCHAR(5) PRIMARY KEY,
     type VARCHAR(50),
-    link VARCHAR(255)
+    question TEXT NOT NULL,
+    answer TEXT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    link VARCHAR(255) NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    image LONGBLOB
 );
-
 CREATE TABLE Admin_Resource (
+    admin_resource_id VARCHAR(5) PRIMARY KEY,
     admin_id VARCHAR(5),
     resource_id VARCHAR(5),
     action_type ENUM('added', 'edited', 'deleted') NOT NULL,
     timestamp DATETIME NOT NULL,
     description TEXT,
-    PRIMARY KEY (admin_id, resource_id),
     FOREIGN KEY (admin_id) REFERENCES Admin(admin_id),
     FOREIGN KEY (resource_id) REFERENCES Resource(resource_id)
 );
@@ -191,15 +195,6 @@ CREATE TABLE Assessment_Settings (
     default_time_limit INT NOT NULL,
     passing_score_percentage INT NOT NULL,
     allowed_question_types TEXT NOT NULL -- JSON array (e.g., ["Multiple Choice", "Essay"])
-);
-
-CREATE TABLE Security_Settings (
-    setting_id VARCHAR(5) PRIMARY KEY,
-    min_password_length INT NOT NULL,
-    require_special_char BOOLEAN NOT NULL,
-    require_uppercase BOOLEAN NOT NULL,
-    require_numbers BOOLEAN NOT NULL,
-    password_expiration_days INT NOT NULL
 );
 
 CREATE TABLE Notification_Settings (

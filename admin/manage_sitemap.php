@@ -3,91 +3,193 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Database connection
 $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "techfit";
 
 $mysqli = new mysqli($servername, $username, $password, $dbname);
-
 if ($mysqli->connect_error) {
-    die("Database connection failed: " . $mysqli->connect_error);
+    die(json_encode(['status' => 'error', 'message' => 'Database connection failed']));
 }
 
-// Function to Generate Custom Resource IDs
-function generateResourceId($mysqli) {
-    // Fetch the last ID
-    $result = $mysqli->query("SELECT resource_id FROM resource ORDER BY resource_id DESC LIMIT 1");
-    $lastId = $result->fetch_assoc()['resource_id'];
+// Get the user_id from the session
+if (!isset($_SESSION['user_id'])) {
+    die(json_encode(['status' => 'error', 'message' => 'User not logged in']));
+}
+$user_id = $_SESSION['user_id'];
 
-    // Determine the numeric part and increment it
-    $prefix = "R";
-    $newId = 1; // Default for the first entry
-    if ($lastId) {
-        $numericPart = intval(substr($lastId, strlen($prefix)));
-        $newId = $numericPart + 1;
-    }
+// Fetch admin_id using user_id
+$admin_id_query = $mysqli->prepare("SELECT admin_id FROM admin WHERE user_id = ?");
+$admin_id_query->bind_param("s", $user_id);
+$admin_id_query->execute();
+$admin_id_query->bind_result($admin_id);
+$admin_id_query->fetch();
+$admin_id_query->close();
 
-    // Return the new ID
-    return $prefix . str_pad($newId, 2, "0", STR_PAD_LEFT);
+error_log('Request received: ' . print_r($_POST, true));
+error_log('Request FILES: ' . print_r($_FILES, true));
+
+if (empty($admin_id)) {
+    die(json_encode(['status' => 'error', 'message' => 'Admin ID not found']));
+}
+
+// Fetch descriptions for each sitemap
+$sitemapDescriptions = [];
+$result = $mysqli->query("SELECT resource_id, description FROM admin_resource");
+while ($row = $result->fetch_assoc()) {
+    $sitemapDescriptions[$row['resource_id']] = $row['description'];
+}
+
+// Function to log admin actions
+function logAdminAction($mysqli, $admin_id, $resource_id, $action_type, $description) {
+    $timestamp = date('Y-m-d H:i:s');
+    $admin_resource_id = generateAdminResourceId($mysqli);
+    $stmt = $mysqli->prepare(
+        "INSERT INTO Admin_Resource (admin_resource_id, admin_id, resource_id, action_type, timestamp, description) 
+        VALUES (?, ?, ?, ?, ?, ?)"
+    );
+    $stmt->bind_param("ssssss", $admin_resource_id, $admin_id, $resource_id, $action_type, $timestamp, $description);
+    $stmt->execute();
+    $stmt->close();
 }
 
 // Handle Add/Edit/Delete Actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
-        $action = $_POST['action'];
-        if ($action === 'add') {
-            $category = trim($_POST['category']);
-            $image = $_FILES['image']['tmp_name'];
+    $action = $_POST['action'] ?? null;
 
-            if ($category && $image) {
-                $resourceId = generateResourceId($mysqli);
-                $imageData = file_get_contents($image);
-                $stmt = $mysqli->prepare("INSERT INTO resource (resource_id, type, category, image) VALUES (?, 'sitemap', ?, ?)");
-                $stmt->bind_param("sss", $resourceId, $category, $imageData);
-                $stmt->execute();
-                echo json_encode(['status' => 'success', 'message' => 'Sitemap added successfully']);
-            } else {
-                echo json_encode(['status' => 'error', 'message' => 'All fields are required.']);
-            }
-        } elseif ($action === 'edit') {
-            $id = $_POST['id'];
-            $category = trim($_POST['category']);
-            $image = $_FILES['image']['tmp_name'];
-
-            if ($id && $category) {
-                if ($image) {
-                    $imageData = file_get_contents($image);
-                    $stmt = $mysqli->prepare("UPDATE resource SET category = ?, image = ? WHERE resource_id = ?");
-                    $stmt->bind_param("sss", $category, $imageData, $id);
-                } else {
-                    $stmt = $mysqli->prepare("UPDATE resource SET category = ? WHERE resource_id = ?");
-                    $stmt->bind_param("ss", $category, $id);
-                }
-                $stmt->execute();
-                echo json_encode(['status' => 'success', 'message' => 'Sitemap updated successfully']);
-            } else {
-                echo json_encode(['status' => 'error', 'message' => 'All fields are required.']);
-            }
-        } elseif ($action === 'delete') {
-            $id = $_POST['id'];
-            if ($id) {
-                $stmt = $mysqli->prepare("DELETE FROM resource WHERE resource_id = ?");
-                $stmt->bind_param("s", $id);
-                $stmt->execute();
-                echo json_encode(['status' => 'success', 'message' => 'Sitemap deleted successfully']);
-            } else {
-                echo json_encode(['status' => 'error', 'message' => 'Invalid Sitemap ID.']);
-            }
-        }
+    if (!$action) {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid action']);
         exit;
     }
+
+    if ($action === 'delete') {
+        $resource_id = $_POST['id'] ?? null;
+        logAdminAction($mysqli, $admin_id, $resource_id, 'deleted', 'Sitemap deleted');
+        
+        // Validate the resource ID
+        if (!$resource_id) {
+            echo json_encode(['status' => 'error', 'message' => 'Resource ID is required for deletion']);
+            exit;
+        }
+
+        // First, delete related rows in Admin_Resource
+        $stmt = $mysqli->prepare("DELETE FROM Admin_Resource WHERE resource_id = ?");
+        $stmt->bind_param("s", $resource_id);
+        if (!$stmt->execute()) {
+            error_log('Error deleting from Admin_Resource: ' . $stmt->error);
+            echo json_encode(['status' => 'error', 'message' => 'Failed to delete related admin resources.']);
+            exit;
+        }
+        $stmt->close();
+
+        // Then, delete the row in Resource
+        $stmt = $mysqli->prepare("DELETE FROM Resource WHERE resource_id = ?");
+        $stmt->bind_param("s", $resource_id);
+        if (!$stmt->execute()) {
+            error_log('Error deleting from Resource: ' . $stmt->error);
+            echo json_encode(['status' => 'error', 'message' => 'Failed to delete the resource.']);
+            exit;
+        }
+        $stmt->close();
+
+        echo json_encode(['status' => 'success', 'message' => 'Sitemap deleted successfully']);
+        exit;
+    } elseif ($action === 'add') {
+        // Validate for 'add' action
+        $description = trim($_POST['description'] ?? '');
+        $category = trim($_POST['category'] ?? '');
+        $image = $_FILES['image']['tmp_name'] ?? null;
+
+        if (!$description || !$category || !$image) {
+            echo json_encode(['status' => 'error', 'message' => 'All fields are required for adding a sitemap']);
+            exit;
+        }
+
+        // Proceed with adding logic
+        $admin_resource_id = generateAdminResourceId($mysqli);
+        $resource_id = generateResourceId($mysqli);
+        $image_data = file_get_contents($image);
+
+        $stmt = $mysqli->prepare("INSERT INTO resource (resource_id, type, category, image) VALUES (?, 'sitemap', ?, ?)");
+        $stmt->bind_param("sss", $resource_id, $category, $image_data);
+        $stmt->execute();
+        $stmt->close();
+
+        logAdminAction($mysqli, $admin_id, $resource_id, 'added', $description);
+
+        echo json_encode(['status' => 'success', 'message' => 'Sitemap added successfully']);
+        exit;
+    } elseif ($action === 'edit') {
+        // Validate for 'edit' action
+        $resource_id = $_POST['id'] ?? null;
+        $description = trim($_POST['description'] ?? '');
+        $category = trim($_POST['category'] ?? '');
+        $image = $_FILES['image']['tmp_name'] ?? null;
+
+        if (!$resource_id || !$description || !$category) {
+            echo json_encode(['status' => 'error', 'message' => 'All fields are required for editing a sitemap']);
+            exit;
+        }
+
+        // Proceed with editing logic
+        if ($image) {
+            $image_data = file_get_contents($image);
+            $stmt = $mysqli->prepare("UPDATE resource SET category = ?, image = ? WHERE resource_id = ?");
+            $stmt->bind_param("sss", $category, $image_data, $resource_id);
+        } else {
+            $stmt = $mysqli->prepare("UPDATE resource SET category = ? WHERE resource_id = ?");
+            $stmt->bind_param("ss", $category, $resource_id);
+        }
+        $stmt->execute();
+        $stmt->close();
+
+        logAdminAction($mysqli, $admin_id, $resource_id, 'edited', $description);
+
+        echo json_encode(['status' => 'success', 'message' => 'Sitemap updated successfully']);
+        exit;
+    } else {
+        echo json_encode(['status' => 'error', 'message' => 'Invalid action']);
+        exit;
+    }
+}
+
+
+// Function to Generate Resource IDs
+function generateResourceId($mysqli) {
+    $prefix = "R";
+    $new_id = 1;
+    $resource_id = '';
+
+    do {
+        $resource_id = $prefix . str_pad($new_id, 2, "0", STR_PAD_LEFT);
+        $result = $mysqli->query("SELECT resource_id FROM resource WHERE resource_id = '$resource_id'");
+        $new_id++;
+    } while ($result->num_rows > 0);
+
+    return $resource_id;
+}
+
+function generateAdminResourceId($mysqli) {
+    $prefix = "AR";
+    $new_id = 1;
+    $admin_resource_id = '';
+
+    do {
+        $admin_resource_id = $prefix . str_pad($new_id, 3, "0", STR_PAD_LEFT);
+        $result = $mysqli->query("SELECT admin_resource_id FROM Admin_Resource WHERE admin_resource_id = '$admin_resource_id'");
+        $new_id++;
+    } while ($result->num_rows > 0);
+
+    return $admin_resource_id;
 }
 
 // Fetch Sitemaps for Display
 $result = $mysqli->query("SELECT * FROM resource WHERE type = 'sitemap' ORDER BY category, resource_id");
 $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -96,7 +198,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
 </head>
 <header>
         <div class="logo">
-            <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+            <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
         <nav>
             <div class="nav-container">
@@ -108,32 +210,32 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                 <ul class="nav-list">
                     <li><a href="#">Assessments</a>
                         <ul class="dropdown">
-                            <li><a href="create_assessment.html">Create New Assessment</a></li>
+                            <li><a href="create_assessment.php">Create New Assessment</a></li>
                             <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                            <li><a href="view_assessment_results.html">View Assessment Results</a></li>
+                            <li><a href="view_assessment_results.php">View Assessment Results</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Users</a>
                         <ul class="dropdown">
                             <li><a href="manage_users.php">Manage Users</a></li>
-                            <li><a href="user_feedback.html">User Feedback</a></li>
+                            <li><a href="user_feedback.php">User Feedback</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Reports</a>
                         <ul class="dropdown">
-                            <li><a href="assessment_performance.html">Assessment Performance</a></li>
-                            <li><a href="user_engagement.html">User Engagement Statistics</a></li>
-                            <li><a href="feedback_analysis.html">Feedback Analysis</a></li>
+                            <li><a href="assessment_performance.php">Assessment Performance</a></li>
+                            <li><a href="user_engagement.php">User Engagement Statistics</a></li>
+                            <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
-                            <li><a href="useful_links.html">Manage Useful Links</a></li>
-                            <li><a href="faq.html">Manage FAQs</a></li>
-                            <li><a href="sitemap.html">Manage Sitemap</a></li>
+                            <li><a href="useful_links.php">Manage Useful Links</a></li>
+                            <li><a href="faq.php">Manage FAQs</a></li>
+                            <li><a href="sitemap.php">Manage Sitemap</a></li>
                         </ul>
                     </li>
-                    <li><a href="about.html">About</a></li>
+                    <li><a href="about.php">About</a></li>
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
@@ -142,13 +244,13 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                             </div>
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
-                            <li><a href="settings.html">Settings</a>
+                            <li><a href="settings.php">Settings</a>
                                 <ul class="dropdown">
-                                    <li><a href="manage_profile.html">Manage Profile</a></li>
-                                    <li><a href="system_configuration.html">System Configuration Settings</a></li>
+                                    <li><a href="manage_profile.php">Manage Profile</a></li>
+                                    <li><a href="system_configuration.php">System Configuration Settings</a></li>
                                 </ul>
                             </li>
-                            <li><a href="logout.html">Logout</a></li>
+                            <li><a href="logout.php">Logout</a></li>
                         </ul>
                     </li>                    
                 </ul>
@@ -167,26 +269,32 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
         </select><br>
         <label>Image:</label><br>
         <input type="file" name="image" accept="image/*" required><br><br>
+        <label>Description:</label><br>
+        <textarea name="description" required></textarea><br><br>
         <button type="button" onclick="submitSitemap()">Add Sitemap</button>
     </form>
-    <h2 style="text-align: center;">Existing Sitemaps</h2>
-    <div id="sitemap">
+    <h1 style="text-align: center;">Existing Sitemaps</h1>
+    <div id="sitemap" style="padding: 20px; font-family: Arial, sans-serif;">
         <?php foreach (['jobSeeker', 'employer'] as $category): ?>
-            <div class="sitemap-category">
-                <h3>For <?= ucfirst($category) ?>s</h3>
+            <div class="sitemap-category" style="margin-bottom: 30px;">
+                <h1 style="font-size: 24px; color: #333;">For <?= ucfirst($category) ?>s</h2>
                 <?php 
                 $categorySitemaps = array_filter($sitemaps, fn($sitemap) => $sitemap['category'] === $category);
                 if ($categorySitemaps): 
                     foreach ($categorySitemaps as $sitemap): ?>
-                        <div class="sitemap-item" data-id="<?= $sitemap['resource_id'] ?>">
-                            <strong>Image:</strong><br>
-                            <img src="data:image/jpeg;base64,<?= base64_encode($sitemap['image']) ?>" alt="Sitemap Image" style="max-width: 100px;"><br>
-                            <button onclick="editSitemap('<?= $sitemap['resource_id'] ?>')">Edit</button>
-                            <button onclick="deleteSitemap('<?= $sitemap['resource_id'] ?>')">Delete</button>
+                        <div class="sitemap-item" data-id="<?= $sitemap['resource_id'] ?>" style="border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px; background-color: #f9f9f9;">
+                            <strong style="display: block; margin-bottom: 10px;">Image:</strong>
+                            <img src="data:image/jpeg;base64,<?= base64_encode($sitemap['image']) ?>" alt="Sitemap Image" class="sitemap-image" style="max-width: 50%; height: auto; margin-bottom: 10px;"><br>
+                            <button class="edit-button" onclick="editSitemap('<?= $sitemap['resource_id'] ?>')" style="margin-right: 10px; padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">Edit</button>
+                            <button class="delete-button" onclick="deleteSitemap('<?= $sitemap['resource_id'] ?>')" style="padding: 5px 10px; background-color: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer;">Delete</button><br><br>
+                            <strong style="display: block; margin-bottom: 5px;">Description:</strong>
+                            <p style="margin: 0; color: #555; font-size: 14px;">
+                                <?= htmlspecialchars($sitemapDescriptions[$sitemap['resource_id']] ?? 'No description available', ENT_QUOTES, 'UTF-8') ?>
+                            </p>
                         </div>
                     <?php endforeach; 
                 else: ?>
-                    <p>No sitemaps yet for this category.</p>
+                    <p style="color: #888; font-size: 14px;">No sitemaps yet for this category.</p>
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
@@ -199,7 +307,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
         <div class="footer-content">
             <div class="footer-left">
                 <div class="footer-logo">
-                    <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+                    <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
                 </div>
                 <div class="social-media">
                     <p>Keep up with TechFit:</p>
@@ -216,41 +324,41 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                 <div class="footer-column">
                     <h3>Assessments</h3>
                     <ul>
-                        <li><a href="create_assessment.html">Create New Assessment</a></li>
+                        <li><a href="create_assessment.php">Create New Assessment</a></li>
                         <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                        <li><a href="view_assessment_results.html">View Assessment Results</a></li>
+                        <li><a href="view_assessment_results.php">View Assessment Results</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Users</h3>
                     <ul>
-                        <li><a href="manage_users.html">Manage Users</a></li>
-                        <li><a href="user_feedback.html">User Feedback</a></li>
+                        <li><a href="manage_users.php">Manage Users</a></li>
+                        <li><a href="user_feedback.php">User Feedback</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Reports</h3>
                     <ul>
-                        <li><a href="assessment_performance.html">Assessment Performance</a></li>
-                        <li><a href="user_engagement.html">User Engagement Statistics</a></li>
-                        <li><a href="feedback_analysis.html">Feedback Analysis</a></li>
+                        <li><a href="assessment_performance.php">Assessment Performance</a></li>
+                        <li><a href="user_engagement.php">User Engagement Statistics</a></li>
+                        <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.html">Manage Useful Links</a></li>
-                        <li><a href="faq.html">Manage FAQs</a></li>
-                        <li><a href="sitemap.html">Manage Sitemap</a></li>
+                        <li><a href="useful_links.php">Manage Useful Links</a></li>
+                        <li><a href="faq.php">Manage FAQs</a></li>
+                        <li><a href="sitemap.php">Manage Sitemap</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>About</h3>
                     <ul>
-                        <li><a href="about.html">About</a></li>
-                        <li><a href="contact.html">Contact Us</a></li>
-                        <li><a href="terms.html">Terms & Condition</a></li>
-                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="about.php">About</a></li>
+                        <li><a href="contact.php">Contact Us</a></li>
+                        <li><a href="terms.php">Terms & Condition</a></li>
+                        <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
@@ -276,17 +384,42 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                 submitButton.disabled = false; // Re-enable the button if there was an error
             });
         }
-        function editSitemap(id) {
-            // Find the Sitemap item using the data-id attribute
-            const sitemapItem = document.querySelector(`.sitemap-item[data-id="${id}"]`);
-            const category = sitemapItem.closest('.sitemap-category').querySelector('h3').textContent.includes('Job Seeker') ? 'jobSeeker' : 'employer';
 
-            // Populate the form with the Sitemap details
+        function editSitemap(id) {
+            try {
+            const sitemapItem = document.querySelector(`.sitemap-item[data-id="${id}"]`);
+            if (!sitemapItem) {
+                alert('Sitemap item not found');
+                return;
+            }
+            const categoryText = sitemapItem.closest('.sitemap-category').querySelector('h1').textContent.trim().toLowerCase();
+            const category = categoryText.includes('job') ? 'jobSeeker' : 'employer';
+
             const form = document.getElementById('faqForm');
-            form.querySelector('[name="action"]').value = 'edit'; // Change form action to 'edit'
+            form.querySelector('[name="action"]').value = 'edit';
             form.querySelector('[name="category"]').value = category;
 
-            // Add a hidden field for the ID
+            const description = sitemapItem.querySelector('p').innerText.trim();
+            form.querySelector('[name="description"]').value = description;
+
+            // Fetch and display the image
+            const imageSrc = sitemapItem.querySelector('img').src;
+            const imageField = form.querySelector('[name="image"]');
+            const imagePreview = document.createElement('img');
+            imagePreview.src = imageSrc;
+            imagePreview.alt = 'Image Preview';
+            imagePreview.style.maxWidth = '100px';
+            imagePreview.style.display = 'block';
+            imagePreview.style.marginTop = '10px';
+
+            const existingPreview = form.querySelector('img[alt="Image Preview"]');
+            if (existingPreview) {
+                existingPreview.remove();
+            }
+
+            imageField.insertAdjacentElement('afterend', imagePreview);
+
+            // Add a hidden input for the resource ID
             let idField = form.querySelector('[name="id"]');
             if (!idField) {
                 idField = document.createElement('input');
@@ -296,23 +429,106 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
             }
             idField.value = id;
 
-            // Change the button to "Save Changes"
+            // Update the submit button to "Save Sitemap Changes"
             const submitButton = form.querySelector('button[type="button"]');
-            submitButton.textContent = 'Save Changes';
-            submitButton.onclick = saveEditedSitemap;
+            submitButton.textContent = 'Save Sitemap Changes';
+
+            // Handle form submission for "Save Sitemap Changes"
+            submitButton.onclick = () => {
+                const formData = new FormData(form);
+
+                fetch('manage_sitemap.php', {
+                method: 'POST',
+                body: formData,
+                })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.status === 'success') {
+                    location.reload();
+                    } else {
+                    alert('Failed to save changes: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            };
+
+            // Add a cancel button to reset the form
+            let cancelButton = form.querySelector('button.cancel-button');
+            if (!cancelButton) {
+                cancelButton = document.createElement('button');
+                cancelButton.type = 'button';
+                cancelButton.className = 'cancel-button';
+                cancelButton.textContent = 'Cancel';
+                cancelButton.onclick = () => {
+                    form.reset();
+                    submitButton.textContent = 'Add Sitemap';
+                    cancelButton.remove();
+                    const existingPreview = form.querySelector('img[alt="Image Preview"]');
+                    if (existingPreview) {
+                        existingPreview.remove();
+                    }
+                };
+                form.appendChild(cancelButton);
+            }
+
+            // Scroll to the top for visibility
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (error) {
+            console.error('Error in editSitemap function:', error);
+            alert('An error occurred. Please try again.');
+            }
         }
+
+
         function deleteSitemap(id) {
             if (confirm('Are you sure you want to delete this Sitemap?')) {
-                const formData = new FormData();
-                formData.append('action', 'delete');
-                formData.append('id', id);
-                fetch('manage_sitemap.php', { method: 'POST', body: formData })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert(data.message);
-                        if (data.status === 'success') location.reload();
-                    });
+            const formData = new FormData();
+            formData.append('action', 'delete'); // Specify the action
+            formData.append('id', id); // Use `id` as the parameter for the resource ID
+
+            fetch('manage_sitemap.php', { 
+                method: 'POST', 
+                body: formData 
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.status === 'success') {
+                location.reload(); // Reload the page on success
+                } else {
+                alert('Failed to delete the sitemap. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to delete the sitemap. Please try again.');
+            });
             }
+        }
+
+        function logAdminAction(actionType, resourceId) {
+            const formData = new FormData();
+            formData.append('action', 'log');
+            formData.append('action_type', actionType);
+            formData.append('resource_id', resourceId);
+
+            fetch('manage_sitemap.php', {
+            method: 'POST',
+            body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+            if (data.status !== 'success') {
+                console.error('Failed to log action:', data.message);
+            }
+            })
+            .catch(error => {
+            console.error('Error logging action:', error);
+            });
         }
     </script>
 </body>

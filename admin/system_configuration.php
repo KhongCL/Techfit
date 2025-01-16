@@ -39,7 +39,6 @@ if ($conn->connect_error) {
 
 // Retrieve current settings from the database
 $assessment_settings = $conn->query("SELECT * FROM Assessment_Settings WHERE setting_id = '1'")->fetch_assoc();
-$security_settings = $conn->query("SELECT * FROM Security_Settings WHERE setting_id = '1'")->fetch_assoc();
 $notification_settings = $conn->query("SELECT * FROM Notification_Settings")->fetch_all(MYSQLI_ASSOC);
 
 $conn->close();
@@ -210,7 +209,6 @@ $conn->close();
     <main>
     <div class="sidebar">
         <a href="#assessment-settings">Assessment Settings</a>
-        <a href="#security-settings">Security Settings</a>
         <a href="#notification-settings">Notification Settings</a>
     </div>
     <div class="content">
@@ -252,39 +250,6 @@ $conn->close();
                 </div>
 
                 <button type="submit">Save Assessment Settings</button>
-            </form>
-        </div>
-
-        <!-- Security Settings Section -->
-        <div id="security-settings" class="form-section">
-            <h2>Security Settings</h2>
-            <form method="POST" action="save_security_settings.php">
-                <label for="min-password-length">Minimum Password Length:</label>
-                <select id="min-password-length" name="min_password_length">
-                    <option value="6" <?php if ($security_settings['min_password_length'] == 6) echo 'selected'; ?>>6</option>
-                    <option value="8" <?php if ($security_settings['min_password_length'] == 8) echo 'selected'; ?>>8</option>
-                    <option value="10" <?php if ($security_settings['min_password_length'] == 10) echo 'selected'; ?>>10</option>
-                    <option value="12" <?php if ($security_settings['min_password_length'] == 12) echo 'selected'; ?>>12</option>
-                    <option value="15" <?php if ($security_settings['min_password_length'] == 15) echo 'selected'; ?>>15</option>
-                </select>
-
-                <label for="complexity-requirements">Complexity Requirements:</label>
-                <div id="complexity-requirements">
-                    <input type="checkbox" name="complexity_requirements[]" value="Uppercase" <?php if ($security_settings['require_uppercase']) echo 'checked'; ?>> Uppercase Letters<br>
-                    <input type="checkbox" name="complexity_requirements[]" value="Special Characters" <?php if ($security_settings['require_special_char']) echo 'checked'; ?>> Special Characters<br>
-                    <input type="checkbox" name="complexity_requirements[]" value="Numbers" <?php if ($security_settings['require_numbers']) echo 'checked'; ?>> Numbers<br>
-                </div>
-
-                <label for="password-expiration">Password Expiration Period (days):</label>
-                <select id="password-expiration" name="password_expiration">
-                    <option value="30" <?php if ($security_settings['password_expiration_days'] == 30) echo 'selected'; ?>>30</option>
-                    <option value="60" <?php if ($security_settings['password_expiration_days'] == 60) echo 'selected'; ?>>60</option>
-                    <option value="90" <?php if ($security_settings['password_expiration_days'] == 90) echo 'selected'; ?>>90</option>
-                    <option value="120" <?php if ($security_settings['password_expiration_days'] == 120) echo 'selected'; ?>>120</option>
-                    <option value="0" <?php if ($security_settings['password_expiration_days'] == 0) echo 'selected'; ?>>No Expiration</option>
-                </select>
-
-                <button type="submit">Save Security Settings</button>
             </form>
         </div>
 

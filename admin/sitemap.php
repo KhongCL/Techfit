@@ -39,7 +39,7 @@ try {
 <body>
     <header>
         <div class="logo">
-            <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+            <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
         <nav>
             <div class="nav-container">
@@ -51,32 +51,32 @@ try {
                 <ul class="nav-list">
                     <li><a href="#">Assessments</a>
                         <ul class="dropdown">
-                            <li><a href="create_assessment.html">Create New Assessment</a></li>
+                            <li><a href="create_assessment.php">Create New Assessment</a></li>
                             <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                            <li><a href="view_assessment_results.html">View Assessment Results</a></li>
+                            <li><a href="view_assessment_results.php">View Assessment Results</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Users</a>
                         <ul class="dropdown">
                             <li><a href="manage_users.php">Manage Users</a></li>
-                            <li><a href="user_feedback.html">User Feedback</a></li>
+                            <li><a href="user_feedback.php">User Feedback</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Reports</a>
                         <ul class="dropdown">
-                            <li><a href="assessment_performance.html">Assessment Performance</a></li>
-                            <li><a href="user_engagement.html">User Engagement Statistics</a></li>
-                            <li><a href="feedback_analysis.html">Feedback Analysis</a></li>
+                            <li><a href="assessment_performance.php">Assessment Performance</a></li>
+                            <li><a href="user_engagement.php">User Engagement Statistics</a></li>
+                            <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
-                            <li><a href="useful_links.html">Manage Useful Links</a></li>
-                            <li><a href="faq.html">Manage FAQs</a></li>
-                            <li><a href="sitemap.html">Manage Sitemap</a></li>
+                            <li><a href="useful_links.php">Manage Useful Links</a></li>
+                            <li><a href="faq.php">Manage FAQs</a></li>
+                            <li><a href="sitemap.php">Manage Sitemap</a></li>
                         </ul>
                     </li>
-                    <li><a href="about.html">About</a></li>
+                    <li><a href="about.php">About</a></li>
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
@@ -85,13 +85,13 @@ try {
                             </div>
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
-                            <li><a href="settings.html">Settings</a>
+                            <li><a href="settings.php">Settings</a>
                                 <ul class="dropdown">
-                                    <li><a href="manage_profile.html">Manage Profile</a></li>
-                                    <li><a href="system_configuration.html">System Configuration Settings</a></li>
+                                    <li><a href="manage_profile.php">Manage Profile</a></li>
+                                    <li><a href="system_configuration.php">System Configuration Settings</a></li>
                                 </ul>
                             </li>
-                            <li><a href="logout.html">Logout</a></li>
+                            <li><a href="logout.php">Logout</a></li>
                         </ul>
                     </li>                    
                 </ul>
@@ -116,11 +116,11 @@ try {
                 die("Database connection failed: " . $mysqli->connect_error);
             }
 
-            $result = $mysqli->query("SELECT * FROM resource WHERE type = 'sitemap' AND category = 'jobSeeker' ORDER BY resource_id DESC LIMIT 1");
-            $sitemap = $result->fetch_assoc();
-
-            if ($sitemap) {
-                echo '<img src="data:image/jpeg;base64,' . base64_encode($sitemap['image']) . '" alt="Website Sitemap" class="sitemap-image" />';
+            $result = $mysqli->query("SELECT * FROM resource WHERE type = 'sitemap' AND category = 'jobSeeker' ORDER BY resource_id DESC");
+            if ($result->num_rows > 0) {
+                while ($sitemap = $result->fetch_assoc()) {
+                    echo '<img src="data:image/jpeg;base64,' . base64_encode($sitemap['image']) . '" alt="Website Sitemap" class="sitemap-image" />';
+                }
             } else {
                 echo '<p>No sitemap available for Job Seekers.</p>';
             }
@@ -142,13 +142,13 @@ try {
                 die("Database connection failed: " . $mysqli->connect_error);
             }
 
-            $result = $mysqli->query("SELECT * FROM resource WHERE type = 'sitemap' AND category = 'employer' ORDER BY resource_id DESC LIMIT 1");
-            $sitemap = $result->fetch_assoc();
-
-            if ($sitemap) {
-                echo '<img src="data:image/jpeg;base64,' . base64_encode($sitemap['image']) . '" alt="Website Sitemap" class="sitemap-image" />';
+            $result = $mysqli->query("SELECT * FROM resource WHERE type = 'sitemap' AND category = 'employer' ORDER BY resource_id DESC");
+            if ($result->num_rows > 0) {
+                while ($sitemap = $result->fetch_assoc()) {
+                    echo '<img src="data:image/jpeg;base64,' . base64_encode($sitemap['image']) . '" alt="Website Sitemap" class="sitemap-image" />';
+                }
             } else {
-                echo '<p>No sitemap available for Job Seekers.</p>';
+                echo '<p>No sitemap available for Employers.</p>';
             }
 
             $mysqli->close();
@@ -164,7 +164,7 @@ try {
         <div class="footer-content">
             <div class="footer-left">
                 <div class="footer-logo">
-                    <a href="index.html"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+                    <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
                 </div>
                 <div class="social-media">
                     <p>Keep up with TechFit:</p>
@@ -181,41 +181,41 @@ try {
                 <div class="footer-column">
                     <h3>Assessments</h3>
                     <ul>
-                        <li><a href="create_assessment.html">Create New Assessment</a></li>
+                        <li><a href="create_assessment.php">Create New Assessment</a></li>
                         <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                        <li><a href="view_assessment_results.html">View Assessment Results</a></li>
+                        <li><a href="view_assessment_results.php">View Assessment Results</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Users</h3>
                     <ul>
-                        <li><a href="manage_users.html">Manage Users</a></li>
-                        <li><a href="user_feedback.html">User Feedback</a></li>
+                        <li><a href="manage_users.php">Manage Users</a></li>
+                        <li><a href="user_feedback.php">User Feedback</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Reports</h3>
                     <ul>
-                        <li><a href="assessment_performance.html">Assessment Performance</a></li>
-                        <li><a href="user_engagement.html">User Engagement Statistics</a></li>
-                        <li><a href="feedback_analysis.html">Feedback Analysis</a></li>
+                        <li><a href="assessment_performance.php">Assessment Performance</a></li>
+                        <li><a href="user_engagement.php">User Engagement Statistics</a></li>
+                        <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.html">Manage Useful Links</a></li>
-                        <li><a href="faq.html">Manage FAQs</a></li>
-                        <li><a href="sitemap.html">Manage Sitemap</a></li>
+                        <li><a href="useful_links.php">Manage Useful Links</a></li>
+                        <li><a href="faq.php">Manage FAQs</a></li>
+                        <li><a href="sitemap.php">Manage Sitemap</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>About</h3>
                     <ul>
-                        <li><a href="about.html">About</a></li>
-                        <li><a href="contact.html">Contact Us</a></li>
-                        <li><a href="terms.html">Terms & Condition</a></li>
-                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="about.php">About</a></li>
+                        <li><a href="contact.php">Contact Us</a></li>
+                        <li><a href="terms.php">Terms & Condition</a></li>
+                        <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>
                 </div>
             </div>
