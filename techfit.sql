@@ -203,3 +203,5 @@ CREATE TABLE Notification_Settings (
     is_enabled BOOLEAN NOT NULL,
     email_template TEXT NOT NULL
 );
+
+test
