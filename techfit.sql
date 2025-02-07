@@ -204,4 +204,3 @@ CREATE TABLE Notification_Settings (
     email_template TEXT NOT NULL
 );
 
-test
