@@ -3,7 +3,6 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Database connection
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -14,7 +13,6 @@ if ($mysqli->connect_error) {
     die(json_encode(['status' => 'error', 'message' => 'Database connection failed']));
 }
 
-// Get the user_id from the session
 if (!isset($_SESSION['user_id'])) {
     die(json_encode(['status' => 'error', 'message' => 'User not logged in']));
 }

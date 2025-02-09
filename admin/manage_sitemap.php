@@ -3,7 +3,6 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Database connection
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -14,13 +13,11 @@ if ($mysqli->connect_error) {
     die(json_encode(['status' => 'error', 'message' => 'Database connection failed']));
 }
 
-// Get the user_id from the session
 if (!isset($_SESSION['user_id'])) {
     die(json_encode(['status' => 'error', 'message' => 'User not logged in']));
 }
 $user_id = $_SESSION['user_id'];
 
-// Fetch admin_id using user_id
 $admin_id_query = $mysqli->prepare("SELECT admin_id FROM admin WHERE user_id = ?");
 $admin_id_query->bind_param("s", $user_id);
 $admin_id_query->execute();
@@ -35,14 +32,12 @@ if (empty($admin_id)) {
     die(json_encode(['status' => 'error', 'message' => 'Admin ID not found']));
 }
 
-// Fetch descriptions for each sitemap
 $sitemapDescriptions = [];
 $result = $mysqli->query("SELECT resource_id, description FROM admin_resource");
 while ($row = $result->fetch_assoc()) {
     $sitemapDescriptions[$row['resource_id']] = $row['description'];
 }
 
-// Function to log admin actions
 function logAdminAction($mysqli, $admin_id, $resource_id, $action_type, $description) {
     $timestamp = date('Y-m-d H:i:s');
     $admin_resource_id = generateAdminResourceId($mysqli);
@@ -55,7 +50,6 @@ function logAdminAction($mysqli, $admin_id, $resource_id, $action_type, $descrip
     $stmt->close();
 }
 
-// Handle Add/Edit/Delete Actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? null;
 
@@ -68,13 +62,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $resource_id = $_POST['id'] ?? null;
         logAdminAction($mysqli, $admin_id, $resource_id, 'deleted', 'Sitemap deleted');
         
-        // Validate the resource ID
         if (!$resource_id) {
             echo json_encode(['status' => 'error', 'message' => 'Resource ID is required for deletion']);
             exit;
         }
 
-        // First, delete related rows in Admin_Resource
         $stmt = $mysqli->prepare("DELETE FROM Admin_Resource WHERE resource_id = ?");
         $stmt->bind_param("s", $resource_id);
         if (!$stmt->execute()) {
@@ -84,7 +76,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $stmt->close();
 
-        // Then, delete the row in Resource
         $stmt = $mysqli->prepare("DELETE FROM Resource WHERE resource_id = ?");
         $stmt->bind_param("s", $resource_id);
         if (!$stmt->execute()) {
@@ -96,44 +87,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         echo json_encode(['status' => 'success', 'message' => 'Sitemap deleted successfully']);
         exit;
-    } elseif ($action === 'add') {
-        // Validate for 'add' action
+    } 
+    if ($action === 'add') {
         $description = trim($_POST['description'] ?? '');
         $category = trim($_POST['category'] ?? '');
         $image = $_FILES['image']['tmp_name'] ?? null;
-
+    
         if (!$description || !$category || !$image) {
             echo json_encode(['status' => 'error', 'message' => 'All fields are required for adding a sitemap']);
             exit;
         }
-
-        // Proceed with adding logic
-        $admin_resource_id = generateAdminResourceId($mysqli);
+    
+        $checkStmt = $mysqli->prepare("SELECT COUNT(*) FROM resource WHERE type = 'sitemap' AND category = ?");
+        $checkStmt->bind_param("s", $category);
+        $checkStmt->execute();
+        $checkStmt->bind_result($count);
+        $checkStmt->fetch();
+        $checkStmt->close();
+    
+        if ($count > 0) {
+            echo json_encode(['status' => 'error', 'message' => 'A sitemap already exists for this category. Please delete the existing one before uploading a new one.']);
+            exit;
+        }
+    
         $resource_id = generateResourceId($mysqli);
         $image_data = file_get_contents($image);
-
+    
         $stmt = $mysqli->prepare("INSERT INTO resource (resource_id, type, category, image) VALUES (?, 'sitemap', ?, ?)");
         $stmt->bind_param("sss", $resource_id, $category, $image_data);
         $stmt->execute();
         $stmt->close();
-
+    
         logAdminAction($mysqli, $admin_id, $resource_id, 'added', $description);
-
+    
         echo json_encode(['status' => 'success', 'message' => 'Sitemap added successfully']);
         exit;
-    } elseif ($action === 'edit') {
-        // Validate for 'edit' action
+    }
+    
+    elseif ($action === 'edit') {
         $resource_id = $_POST['id'] ?? null;
         $description = trim($_POST['description'] ?? '');
         $category = trim($_POST['category'] ?? '');
         $image = $_FILES['image']['tmp_name'] ?? null;
-
+    
         if (!$resource_id || !$description || !$category) {
             echo json_encode(['status' => 'error', 'message' => 'All fields are required for editing a sitemap']);
             exit;
         }
-
-        // Proceed with editing logic
+    
+        $currentCategoryStmt = $mysqli->prepare("SELECT category FROM resource WHERE resource_id = ?");
+        $currentCategoryStmt->bind_param("s", $resource_id);
+        $currentCategoryStmt->execute();
+        $currentCategoryStmt->bind_result($current_category);
+        $currentCategoryStmt->fetch();
+        $currentCategoryStmt->close();
+    
+        if ($current_category !== $category) {
+            $checkStmt = $mysqli->prepare("SELECT COUNT(*) FROM resource WHERE type = 'sitemap' AND category = ?");
+            $checkStmt->bind_param("s", $category);
+            $checkStmt->execute();
+            $checkStmt->bind_result($count);
+            $checkStmt->fetch();
+            $checkStmt->close();
+    
+            if ($count > 0) {
+                echo json_encode(['status' => 'error', 'message' => 'A sitemap already exists for the new category. Please delete it first.']);
+                exit;
+            }
+        }
+    
         if ($image) {
             $image_data = file_get_contents($image);
             $stmt = $mysqli->prepare("UPDATE resource SET category = ?, image = ? WHERE resource_id = ?");
@@ -144,9 +166,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $stmt->execute();
         $stmt->close();
-
+    
         logAdminAction($mysqli, $admin_id, $resource_id, 'edited', $description);
-
+    
         echo json_encode(['status' => 'success', 'message' => 'Sitemap updated successfully']);
         exit;
     } else {
@@ -156,7 +178,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 
-// Function to Generate Resource IDs
 function generateResourceId($mysqli) {
     $prefix = "R";
     $new_id = 1;
@@ -185,7 +206,6 @@ function generateAdminResourceId($mysqli) {
     return $admin_resource_id;
 }
 
-// Fetch Sitemaps for Display
 $result = $mysqli->query("SELECT * FROM resource WHERE type = 'sitemap' ORDER BY category, resource_id");
 $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
 ?>
@@ -371,17 +391,17 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
     <script>
         function submitSitemap() {
             const submitButton = document.querySelector('button[type="button"]');
-            submitButton.disabled = true; // Disable the button to prevent multiple submissions
+            submitButton.disabled = true;
             const formData = new FormData(document.getElementById('faqForm'));
             fetch('manage_sitemap.php', { method: 'POST', body: formData })
             .then(response => response.json())
             .then(data => {
                 alert(data.message);
                 if (data.status === 'success') location.reload();
-                else submitButton.disabled = false; // Re-enable the button if there was an error
+                else submitButton.disabled = false;
             })
             .catch(() => {
-                submitButton.disabled = false; // Re-enable the button if there was an error
+                submitButton.disabled = false;
             });
         }
 
@@ -402,7 +422,6 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
             const description = sitemapItem.querySelector('p').innerText.trim();
             form.querySelector('[name="description"]').value = description;
 
-            // Fetch and display the image
             const imageSrc = sitemapItem.querySelector('img').src;
             const imageField = form.querySelector('[name="image"]');
             const imagePreview = document.createElement('img');
@@ -419,7 +438,6 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
 
             imageField.insertAdjacentElement('afterend', imagePreview);
 
-            // Add a hidden input for the resource ID
             let idField = form.querySelector('[name="id"]');
             if (!idField) {
                 idField = document.createElement('input');
@@ -429,11 +447,9 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
             }
             idField.value = id;
 
-            // Update the submit button to "Save Sitemap Changes"
             const submitButton = form.querySelector('button[type="button"]');
             submitButton.textContent = 'Save Sitemap Changes';
 
-            // Handle form submission for "Save Sitemap Changes"
             submitButton.onclick = () => {
                 const formData = new FormData(form);
 
@@ -456,7 +472,6 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                 });
             };
 
-            // Add a cancel button to reset the form
             let cancelButton = form.querySelector('button.cancel-button');
             if (!cancelButton) {
                 cancelButton = document.createElement('button');
@@ -475,7 +490,6 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                 form.appendChild(cancelButton);
             }
 
-            // Scroll to the top for visibility
             window.scrollTo({ top: 0, behavior: 'smooth' });
             } catch (error) {
             console.error('Error in editSitemap function:', error);
@@ -487,8 +501,8 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
         function deleteSitemap(id) {
             if (confirm('Are you sure you want to delete this Sitemap?')) {
             const formData = new FormData();
-            formData.append('action', 'delete'); // Specify the action
-            formData.append('id', id); // Use `id` as the parameter for the resource ID
+            formData.append('action', 'delete');
+            formData.append('id', id); 
 
             fetch('manage_sitemap.php', { 
                 method: 'POST', 
@@ -498,7 +512,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
             .then(data => {
                 alert(data.message);
                 if (data.status === 'success') {
-                location.reload(); // Reload the page on success
+                location.reload();
                 } else {
                 alert('Failed to delete the sitemap. Please try again.');
                 }

@@ -3,7 +3,6 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Database connection
 $servername = "localhost";
 $username = "root";
 $password = "";
@@ -14,13 +13,11 @@ if ($mysqli->connect_error) {
     die(json_encode(['status' => 'error', 'message' => 'Database connection failed']));
 }
 
-// Get the user_id from the session
 if (!isset($_SESSION['user_id'])) {
     die(json_encode(['status' => 'error', 'message' => 'User not logged in']));
 }
 $user_id = $_SESSION['user_id'];
 
-// Fetch admin_id using user_id
 $admin_id_query = $mysqli->prepare("SELECT admin_id FROM admin WHERE user_id = ?");
 $admin_id_query->bind_param("s", $user_id);
 $admin_id_query->execute();
@@ -35,7 +32,6 @@ if (empty($admin_id)) {
     die(json_encode(['status' => 'error', 'message' => 'Admin ID not found']));
 }
 
-// Fetch Useful Links from the database
 $usefulLinks = [];
 $result = $mysqli->query("SELECT resource_id, title, link, category FROM resource WHERE type = 'useful_link'");
 while ($row = $result->fetch_assoc()) {
@@ -76,12 +72,11 @@ function generateAdminResourceId($mysqli) {
     return $admin_resource_id;
 }
 
-// Function to log admin actions
 function logAdminAction($mysqli, $admin_id, $resource_id, $action_type, $description) {
     $timestamp = date('Y-m-d H:i:s');
     $admin_resource_id = generateAdminResourceId($mysqli);
     $stmt = $mysqli->prepare(
-        "INSERT INTO Admin_Resource (admin_resource_id, admin_id, resource_id, action_type, timestamp, description) 
+        "INSERT INTO Admin_Resource (admin_resource_id, admin_id, resource_id, action_type, timestamp, description)
         VALUES (?, ?, ?, ?, ?, ?)"
     );
     $stmt->bind_param("ssssss", $admin_resource_id, $admin_id, $resource_id, $action_type, $timestamp, $description);
@@ -89,7 +84,6 @@ function logAdminAction($mysqli, $admin_id, $resource_id, $action_type, $descrip
     $stmt->close();
 }
 
-// Handle Add/Edit/Delete Actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? null;
 
@@ -101,14 +95,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($action === 'delete') {
         $resource_id = $_POST['id'] ?? null;
         logAdminAction($mysqli, $admin_id, $resource_id, 'deleted', 'Useful Link deleted');
-        
-        // Validate the resource ID
+
         if (!$resource_id) {
             echo json_encode(['status' => 'error', 'message' => 'Resource ID is required for deletion']);
             exit;
         }
 
-        // First, delete related rows in Admin_Resource
         $stmt = $mysqli->prepare("DELETE FROM Admin_Resource WHERE resource_id = ?");
         $stmt->bind_param("s", $resource_id);
         if (!$stmt->execute()) {
@@ -118,7 +110,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $stmt->close();
 
-        // Then, delete the row in Resource
         $stmt = $mysqli->prepare("DELETE FROM Resource WHERE resource_id = ?");
         $stmt->bind_param("s", $resource_id);
         if (!$stmt->execute()) {
@@ -131,7 +122,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(['status' => 'success', 'message' => 'Useful Link deleted successfully']);
         exit;
     } elseif ($action === 'add') {
-        // Validate for 'add' 
         $resource_id = $_POST['id'] ?? null;
         $description = trim($_POST['description'] ?? '');
         $title = trim($_POST['title'] ?? '');
@@ -143,7 +133,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // Proceed with adding logic
         $admin_resource_id = generateAdminResourceId($mysqli);
         $resource_id = generateResourceId($mysqli);
 
@@ -157,33 +146,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(['status' => 'success', 'message' => 'Useful Link added successfully']);
         exit;
     } elseif ($action === 'edit') {
-        // Validate for 'edit' action
         $resource_id = $_POST['id'] ?? null;
         $title = trim($_POST['title'] ?? '');
         $link = trim($_POST['link'] ?? '');
         $category = trim($_POST['category'] ?? '');
         $description = trim($_POST['description'] ?? '');
-
+    
         if (!$resource_id || !$title || !$link || !$category) {
             echo json_encode(['status' => 'error', 'message' => 'All fields are required for editing a Useful Link']);
             exit;
         }
-
-        // Proceed with editing logic
+    
         $stmt = $mysqli->prepare("UPDATE resource SET title = ?, link = ?, category = ? WHERE resource_id = ?");
+        if (!$stmt) {
+            error_log('Prepare failed: ' . $mysqli->error);
+            echo json_encode(['status' => 'error', 'message' => 'Database error']);
+            exit;
+        }
         $stmt->bind_param("ssss", $title, $link, $category, $resource_id);
-        $stmt->execute();
+        if (!$stmt->execute()) {
+            error_log('Error updating resource: ' . $stmt->error);
+            echo json_encode(['status' => 'error', 'message' => 'Failed to update the resource.']);
+            exit;
+        }
         $stmt->close();
-
+    
         logAdminAction($mysqli, $admin_id, $resource_id, 'edited', $description);
-
+    
         echo json_encode(['status' => 'success', 'message' => 'Useful Link updated successfully']);
         exit;
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Invalid action']);
         exit;
     }
-}
+    }
 ?>
 <!DOCTYPE html>
 <html>
@@ -192,114 +188,248 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="styles.css">
 </head>
 <header>
-        <div class="logo">
-            <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
-        </div>
-        <nav>
-            <div class="nav-container">
-                <div class="hamburger" id="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-                <ul class="nav-list">
-                    <li><a href="#">Assessments</a>
-                        <ul class="dropdown">
-                            <li><a href="create_assessment.php">Create New Assessment</a></li>
-                            <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                            <li><a href="view_assessment_results.php">View Assessment Results</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#">Users</a>
-                        <ul class="dropdown">
-                            <li><a href="manage_users.php">Manage Users</a></li>
-                            <li><a href="user_feedback.php">User Feedback</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#">Reports</a>
-                        <ul class="dropdown">
-                            <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                            <li><a href="user_engagement.php">User Engagement Statistics</a></li>
-                            <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#">Resources</a>
-                        <ul class="dropdown">
-                            <li><a href="useful_links.php">Manage Useful Links</a></li>
-                            <li><a href="faq.php">Manage FAQs</a></li>
-                            <li><a href="sitemap.php">Manage Sitemap</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="about.php">About</a></li>
-                    <li>
-                        <a href="#" id="profile-link">
-                            <div class="profile-info">
-                                <span class="username" id="username">Admin</span>
-                                <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
-                            </div>
-                        </a>
-                        <ul class="dropdown" id="profile-dropdown">
-                            <li><a href="settings.php">Settings</a>
-                                <ul class="dropdown">
-                                    <li><a href="manage_profile.php">Manage Profile</a></li>
-                                    <li><a href="system_configuration.php">System Configuration Settings</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="logout.php">Logout</a></li>
-                        </ul>
-                    </li>                    
-                </ul>
+    <div class="logo">
+        <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+    </div>
+    <nav>
+        <div class="nav-container">
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
             </div>
-        </nav>
-    </header>  
+            <ul class="nav-list">
+                <li><a href="#">Assessments</a>
+                    <ul class="dropdown">
+                        <li><a href="create_assessment.php">Create New Assessment</a></li>
+                        <li><a href="manage_assessments.php">Manage Assessments</a></li>
+                        <li><a href="view_assessment_results.php">View Assessment Results</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Users</a>
+                    <ul class="dropdown">
+                        <li><a href="manage_users.php">Manage Users</a></li>
+                        <li><a href="user_feedback.php">User Feedback</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Reports</a>
+                    <ul class="dropdown">
+                        <li><a href="assessment_performance.php">Assessment Performance</a></li>
+                        <li><a href="user_engagement.php">User Engagement Statistics</a></li>
+                        <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
+                    </ul>
+                </li>
+                <li><a href="#">Resources</a>
+                    <ul class="dropdown">
+                        <li><a href="useful_links.php">Manage Useful Links</a></li>
+                        <li><a href="faq.php">Manage FAQs</a></li>
+                        <li><a href="sitemap.php">Manage Sitemap</a></li>
+                    </ul>
+                </li>
+                <li><a href="about.php">About</a></li>
+                <li>
+                    <a href="#" id="profile-link">
+                        <div class="profile-info">
+                            <span class="username" id="username">Admin</span>
+                            <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
+                        </div>
+                    </a>
+                    <ul class="dropdown" id="profile-dropdown">
+                        <li><a href="settings.php">Settings</a>
+                            <ul class="dropdown">
+                                <li><a href="manage_profile.php">Manage Profile</a></li>
+                                <li><a href="system_configuration.php">System Configuration Settings</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="logout.php">Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>
 <body>
-    <h1 style="text-align: center; padding-top: 60px;">Manage Useful Links</h1>
-    <form id="faqForm">
+<h1 style="text-align: center; padding-top: 60px;">Manage Useful Links</h1>
+<form id="faqForm">
     <input type="hidden" name="action" value="add">
+    
     <label>Title:</label><br>
-    <textarea name="title" required></textarea><br>
+    <textarea name="title" required oninput="toggleCategoryAccess()"></textarea><br>
+
     <label>Link:</label><br>
     <input type="url" name="link" required oninput="toggleCategoryAccess()"><br><br>
+
     <label>Category:</label><br>
-    <select name="category" required disabled>
+    <select name="category" required disabled oninput="toggleCategoryAccess()">
         <option value="" disabled selected>Select Category</option>
         <option value="jobSeeker">Job Seeker</option>
         <option value="employer">Employer</option>
     </select><br><br>
+
     <label>Description:</label><br>
-    <textarea name="description" required disabled></textarea><br><br>
+    <textarea name="description" required disabled oninput="toggleCategoryAccess()"></textarea><br><br>
+
     <button type="button" onclick="submitUsefulLink()" disabled id="submitBtn">Add Useful Link</button>
 </form>
+
 
 <script>
     function toggleCategoryAccess() {
         const linkInput = document.querySelector('input[name="link"]');
+        const titleInput = document.querySelector('textarea[name="title"]');
         const categorySelect = document.querySelector('select[name="category"]');
         const descriptionInput = document.querySelector('textarea[name="description"]');
         const submitButton = document.getElementById('submitBtn');
-        
+
         // Check if the link is a valid URL
         const validURL = /^https?:\/\/[^\s]+$/i.test(linkInput.value.trim());
-        
-        if (validURL) {
+
+        // Check if the title, category, and description are filled out
+        const titleFilled = titleInput.value.trim() !== '';
+        const categorySelected = categorySelect.value !== '';
+        const descriptionFilled = descriptionInput.value.trim() !== '';
+
+        // Debugging: Log field statuses to see if they meet the conditions
+        console.log("Valid URL:", validURL);
+        console.log("Title Filled:", titleFilled);
+        console.log("Category Selected:", categorySelected);
+        console.log("Description Filled:", descriptionFilled);
+
+        // Enable category, description, and submit button if link is valid and all fields are filled
+        if (validURL && titleFilled && categorySelected && descriptionFilled) {
             categorySelect.removeAttribute('disabled');
             descriptionInput.removeAttribute('disabled');
             submitButton.removeAttribute('disabled');
+            console.log("All fields are valid. Enabling submit button.");
         } else {
             categorySelect.setAttribute('disabled', 'disabled');
             descriptionInput.setAttribute('disabled', 'disabled');
             submitButton.setAttribute('disabled', 'disabled');
+            console.log("One or more fields are invalid. Disabling submit button.");
+        }
+    }
+
+
+    function submitUsefulLink() {
+        const submitButton = document.getElementById('submitBtn');
+        submitButton.disabled = true;
+        const formData = new FormData(document.getElementById('faqForm'));
+        console.log("Form Data being sent:", formData);
+        fetch('manage_useful_links.php', { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (data.status === 'success') location.reload();
+                else submitButton.disabled = false;
+            })
+            .catch(() => {
+                submitButton.disabled = false;
+            });
+    }
+
+    function editUsefulLink(id) {
+        try {
+        const usefulLinkItem = document.querySelector(`.faq-item[data-id="${id}"]`);
+        if (!usefulLinkItem) {
+            alert('Useful Link item not found');
+            return;
+        }
+        const title = usefulLinkItem.querySelector('strong:nth-of-type(1)').nextSibling.textContent.trim();
+        const link = usefulLinkItem.querySelector('strong:nth-of-type(2)').nextSibling.textContent.trim();
+        const category = usefulLinkItem.closest('.faq-category').querySelector('h3').textContent.toLowerCase().includes('job') ? 'jobSeeker' : 'employer';
+        const description = usefulLinkItem.querySelector('p').textContent.replace('Description:', '').trim();
+
+        const form = document.getElementById('faqForm');
+        form.querySelector('[name="action"]').value = 'edit';
+        form.querySelector('[name="title"]').value = title;
+        form.querySelector('[name="link"]').value = link;
+        form.querySelector('[name="category"]').value = category;
+        form.querySelector('[name="description"]').value = description;
+
+        form.querySelector('[name="category"]').removeAttribute('disabled');
+        form.querySelector('[name="description"]').removeAttribute('disabled');
+
+        let idField = form.querySelector('[name="id"]');
+        if (!idField) {
+            idField = document.createElement('input');
+            idField.type = 'hidden';
+            idField.name = 'id';
+            form.appendChild(idField);
+        }
+        idField.value = id;
+
+        const submitButton = form.querySelector('button[type="button"]');
+        submitButton.textContent = 'Save Changes';
+        submitButton.onclick = () => {
+        const formData = new FormData(form);
+            fetch('manage_useful_links.php', {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(text) });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    alert('Failed to save changes: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please check the console for details.');
+            });
+        };
+
+        let cancelButton = form.querySelector('button.cancel-button');
+        if (!cancelButton) {
+            cancelButton = document.createElement('button');
+            cancelButton.type = 'button';
+            cancelButton.className = 'cancel-button';
+            cancelButton.textContent = 'Cancel';
+            cancelButton.onclick = () => {
+            form.reset();
+            submitButton.textContent = 'Add Useful Link';
+            cancelButton.remove();
+            };
+            form.appendChild(cancelButton);
+        }
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        } catch (error) {
+        console.error('Error in editUsefulLink function:', error);
+        alert('An error occurred. Please try again.');
+        }
+    }
+
+    function deleteUsefulLink(id) {
+        if (confirm('Are you sure you want to delete this Useful Link?')) {
+            const formData = new FormData();
+            formData.append('action', 'delete');
+            formData.append('id', id);
+            fetch('manage_useful_links.php', { method: 'POST', body: formData })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    if (data.status === 'success') location.reload();
+                });
         }
     }
 </script>
+
     <h2 style="text-align: center;">Existing Useful Links</h2>
     <div id="faq">
         <?php foreach (['jobSeeker', 'employer'] as $category): ?>
             <div class="faq-category">
                 <h3>For <?= ucfirst($category) ?>s</h3>
-                <?php 
+                <?php
                 $categoryLinks = array_filter($usefulLinks, fn($usefulLink) => $usefulLink['category'] === $category);
-                if ($categoryLinks): 
+                if ($categoryLinks):
                     foreach ($categoryLinks as $usefulLink): ?>
                         <div class="faq-item" data-id="<?= $usefulLink['resource_id'] ?>">
                             <strong>Title:</strong> <?= htmlspecialchars($usefulLink['title']) ?><br><br>
@@ -312,7 +442,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <button style="background-color: red; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer;" onclick="deleteUsefulLink('<?= $usefulLink['resource_id'] ?>')">Delete</button>
                             </div>
                         </div>
-                    <?php endforeach; 
+                    <?php endforeach;
                 else: ?>
                     <p>No useful links yet for this category.</p>
                 <?php endif; ?>
@@ -322,7 +452,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
         <a href="useful_links.php" id="manage_useful_links_button" style="background-color: #4CAF50; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Back to Useful Links</a>
     </div>
-    
     <footer>
         <div class="footer-content">
             <div class="footer-left">
@@ -389,98 +518,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </footer>
 
     <script src="scripts.js"></script>
-    <script>
-        function submitUsefulLink() {
-            const submitButton = document.getElementById('submitBtn');
-            submitButton.disabled = true; // Disable the button to prevent multiple submissions
-            const formData = new FormData(document.getElementById('faqForm'));
-            fetch('manage_useful_links.php', { method: 'POST', body: formData })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    if (data.status === 'success') location.reload();
-                    else submitButton.disabled = false;
-                })
-                .catch(() => {
-                    submitButton.disabled = false;
-                });
-        }
-        
-        function editUsefulLink(id) {
-            try {
-            const usefulLinkItem = document.querySelector(`.faq-item[data-id="${id}"]`);
-            if (!usefulLinkItem) {
-                alert('Useful Link item not found');
-                return;
-            }
-            const title = usefulLinkItem.querySelector('strong:nth-of-type(1)').nextSibling.textContent.trim();
-            const link = usefulLinkItem.querySelector('strong:nth-of-type(2)').nextSibling.textContent.trim();
-            const category = usefulLinkItem.closest('.faq-category').querySelector('h3').textContent.toLowerCase().includes('job') ? 'jobSeeker' : 'employer';
-            const description = usefulLinkItem.querySelector('p').textContent.replace('Description:', '').trim();
-
-            // Populate the form with the Useful Link details
-            const form = document.getElementById('faqForm');
-            form.querySelector('[name="action"]').value = 'edit';
-            form.querySelector('[name="title"]').value = title;
-            form.querySelector('[name="link"]').value = link;
-            form.querySelector('[name="category"]').value = category;
-            form.querySelector('[name="description"]').value = description;
-
-            // Enable the category and description fields
-            form.querySelector('[name="category"]').removeAttribute('disabled');
-            form.querySelector('[name="description"]').removeAttribute('disabled');
-
-            // Add a hidden field for the ID
-            let idField = form.querySelector('[name="id"]');
-            if (!idField) {
-                idField = document.createElement('input');
-                idField.type = 'hidden';
-                idField.name = 'id';
-                form.appendChild(idField);
-            }
-            idField.value = id;
-
-            // Change the button to "Save Changes"
-            const submitButton = form.querySelector('button[type="button"]');
-            submitButton.textContent = 'Save Changes';
-            submitButton.onclick = submitUsefulLink;
-
-            // Add a cancel button to reset the form
-            let cancelButton = form.querySelector('button.cancel-button');
-            if (!cancelButton) {
-                cancelButton = document.createElement('button');
-                cancelButton.type = 'button';
-                cancelButton.className = 'cancel-button';
-                cancelButton.textContent = 'Cancel';
-                cancelButton.onclick = () => {
-                form.reset();
-                submitButton.textContent = 'Add Useful Link';
-                cancelButton.remove();
-                };
-                form.appendChild(cancelButton);
-            }
-
-            // Scroll to the top for visibility
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            } catch (error) {
-            console.error('Error in editUsefulLink function:', error);
-            alert('An error occurred. Please try again.');
-            }
-        }
-        
-        function deleteUsefulLink(id) {
-            if (confirm('Are you sure you want to delete this Useful Link?')) {
-                const formData = new FormData();
-                formData.append('action', 'delete');
-                formData.append('id', id);
-                fetch('manage_useful_links.php', { method: 'POST', body: formData })
-                    .then(response => response.json())
-                    .then(data => {
-                        alert(data.message);
-                        if (data.status === 'success') location.reload();
-                    });
-            }
-        }
-    </script>
 </body>
 </html>
