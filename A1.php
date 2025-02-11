@@ -1,7 +1,6 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message
 function displayLoginMessage() {
     echo '<script>
         alert("You need to log in to access this page.");
@@ -9,12 +8,10 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message if not logged in
+    displayLoginMessage();s
 }
 
-// Check if the user has the correct role
 if ($_SESSION['role'] !== 'Admin') {
     displayLoginMessage(); // Display message if the role is not Admin
 }

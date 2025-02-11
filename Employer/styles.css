@@ -1097,6 +1097,14 @@ footer {
     color: #333;
 }
 
+#faq h3 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+}
+
 /* FAQ Container */
 .faq-container {
     display: grid;

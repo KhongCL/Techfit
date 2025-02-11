@@ -1,7 +1,6 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start();
 
-// Function to display the message and options
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
@@ -15,15 +14,14 @@ function displayLoginMessage() {
 
 // Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message and options if not logged in
+    displayLoginMessage();
 }
 
 // Check if the user has the correct role
 if ($_SESSION['role'] !== 'Employer') {
-    displayLoginMessage(); // Display message and options if the role is not Employer
+    displayLoginMessage();
 }
 
-// Close the session
 session_write_close();
 ?>
 
@@ -50,8 +48,8 @@ session_write_close();
             flex: 1;
         }
         header, footer {
-            background-color: #333; /* Assuming the header's background color is #333 */
-            color: #fff; /* Assuming the text color is white */
+            background-color: #333;
+            color: #fff;
         }
         footer {
             padding: 20px;
@@ -212,7 +210,7 @@ session_write_close();
         }
 
         function logoutUser() {
-            window.location.href = '/Techfit'; // Redirect to the root directory
+            window.location.href = '/Techfit';
         }
     </script>
 </body>

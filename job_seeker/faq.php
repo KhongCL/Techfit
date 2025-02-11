@@ -1,5 +1,5 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -47,15 +47,15 @@ function displayLoginMessage() {
 }
 
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message and options if not logged in
+    displayLoginMessage(); 
 }
 
 if ($_SESSION['role'] !== 'Job Seeker') {
-    displayLoginMessage(); // Display message and options if the role is not Job Seeker
+    displayLoginMessage(); 
 }
 
 if (!isset($_SESSION['job_seeker_id'])) {
-    displayLoginMessage(); // Display message and options if job seeker ID is not set
+    displayLoginMessage(); 
 }
 
 session_write_close();
@@ -134,11 +134,11 @@ session_write_close();
                             <div class="profile-info">
                                 <span class="username" id="username">
                                     <?php
-                                    // Check if the user is logged in and display their username
+                                    
                                     if (isset($_SESSION['username'])) {
-                                        echo $_SESSION['username'];  // Display the username from session
+                                        echo $_SESSION['username'];  
                                     } else {
-                                        echo "Guest";  // Default if not logged in
+                                        echo "Guest";  
                                     }
                                     ?>
                                 </span>
@@ -233,7 +233,7 @@ session_write_close();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -275,7 +275,6 @@ session_write_close();
         </div>
     </footer>
 
-
     <script src="scripts.js?v=1.0"></script>
     <script>
         function openPopup(popupId) {
@@ -287,7 +286,7 @@ session_write_close();
         }
 
         function logoutUser() {
-            window.location.href = '/Techfit'; // Redirect to the root directory
+            window.location.href = '/Techfit'; 
         }
     </script>
 </body>

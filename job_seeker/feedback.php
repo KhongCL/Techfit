@@ -1,7 +1,7 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message and options
+
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
@@ -13,22 +13,22 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message and options if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Job Seeker') {
-    displayLoginMessage(); // Display message and options if the role is not Job Seeker
+    displayLoginMessage(); 
 }
 
-// Check if the job seeker ID is set
+
 if (!isset($_SESSION['job_seeker_id'])) {
-    displayLoginMessage(); // Display message and options if job seeker ID is not set
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 ?>
 
@@ -105,11 +105,11 @@ session_write_close();
                             <div class="profile-info">
                                 <span class="username" id="username">
                                     <?php
-                                    // Check if the user is logged in and display their username
+                                    
                                     if (isset($_SESSION['username'])) {
-                                        echo $_SESSION['username'];  // Display the username from session
+                                        echo $_SESSION['username'];  
                                     } else {
-                                        echo "Guest";  // Default if not logged in
+                                        echo "Guest";  
                                     }
                                     ?>
                                 </span>
@@ -131,7 +131,6 @@ session_write_close();
         </nav>
     </header>
 
-    <!-- Logout Popup -->
     <div id="logout-popup" class="popup">
         <h2>Are you sure you want to Log Out?</h2>
         <button class="close-button" onclick="logoutUser()">Yes</button>
@@ -172,10 +171,18 @@ session_write_close();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
+                <div class="footer-column">
+                    <h3>Assessment</h3>
+                    <ul>
+                        <li><a href="start_assessment.php">Start Assessment</a></li>
+                        <li><a href="assessment_history.php">Assessment History</a></li>
+                        <li><a href="assessment_summary.php">Assessment Summary</a></li>
+                    </ul>
+                </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
@@ -217,7 +224,7 @@ session_write_close();
         }
 
         function logoutUser() {
-            window.location.href = '/Techfit'; // Redirect to the root directory
+            window.location.href = '/Techfit'; 
         }
     </script>
 </body>

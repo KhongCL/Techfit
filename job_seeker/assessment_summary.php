@@ -1,7 +1,7 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message and options
+
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
@@ -13,29 +13,29 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message and options if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Job Seeker') {
-    displayLoginMessage(); // Display message and options if the role is not Job Seeker
+    displayLoginMessage(); 
 }
 
-// Check if the job seeker ID is set
+
 if (!isset($_SESSION['job_seeker_id'])) {
-    displayLoginMessage(); // Display message and options if job seeker ID is not set
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 ?>
 
 <?php
-session_start(); // Start the session
+session_start(); 
 
-// Database connection
+
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -46,10 +46,10 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Retrieve job seeker ID from session
+
 $job_seeker_id = $_SESSION['job_seeker_id'];
 
-// Fetch assessment summaries for the job seeker
+
 $sql = "
     SELECT 
     Assessment_Job_Seeker.end_time AS assessment_date, 
@@ -77,99 +77,49 @@ $result = $stmt->get_result();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechFit</title>
+    <title>Assessment History - TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh; /* Full viewport height */
-            margin: 0;
-        }
-
-        header {
-            flex-shrink: 0; /* Header stays at the top */
-        }
-
-        #assessment-summary {
-            flex-grow: 1; /* Main section grows to fill space between header and footer */
-            margin: 20px 0; /* Optional spacing around the container */
-            background-color: #f8f8f8;
-            padding: 20px 0;
-        }
-
-        .container_a_s {
-            width: 90%;
-            max-width: 800px;
-            margin: auto; /* Center horizontally */
-            background-color: #fff;
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--popup-background-color);
+            padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
         }
-
-        .summary_header {
-            padding: 20px;
-            text-align: left;
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #333;
-            border-bottom: 2px solid #ddd;
+        .popup h2 {
+            color: var(--lighter-text-color);
         }
-
-        .scrollable {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .summary-item:last-child {
-            border-bottom: none;
-        }
-
-        .summary-item h3 {
-            margin: 0;
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .summary-item p {
-            margin: 5px 0;
-            font-size: 1rem;
-            color: #555;
-        }
-
-        .summary-details {
-            flex-grow: 1;
-        }
-
-        .view-answers-button {
-            display: inline-block;
+        .popup button {
             padding: 10px 20px;
-            background-color: #007bff;
-            color: #fff;
-            text-decoration: none;
+            border: none;
             border-radius: 5px;
-            font-size: 0.9rem;
-            transition: background-color 0.3s;
+            cursor: pointer;
+            font-weight: bold;
         }
-
-        .view-answers-button:hover {
-            background-color: #0056b3;
+        .popup .close-button {
+            background-color: var(--danger-color);
+            color: var(--hover-text-color);
         }
-    </style>
-
+        .popup .cancel-button {
+            background-color: var(--primary-color);
+            color: var(--hover-text-color);
+        }
+        .popup .close-button:hover {
+            background-color: var(--danger-hover-color);
+        }
+        .popup .cancel-button:hover {
+            background-color: var(--accent-color);
+        }
+</style>
 </head>
 <body>
-<header>
+    <header>
         <div class="logo">
             <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
@@ -196,11 +146,11 @@ $result = $stmt->get_result();
                             <div class="profile-info">
                                 <span class="username" id="username">
                                     <?php
-                                    // Check if the user is logged in and display their username
+                                    
                                     if (isset($_SESSION['username'])) {
-                                        echo $_SESSION['username'];  // Display the username from session
+                                        echo $_SESSION['username'];  
                                     } else {
-                                        echo "Guest";  // Default if not logged in
+                                        echo "Guest";  
                                     }
                                     ?>
                                 </span>
@@ -222,7 +172,6 @@ $result = $stmt->get_result();
         </nav>
     </header>
 
-    <!-- Logout Popup -->
     <div id="logout-popup" class="popup">
         <h2>Are you sure you want to Log Out?</h2>
         <button class="close-button" onclick="logoutUser()">Yes</button>
@@ -267,7 +216,7 @@ $result = $stmt->get_result();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -309,7 +258,6 @@ $result = $stmt->get_result();
         </div>
     </footer>
 
-
     <script src="scripts.js?v=1.0"></script>
     <script>
         function openPopup(popupId) {
@@ -321,7 +269,7 @@ $result = $stmt->get_result();
         }
 
         function logoutUser() {
-            window.location.href = '/Techfit'; // Redirect to the root directory
+            window.location.href = '/Techfit'; 
         }
     </script>
 </body>

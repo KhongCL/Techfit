@@ -1,7 +1,7 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message and options
+
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
@@ -13,27 +13,27 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message and options if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Job Seeker') {
-    displayLoginMessage(); // Display message and options if the role is not Job Seeker
+    displayLoginMessage(); 
 }
 
-// Check if the job seeker ID is set
+
 if (!isset($_SESSION['job_seeker_id'])) {
-    displayLoginMessage(); // Display message and options if job seeker ID is not set
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 ?>
 
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
 $host = 'localhost';
 $username = 'root';
@@ -46,9 +46,9 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$user_id = $_SESSION['user_id']; // Assuming user_id is stored in session
+$user_id = $_SESSION['user_id']; 
 
-// Updated SQL query with the required INNER JOINs
+
 $sql = "
     SELECT 
         Assessment_Job_Seeker.assessment_id AS 'assessment_id',
@@ -86,81 +86,43 @@ $conn->close();
     <title>Assessment History - TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-            .history-item {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 10px;
-                width: 45%; /* Shrinking the box width to 60% of its original size (40% shrink) */
-                margin: 0 auto 14px auto; /* Center-align the box with reduced margin */
-                padding: 5px 10px; /* Adjusted padding to fit the smaller box */
-                border: 2px solid rgb(41, 40, 40);
-                border-radius: 8px;
-                background-color: rgb(76, 76, 76); /* Medium gray color */
-                color: #fff; /* White text color for contrast */
-                position: relative; /* Ensure that child absolute elements are positioned relative to this */
-            }
-            .date-time {
-                grid-column: 1 / span 2;
-                align-self: auto;
-                justify-self: auto;
-                text-align: left;
-                margin-bottom: 8px;
-                margin-left: 10px; /* Move 10px to the right */
-                margin-top: 10px; /* Move 10px down */
-            }
-            .score {
-                position: absolute;
-                right: 50px; /* Adjust distance from the main box */
-                top: 50%;
-                transform: translateY(-50%);
-                text-align: center;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                gap: 4px;
-                background-color: rgba(0, 0, 0, 0.3); /* Dark background */
-                color: #fff;
-                padding: 5px 25px;
-                border: 1px solid #555;
-                border-radius: 10px;
-                box-shadow: 0 2px 6px rgba(86, 85, 85, 0.3);
-                min-width: 80px; /* Ensures consistent size */
-            }
-            .score h3 {
-                margin-bottom: -10px; /* Close gap between Score label and score mark */
-            }
-            .actions {
-                grid-column: 1 / span 2;
-                display: flex;
-                justify-content: flex-start;
-                gap: 8px;
-                margin-top: 10px;
-                position: relative;
-                top: -15px; /* Negative value moves the buttons upwards */
-                left: 10px;
-            }
-            .actions a {
-                text-decoration: none;
-                color: #007BFF;
-                font-size: 12px;
-                padding: 4px 8px;
-                border: 1px solid #007BFF;
-                border-radius: 4px;
-                background-color:rgb(202, 200, 200);
-                transition: background-color 0.3s, color 0.3s;
-            }
-            .actions a:hover {
-                background-color: #007BFF;
-                color: #fff;
-            }
-            .history-header {
-                display: flex;
-                align-items: center; /* Align vertically to the center */
-                justify-content: space-between; /* Ensures balanced spacing between elements */
-                margin-bottom: 10px;
-            }
-        </style>
-
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: var(--popup-background-color);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        .popup h2 {
+            color: var(--lighter-text-color);
+        }
+        .popup button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .popup .close-button {
+            background-color: var(--danger-color);
+            color: var(--hover-text-color);
+        }
+        .popup .cancel-button {
+            background-color: var(--primary-color);
+            color: var(--hover-text-color);
+        }
+        .popup .close-button:hover {
+            background-color: var(--danger-hover-color);
+        }
+        .popup .cancel-button:hover {
+            background-color: var(--accent-color);
+        }
+</style>
 </head>
 <body>
     <header>
@@ -190,11 +152,11 @@ $conn->close();
                             <div class="profile-info">
                                 <span class="username" id="username">
                                     <?php
-                                    // Check if the user is logged in and display their username
+                                    
                                     if (isset($_SESSION['username'])) {
-                                        echo $_SESSION['username'];  // Display the username from session
+                                        echo $_SESSION['username'];  
                                     } else {
-                                        echo "Guest";  // Default if not logged in
+                                        echo "Guest";  
                                     }
                                     ?>
                                 </span>
@@ -216,7 +178,6 @@ $conn->close();
         </nav>
     </header>
 
-    <!-- Logout Popup -->
     <div id="logout-popup" class="popup">
         <h2>Are you sure you want to Log Out?</h2>
         <button class="close-button" onclick="logoutUser()">Yes</button>
@@ -225,12 +186,10 @@ $conn->close();
     
     <section id="assessment-history">
         <div class="container">
-            <!-- Header -->
             <div class="history-header">
                 <h2>Assessment History</h2>
             </div>
 
-            <!-- History Items -->
             <?php if (!empty($assessments)): ?>
                 <?php foreach ($assessments as $assessment): ?>
                     <div class="history-item">
@@ -248,10 +207,7 @@ $conn->close();
                             <a href="download_assessment_history_report.php?assessment_id=<?php echo urlencode($assessment['assessment_id']); ?>" title="Download">Download</a>
                             <a href="share_assessment_history.php?assessment_id=<?= urlencode($assessment['assessment_id']); ?>" title="Share">Share</a>
                         </div>
-
                     </div>
-
-
                 <?php endforeach; ?>
             <?php else: ?>
                 <p>No assessment history available.</p>
@@ -273,7 +229,7 @@ $conn->close();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -326,7 +282,7 @@ $conn->close();
         }
 
         function logoutUser() {
-            window.location.href = '/Techfit'; // Redirect to the root directory
+            window.location.href = '/Techfit'; 
         }
     </script>
 </body>

@@ -1,7 +1,6 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message and options
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
@@ -13,22 +12,16 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message and options if not logged in
+    displayLoginMessage(); 
 }
-
-// Check if the user has the correct role
 if ($_SESSION['role'] !== 'Job Seeker') {
-    displayLoginMessage(); // Display message and options if the role is not Job Seeker
+    displayLoginMessage(); 
 }
-
-// Check if the job seeker ID is set
 if (!isset($_SESSION['job_seeker_id'])) {
-    displayLoginMessage(); // Display message and options if job seeker ID is not set
+    displayLoginMessage(); 
 }
 
-// Close the session
 session_write_close();
 ?>
 
@@ -39,6 +32,7 @@ session_write_close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About Us - TechFit</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         .popup {
             display: none;
@@ -105,11 +99,11 @@ session_write_close();
                             <div class="profile-info">
                                 <span class="username" id="username">
                                     <?php
-                                    // Check if the user is logged in and display their username
+                                    
                                     if (isset($_SESSION['username'])) {
-                                        echo $_SESSION['username'];  // Display the username from session
+                                        echo $_SESSION['username'];  
                                     } else {
-                                        echo "Guest";  // Default if not logged in
+                                        echo "Guest";  
                                     }
                                     ?>
                                 </span>
@@ -131,7 +125,6 @@ session_write_close();
         </nav>
     </header>
 
-    <!-- Logout Popup -->
     <div id="logout-popup" class="popup">
         <h2>Are you sure you want to Log Out?</h2>
         <button class="close-button" onclick="logoutUser()">Yes</button>
@@ -141,27 +134,28 @@ session_write_close();
     <section id="contact-us">
         <div class="container">
             <h2>Contact Us</h2>
-            <div id="contact-block">
-                <div class="contact-box">
-                    <h3><i class="fas fa-phone-alt icon fa-flip-horizontal"></i> Phone</h3>
-                    <p>+123 456 7890</p>
-                    <p>+987 654 3210</p>
-                    <p>+135 792 4680</p>
-                </div>
-                <div class="contact-box">
-                    <h3><i class="fas fa-envelope icon"></i> Email</h3>
-                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
-                    <p><a href="mailto:techfit.business@gmail.com">techfit.business@gmail.com</a></p>
-                    <p><a href="mailto:techfit.backup@gmail.com">techfit.backup@gmail.com</a></p>
-
-                </div>
-                <div class="contact-box">
-                    <h3><i class="fas fa-map-marker-alt icon"></i> Location</h3>
-                    <p>Jalan Teknologi 5, Taman Teknologi Malaysia, 57000 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur, Malaysia</p>
+            <div id="contact-us">
+            <div class="container">
+                <div id="contact-block">
+                  <div class="contact-box">
+                        <h3><i class="fas fa-phone-alt icon"></i> Phone</h3>
+                        <p>+123 456 7890</p>
+                        <p>+987 654 3210</p>
+                        <p>+135 792 4680</p>
+                    </div>
+                    <div class="contact-box">
+                        <h3><i class="fas fa-envelope icon"></i> Email</h3>
+                        <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
+                        <p><a href="mailto:techfit@yahoo.com">techfit@yahoo.com</a></p>
+                        <p><a href="mailto:techfit.@mail.apu.edu.my">techfit@mail.apu.edu.my</a></p>
+                    </div>
+                    <div class="contact-box">
+                        <h3><i class="fas fa-map-marker-alt icon"></i> Location</h3>
+                        <p>Jalan Teknologi 5, Taman Teknologi Malaysia, 57000 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur, Malaysia</p>
+                    </div>
                 </div>
             </div>
         </div>
-        <div style="height: 75px;"></div>
     </section>
     
     <footer>
@@ -178,7 +172,7 @@ session_write_close();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -231,7 +225,7 @@ session_write_close();
         }
 
         function logoutUser() {
-            window.location.href = '/Techfit'; // Redirect to the root directory
+            window.location.href = '/Techfit'; 
         }
     </script>
 </body>

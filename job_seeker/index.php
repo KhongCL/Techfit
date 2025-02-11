@@ -1,7 +1,7 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message and options
+
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
@@ -13,22 +13,21 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message and options if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Job Seeker') {
-    displayLoginMessage(); // Display message and options if the role is not Job Seeker
+    displayLoginMessage(); 
 }
 
-// Check if the job seeker ID is set
+
 if (!isset($_SESSION['job_seeker_id'])) {
-    displayLoginMessage(); // Display message and options if job seeker ID is not set
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 ?>
 
@@ -39,7 +38,6 @@ session_write_close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechFit Job Seeker - Home</title>
     <link rel="stylesheet" href="styles.css?v=2.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         .popup {
             display: none;
@@ -54,7 +52,7 @@ session_write_close();
             z-index: 1000;
         }
         .popup h2 {
-            color: #fff; /* Set the heading text color to white */
+            color: #fff;
         }
         .popup input[type="text"],
         .popup input[type="password"] {
@@ -129,11 +127,11 @@ session_write_close();
                             <div class="profile-info">
                                 <span class="username" id="username">
                                     <?php
-                                    // Check if the user is logged in and display their username
+                                    
                                     if (isset($_SESSION['username'])) {
-                                        echo $_SESSION['username'];  // Display the username from session
+                                        echo $_SESSION['username'];  
                                     } else {
-                                        echo "Guest";  // Default if not logged in
+                                        echo "Guest";  
                                     }
                                     ?>
                                 </span>
@@ -175,7 +173,7 @@ session_write_close();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -190,7 +188,7 @@ session_write_close();
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.php">Resources</a></li>
+                        <li><a href="useful_links.php">Useful Links</a></li>
                         <li><a href="faq.php">FAQ</a></li>
                         <li><a href="sitemap.php">Sitemap</a></li>
                         <li><a href="about.php">About</a></li>
@@ -217,7 +215,6 @@ session_write_close();
         </div>
     </footer>
 
-    <!-- Logout Popup -->
     <div id="logout-popup" class="popup">
         <h2>Are you sure you want to Log Out?</h2>
         <form id="logout-form" action="profile.php" method="post">

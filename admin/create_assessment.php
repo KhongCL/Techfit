@@ -1,7 +1,7 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start();
 
-// Function to display the message
+
 function displayLoginMessage() {
     echo '<script>
         alert("You need to log in to access this page.");
@@ -9,17 +9,17 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Admin') {
-    displayLoginMessage(); // Display message if the role is not Admin
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 ?>
 
@@ -33,15 +33,15 @@ $username = "root";
 $password = "";
 $dbname = "techfit";
 
-// Create connection
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Function to generate the next ID with a given prefix
+
 function generateNextId($conn, $table, $column, $prefix) {
     $sql = "SELECT MAX(CAST(SUBSTRING($column, LENGTH('$prefix') + 1) AS UNSIGNED)) AS max_id FROM $table WHERE $column LIKE '$prefix%'";
     $result = $conn->query($sql);
@@ -53,9 +53,9 @@ function generateNextId($conn, $table, $column, $prefix) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $assessment_id = generateNextId($conn, 'Assessment_Admin', 'assessment_id', 'AS');
-    $admin_user_id = $_SESSION['user_id']; // Assuming the admin is logged in and their user_id is stored in the session
+    $admin_user_id = $_SESSION['user_id']; 
 
-    // Retrieve the admin_id using the user_id
+    
     $admin_sql = "SELECT admin_id FROM Admin WHERE user_id = '$admin_user_id'";
     $admin_result = $conn->query($admin_sql);
     if ($admin_result->num_rows > 0) {
@@ -71,12 +71,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $description = $_POST['description'];
     $timestamp = date('Y-m-d H:i:s');
 
-    // Insert the assessment into the database
+    
     $sql = "INSERT INTO Assessment_Admin (assessment_id, admin_id, assessment_name, description, timestamp, is_active)
             VALUES ('$assessment_id', '$admin_id', '$assessment_name', '$description', '$timestamp', TRUE)";
     
     if ($conn->query($sql) === TRUE) {
-        // Redirect to create_questions.php with the assessment_id
+        
         header("Location: create_questions.php?assessment_id=$assessment_id");
         exit();
     } else {
@@ -97,27 +97,27 @@ $conn->close();
     <title>Create Assessment - TechFit</title>
     <link rel="stylesheet" href="styles.css">
         <style>
-        /* Color Theme */
+       
         :root {
-            --primary-color: #007bff; /* Blue */
-            --secondary-color: #1e1e1e; /* Dark Grey */
-            --accent-color: #0056b3; /* Darker Blue */
-            --text-color: #e0e0e0; /* Slightly Darker White */
-            --background-color: #121212; /* Very Dark Grey */
-            --border-color: #333; /* Dark Grey */
-            --hover-background-color: #333; /* Slightly Lighter Dark Grey */
-            --hover-text-color: #fff; /* White */
-            --button-hover-color: #80bdff; /* Lighter Blue */
-            --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
-            --popup-border-color: #444; /* Slightly Lighter Dark Grey */
-            --danger-color: #dc3545; /* Red */
-            --danger-hover-color: #c82333; /* Darker Red */
-            --success-color: #28a745; /* Green */
-            --success-hover-color: #218838; /* Darker Green */
-            --lighter-text-color: #f5f5f5; /* Lighter White */
+            --primary-color: #007bff;
+            --secondary-color: #1e1e1e;
+            --accent-color: #0056b3;
+            --text-color: #e0e0e0;
+            --background-color: #121212;
+            --border-color: #333;
+            --hover-background-color: #333;
+            --hover-text-color: #fff;
+            --button-hover-color: #80bdff;
+            --popup-background-color: #1a1a1a;
+            --popup-border-color: #444;
+            --danger-color: #dc3545;
+            --danger-hover-color: #c82333;
+            --success-color: #28a745;
+            --success-hover-color: #218838;
+            --lighter-text-color: #f5f5f5;
         }
 
-        /* General Styles */
+       
         body {
             font-family: Arial, sans-serif;
             color: var(--text-color);
@@ -128,7 +128,7 @@ $conn->close();
             padding: 20px;
         }
 
-        /* Header Controls */
+       
         .header-controls {
             display: flex;
             justify-content: space-between;
@@ -151,7 +151,7 @@ $conn->close();
             margin-bottom: 10px;
         }
 
-        /* Buttons */
+       
         button {
             background-color: var(--primary-color);
             color: var(--text-color);
@@ -161,7 +161,7 @@ $conn->close();
             transition: background-color 0.3s ease, color 0.3s ease;
             border-radius: 5px;
             font-weight: bold;
-            box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+            box-sizing: border-box;
         }
 
         button:hover {
@@ -178,7 +178,7 @@ $conn->close();
         }
 
         button.success {
-            background-color: var (--success-color);
+            background-color: var(--success-color);
         }
 
         button.success:hover {
@@ -186,12 +186,12 @@ $conn->close();
         }
 
         button[type="button"] {
-            margin-right: 10px; /* Add horizontal spacing between buttons */
+            margin-right: 10px;
         }
 
-        /* Input Fields and Dropdowns */
+       
         input[type="text"], textarea, select {
-            width: 100%; /* Ensure full width */
+            width: 100%;
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid var(--border-color);
@@ -199,7 +199,7 @@ $conn->close();
             background-color: var(--secondary-color);
             color: var(--text-color);
             transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-            box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+            box-sizing: border-box;
         }
 
         input[type="text"]:hover, textarea:hover, select:hover {
@@ -211,23 +211,23 @@ $conn->close();
         }
 
         label, textarea, select, input[type="text"], button {
-            margin-bottom: 15px; /* Add vertical spacing */
+            margin-bottom: 15px;
         }
 
-        /* Form Container */
+       
         #create-assessment-form {
-            background-color: var(--secondary-color); /* Use secondary color for the form */
+            background-color: var(--secondary-color);
             padding: 20px;
             border-radius: 5px;
-            box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+            box-sizing: border-box;
         }
 
-        /* Lighter Text for Labels */
+       
         #assessment-name-label, #description-label {
-            color: var(--lighter-text-color); /* Make the label text lighter */
+            color: var(--lighter-text-color);
         }
 
-        /* Spacing */
+       
         .form-group {
             margin-bottom: 20px;
         }
@@ -324,10 +324,10 @@ $conn->close();
                 <div class="social-media">
                     <p>Keep up with TechFit:</p>
                     <div class="social-icons">
-                        <a href="https://facebook.com"><img src="images/facebook.png" alt="Facebook"></a>
-                        <a href="https://twitter.com"><img src="images/twitter.png" alt="Twitter"></a>
-                        <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
-                        <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
+                        <a href="https:
+                        <a href="https:
+                        <a href="https:
+                        <a href="https:
                     </div>
                     <p>techfit@gmail.com</p>
                 </div>

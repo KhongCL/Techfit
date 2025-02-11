@@ -131,7 +131,6 @@ session_write_close();
         </nav>
     </header>
 
-    <!-- Logout Popup -->
     <div id="logout-popup" class="popup">
         <h2>Are you sure you want to Log Out?</h2>
         <button class="close-button" onclick="logoutUser()">Yes</button>
@@ -142,7 +141,6 @@ session_write_close();
         <div class="container">
             <h2>About Us</h2>
     
-            <!-- Mission Section -->
             <div id="mission" class="about-block">
                 <div id="mission-text" class="text-left">
                     <h3>Our Mission</h3>
@@ -153,7 +151,6 @@ session_write_close();
                 </div>
             </div>
     
-            <!-- Vision Section -->
             <div id="vision" class="about-block">
                 <div id="vision-image" class="image-left">
                     <img src="https://picsum.photos/1600/900?random=2" alt="Vision Image">
@@ -164,7 +161,6 @@ session_write_close();
                 </div>
             </div>
     
-            <!-- Values Section -->
             <h3 id="values-title">Our Values</h3>
             <div id="values-gallery" class="values-gallery">
                 <div class="value-item">

@@ -1,19 +1,20 @@
 :root {
-    --primary-color: #007bff; /* Blue */
-    --secondary-color: #1e1e1e; /* Dark Grey */
-    --accent-color: #0056b3; /* Darker Blue */
-    --text-color: #e0e0e0; /* Slightly Darker White */
-    --background-color: #121212; /* Very Dark Grey */
-    --border-color: #333; /* Dark Grey */
-    --hover-background-color: #333; /* Slightly Lighter Dark Grey */
-    --hover-text-color: #fff; /* White */
-    --button-hover-color: #80bdff; /* Lighter Blue */
-    --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
-    --popup-border-color: #444; /* Slightly Lighter Dark Grey */
-    --danger-color: #dc3545; /* Red */
-    --danger-hover-color: #c82333; /* Darker Red */
-    --success-color: #28a745; /* Green */
-    --success-hover-color: #218838; /* Darker Green */
+    --primary-color: #007bff;
+    --secondary-color: #1e1e1e;
+    --accent-color: #0056b3;
+    --text-color: #e0e0e0;
+    --background-color: #121212;
+    --border-color: #333;
+    --hover-background-color: #333;
+    --hover-text-color: #fff;
+    --button-hover-color: #80bdff;
+    --popup-background-color: #1a1a1a;
+    --popup-border-color: #444;
+    --danger-color: #dc3545;
+    --danger-hover-color: #c82333;
+    --success-color: #28a745;
+    --success-hover-color: #218838;
+    --lighter-text-color: #f5f5f5;
 }
 
 body {
@@ -24,11 +25,11 @@ body {
     flex-direction: column;
     padding-top: 60px;
     min-height: 100vh;
-    overflow-x: hidden; /* Prevent horizontal overflow */
+    overflow-x: hidden;
 }
 
 
-/* Header */
+
 header {
     display: flex;
     justify-content: space-between;
@@ -40,14 +41,14 @@ header {
     left: 0;
     width: 100%;
     z-index: 1000;
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    box-sizing: border-box;
 }
     
 .logo img {
     height: 50px;
 }
 
-/* Navigation Bar */
+
 .nav-container {
     display: flex;
     align-items: center;
@@ -110,24 +111,24 @@ header {
 .profile-info {
     display: flex;
     align-items: center;
-    margin-top: -5px; /* Move the entire profile-info block up */
+    margin-top: -5px;
 }
 
 .profile-image {
     display: inline-block;
-    margin-left: 10px; /* Adjust the space between the username and the image */
-    width: 30px; /* Set the size of the profile image */
-    height: 30px; /* Ensure the image is square */
+    margin-left: 10px;
+    width: 30px;
+    height: 30px;
     border-radius: 50%;
 }
 
 .username {
     display: inline-block;
-    color: white; /* Username color */
+    color: white;
     font-size: 16px;
 }
 
-/* Styling for nested dropdown links */
+
 .nav-list .dropdown li {
     width: auto;
 }
@@ -138,7 +139,7 @@ header {
     color: white;
     text-decoration: none;
     white-space: nowrap;
-    transition: background-color 0.3s ease; /* Smooth hover transition */
+    transition: background-color 0.3s ease;
     transition: padding-left 0.6s ease;
 }
 
@@ -165,7 +166,7 @@ header {
     transition: background-color 0.3s ease;
 }
 
-/* Hamburger Menu */
+
 .hamburger {
     display: none;
     flex-direction: column;
@@ -181,7 +182,7 @@ header {
     transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
-/* Sidebar and Hamburger Animation */
+
 .nav-list.active {
     transform: translateX(0);
 }
@@ -203,18 +204,18 @@ header {
     transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-/* Active dropdown styles */
+
 .dropdown.active {
     display: block;
     transform: translateY(0);
 }
 
-/* Highlight active parent item */
+
 .nav-list li.active > a {
     background-color: #555;
 }
 
-/* Ensure links inside dropdown are styled correctly */
+
 .dropdown a {
     padding: 10px 15px;
     color: white;
@@ -243,7 +244,7 @@ header {
         right: 0;
         height: 100%;
         background-color: #333;
-        width: 350px; /* Increased width */
+        width: 350px;
         z-index: 1000;
         padding: 60px 20px;
         box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
@@ -257,7 +258,7 @@ header {
     }
 
     .nav-list li.active > .dropdown {
-        display: block; /* Display dropdown on tap */
+        display: block;
     }
 
     .nav-list a {
@@ -273,7 +274,7 @@ header {
         border-radius: 0;
         box-shadow: none;
         width: 100%;
-        display: none; /* Initially hide dropdown */
+        display: none;
     }
 
     .nav-list .dropdown a {
@@ -282,7 +283,7 @@ header {
         color: white;
         text-decoration: none;
         white-space: nowrap;
-        transition: background-color 0.3s ease; /* Smooth hover transition */
+        transition: background-color 0.3s ease;
         transition: padding-left 0.6s ease;
     }
     
@@ -295,7 +296,7 @@ header {
         display: none;
     }
     
-    /* Show the username instead of the profile image */
+   
     .username {
         display: inline-block;
         font-size: 16px;
@@ -306,18 +307,18 @@ header {
         transition: opacity 0.3s ease, transform 0.3s ease;
     }
 
-    /* Active dropdown styles */
+   
     .dropdown.active {
         display: block;
         transform: translateY(0);
     }
 
-    /* Highlight active parent item */
+   
     .nav-list li.active > a {
         background-color: #555;
     }
 
-    /* Ensure links inside dropdown are styled correctly */
+   
     .dropdown a {
         padding: 10px 15px;
         color: white;
@@ -330,27 +331,27 @@ header {
     }
 }
 
-/* Global Box-Sizing */
+
 *, *::before, *::after {
     box-sizing: border-box;
 }
 
-/* Section Styling */
+
 #home {
-    flex: 1; /* Allow the section to grow and fill available space */
+    flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     padding: 50px;
     background-color: #f4f4f4;
-    width: 100%; /* Ensure section takes full width */
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
-    position: relative; /* Ensure correct positioning */
-    margin: 0; /* Remove any default margin */
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    margin: 0;
 }
 
-/* Main content should take all available space except the footer */
+
 main {
     flex: 1;
 }
@@ -378,7 +379,7 @@ main {
     background-color: #555;
 }
 
-/* Footer Styles */
+
 footer {
     background-color: #333;
     color: white;
@@ -386,10 +387,10 @@ footer {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%; /* Ensure footer spans full width */
-    margin: 0; /* Remove any default margin */
-    position: relative; /* Ensure correct positioning */
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    width: 100%;
+    margin: 0;
+    position: relative;
+    box-sizing: border-box;
 }
 
 .footer-content {
@@ -397,7 +398,7 @@ footer {
     justify-content: space-between;
     width: 100%;
     padding: 0 0px;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    flex-wrap: wrap;
 }
 
 .footer-left {
@@ -406,10 +407,10 @@ footer {
     padding-left: 20px;
     margin-left: 0px;
     padding-right: 10px;
-    flex: 1 1 20%; /* Take full width on smaller screens */
-    min-width: 200px; /* Ensure columns don't get too narrow */
-    justify-content: left; /* Center align content */
-    text-align: center; /* Center align text */
+    flex: 1 1 20%;
+    min-width: 200px;
+    justify-content: left;
+    text-align: center;
     margin-right: 45px;
 }
 
@@ -420,17 +421,17 @@ footer {
 .footer-logo img {
     height: 50px;
     margin-left: 0;
-    transition: transform 0.3s ease; /* Smooth transition for hover effect */
+    transition: transform 0.3s ease;
 }
 
 .footer-logo img:hover {
-    transform: translateY(-5px); /* Levitating effect */
+    transform: translateY(-5px);
 }
 
 .social-media {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center align content */
+    align-items: center;
 }
 
 .social-media p {
@@ -445,29 +446,29 @@ footer {
 .social-icons img {
     width: 30px;
     height: 30px;
-    transition: transform 0.3s ease; /* Smooth transition for hover effect */
+    transition: transform 0.3s ease;
 }
 
 .social-icons img:hover {
-    transform: translateY(-5px); /* Levitating effect */
+    transform: translateY(-5px);
 }
 
 .footer-right {
     display: flex;
     justify-content: flex-end;
     width: 100%;
-    flex-wrap: wrap; /* Allow wrapping on smaller screens */
-    flex: 1 1 70%; /* Take approximately two-thirds of the width */
-    text-align: center; /* Center align text */
+    flex-wrap: wrap;
+    flex: 1 1 70%;
+    text-align: center;
     align-items: right;
     padding: 0 0px;
 }
 
 .footer-column {
     flex: 1;
-    min-width: 150px; /* Adjust this value as needed */
+    min-width: 150px;
     margin: 10px;
-    text-align: left; /* Align text to the left */
+    text-align: left;
 }
 
 
@@ -478,7 +479,7 @@ footer {
 .footer-column ul {
     list-style: none;
     padding: 0;
-    text-align: left; /* Align text to the left */
+    text-align: left;
 }
 
 .footer-column ul li {
@@ -497,12 +498,12 @@ footer {
 .footer-bottom {
     margin-top: 20px;
     text-align: center;
-    width: 100%; /* Ensure footer-bottom spans full width */
-    box-sizing: border-box; /* Include padding and border in element's total width and height */
-    padding: 0; /* Remove any default padding */
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0;
 }
 
-/* Responsive Design */
+
 @media (max-width: 1200px) {
     .footer-content {
         display: flex;
@@ -584,7 +585,7 @@ footer {
     }
 }
 
-/* About Us Style */
+
 #about-us {
     width: 100%;
     max-width: 1000px;
@@ -690,7 +691,7 @@ footer {
     margin-top: 30px;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
     #mission,
     #vision {
@@ -715,7 +716,7 @@ footer {
     }
 }
 
-/* Contact Us Style */
+
 #contact-us {
     width: 100%;
     max-width: 1000px;
@@ -787,7 +788,7 @@ footer {
     }
 }
 
-/* Contact Us Style */
+
 #contact-us {
     width: 100%;
     max-width: 1000px;
@@ -857,7 +858,7 @@ footer {
     font-size: 1.2rem;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
     #contact-block {
         flex-direction: column;
@@ -871,7 +872,7 @@ footer {
     }
 }
 
-/* Terms and Conditions Style */
+
 #terms {
     width: 100%;
     max-width: 1000px;
@@ -921,7 +922,7 @@ footer {
     text-align: left;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
     #terms {
         padding: 40px 20px;
@@ -946,7 +947,7 @@ footer {
     }
 }
 
-/* Privacy Policy Style */  
+  
 #privacy-policy {
     width: 100%;
     max-width: 1000px;
@@ -995,7 +996,7 @@ footer {
     text-align: left;
 }
 
-/* Resources Styling */
+
 #resources {
     width: 100%;
     max-width: 1000px;
@@ -1006,7 +1007,7 @@ footer {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Title */
+
 #resources h2 {
     font-size: 2.0rem;
     font-weight: 700;
@@ -1015,7 +1016,7 @@ footer {
     margin-bottom: 30px;
 }
 
-/* Description */
+
 #resources p {
     font-size: 1.2rem;
     text-align: center;
@@ -1024,12 +1025,12 @@ footer {
 }
 
 
-/* Columns */
+
 .resource-columns {
     display: flex;
     justify-content: center;
     gap: 30px;
-    flex-wrap: wrap; /* Ensure columns wrap on smaller screens */
+    flex-wrap: wrap;
 }
 
 .resource-column {
@@ -1037,7 +1038,7 @@ footer {
     text-align: center;
 }
 
-/* Section Headings */
+
 #resources h3 {
     font-size: 1.6rem;
     font-weight: 600;
@@ -1046,7 +1047,7 @@ footer {
     padding-left: 10px;
 }
 
-/* Links */
+
 .resource-column ul {
     list-style-type: none;
     padding: 0;
@@ -1056,7 +1057,7 @@ footer {
     margin-bottom: 15px;
 }
 
-/* Links Styling */
+
 .resource-column ul li a {
     font-size: 1.2rem;
     text-decoration: none;
@@ -1078,7 +1079,7 @@ footer {
         padding: 20px;
     }
 
-    /* Vertical column on small screens */
+   
     .resource-columns {
         flex-direction: column;
         gap: 20px;
@@ -1106,7 +1107,7 @@ footer {
     }
 }
 
-/* FAQ Styles */
+
 #faq {
     width: 100%;
     max-width: 1200px;
@@ -1125,7 +1126,7 @@ footer {
     color: #333;
 }
 
-/* FAQ Container */
+
 .faq-container {
     display: grid;
     grid-template-columns: 1fr;
@@ -1134,7 +1135,7 @@ footer {
     width: 100%;
 }
 
-/* FAQ Question/Item */
+
 .faq-item {
     background-color: #f4f4f4;
     padding: 20px;
@@ -1172,7 +1173,7 @@ footer {
     height: 30px;
 }
 
-/* FAQ Answer Closed */
+
 .faq-answer {
     display: block;
     margin-top: 10px;
@@ -1185,33 +1186,33 @@ footer {
     transition: max-height 0.5s ease, padding 0.5s ease;
 }
 
-/* FAQ Answer Open */
+
 .faq-item.open .faq-answer {
     max-height: 100px;
     padding: 10px 20px;
 }
 
 #manage_faq_button {
-    display: inline-block; /* Makes it behave like a block element but inline */
+    display: inline-block;
     padding: 10px 20px;
-    background-color: #4CAF50; /* Green */
+    background-color: #4CAF50;
     color: white;
-    text-decoration: none; /* Remove underline */
-    border-radius: 5px; /* Rounded corners */
-    transition: background-color 0.3s ease; /* Smooth hover effect */
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
 }
 
 #manage_faq_button:hover {
-    background-color: #45a049; /* Darker green on hover */
+    background-color: #45a049;
 }
 
-/* Optional: Center the button */
+
 .faq-button-container {
-    text-align: center; /* Centers the content within the container */
-    margin-top: 20px; /* Adds some spacing above the button */
+    text-align: center;
+    margin-top: 20px;
 }
 
-/* Form Styling */
+
 form#faqForm {
     max-width: 600px;
     margin: 0 auto 40px;
@@ -1304,7 +1305,7 @@ form#faqForm button:hover {
     background-color: #c82333;
 }
 
-/* Empty State Message */
+
 .faq-category p {
     text-align: center;
     color: #999;
@@ -1349,7 +1350,7 @@ form#faqForm button:hover {
     }
 }
 
-/* Sitemap Styles */
+
 #sitemap {
     width: 100%;
     max-width: 1200px;
@@ -1362,7 +1363,7 @@ form#faqForm button:hover {
     box-sizing: border-box;
 }
 
-/* Title */
+
 #sitemap h2 {
     font-size: 2.0rem;
     font-weight: 700;
@@ -1370,14 +1371,14 @@ form#faqForm button:hover {
     color: #333;
 }
 
-/* Description Text */
+
 #sitemap p {
     font-size: 1.2rem;
     color: #555;
     margin-bottom: 40px;
 }
 
-/* Container */
+
 .sitemap-container {
     display: flex;
     justify-content: center;
@@ -1385,7 +1386,7 @@ form#faqForm button:hover {
     margin-bottom: 20px;
 }
 
-/* Image */
+
 .sitemap-image {
     max-width: 100%;
     height: auto;
@@ -1417,7 +1418,7 @@ form#faqForm button:hover {
 }
 
 
-/* Feeback */
+
 .feedback-container {
     display: flex;
     flex-direction: column;
@@ -1471,7 +1472,7 @@ form#faqForm button:hover {
     margin-bottom: 20px;
 }
 
-/* Create Assessment */
+
 #create-assessment-main {
     width: 100%;
     max-width: 1000px;
@@ -1553,7 +1554,7 @@ form#faqForm button:hover {
     background-color: #0056b3;
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
     #create-assessment-main {
         margin-top: 30px;
@@ -1574,7 +1575,7 @@ form#faqForm button:hover {
 }
 
 
-/* manage user */
+
 .content {
     padding: 20px;
     font-family: Arial, sans-serif;
@@ -1696,7 +1697,7 @@ select, label {
 }
 .tabs {
     display: flex;
-    justify-content: center; /* Center tabs horizontally */
+    justify-content: center;
     border-bottom: 1px solid #ccc;
     background-color: #f9f9f9;
     padding: 10px 0;
