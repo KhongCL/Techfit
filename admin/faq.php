@@ -12,7 +12,6 @@ try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Function to fetch FAQs by category
     function getFAQs($conn, $category) {
         $stmt = $conn->prepare("SELECT question, answer FROM resource WHERE type = 'faq' AND category = :category");
         $stmt->bindParam(':category', $category);

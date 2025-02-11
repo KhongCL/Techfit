@@ -260,14 +260,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <input type="url" name="link" required oninput="toggleCategoryAccess()"><br><br>
 
     <label>Category:</label><br>
-    <select name="category" required disabled oninput="toggleCategoryAccess()">
+    <select name="category" required oninput="toggleCategoryAccess()">
         <option value="" disabled selected>Select Category</option>
         <option value="jobSeeker">Job Seeker</option>
         <option value="employer">Employer</option>
     </select><br><br>
 
     <label>Description:</label><br>
-    <textarea name="description" required disabled oninput="toggleCategoryAccess()"></textarea><br><br>
+    <textarea name="description" required oninput="toggleCategoryAccess()"></textarea><br><br>
 
     <button type="button" onclick="submitUsefulLink()" disabled id="submitBtn">Add Useful Link</button>
 </form>
@@ -297,15 +297,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Enable category, description, and submit button if link is valid and all fields are filled
         if (validURL && titleFilled && categorySelected && descriptionFilled) {
-            categorySelect.removeAttribute('disabled');
-            descriptionInput.removeAttribute('disabled');
             submitButton.removeAttribute('disabled');
             console.log("All fields are valid. Enabling submit button.");
-        } else {
-            categorySelect.setAttribute('disabled', 'disabled');
-            descriptionInput.setAttribute('disabled', 'disabled');
-            submitButton.setAttribute('disabled', 'disabled');
-            console.log("One or more fields are invalid. Disabling submit button.");
         }
     }
 

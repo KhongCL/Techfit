@@ -14,76 +14,27 @@ if ($mysqli->connect_error) {
     die("Database connection failed: " . $mysqli->connect_error);
 }
 
-// Function to Generate Custom Resource IDs
-function generateResourceId($mysqli) {
-    // Fetch the last ID
-    $result = $mysqli->query("SELECT resource_id FROM resource ORDER BY resource_id DESC LIMIT 1");
-    $lastId = $result->fetch_assoc()['resource_id'];
-
-    // Determine the numeric part and increment it
-    $prefix = "R";
-    $newId = 1; // Default for the first entry
-    if ($lastId) {
-        $numericPart = intval(substr($lastId, strlen($prefix)));
-        $newId = $numericPart + 1;
-    }
-
-    // Return the new ID
-    return $prefix . str_pad($newId, 2, "0", STR_PAD_LEFT);
-}
-
-// Handle Add/Edit/Delete Actions
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action'])) {
-        $action = $_POST['action'];
-        if ($action === 'add') {
-            $title = trim($_POST['title']);
-            $link = trim($_POST['link']);
-            $category = trim($_POST['category']);
-
-            if ($title && $link && $category) {
-                $resourceId = generateResourceId($mysqli);
-                $stmt = $mysqli->prepare("INSERT INTO resource (resource_id, type, title, link, category) VALUES (?, 'usefulLink', ?, ?, ?)");
-                $stmt->bind_param("ssss", $resourceId, $title, $link, $category);
-                $stmt->execute();
-                echo json_encode(['status' => 'success', 'message' => 'Useful link added successfully']);
-            } else {
-                echo json_encode(['status' => 'error', 'message' => 'All fields are required.']);
-            }
-        } elseif ($action === 'edit') {
-            $id = $_POST['id'];
-            $title = trim($_POST['title']);
-            $link = trim($_POST['link']);
-            $category = trim($_POST['category']);
-
-            if ($id && $title && $link && $category) {
-                $stmt = $mysqli->prepare("UPDATE resource SET title = ?, link = ?, category = ? WHERE resource_id = ?");
-                $stmt->bind_param("ssss", $title, $link, $category, $id);
-                $stmt->execute();
-                echo json_encode(['status' => 'success', 'message' => 'Useful link updated successfully']);
-            } else {
-                echo json_encode(['status' => 'error', 'message' => 'All fields are required.']);
-            }
-        } elseif ($action === 'delete') {
-            $id = $_POST['id'];
-            if ($id) {
-                $stmt = $mysqli->prepare("DELETE FROM resource WHERE resource_id = ?");
-                $stmt->bind_param("s", $id);
-                $stmt->execute();
-                echo json_encode(['status' => 'success', 'message' => 'Useful link deleted successfully']);
-            } else {
-                echo json_encode(['status' => 'error', 'message' => 'Invalid ID.']);
-            }
-        }
-        exit;
-    }
-}
-
-// Fetch Useful Links for Display
 $result = $mysqli->query("SELECT * FROM resource WHERE type = 'usefulLink' ORDER BY category, resource_id");
 $usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
 
-// Function to display the message and options
+try {
+    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    function getFAQs($conn, $category) {
+        $stmt = $conn->prepare("SELECT question, answer FROM resource WHERE type = 'faq' AND category = :category");
+        $stmt->bindParam(':category', $category);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    $jobSeekerFAQs = getFAQs($conn, 'jobSeeker');
+    $employerFAQs = getFAQs($conn, 'employer');
+
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
+
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
@@ -95,22 +46,18 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
     displayLoginMessage(); // Display message and options if not logged in
 }
 
-// Check if the user has the correct role
 if ($_SESSION['role'] !== 'Job Seeker') {
     displayLoginMessage(); // Display message and options if the role is not Job Seeker
 }
 
-// Check if the job seeker ID is set
 if (!isset($_SESSION['job_seeker_id'])) {
     displayLoginMessage(); // Display message and options if job seeker ID is not set
 }
 
-// Close the session
 session_write_close();
 ?>
 

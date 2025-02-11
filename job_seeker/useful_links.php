@@ -234,7 +234,6 @@ session_write_close();
                         if ($jobSeekerLinks):
                             foreach ($jobSeekerLinks as $link): ?>
                                 <li><a href="<?= htmlspecialchars($link['link']) ?>"><?= htmlspecialchars($link['title']) ?></a></li>
-                                <div style="height: 145px;"></div>
                                 <?php endforeach;
                         else: ?>
                             <li style="color: grey; font-style: italic;">No useful links yet for this category.</li>
@@ -253,7 +252,6 @@ session_write_close();
                         if ($employerLinks):
                             foreach ($employerLinks as $link): ?>
                                 <li><a href="<?= htmlspecialchars($link['link']) ?>"><?= htmlspecialchars($link['title']) ?></a></li>
-                                <div style="height: 145px;"></div>
                                 <?php endforeach;
                         else: ?>
                             <li style="color: grey; font-style: italic;">No useful links yet for this category.</li>

@@ -1,7 +1,40 @@
 <?php
 session_start(); // Start the session to access session variables
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-// Function to display the message and options
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "techfit";
+
+$mysqli = new mysqli($servername, $username, $password, $dbname);
+
+if ($mysqli->connect_error) {
+    die("Database connection failed: " . $mysqli->connect_error);
+}
+
+$result = $mysqli->query("SELECT * FROM resource WHERE type = 'usefulLink' ORDER BY category, resource_id");
+$usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
+
+try {
+    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    function getFAQs($conn, $category) {
+        $stmt = $conn->prepare("SELECT question, answer FROM resource WHERE type = 'faq' AND category = :category");
+        $stmt->bindParam(':category', $category);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    $jobSeekerFAQs = getFAQs($conn, 'jobSeeker');
+    $employerFAQs = getFAQs($conn, 'employer');
+
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
+
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
@@ -13,17 +46,14 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message and options if not logged in
+    displayLoginMessage();
 }
 
-// Check if the user has the correct role
 if ($_SESSION['role'] !== 'Employer') {
-    displayLoginMessage(); // Display message and options if the role is not Employer
+    displayLoginMessage();
 }
 
-// Close the session
 session_write_close();
 ?>
 
