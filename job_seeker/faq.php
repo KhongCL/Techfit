@@ -66,45 +66,9 @@ session_write_close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us - TechFit</title>
+    <title>FAQ - TechFit</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #1e1e1e;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-        .popup h2 {
-            color: #fff;
-        }
-        .popup button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .popup .close-button {
-            background-color: #dc3545;
-            color: #fff;
-        }
-        .popup .cancel-button {
-            background-color: #007bff;
-            color: #fff;
-        }
-        .popup .close-button:hover {
-            background-color: #c82333;
-        }
-        .popup .cancel-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+
 </head>
 <body>
     <header>
@@ -160,7 +124,7 @@ session_write_close();
         </nav>
     </header>
 
-    <!-- Logout Popup -->
+    
     <div id="logout-popup" class="popup">
         <h2>Are you sure you want to Log Out?</h2>
         <button class="close-button" onclick="logoutUser()">Yes</button>
@@ -276,18 +240,5 @@ session_write_close();
     </footer>
 
     <script src="scripts.js?v=1.0"></script>
-    <script>
-        function openPopup(popupId) {
-            document.getElementById(popupId).style.display = 'block';
-        }
-
-        function closePopup(popupId) {
-            document.getElementById(popupId).style.display = 'none';
-        }
-
-        function logoutUser() {
-            window.location.href = '/Techfit'; 
-        }
-    </script>
 </body>
 </html>

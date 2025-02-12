@@ -38,66 +38,6 @@ session_write_close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechFit Job Seeker - Home</title>
     <link rel="stylesheet" href="styles.css?v=2.0">
-    <style>
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #1e1e1e;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-        .popup h2 {
-            color: #fff;
-        }
-        .popup input[type="text"],
-        .popup input[type="password"] {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #333;
-            color: #fff;
-        }
-        .popup input[type="submit"] {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: #fff;
-            cursor: pointer;
-        }
-        .popup input[type="submit"]:hover {
-            background-color: #0056b3;
-        }
-        .popup .close-button {
-            background-color: #dc3545;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-        .popup .close-button:hover {
-            background-color: #c82333;
-        }
-        .popup .cancel-button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-        .popup .cancel-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
 </head>
 <body>
     <header>
@@ -223,20 +163,6 @@ session_write_close();
             <button type="button" class="cancel-button" onclick="closePopup('logout-popup')">No</button>
         </form>
     </div>
-
     <script src="scripts.js?v=1.0"></script>
-    <script>
-        function openPopup(popupId) {
-            document.getElementById(popupId).style.display = 'block';
-        }
-
-        function closePopup(popupId) {
-            document.getElementById(popupId).style.display = 'none';
-        }
-
-        function logoutUser() {
-            document.getElementById('logout-form').submit();
-        }
-    </script>
 </body>
 </html>

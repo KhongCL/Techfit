@@ -14,25 +14,20 @@ if ($mysqli->connect_error) {
     die("Database connection failed: " . $mysqli->connect_error);
 }
 
-// Function to Generate Custom Resource IDs
 function generateResourceId($mysqli) {
-    // Fetch the last ID
     $result = $mysqli->query("SELECT resource_id FROM resource ORDER BY resource_id DESC LIMIT 1");
     $lastId = $result->fetch_assoc()['resource_id'];
 
-    // Determine the numeric part and increment it
     $prefix = "R";
-    $newId = 1; // Default for the first entry
+    $newId = 1;
     if ($lastId) {
         $numericPart = intval(substr($lastId, strlen($prefix)));
         $newId = $numericPart + 1;
     }
 
-    // Return the new ID
     return $prefix . str_pad($newId, 2, "0", STR_PAD_LEFT);
 }
 
-// Handle Add/Edit/Delete Actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         $action = $_POST['action'];
@@ -79,13 +74,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch Useful Links for Display
 $result = $mysqli->query("SELECT * FROM resource WHERE type = 'useful_link' ORDER BY category, resource_id");
 $usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
 ?>
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Useful Links Management</title>
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -132,7 +128,16 @@ $usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
-                                <span class="username" id="username">Admin</span>
+                                <span class="username" id="username">
+                                    <?php
+                                    
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  
+                                    } else {
+                                        echo "Guest";  
+                                    }
+                                    ?>
+                                </span>
                                 <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
                             </div>
                         </a>
@@ -143,13 +148,20 @@ $usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
                                     <li><a href="system_configuration.php">System Configuration Settings</a></li>
                                 </ul>
                             </li>
-                            <li><a href="logout.php">Logout</a></li>
+                            <li><a href="#" >Logout</a></li>
                         </ul>
                     </li>                    
                 </ul>
             </div>
         </nav>
     </header>  
+
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>
+
 <body>
         <section id="resources">
             <h2>Useful Links</h2>
@@ -195,6 +207,7 @@ $usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
         <a href="manage_useful_links.php" id="manage_useful_links_button" style="background-color: #4CAF50; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Manage Useful Links</a>
         <div style="height: 110px;"></div>
     </div>
+    
     <footer>
         <div class="footer-content">
             <div class="footer-left">
@@ -209,7 +222,7 @@ $usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -249,7 +262,7 @@ $usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
                     <ul>
                         <li><a href="about.php">About</a></li>
                         <li><a href="contact.php">Contact Us</a></li>
-                        <li><a href="terms.php">Terms & Condition</a></li>
+                        <li><a href="terms.php">Terms of Service</a></li>
                         <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>
                 </div>
@@ -259,5 +272,6 @@ $usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
+    <script src="scripts.js"></script>
 </body>
 </html>

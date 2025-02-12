@@ -1,5 +1,5 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -14,25 +14,25 @@ if ($mysqli->connect_error) {
     die("Database connection failed: " . $mysqli->connect_error);
 }
 
-// Function to Generate Custom Resource IDs
+
 function generateResourceId($mysqli) {
-    // Fetch the last ID
+    
     $result = $mysqli->query("SELECT resource_id FROM resource ORDER BY resource_id DESC LIMIT 1");
     $lastId = $result->fetch_assoc()['resource_id'];
 
-    // Determine the numeric part and increment it
+    
     $prefix = "R";
-    $newId = 1; // Default for the first entry
+    $newId = 1; 
     if ($lastId) {
         $numericPart = intval(substr($lastId, strlen($prefix)));
         $newId = $numericPart + 1;
     }
 
-    // Return the new ID
+    
     return $prefix . str_pad($newId, 2, "0", STR_PAD_LEFT);
 }
 
-// Handle Add/Edit/Delete Actions
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         $action = $_POST['action'];
@@ -79,11 +79,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch Useful Links for Display
+
 $result = $mysqli->query("SELECT * FROM resource WHERE type = 'usefulLink' ORDER BY category, resource_id");
 $usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
 
-// Function to display the message and options
+
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
@@ -95,22 +95,22 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message and options if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Job Seeker') {
-    displayLoginMessage(); // Display message and options if the role is not Job Seeker
+    displayLoginMessage(); 
 }
 
-// Check if the job seeker ID is set
+
 if (!isset($_SESSION['job_seeker_id'])) {
-    displayLoginMessage(); // Display message and options if job seeker ID is not set
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 ?>
 
@@ -119,45 +119,9 @@ session_write_close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assessment History - TechFit</title>
+    <title>Sitemap - TechFit</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #1e1e1e;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-        .popup h2 {
-            color: #fff;
-        }
-        .popup button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .popup .close-button {
-            background-color: #dc3545;
-            color: #fff;
-        }
-        .popup .cancel-button {
-            background-color: #007bff;
-            color: #fff;
-        }
-        .popup .close-button:hover {
-            background-color: #c82333;
-        }
-        .popup .cancel-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+
 </head>
 <body>
     <header>
@@ -187,11 +151,11 @@ session_write_close();
                             <div class="profile-info">
                                 <span class="username" id="username">
                                     <?php
-                                    // Check if the user is logged in and display their username
+                                    
                                     if (isset($_SESSION['username'])) {
-                                        echo $_SESSION['username'];  // Display the username from session
+                                        echo $_SESSION['username'];  
                                     } else {
-                                        echo "Guest";  // Default if not logged in
+                                        echo "Guest";  
                                     }
                                     ?>
                                 </span>
@@ -213,7 +177,7 @@ session_write_close();
         </nav>
     </header>
 
-    <!-- Logout Popup -->
+    
     <div id="logout-popup" class="popup">
         <h2>Are you sure you want to Log Out?</h2>
         <button class="close-button" onclick="logoutUser()">Yes</button>
@@ -250,7 +214,7 @@ session_write_close();
         </div>
         <div style="height: 205px;"></div>
     </section>
-         
+    
     <footer>
         <div class="footer-content">
             <div class="footer-left">
@@ -265,7 +229,7 @@ session_write_close();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -307,7 +271,6 @@ session_write_close();
         </div>
     </footer>
 
-
     <script src="scripts.js?v=1.0"></script>
     <script>
         function openPopup(popupId) {
@@ -319,7 +282,7 @@ session_write_close();
         }
 
         function logoutUser() {
-            window.location.href = '../'; // Redirect to the root directory
+            window.location.href = '../'; 
         }
     </script>
 </body>

@@ -6,19 +6,19 @@
     --success-color: #28a745;
     --success-color-hover: #2ecc71;
 
-    --background-color: #2A2A2A;
-    --background-color-dark: #1A1A1A;
-    --background-color-medium: #333;
-    --background-color-light: #555;
-    --background-color-extra-light: #666;
-    --background-color-hover: #777;
+    --background-color: #121212;
+    --background-color-medium: #080808;
+    --background-color-medium: #1E1E1E;
+    --background-color-light: #444;
+    --background-color-extra-light: #555;
+    --background-color-hover: #666;
     
-    --text-color: #b0b0b0;
-    --text-color-dark: #606060;
-    --text-color-medium: #b8b8b8;
+    --text-color: #fafafa;
+    --text-color-dark: #b0b0b0;
+    --text-color-medium: #e0e0e0;
     --text-color-light: #f7f7f7;
     --text-color-extra-light: #ffffff;
-    --text-color-hover: #ffffff;
+    --text-color-hover: #b0b0b0;
     
     --button-color: #007bff;
     --button-color-hover: #3c87e3;
@@ -26,6 +26,24 @@
     --disabled-color: #7f8c8d;
 }
 
+
+main {
+    flex: 1;
+}
+
+html, body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
 
 body {
     font-family: Arial, sans-serif;
@@ -36,6 +54,7 @@ body {
     padding-top: 60px;
     min-height: 100vh;
     overflow-x: hidden;
+    background-color: var(--background-color);
 }
 
 header {
@@ -43,7 +62,7 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    background-color: var(--background-color-dark);
+    background-color: var(--background-color-medium);
     position: fixed;
     top: 0;
     left: 0;
@@ -54,7 +73,7 @@ header {
     
 .logo img {
     height: 50px;
-    padding-top: 10px;
+    padding-top: 5px;
     padding-left: 5px;
 }
 
@@ -74,7 +93,7 @@ header {
 }
 
 .nav-list li {
-    padding-top: 10px;
+    padding-top: 5px;
     position: relative;
     margin-left: 10px;
 }
@@ -91,7 +110,7 @@ header {
     position: absolute;
     top: 100%;
     left: 0;
-    background-color: var(--background-color-medium);
+    background-color: var(--background-color-light);
     list-style: none;
     padding: 0;
     transform: translateY(-6px);
@@ -113,7 +132,7 @@ header {
     left: auto;
     right: 100%;
     top: 0;
-    background-color: var(--background-color-medium);
+    background-color: var(--background-color-light);
     border: 1px solid var(--background-color-light);
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
 }
@@ -121,7 +140,7 @@ header {
 .profile-info {
     display: flex;
     align-items: center;
-    margin-top: -5px;
+    margin-top: -6px;
 }
 
 .profile-image {
@@ -171,7 +190,7 @@ header {
 }
 
 .nav-list li:hover > a {
-    background-color: var(--background-color-medium);
+    background-color: var(--background-color-light);
     transition: background-color 0.3s ease;
 }
 
@@ -335,57 +354,50 @@ header {
     }
 }
 
-*, *::before, *::after {
-    box-sizing: border-box;
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
 }
 
-main {
-    flex: 1;
-}
-
-#home {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 50px;
-    background-color: var(--background-color);
-    width: 100%;
-    box-sizing: border-box;
-    position: relative;
-    margin: 0;
-}
-
-
-#home h2 {
+.popup h2 {
     color: var(--text-color);
-    font-size: 2rem;
-    margin-bottom: 20px;
 }
 
-#home p {
-    color: var(--text-color);
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-}
-
-#home button {
+.popup button {
     padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.popup .close-button {
+    background-color: var(--danger-color);
+    color: var(--text-color);
+}
+
+.popup .cancel-button {
     background-color: var(--button-color);
     color: var(--text-color);
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    border-radius: 2px;
 }
 
-#home button:hover {
+.popup .close-button:hover {
+    background-color: var(--danger-color-hover);
+}
+
+.popup .cancel-button:hover {
     background-color: var(--button-color-hover);
 }
 
 footer {
-    background-color: var(--background-color-dark);
+    background-color: var(--background-color-medium);
     color: var(--text-color);
     padding: 20px;
     display: flex;
@@ -397,7 +409,9 @@ footer {
     box-sizing: border-box;
     padding-left: 40px;
     padding-right: 40px;
+    margin-top: auto;
 }
+
 
 .footer-content {
     display: flex;
@@ -477,7 +491,6 @@ footer {
     text-align: left;
 }
 
-
 .footer-column h3 {
     margin-bottom: 10px;
 }
@@ -508,7 +521,6 @@ footer {
     box-sizing: border-box;
     padding: 0;
 }
-
 
 @media (max-width: 1103px) {
     .footer-content {
@@ -581,6 +593,45 @@ footer {
     }
 }
 
+#home {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 50px;
+    background-color: var(--background-color);
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    margin: 0;
+}
+
+#home h2 {
+    color: var(--text-color);
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+#home p {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+#home button {
+    padding: 10px 20px;
+    background-color: var(--button-color);
+    color: var(--text-color);
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 2px;
+}
+
+#home button:hover {
+    background-color: var(--button-color-hover);
+}
 
 #about-us {
     flex: 1;
@@ -982,7 +1033,6 @@ footer {
     padding-left: 10px;
 }
 
-
 .resource-column ul {
     list-style-type: none;
     padding: 0;
@@ -1044,7 +1094,6 @@ footer {
     }
 }
 
-
 #faq {
     flex: 1;
     display: flex;
@@ -1091,6 +1140,7 @@ footer {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s;
     border-bottom: none;
+    border-right: none;
 }
 
 .faq-item:hover {
@@ -1126,13 +1176,16 @@ footer {
     display: block;
     margin-top: 10px;
     font-size: 1.1rem;
-    color: var(--background-color-medium);
     padding-left: 20px;
     overflow: hidden;
     max-height: 0;
     padding: 0 20px;
     transition: max-height 0.5s ease, padding 0.5s ease;
     color: var(--text-color-light);
+}
+
+.faq-answer p {
+    text-align: left;
 }
 
 
@@ -1428,7 +1481,7 @@ form#faqForm button:hover {
     border: none;
     border-radius: 5px;
     background-color: var(--button-color);
-    color: var(--background-color-dark);
+    color: var(--background-color-medium);
     transition: background-color 0.3s, color 0.3s;
     cursor: pointer;
     font-size: 1rem;
@@ -1759,7 +1812,7 @@ form#faqForm button:hover {
 
 #start-assessment-button {
     background-color: var(--button-color);
-    color: var(--background-color-dark);
+    color: var(--background-color-medium);
     padding: 12px 25px;
     border: none;
     border-radius: 25px;

@@ -1,5 +1,5 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -73,7 +73,11 @@ session_write_close();
         <nav>
             <div class="nav-container">
                 <ul class="nav-list">
-                    <li><a href="#">Candidates</a></li>
+                    <li><a href="#">Candidates</a>
+                        <ul class="dropdown">
+                            <li><a href="search_candidate.php">Search Candidates</a></li>
+                        </ul>
+                    </li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
                             <li><a href="useful_links.php">Useful Links</a></li>
@@ -83,15 +87,24 @@ session_write_close();
                     </li>
                     <li><a href="about.php">About</a></li>
                     <li>
-                        <a href="#" id="profile-link">
+                    <a href="#" id="profile-link">
                             <div class="profile-info">
-                                <span class="username" id="username">Employer</span>
+                                <span class="username" id="username">
+                                    <?php
+                                    
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  
+                                    } else {
+                                        echo "Guest";  
+                                    }
+                                    ?>
+                                </span>
                                 <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
                             </div>
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
                             <li><a href="profile.php">Settings</a></li>
-                            <li><a href="logout.php">Logout</a></li>
+                            <li><a href="#" >Logout</a></li>
                         </ul>
                     </li> 
                 </ul>
@@ -104,6 +117,12 @@ session_write_close();
         </nav>
     </header>
 
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>
+    
     <section id="faq">
         <h2>Frequently Asked Questions</h2>
 
@@ -170,14 +189,14 @@ session_write_close();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:/a></p>techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
                 <div class="footer-column">
                     <h3>Candidate</h3>
                     <ul>
-                        <li><a href="candidates.php">Candidates</a></li>
+                        <li><a href="search_candidate.php">Search Candidates</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -209,6 +228,7 @@ session_write_close();
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
+    
     <script src="scripts.js"></script>
 </body>
 </html>

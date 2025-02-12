@@ -184,10 +184,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Useful Links Management</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <header>
+<div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>
     <div class="logo">
         <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
     </div>
@@ -228,12 +235,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </li>
                 <li><a href="about.php">About</a></li>
                 <li>
-                    <a href="#" id="profile-link">
-                        <div class="profile-info">
-                            <span class="username" id="username">Admin</span>
-                            <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
-                        </div>
-                    </a>
+                        <a href="#" id="profile-link">
+                            <div class="profile-info">
+                                <span class="username" id="username">
+                                    <?php
+                                    
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  
+                                    } else {
+                                        echo "Guest";  
+                                    }
+                                    ?>
+                                </span>
+                                <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
+                            </div>
+                        </a>
                     <ul class="dropdown" id="profile-dropdown">
                         <li><a href="settings.php">Settings</a>
                             <ul class="dropdown">
@@ -241,7 +257,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <li><a href="system_configuration.php">System Configuration Settings</a></li>
                             </ul>
                         </li>
-                        <li><a href="logout.php">Logout</a></li>
+                        <li><a href="#" >Logout</a></li>
                     </ul>
                 </li>
             </ul>
@@ -249,29 +265,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </nav>
 </header>
 <body>
-<h1 style="text-align: center; padding-top: 60px;">Manage Useful Links</h1>
-<form id="faqForm">
-    <input type="hidden" name="action" value="add">
-    
-    <label>Title:</label><br>
-    <textarea name="title" required oninput="toggleCategoryAccess()"></textarea><br>
+<div id="formContainer">
+    <h1 style='text-align:center'>Manage Useful Links</h1>
+    <form id="faqForm">
+        <input type="hidden" name="action" value="add">
+        
+        <label style="margin-left: 6px;">Title:</label><br>
+        <textarea name="title" required oninput="toggleCategoryAccess()" style="resize: vertical; margin-left: 6px;"></textarea><br>
 
-    <label>Link:</label><br>
-    <input type="url" name="link" required oninput="toggleCategoryAccess()"><br><br>
+        <label style="margin-left: 6px;">Link:</label><br>
+        <input type="url" name="link" required oninput="toggleCategoryAccess()" style="margin-left: 6px;"><br><br>
 
-    <label>Category:</label><br>
-    <select name="category" required oninput="toggleCategoryAccess()">
-        <option value="" disabled selected>Select Category</option>
-        <option value="jobSeeker">Job Seeker</option>
-        <option value="employer">Employer</option>
-    </select><br><br>
+        <label style="margin-left: 6px;">Category:</label><br>
+        <select name="category" required oninput="toggleCategoryAccess()" style="margin-left: 6px;">
+            <option value="" disabled selected>Select Category</option>
+            <option value="jobSeeker">Job Seeker</option>
+            <option value="employer">Employer</option>
+        </select><br><br>
 
-    <label>Description:</label><br>
-    <textarea name="description" required oninput="toggleCategoryAccess()"></textarea><br><br>
+        <label style="margin-left: 6px;">Description:</label><br>
+        <textarea name="description" required oninput="toggleCategoryAccess()" style="resize: vertical; margin-left: 6px;"></textarea><br><br>
 
-    <button type="button" onclick="submitUsefulLink()" disabled id="submitBtn">Add Useful Link</button>
-</form>
-
+        <div style="text-align: center;">
+            <button type="button" onclick="submitUsefulLink()" disabled id="submitBtn">Add Useful Link</button>
+        </div>
+    </form>
+</div>
 
 <script>
     function toggleCategoryAccess() {
@@ -281,21 +300,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const descriptionInput = document.querySelector('textarea[name="description"]');
         const submitButton = document.getElementById('submitBtn');
 
-        // Check if the link is a valid URL
+        
         const validURL = /^https?:\/\/[^\s]+$/i.test(linkInput.value.trim());
 
-        // Check if the title, category, and description are filled out
+        
         const titleFilled = titleInput.value.trim() !== '';
         const categorySelected = categorySelect.value !== '';
         const descriptionFilled = descriptionInput.value.trim() !== '';
 
-        // Debugging: Log field statuses to see if they meet the conditions
+        
         console.log("Valid URL:", validURL);
         console.log("Title Filled:", titleFilled);
         console.log("Category Selected:", categorySelected);
         console.log("Description Filled:", descriptionFilled);
 
-        // Enable category, description, and submit button if link is valid and all fields are filled
+        
         if (validURL && titleFilled && categorySelected && descriptionFilled) {
             submitButton.removeAttribute('disabled');
             console.log("All fields are valid. Enabling submit button.");
@@ -415,20 +434,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 </script>
 
-    <h2 style="text-align: center;">Existing Useful Links</h2>
     <div id="faq">
+        <h2 style="text-align: center;">Existing Useful Links</h2>
         <?php foreach (['jobSeeker', 'employer'] as $category): ?>
             <div class="faq-category">
-                <h3>For <?= ucfirst($category) ?>s</h3>
+            <h3>For <?= ucfirst(str_replace('jobSeeker', 'Job Seeker', $category)) ?>s</h3>
                 <?php
                 $categoryLinks = array_filter($usefulLinks, fn($usefulLink) => $usefulLink['category'] === $category);
                 if ($categoryLinks):
                     foreach ($categoryLinks as $usefulLink): ?>
                         <div class="faq-item" data-id="<?= $usefulLink['resource_id'] ?>">
-                            <strong>Title:</strong> <?= htmlspecialchars($usefulLink['title']) ?><br><br>
-                            <strong>Link:</strong> <?= htmlspecialchars($usefulLink['link']) ?><br><br>
-                            <p style="margin: 0; color: #555; font-size: 14px; text-align: justify;">
-                                <strong>Description:</strong> <?= htmlspecialchars($usefulLinkDescriptions[$usefulLink['resource_id']] ?? 'No description available', ENT_QUOTES, 'UTF-8') ?>
+                            <div style="color:white;">
+                                <strong>Title: </strong><?= htmlspecialchars($usefulLink['title'])?><br><br>
+                                <strong>Link: </strong> <a href="<?= htmlspecialchars($usefulLink['link']) ?>" target="_blank"><?= htmlspecialchars($usefulLink['link']) ?></a><br><br>
+                            </div>
+                            <p>
+                            <strong>Description: </strong> <?= htmlspecialchars($usefulLinkDescriptions[$usefulLink['resource_id']] ?? 'No description available', ENT_QUOTES, 'UTF-8') ?>
                             </p>
                             <div style="text-align: center; margin-top: 10px;">
                                 <button style="background-color: green; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer;" onclick="editUsefulLink('<?= $usefulLink['resource_id'] ?>')">Edit</button>
@@ -440,10 +461,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <p>No useful links yet for this category.</p>
                 <?php endif; ?>
             </div>
-        <?php endforeach; ?>
-    </div>
-    <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
-        <a href="useful_links.php" id="manage_useful_links_button" style="background-color: #4CAF50; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Back to Useful Links</a>
+            <?php endforeach; ?>
+            <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
+                <a href="useful_links.php" id="manage_useful_links_button" style="background-color: #4CAF50; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Back to Useful Links</a>
+            </div>
     </div>
     <footer>
         <div class="footer-content">
@@ -459,7 +480,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -499,7 +520,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <ul>
                         <li><a href="about.php">About</a></li>
                         <li><a href="contact.php">Contact Us</a></li>
-                        <li><a href="terms.php">Terms & Condition</a></li>
+                        <li><a href="terms.php">Terms of Service</a></li>
                         <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>
                 </div>
@@ -509,7 +530,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
-
+    
     <script src="scripts.js"></script>
 </body>
 </html>

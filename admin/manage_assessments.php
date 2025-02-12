@@ -75,7 +75,16 @@ session_write_close();
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
-                                <span class="username" id="username">Admin</span>
+                                <span class="username" id="username">
+                                    <?php
+                                    
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  
+                                    } else {
+                                        echo "Guest";  
+                                    }
+                                    ?>
+                                </span>
                                 <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
                             </div>
                         </a>
@@ -86,13 +95,18 @@ session_write_close();
                                     <li><a href="system_configuration.php">System Configuration Settings</a></li>
                                 </ul>
                             </li>
-                            <li><a href="logout.php">Logout</a></li>
+                            <li><a href="#" >Logout</a></li>
                         </ul>
                     </li>                    
                 </ul>
             </div>
         </nav>
     </header>    
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>
         <main>
         <h1>Manage Assessments</h1>
         <div class="header-controls">
@@ -649,7 +663,7 @@ session_write_close();
         }
 
         /* Close Button */
-        .close-button {
+        .assessment-close-button {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -661,7 +675,7 @@ session_write_close();
             transition: color 0.1s ease, transform 0.1s ease; /* Add transition for smooth effect */
         }
 
-        .close-button:hover {
+        .assessment-close-button:hover {
             color: var(--accent-color); /* Use a less prominent color for hover */
             transform: scale(1.1); /* Slightly enlarge the button on hover */
             background: none; /* Ensure no background color on hover */
@@ -772,7 +786,7 @@ session_write_close();
                         });
 
                         // Add event listener for close button
-                        document.querySelector('.close-button').addEventListener('click', closeDeletedAssessments);
+                        document.querySelector('.assessment-close-button').addEventListener('click', closeDeletedAssessments);
 
                         // Add event listener for restore selected button
                         document.getElementById('restoreSelectedButton').addEventListener('click', restoreSelectedAssessments);
@@ -888,7 +902,7 @@ session_write_close();
             });
 
             function closeDeletedAssessments() {
-                const closeButton = document.querySelector('.close-button');
+                const closeButton = document.querySelector('.assessment-close-button');
                 closeButton.style.backgroundColor = 'transparent'; // Ensure no background color
                 document.getElementById('deleted-assessments-tab').style.display = 'none';
 
@@ -1164,7 +1178,7 @@ session_write_close();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -1204,7 +1218,7 @@ session_write_close();
                     <ul>
                         <li><a href="about.php">About</a></li>
                         <li><a href="contact.php">Contact Us</a></li>
-                        <li><a href="terms.php">Terms & Condition</a></li>
+                        <li><a href="terms.php">Terms of Service</a></li>
                         <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>
                 </div>
@@ -1214,5 +1228,6 @@ session_write_close();
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
+    <script src = "scripts.js"></script>
 </body>
 </html>

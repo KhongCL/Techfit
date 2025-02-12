@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms and Conditions - TechFit</title>
+    <title>Terms of Service - TechFit</title>
     <link rel="stylesheet" href="styles.css?v=2.0">
 </head>
 <body>
@@ -41,13 +41,13 @@
 
     <section id="terms">
         <div class="container">
-            <h2>TechFit - Terms and Conditions</h2>
+            <h2>TechFit - Terms of Service</h2>
             <div id="last-updated">
                 Last Updated: December 18, 2024
             </div>
             
             <div id="terms-header">
-                By using our website, you agree to the following terms and conditions:
+                By using our website, you agree to the following Terms of Service:
             </div>
     
             <div id="terms-section">
@@ -58,9 +58,9 @@
                 <ol>
                     <li>The content on our website is for informational purposes only and should not be construed as legal advice.</li>
                     <li>We do not warrant the accuracy, reliability, or completeness of any information on our website.</li>
-                    <li>We reserve the right to modify or update these terms and conditions at any time.</li>
-                    <li>By using our website, you agree to be bound by these terms and conditions.</li>
-                    <li>If you have any questions or concerns about these terms and conditions, please contact us.</li>
+                    <li>We reserve the right to modify or update these Terms of Service at any time.</li>
+                    <li>By using our website, you agree to be bound by these Terms of Service.</li>
+                    <li>If you have any questions or concerns about these Terms of Service, please contact us.</li>
                 </ol>
             </div>
     
@@ -162,7 +162,7 @@
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">

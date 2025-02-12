@@ -277,7 +277,16 @@ $conn->close();
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
-                                <span class="username" id="username">Admin</span>
+                                <span class="username" id="username">
+                                    <?php
+                                    
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  
+                                    } else {
+                                        echo "Guest";  
+                                    }
+                                    ?>
+                                </span>
                                 <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
                             </div>
                         </a>
@@ -288,13 +297,18 @@ $conn->close();
                                     <li><a href="system_configuration.php">System Configuration Settings</a></li>
                                 </ul>
                             </li>
-                            <li><a href="logout.php">Logout</a></li>
+                            <li><a href="#" >Logout</a></li>
                         </ul>
                     </li>                    
                 </ul>
             </div>
         </nav>
-    </header>    
+    </header> 
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>   
     
     <main id="create-assessment-main">
         <h2 id="create-assessment-title">Create New Assessment</h2>
@@ -324,12 +338,12 @@ $conn->close();
                 <div class="social-media">
                     <p>Keep up with TechFit:</p>
                     <div class="social-icons">
-                        <a href="https:
-                        <a href="https:
-                        <a href="https:
-                        <a href="https:
+                        <a href="https://facebook.com"><img src="images/facebook.png" alt="Facebook"></a>
+                        <a href="https://twitter.com"><img src="images/twitter.png" alt="Twitter"></a>
+                        <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
+                        <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -369,7 +383,7 @@ $conn->close();
                     <ul>
                         <li><a href="about.php">About</a></li>
                         <li><a href="contact.php">Contact Us</a></li>
-                        <li><a href="terms.php">Terms & Condition</a></li>
+                        <li><a href="terms.php">Terms of Service</a></li>
                         <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>
                 </div>

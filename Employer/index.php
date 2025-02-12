@@ -12,12 +12,12 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
     displayLoginMessage();
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Employer') {
     displayLoginMessage();
 }
@@ -32,65 +32,6 @@ session_write_close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechFit Employer - Home</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-        }
-        .container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .table-container {
-            flex: 1;
-        }
-        header, footer {
-            background-color: #333;
-            color: #fff;
-        }
-        footer {
-            padding: 20px;
-            text-align: center;
-        }
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #1e1e1e;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-        .popup h2 {
-            color: #fff;
-        }
-        .popup button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .popup .close-button {
-            background-color: #dc3545;
-            color: #fff;
-        }
-        .popup .cancel-button {
-            background-color: #007bff;
-            color: #fff;
-        }
-        .popup .close-button:hover {
-            background-color: #c82333;
-        }
-        .popup .cancel-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
 </head>
 <body>
     <header>
@@ -114,15 +55,24 @@ session_write_close();
                     </li>
                     <li><a href="about.php">About</a></li>
                     <li>
-                        <a href="#" id="profile-link">
+                    <a href="#" id="profile-link">
                             <div class="profile-info">
-                                <span class="username" id="username">Employer</span>
+                                <span class="username" id="username">
+                                    <?php
+                                    
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  
+                                    } else {
+                                        echo "Guest";  
+                                    }
+                                    ?>
+                                </span>
                                 <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
                             </div>
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
                             <li><a href="profile.php">Settings</a></li>
-                            <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li>
+                            <li><a href="#" >Logout</a></li>
                         </ul>
                     </li> 
                 </ul>
@@ -135,11 +85,10 @@ session_write_close();
         </nav>
     </header>
 
-    <!-- Logout Popup -->
     <div id="logout-popup" class="popup">
         <h2>Are you sure you want to Log Out?</h2>
-        <button class="close-button" onclick="logoutUser()">Yes</button>
-        <button class="cancel-button" onclick="closePopup('logout-popup')">No</button>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
     </div>
 
     <section id="home">
@@ -161,7 +110,7 @@ session_write_close();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:/a></p>techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -199,19 +148,7 @@ session_write_close();
         <div class="footer-bottom">
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
-    </footer>
-    <script>
-        function openPopup(popupId) {
-            document.getElementById(popupId).style.display = 'block';
-        }
-
-        function closePopup(popupId) {
-            document.getElementById(popupId).style.display = 'none';
-        }
-
-        function logoutUser() {
-            window.location.href = '/Techfit';
-        }
-    </script>
+    </footer>   
+    <script src="scripts.js"></script>
 </body>
 </html>
