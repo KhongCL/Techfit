@@ -9,189 +9,10 @@ session_start();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechFit Employer - Search Candidates</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        body, html {
-            height: 100%;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-        }
-        .container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        .table-container {
-            max-height: 600px; /* Set a maximum height for the container */
-            overflow-y: auto; /* Enable vertical scrolling */
-        }
-        header, footer {
-            background-color: #333; /* Assuming the header's background color is #333 */
-            color: #fff; /* Assuming the text color is white */
-        }
-        footer {
-            padding: 20px;
-            text-align: center;
-        }
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #1e1e1e;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-        .popup h2 {
-            color: #fff;
-        }
-        .popup button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .popup .close-button {
-            background-color: #dc3545;
-            color: #fff;
-        }
-        .popup .cancel-button {
-            background-color: #007bff;
-            color: #fff;
-        }
-        .popup .close-button:hover {
-            background-color: #c82333;
-        }
-        .popup .cancel-button:hover {
-            background-color: #0056b3;
-        }
-        .actions .accept:hover {
-            color: green;
-        }
-        .actions .reject:hover {
-                color: red;
-        }
-        .remove-button {
-            background: none;
-            border: none;
-            color: red;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .remove-button:hover {
-            color: darkred;
-        }
-        .remove-button {
-        background: none;
-        border: none;
-        color: red;
-        cursor: pointer;
-        font-size: 16px;
-        }
-        .remove-button:hover {
-            color: darkred;
-        }
-        .view {
-            background: none;
-            border: none;
-            color: black;
-            cursor: pointer;
-            font-size: 16px;
-            text-decoration: none; /* Remove underline */
-        }
-        .view:hover {
-            color: #555;
-        }
-        .actions {
-        display: flex;
-        align-items: center; /* Align items vertically */
-        gap: 10px; /* Add some space between the icons */
-        }
-        .accept, .reject {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .accept:hover {
-            color: green;
-        }
-        .reject:hover {
-            color: red;
-        }
-        .view {
-            background: none;
-            border: none;
-            color: #007bff; /* Blue color */
-            cursor: pointer;
-            font-size: 16px;
-            text-decoration: none; /* Remove underline */
-        }
-        .view:hover {
-            color: #0056b3; /* Darker blue on hover */
-            text-decoration: underline; /* Underline on hover */
-        }
-        .sort-controls-wrapper {
-            margin-top: 0px; /* Move the sort controls down by 30px */
-        }
-        .sort-controls {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .sort-controls span {
-            margin-right: 10px;
-        }
-
-        #sortDropdown {
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .search-container {
-            position: relative;
-            margin-left: 10px;
-        }
-
-        #searchInput {
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding-right: 30px; /* Add space for the clear button */
-        }
-
-        #clearSearch {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            display: none;
-        }
-
-        #noMatchesPopup {
-            display: none;
-            position: absolute;
-            top: calc(100% + 10px);
-            left: 0;
-            background: #1e1e1e;
-            color: #fff;
-            padding: 10px;
-            border: 1px solid #444;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-        }
-        
-    </style>
+    <link rel="stylesheet" href="employer.css">
 </head>
 <body>
-    <header>
+<header>
         <div class="logo">
             <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
@@ -212,17 +33,26 @@ session_start();
                     </li>
                     <li><a href="about.php">About</a></li>
                     <li>
-                        <a href="#" id="profile-link">
+                    <a href="#" id="profile-link">
                             <div class="profile-info">
-                                <span class="username" id="username">Employer</span>
+                                <span class="username" id="username">
+                                    <?php
+
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];
+                                    } else {
+                                        echo "Guest";
+                                    }
+                                    ?>
+                                </span>
                                 <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
                             </div>
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
                             <li><a href="profile.php">Settings</a></li>
-                            <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li>
+                            <li><a href="#" >Logout</a></li>
                         </ul>
-                    </li> 
+                    </li>
                 </ul>
                 <div class="hamburger" id="hamburger">
                     <span></span>
@@ -233,13 +63,15 @@ session_start();
         </nav>
     </header>
 
-    <!-- Logout Popup -->
     <div id="logout-popup" class="popup">
         <h2>Are you sure you want to Log Out?</h2>
         <button class="close-button" onclick="logoutUser()">Yes</button>
         <button class="cancel-button" onclick="closePopup('logout-popup')">No</button>
     </div>
-
+    
+    <div style="text-align: center; padding-top: 50px; color: white;">
+        <h1>Search Candidates</h1>
+    </div>
     <div class="container">
         <div class="table-container">
             <div class="sort-controls-wrapper">
@@ -282,7 +114,6 @@ session_start();
                 </thead>
                 <tbody id="active-tab">
                     <?php
-                    // Database connection
                     $servername = "localhost";
                     $username = "root";
                     $password = "";
@@ -298,27 +129,33 @@ session_start();
                         die("Employer not logged in.");
                     }
 
-                    $employer_id = $_SESSION['employer_id']; // Get the logged-in employer's ID from the session
+                    $employer_id = $_SESSION['employer_id'];
 
-                    $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id, 
+                    $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
                                 GROUP_CONCAT(ajs.score ORDER BY ajs.assessment_id SEPARATOR ', ') AS scores,
                                 AVG(ajs.score) AS avg_score
                             FROM Job_Seeker js
                             JOIN User u ON js.user_id = u.user_id
                             LEFT JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
                             LEFT JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id AND ei.employer_id = '$employer_id'
-                            WHERE (ei.interest_status IS NULL OR ei.is_active = 0) AND ajs.assessment_id IS NOT NULL
+                            WHERE ei.employer_id IS NULL AND ajs.assessment_id IS NOT NULL
                             GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
-                    
+
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
                             echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
                             echo "<td><input type='checkbox'></td>";
                             echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
-                            echo "<td>" . $row['education_level'] . "</td>";
-                            echo "<td>" . $row['year_of_experience'] . "</td>";
-                            echo "<td>" . $row['scores'] . "</td>";
+                            
+                                $education_level = !empty($row['education_level']) ? htmlspecialchars($row['education_level']) : 'null';
+                            echo "<td>" . $education_level . "</td>";
+                            
+                                $experience = (!empty($row['year_of_experience']) || $row['year_of_experience'] === '0') ? htmlspecialchars($row['year_of_experience']) : 'null';
+                            echo "<td>" . $experience . "</td>";
+                            
+                                $scores_display = !empty($row['scores']) ? htmlspecialchars($row['scores']) : 'null';
+                            echo "<td>" . $scores_display . "</td>";
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
                                 echo "<button class='accept' onclick='updateInterest(\"" . $row['job_seeker_id'] . "\", \"interested\")'>✔</button>";
@@ -338,14 +175,14 @@ session_start();
 
                 <tbody id="interested-tab" style="display:none;">
                     <?php
-                    // Database connection
+
                     $conn = new mysqli($servername, $username, $password, $dbname);
 
                     if ($conn->connect_error) {
                         die("Connection failed: " . $conn->connect_error);
                     }
 
-                    $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id, 
+                    $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
                                 GROUP_CONCAT(ajs.score ORDER BY ajs.assessment_id SEPARATOR ', ') AS scores,
                                 AVG(ajs.score) AS avg_score
                             FROM Job_Seeker js
@@ -355,15 +192,21 @@ session_start();
                             WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'interested' AND ei.is_active = 1 AND ajs.assessment_id IS NOT NULL
                             GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
-                    
+
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
                             echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
                             echo "<td><input type='checkbox'></td>";
                             echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
-                            echo "<td>" . $row['education_level'] . "</td>";
-                            echo "<td>" . $row['year_of_experience'] . "</td>";
-                            echo "<td>" . $row['scores'] . "</td>";
+                            
+                                $education_level = !empty($row['education_level']) ? htmlspecialchars($row['education_level']) : 'null';
+                            echo "<td>" . $education_level . "</td>";
+                            
+                                $experience = (!empty($row['year_of_experience']) || $row['year_of_experience'] === '0') ? htmlspecialchars($row['year_of_experience']) : 'null';
+                            echo "<td>" . $experience . "</td>";
+                            
+                                $scores_display = !empty($row['scores']) ? htmlspecialchars($row['scores']) : 'null';
+                            echo "<td>" . $scores_display . "</td>";
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
                                 echo "<a href='candidate_answer.php?job_seeker_id=" . $row['job_seeker_id'] . "' class='view'>View</a>";
@@ -382,14 +225,14 @@ session_start();
 
                 <tbody id="uninterested-tab" style="display:none;">
                     <?php
-                    // Database connection
+
                     $conn = new mysqli($servername, $username, $password, $dbname);
 
                     if ($conn->connect_error) {
                         die("Connection failed: " . $conn->connect_error);
                     }
 
-                    $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id, 
+                    $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
                                 GROUP_CONCAT(ajs.score ORDER BY ajs.assessment_id SEPARATOR ', ') AS scores,
                                 AVG(ajs.score) AS avg_score
                             FROM Job_Seeker js
@@ -399,15 +242,21 @@ session_start();
                             WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'uninterested' AND ei.is_active = 1 AND ajs.assessment_id IS NOT NULL
                             GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
-                    
+
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
                             echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
                             echo "<td><input type='checkbox'></td>";
                             echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
-                            echo "<td>" . $row['education_level'] . "</td>";
-                            echo "<td>" . $row['year_of_experience'] . "</td>";
-                            echo "<td>" . $row['scores'] . "</td>";
+                            
+                                $education_level = !empty($row['education_level']) ? htmlspecialchars($row['education_level']) : 'null';
+                            echo "<td>" . $education_level . "</td>";
+                            
+                                $experience = (!empty($row['year_of_experience']) || $row['year_of_experience'] === '0') ? htmlspecialchars($row['year_of_experience']) : 'null';
+                            echo "<td>" . $experience . "</td>";
+                            
+                                $scores_display = !empty($row['scores']) ? htmlspecialchars($row['scores']) : 'null';
+                            echo "<td>" . $scores_display . "</td>";
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
                                 echo "<a href='candidate_answer.php?job_seeker_id=" . $row['job_seeker_id'] . "' class='view'>View</a>";
@@ -426,14 +275,13 @@ session_start();
 
                 <tbody id="view-deleted-candidates-tab" style="display:none;">
                     <?php
-                    // Database connection
                     $conn = new mysqli($servername, $username, $password, $dbname);
 
                     if ($conn->connect_error) {
                         die("Connection failed: " . $conn->connect_error);
                     }
 
-                    $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id, 
+                    $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
                                 GROUP_CONCAT(ajs.score ORDER BY ajs.assessment_id SEPARATOR ', ') AS scores,
                                 AVG(ajs.score) AS avg_score
                             FROM Job_Seeker js
@@ -443,15 +291,25 @@ session_start();
                             WHERE ei.employer_id = '$employer_id' AND ei.is_active = 0 AND ajs.assessment_id IS NOT NULL
                             GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
-                    
+
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
                             echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
                             echo "<td><input type='checkbox'></td>";
                             echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
-                            echo "<td>" . $row['education_level'] . "</td>";
-                            echo "<td>" . $row['year_of_experience'] . "</td>";
-                            echo "<td>" . $row['scores'] . "</td>";
+                            
+                            
+                            $education_level = !empty($row['education_level']) ? htmlspecialchars($row['education_level']) : 'null';
+                            echo "<td>" . $education_level . "</td>";
+                            
+                            
+                            $experience = (!empty($row['year_of_experience']) || $row['year_of_experience'] === '0') ? htmlspecialchars($row['year_of_experience']) : 'null';
+                            echo "<td>" . $experience . "</td>";
+                            
+                            
+                            $scores_display = !empty($row['scores']) ? htmlspecialchars($row['scores']) : 'null';
+                            echo "<td>" . $scores_display . "</td>";
+                            
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
                                 echo "<button class='accept' onclick='updateInterest(\"" . $row['job_seeker_id'] . "\", \"interested\")'>✔</button>";
@@ -464,7 +322,6 @@ session_start();
                     } else {
                         echo "<tr id='no-candidates-deleted'><td colspan='6'>No candidates found</td></tr>";
                     }
-
                     $conn->close();
                     ?>
                 </tbody>
@@ -472,28 +329,6 @@ session_start();
         </div>
     </div>
 
-        <!-- View Deleted Candidates Popup -->
-    <div id="deleted-candidates-popup" class="popup">
-        <h2>Deleted Candidates</h2>
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Education Level</th>
-                        <th>Years of Experience</th>
-                        <th>Assessment Scores</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="deleted-candidates-tab">
-                    <!-- Rows will be dynamically generated here -->
-                </tbody>
-            </table>
-        </div>
-        <button class="cancel-button" onclick="closePopup('deleted-candidates-popup')">Close</button>
-    </div>
-    
     <footer>
         <div class="footer-content">
             <div class="footer-left">
@@ -508,7 +343,7 @@ session_start();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
+                    <p><a href="mailto:/a></p>techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -546,33 +381,22 @@ session_start();
         <div class="footer-bottom">
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
-    </footer>
+    </footer> 
+    <script src="scripts.js"></script>  
     <script>
-    function openPopup(popupId) {
-        document.getElementById(popupId).style.display = 'block';
-    }
-
-    function closePopup(popupId) {
-        document.getElementById(popupId).style.display = 'none';
-    }
-
-    function logoutUser() {
-        window.location.href = '/Techfit'; // Redirect to the root directory
-    }
-
     function updateInterest(jobSeekerId, interestStatus) {
         var xhr = new XMLHttpRequest();
         xhr.open("POST", "update_interest.php", true);
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
-                // Remove the row from the current tab
+                
                 var row = document.getElementById('row-' + jobSeekerId);
                 if (row) {
                     row.parentNode.removeChild(row);
                 }
 
-                // Add the row to the appropriate tab
+                
                 var newRow = document.createElement('tr');
                 newRow.id = 'row-' + jobSeekerId;
                 newRow.innerHTML = row.innerHTML;
@@ -585,11 +409,11 @@ session_start();
                     document.getElementById('uninterested-tab').appendChild(newRow);
                 }
 
-                // Remove "No candidates found" message if present
+                
                 removeNoCandidatesMessage('interested-tab');
                 removeNoCandidatesMessage('uninterested-tab');
 
-                // Update the "View Deleted Candidates" tab
+                
                 fetchDeletedCandidates();
             }
         };
@@ -602,23 +426,22 @@ session_start();
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
-                // Remove the row from the current tab
+                
                 var row = document.getElementById('row-' + jobSeekerId);
                 if (row) {
                     row.parentNode.removeChild(row);
                 }
 
-                // Add the row back to the active tab
+                
                 var newRow = document.createElement('tr');
                 newRow.id = 'row-' + jobSeekerId;
                 newRow.innerHTML = row.innerHTML;
                 newRow.querySelector('.actions').innerHTML = "<button class='accept' onclick='updateInterest(\"" + jobSeekerId + "\", \"interested\")'>✔</button><button class='reject' onclick='updateInterest(\"" + jobSeekerId + "\", \"uninterested\")'>✖</button><a href='candidate_answer.php?job_seeker_id=" + jobSeekerId + "' class='view'>View</a>";
-                document.getElementById('active-tab').appendChild(newRow);
 
-                // Remove "No candidates found" message if present
+                
                 removeNoCandidatesMessage('active-tab');
 
-                // Update the "View Deleted Candidates" tab
+                
                 fetchDeletedCandidates();
             }
         };
@@ -679,7 +502,7 @@ session_start();
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        // Existing sorting function for the dropdown
+        
         document.getElementById('sortDropdown').addEventListener('change', function() {
             const value = this.value;
             const activeTab = document.getElementById('active-tab');
@@ -732,7 +555,7 @@ session_start();
                 rows.sort((a, b) => {
                     const aText = a.querySelector(`td:nth-child(${columnIndex})`).textContent.trim();
                     const bText = b.querySelector(`td:nth-child(${columnIndex})`).textContent.trim();
-                    if (columnIndex === 4 || columnIndex === 5) { // For numerical values
+                    if (columnIndex === 4 || columnIndex === 5) { 
                         const aValue = columnIndex === 5 ? calculateAverage(aText) : parseFloat(aText);
                         const bValue = columnIndex === 5 ? calculateAverage(bText) : parseFloat(bText);
                         return (aValue - bValue) * order;
@@ -748,18 +571,18 @@ session_start();
             return scores.reduce((sum, score) => sum + score, 0) / scores.length;
         }
 
-        // Add event listeners for sorting columns in the table
+        
         document.querySelectorAll('th[data-column]').forEach(th => {
             th.addEventListener('click', function() {
                 const column = this.getAttribute('data-column');
                 const currentOrder = this.dataset.order || -1;
-                const order = this.dataset.order = currentOrder * -1; // Toggle order
-                console.log(`Sorting table column: ${column}, Order: ${order}`); // Debug log
+                const order = this.dataset.order = currentOrder * -1; 
+                console.log(`Sorting table column: ${column}, Order: ${order}`); 
                 const rows = Array.from(document.querySelectorAll('#active-tab tr, #interested-tab tr, #uninterested-tab tr, #view-deleted-candidates-tab tr'));
                 rows.sort((a, b) => {
                     const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
                     const bText = b.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
-                    if (column === 'years_of_experience' || column === 'assessment_scores') { // For numerical values
+                    if (column === 'years_of_experience' || column === 'assessment_scores') { 
                         const aValue = column === 'assessment_scores' ? calculateAverage(aText) : parseFloat(aText);
                         const bValue = column === 'assessment_scores' ? calculateAverage(bText) : parseFloat(bText);
                         return (aValue - bValue) * order;
@@ -768,13 +591,13 @@ session_start();
                 });
                 rows.forEach(row => row.parentNode.appendChild(row));
 
-                // Update chevron
+                
                 document.querySelectorAll('th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
                 this.classList.add(order === 1 ? 'asc' : 'desc');
             });
         });
 
-        // Search functionality
+        
         document.getElementById('searchInput').addEventListener('input', function() {
             const filter = this.value.toLowerCase();
             const rows = document.querySelectorAll('#active-tab tr, #interested-tab tr, #uninterested-tab tr, #view-deleted-candidates-tab tr');
