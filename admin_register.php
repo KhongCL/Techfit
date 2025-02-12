@@ -343,7 +343,7 @@ $conn->close();
             
             <div class="form-row checkbox-row">
                 <input type="checkbox" id="terms" name="terms" required>
-                <label for="terms">I agree to the terms and conditions and privacy policy</label>
+                <label for="terms">I agree to the Terms of Service and privacy policy</label>
             </div>
             <input type="submit" value="Register">
         </form>

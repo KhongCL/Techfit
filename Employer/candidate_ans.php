@@ -73,6 +73,13 @@ session_write_close();
             </div>
         </nav>
     </header>
+
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>
+    
     <section class="about-us">
         <div class="container">
           <h1>About Us</h1>
@@ -137,7 +144,7 @@ session_write_close();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    
                 </div>
             </div>
             <div class="footer-right">

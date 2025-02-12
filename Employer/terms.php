@@ -1,7 +1,7 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message and options
+
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
@@ -13,17 +13,17 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message and options if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Employer') {
-    displayLoginMessage(); // Display message and options if the role is not Employer
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 ?>
 
@@ -33,7 +33,7 @@ session_write_close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-    <title>Terms and Conditions - TechFit</title>
+    <title>Terms of Service - TechFit</title>
 </head>
 <body>
     <header>
@@ -43,7 +43,11 @@ session_write_close();
         <nav>
             <div class="nav-container">
                 <ul class="nav-list">
-                    <li><a href="#">Candidates</a></li>
+                    <li><a href="#">Candidates</a>
+                        <ul class="dropdown">
+                            <li><a href="search_candidate.php">Search Candidates</a></li>
+                        </ul>
+                    </li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
                             <li><a href="useful_links.php">Useful Links</a></li>
@@ -53,15 +57,24 @@ session_write_close();
                     </li>
                     <li><a href="about.php">About</a></li>
                     <li>
-                        <a href="#" id="profile-link">
+                    <a href="#" id="profile-link">
                             <div class="profile-info">
-                                <span class="username" id="username">Employer</span>
+                                <span class="username" id="username">
+                                    <?php
+                                    
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  
+                                    } else {
+                                        echo "Guest";  
+                                    }
+                                    ?>
+                                </span>
                                 <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
                             </div>
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
                             <li><a href="profile.php">Settings</a></li>
-                            <li><a href="logout.php">Logout</a></li>
+                            <li><a href="#" >Logout</a></li>
                         </ul>
                     </li> 
                 </ul>
@@ -74,15 +87,21 @@ session_write_close();
         </nav>
     </header>
 
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>
+    
     <section id="terms">
         <div class="container">
-            <h2>TechFit - Terms and Conditions</h2>
+            <h2>TechFit - Terms of Service</h2>
             <div id="last-updated">
                 Last Updated: December 18, 2024
             </div>
             
             <div id="terms-header">
-                By using our website, you agree to the following terms and conditions:
+                By using our website, you agree to the following Terms of Service:
             </div>
     
             <div id="terms-section">
@@ -93,9 +112,9 @@ session_write_close();
                 <ol>
                     <li>The content on our website is for informational purposes only and should not be construed as legal advice.</li>
                     <li>We do not warrant the accuracy, reliability, or completeness of any information on our website.</li>
-                    <li>We reserve the right to modify or update these terms and conditions at any time.</li>
-                    <li>By using our website, you agree to be bound by these terms and conditions.</li>
-                    <li>If you have any questions or concerns about these terms and conditions, please contact us.</li>
+                    <li>We reserve the right to modify or update these Terms of Service at any time.</li>
+                    <li>By using our website, you agree to be bound by these Terms of Service.</li>
+                    <li>If you have any questions or concerns about these Terms of Service, please contact us.</li>
                 </ol>
             </div>
     
@@ -197,7 +216,7 @@ session_write_close();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:/a></p>techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -236,6 +255,7 @@ session_write_close();
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
+    
     <script src="scripts.js"></script>
 </body>
 </html>

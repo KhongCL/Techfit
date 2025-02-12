@@ -28,7 +28,7 @@ session_write_close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms and Conditions - TechFit</title>
+    <title>Terms of Service - TechFit</title>
     <link rel="stylesheet" href="styles.css?v=2.0">
 </head>
 <body>
@@ -75,7 +75,16 @@ session_write_close();
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
-                                <span class="username" id="username">Admin</span>
+                                <span class="username" id="username">
+                                    <?php
+                                    
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  
+                                    } else {
+                                        echo "Guest";  
+                                    }
+                                    ?>
+                                </span>
                                 <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
                             </div>
                         </a>
@@ -86,23 +95,29 @@ session_write_close();
                                     <li><a href="system_configuration.php">System Configuration Settings</a></li>
                                 </ul>
                             </li>
-                            <li><a href="logout.php">Logout</a></li>
+                            <li><a href="#" >Logout</a></li>
                         </ul>
                     </li>                    
                 </ul>
             </div>
         </nav>
-    </header>    
+    </header>
+
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>
 
     <section id="terms">
         <div class="container">
-            <h2>TechFit - Terms and Conditions</h2>
+            <h2>TechFit - Terms of Service</h2>
             <div id="last-updated">
                 Last Updated: December 18, 2024
             </div>
             
             <div id="terms-header">
-                By using our website, you agree to the following terms and conditions:
+                By using our website, you agree to the following Terms of Service:
             </div>
     
             <div id="terms-section">
@@ -113,9 +128,9 @@ session_write_close();
                 <ol>
                     <li>The content on our website is for informational purposes only and should not be construed as legal advice.</li>
                     <li>We do not warrant the accuracy, reliability, or completeness of any information on our website.</li>
-                    <li>We reserve the right to modify or update these terms and conditions at any time.</li>
-                    <li>By using our website, you agree to be bound by these terms and conditions.</li>
-                    <li>If you have any questions or concerns about these terms and conditions, please contact us.</li>
+                    <li>We reserve the right to modify or update these Terms of Service at any time.</li>
+                    <li>By using our website, you agree to be bound by these Terms of Service.</li>
+                    <li>If you have any questions or concerns about these Terms of Service, please contact us.</li>
                 </ol>
             </div>
     
@@ -217,7 +232,7 @@ session_write_close();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -257,7 +272,7 @@ session_write_close();
                     <ul>
                         <li><a href="about.php">About</a></li>
                         <li><a href="contact.php">Contact Us</a></li>
-                        <li><a href="terms.php">Terms & Condition</a></li>
+                        <li><a href="terms.php">Terms of Service</a></li>
                         <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>
                 </div>

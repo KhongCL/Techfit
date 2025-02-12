@@ -236,7 +236,7 @@ $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
         </nav>
     </header>
 
-    <!-- Logout Popup -->
+    
     <div id="logout-popup" class="popup">
         <h2>Are you sure you want to Log Out?</h2>
         <button class="close-button" onclick="logoutUser()">Yes</button>
@@ -333,18 +333,6 @@ $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
     </footer>
 
     <script src="scripts.js?v=1.0"></script>
-    <script>
-        function openPopup(popupId) {
-            document.getElementById(popupId).style.display = 'block';
-        }
 
-        function closePopup(popupId) {
-            document.getElementById(popupId).style.display = 'none';
-        }
-
-        function logoutUser() {
-            window.location.href = '/Techfit'; // Redirect to the root directory
-        }
-    </script>
 </body>
 </html>

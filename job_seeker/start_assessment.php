@@ -32,44 +32,7 @@ session_write_close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assessment History - TechFit</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: var(--popup-background-color);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-        .popup h2 {
-            color: var(--lighter-text-color);
-        }
-        .popup button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .popup .close-button {
-            background-color: var(--danger-color);
-            color: var(--hover-text-color);
-        }
-        .popup .cancel-button {
-            background-color: var(--primary-color);
-            color: var(--hover-text-color);
-        }
-        .popup .close-button:hover {
-            background-color: var(--danger-hover-color);
-        }
-        .popup .cancel-button:hover {
-            background-color: var(--accent-color);
-        }
-</style>
+
 </head>
 <body>
     <header>

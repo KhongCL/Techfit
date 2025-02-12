@@ -213,8 +213,10 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - Sitemap Management</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <header>
         <div class="logo">
@@ -259,7 +261,16 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
-                                <span class="username" id="username">Admin</span>
+                                <span class="username" id="username">
+                                    <?php
+                                    
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  
+                                    } else {
+                                        echo "Guest";  
+                                    }
+                                    ?>
+                                </span>
                                 <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
                             </div>
                         </a>
@@ -270,39 +281,45 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                                     <li><a href="system_configuration.php">System Configuration Settings</a></li>
                                 </ul>
                             </li>
-                            <li><a href="logout.php">Logout</a></li>
+                            <li><a href="#" >Logout</a></li>
                         </ul>
                     </li>                    
                 </ul>
             </div>
         </nav>
     </header>  
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>
 <body>
+<div id="formContainer">
     <h1 style="text-align: center; padding-top: 60px;">Manage Sitemaps</h1>
     <form id="faqForm" enctype="multipart/form-data">
         <input type="hidden" name="action" value="add">
         <label>Category:</label><br>
-        <select name="category" required>
+        <select name="category" required oninput="toggleCategoryAccess()">
             <option value="" disabled selected>Select Category</option>
             <option value="jobSeeker">Job Seeker</option>
             <option value="employer">Employer</option>
         </select><br>
         <label>Image:</label><br>
-        <input type="file" name="image" accept="image/*" required><br><br>
+        <input type="file" name="image" accept="image/*" required oninput="toggleCategoryAccess()"><br><br>
         <label>Description:</label><br>
-        <textarea name="description" required></textarea><br><br>
-        <button type="button" onclick="submitSitemap()">Add Sitemap</button>
+        <textarea name="description" required oninput="toggleCategoryAccess()" style="resize: vertical"></textarea><br><br>
+        <button type="button" onclick="submitSitemap()" disabled id="submitBtn" style="display: block; margin: 0 auto;">Add Sitemap</button>
     </form>
-    <h1 style="text-align: center;">Existing Sitemaps</h1>
+    <h1 style="padding-top: 150px;">Existing Sitemaps</h1>
     <div id="sitemap" style="padding: 20px; font-family: Arial, sans-serif;">
         <?php foreach (['jobSeeker', 'employer'] as $category): ?>
-            <div class="sitemap-category" style="margin-bottom: 30px;">
-                <h1 style="font-size: 24px; color: #333;">For <?= ucfirst($category) ?>s</h2>
+            <div class="sitemap-category" style="margin-bottom: 20px;">
+                <h2 style="font-size: 24px; color: white;">For <?= ucfirst(str_replace('jobSeeker', 'Job Seeker', $category)) ?>s</h2>
                 <?php 
                 $categorySitemaps = array_filter($sitemaps, fn($sitemap) => $sitemap['category'] === $category);
                 if ($categorySitemaps): 
                     foreach ($categorySitemaps as $sitemap): ?>
-                        <div class="sitemap-item" data-id="<?= $sitemap['resource_id'] ?>" style="border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px; background-color: #f9f9f9;">
+                        <div class="sitemap-item" data-id="<?= $sitemap['resource_id'] ?>" style="border: 1px solid #ccc; padding: 15px; margin-bottom: 15px; border-radius: 5px; background-color: #121212;">
                             <strong style="display: block; margin-bottom: 10px;">Image:</strong>
                             <img src="data:image/jpeg;base64,<?= base64_encode($sitemap['image']) ?>" alt="Sitemap Image" class="sitemap-image" style="max-width: 50%; height: auto; margin-bottom: 10px;"><br>
                             <button class="edit-button" onclick="editSitemap('<?= $sitemap['resource_id'] ?>')" style="margin-right: 10px; padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">Edit</button>
@@ -322,6 +339,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
     <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
         <a href="sitemap.php" id="manage_sitemap_button" style="background-color: #4CAF50; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Back to Sitemap</a>
     </div>
+</div>
     
     <footer>
         <div class="footer-content">
@@ -337,7 +355,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -377,7 +395,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                     <ul>
                         <li><a href="about.php">About</a></li>
                         <li><a href="contact.php">Contact Us</a></li>
-                        <li><a href="terms.php">Terms & Condition</a></li>
+                        <li><a href="terms.php">Terms of Service</a></li>
                         <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>
                 </div>
@@ -389,6 +407,25 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
     </footer>
     <script src="scripts.js"></script>
     <script>
+        function toggleCategoryAccess() {
+            const categorySelect = document.querySelector('select[name="category"]');
+            const imageInput = document.querySelector('input[name="image"]');
+            const descriptionInput = document.querySelector('textarea[name="description"]');
+            const submitButton = document.querySelector('button[type="button"]');
+            
+            const categorySelected = categorySelect.value !== '';
+            const imageFilled = imageInput.files.length > 0;
+            const descriptionFilled = descriptionInput.value.trim() !== '';
+          
+            if (categorySelected && imageFilled && descriptionFilled) {
+            submitButton.removeAttribute('disabled');
+            console.log("All fields are valid. Enabling submit button.");
+            } else {
+            submitButton.setAttribute('disabled', 'disabled');
+            console.log("Some fields are missing. Disabling submit button.");
+            }
+        }
+
         function submitSitemap() {
             const submitButton = document.querySelector('button[type="button"]');
             submitButton.disabled = true;

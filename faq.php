@@ -1,9 +1,72 @@
+<?php
+session_start(); 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "techfit";
+
+$mysqli = new mysqli($servername, $username, $password, $dbname);
+
+if ($mysqli->connect_error) {
+    die("Database connection failed: " . $mysqli->connect_error);
+}
+
+$result = $mysqli->query("SELECT * FROM resource WHERE type = 'usefulLink' ORDER BY category, resource_id");
+$usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
+
+try {
+    $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    function getFAQs($conn, $category) {
+        $stmt = $conn->prepare("SELECT question, answer FROM resource WHERE type = 'faq' AND category = :category");
+        $stmt->bindParam(':category', $category);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    $jobSeekerFAQs = getFAQs($conn, 'jobSeeker');
+    $employerFAQs = getFAQs($conn, 'employer');
+
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
+}
+
+function displayLoginMessage() {
+    echo '<script>
+        if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
+            window.location.href = "../login.php";
+        } else {
+            window.location.href = "../index.php";
+        }
+    </script>';
+    exit();
+}
+
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage(); 
+}
+
+if ($_SESSION['role'] !== 'Job Seeker') {
+    displayLoginMessage(); 
+}
+
+if (!isset($_SESSION['job_seeker_id'])) {
+    displayLoginMessage(); 
+}
+
+session_write_close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FAQ - TechFit</title>
+    <title>TechFit - Home</title>
     <link rel="stylesheet" href="styles.css?v=2.0">
 </head>
 <body>
@@ -38,157 +101,59 @@
             </div>
         </nav>
     </header>
-    
+
     <section id="faq">
         <h2>Frequently Asked Questions</h2>
-        <div class="faq-container">
+
+        <div class="faq-container" id="job-seeker-faq-container">
             <h1 style="text-align: center;">For Job Seekers</h1>
-            <div class="faq-item">
+            <?php if (empty($jobSeekerFAQs)): ?>
+            <div class="faq-category">
+                <h3>This category is empty.</h3>
+                <p>No questions found.</p>
+            </div>
+            <?php else: ?>
+            <?php foreach ($jobSeekerFAQs as $faq): ?>
+                <div class="faq-item">
                 <div class="faq-question">
-                    <span>How does the assessment process work?</span>
+                    <span><?php echo $faq['question']; ?></span>
                     <div class="dropdown-arrow-wrapper">
-                        <span class="dropdown-arrow">&#9660;</span> <!-- This is the downward triangle arrow -->
+                    <span class="dropdown-arrow">&#9660;</span>
                     </div>
                 </div>
                 <div class="faq-answer">
-                    <p>You’ll complete an assessment comprising a series of questions designed to understand your skills, experiences, and preferences. Based on your answers, our system generates a detailed profile highlighting your strengths.</p>
+                    <p><?php echo $faq['answer']; ?></p>
                 </div>
-            </div>
-    
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>Is the assessment free to take?</span>
-                    <div class="dropdown-arrow-wrapper">
-                        <span class="dropdown-arrow">&#9660;</span>
-                    </div>
                 </div>
-                <div class="faq-answer">
-                    <p>Yes, the assessment is completely free for job seekers.</p>
-                </div>
-            </div>
-    
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>Can I pause the assessment and resume later?</span>
-                    <div class="dropdown-arrow-wrapper">
-                        <span class="dropdown-arrow">&#9660;</span>
-                    </div>
-                </div>
-                <div class="faq-answer">
-                    <p>Yes, you can save your progress and resume the assessment at any time.</p>
-                </div>
-            </div>
+            <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
 
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>Will my profile be automatically updated with my new assessment results?</span>
-                    <div class="dropdown-arrow-wrapper">
-                        <span class="dropdown-arrow">&#9660;</span>
-                    </div>
-                </div>
-                <div class="faq-answer">
-                    <p>Yes, once you complete a new assessment, your profile will be updated automatically to reflect the latest results.</p>
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>How often should I update my profile?</span>
-                    <div class="dropdown-arrow-wrapper">
-                        <span class="dropdown-arrow">&#9660;</span>
-                    </div>
-                </div>
-                <div class="faq-answer">
-                    <p>We recommend updating your profile every six months or whenever you acquire new skills or experience to keep it relevant and up-to-date.</p>
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>Is my data safe on your platform?</span>
-                    <div class="dropdown-arrow-wrapper">
-                        <span class="dropdown-arrow">&#9660;</span>
-                    </div>
-                </div>
-                <div class="faq-answer">
-                    <p>Absolutely, we take data security seriously and use advanced encryption methods to protect your information.</p>
-                </div>
-            </div>
-
+        <div class="faq-container" id="employer-faq-container">
             <h1 style="text-align: center;">For Employers</h1>
-            <div class="faq-item">
+            <?php if (empty($employerFAQs)): ?>
+            <div class="faq-category">
+                <h3>This category is empty.</h3>
+                <p>No questions found.</p>
+            </div>
+            <?php else: ?>
+            <?php foreach ($employerFAQs as $faq): ?>
+                <div class="faq-item">
                 <div class="faq-question">
-                    <span>How can I view candidate profiles?</span>
+                    <span><?php echo $faq['question']; ?></span>
                     <div class="dropdown-arrow-wrapper">
-                        <span class="dropdown-arrow">&#9660;</span> <!-- This is the downward triangle arrow -->
+                    <span class="dropdown-arrow">&#9660;</span>
                     </div>
                 </div>
                 <div class="faq-answer">
-                    <p>After registering and logging in as an employer, you’ll have access to our database of candidate profiles. You can search for candidates based on various criteria like skills, experience, and assessment results.</p>
+                    <p><?php echo $faq['answer']; ?></p>
                 </div>
-            </div>
-    
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>Is there a fee to access candidate profiles?</span>
-                    <div class="dropdown-arrow-wrapper">
-                        <span class="dropdown-arrow">&#9660;</span>
-                    </div>
                 </div>
-                <div class="faq-answer">
-                    <p>Access to candidate profiles is completely free of charge.</p>
-                </div>
-            </div>
-    
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>How do I contact candidates I’m interested in?</span>
-                    <div class="dropdown-arrow-wrapper">
-                        <span class="dropdown-arrow">&#9660;</span>
-                    </div>
-                </div>
-                <div class="faq-answer">
-                    <p>You can either contact them via a third-party app or send messages directly through our platform to candidates you’re interested in. They will receive a notification and can respond via the platform.</p>
-                </div>
-            </div>
-            
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>What type of assessments do candidates complete?</span>
-                    <div class="dropdown-arrow-wrapper">
-                        <span class="dropdown-arrow">&#9660;</span>
-                    </div>
-                </div>
-                <div class="faq-answer">
-                    <p>Candidates complete a comprehensive assessment that evaluates their skills, experiences, and job preferences. The results help you identify the best matches for your job openings.</p>
-                </div>
-            </div>
-    
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>How can I edit my company profile?</span>
-                    <div class="dropdown-arrow-wrapper">
-                        <span class="dropdown-arrow">&#9660;</span>
-                    </div>
-                </div>
-                <div class="faq-answer">
-                    <p>You can edit your company profile by logging into your employer account and navigating to the “Profile” section, where you can update your company information, logo, and description.</p>
-                </div>
-            </div>
-    
-            <div class="faq-item">
-                <div class="faq-question">
-                    <span>How often is your candidate database updated?</span>
-                    <div class="dropdown-arrow-wrapper">
-                        <span class="dropdown-arrow">&#9660;</span>
-                    </div>
-                </div>
-                <div class="faq-answer">
-                    <p>Our candidate database is continuously updated as new job seekers join and existing profiles are refreshed.</p>
-                </div>
-            </div>
+            <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </section>
+        
 
     <footer>
         <div class="footer-content">
@@ -204,7 +169,7 @@
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -239,5 +204,6 @@
     </footer>
 
     <script src="scripts.js?v=1.0"></script>
+
 </body>
 </html>

@@ -6,26 +6,25 @@
     --success-color: #28a745;
     --success-color-hover: #2ecc71;
 
-    --background-color: #2A2A2A;
-    --background-color-dark: #1A1A1A;
-    --background-color-medium: #333;
+    --background-color: #121212;
+    --background-color-dark: #1E1E1E;
+    --background-color-medium: #444;
     --background-color-light: #555;
     --background-color-extra-light: #666;
     --background-color-hover: #777;
     
-    --text-color: #b0b0b0;
-    --text-color-dark: #606060;
-    --text-color-medium: #b8b8b8;
+    --text-color: #fafafa;
+    --text-color-dark: #b0b0b0;
+    --text-color-medium: #e0e0e0;
     --text-color-light: #f7f7f7;
     --text-color-extra-light: #ffffff;
-    --text-color-hover: #ffffff;
+    --text-color-hover: #b0b0b0;
     
     --button-color: #007bff;
     --button-color-hover: #3c87e3;
     --focus-border-color: #47a3e0;
     --disabled-color: #7f8c8d;
 }
-
 
 body {
     font-family: Arial, sans-serif;
@@ -54,7 +53,7 @@ header {
     
 .logo img {
     height: 50px;
-    padding-top: 10px;
+    padding-top: 5px;
     padding-left: 5px;
 }
 
@@ -296,10 +295,10 @@ header {
         padding-left: 20px; 
         
     }
+    
     .profile-image {
         display: none;
     }
-    
    
     .username {
         display: inline-block;
@@ -311,18 +310,15 @@ header {
         transition: opacity 0.3s ease, transform 0.3s ease;
     }
 
-   
     .dropdown.active {
         display: block;
         transform: translateY(0);
     }
-
    
     .nav-list li.active > a {
         background-color: var(--background-color-medium);
     }
 
-   
     .dropdown a {
         padding: 10px 15px;
         color: var(--text-color);
@@ -333,6 +329,48 @@ header {
     .dropdown a:hover {
         background-color: var(--background-color-light);
     }
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #1e1e1e;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.popup h2 {
+    color: var(--text-color);
+}
+
+.popup button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.popup .close-button {
+    background-color: var(--danger-color);
+    color: var(--text-color);
+}
+
+.popup .cancel-button {
+    background-color: var(--button-color);
+    color: var(--text-color);
+}
+
+.popup .close-button:hover {
+    background-color: var(--danger-color-hover);
+}
+
+.popup .cancel-button:hover {
+    background-color: var(--button-color-hover);
 }
 
 *, *::before, *::after {
@@ -982,7 +1020,6 @@ footer {
     padding-left: 10px;
 }
 
-
 .resource-column ul {
     list-style-type: none;
     padding: 0;
@@ -1044,7 +1081,6 @@ footer {
     }
 }
 
-
 #faq {
     flex: 1;
     display: flex;
@@ -1085,7 +1121,7 @@ footer {
 }
 
 .faq-item {
-    background-color: var(--background-color-medium);
+    background-color: var(--background-color-dark);
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -1094,7 +1130,7 @@ footer {
 }
 
 .faq-item:hover {
-    background-color: var(--background-color-light);
+    background-color: var(--background-color-medium);
 }
 
 .faq-question {
@@ -1126,13 +1162,16 @@ footer {
     display: block;
     margin-top: 10px;
     font-size: 1.1rem;
-    color: var(--background-color-medium);
     padding-left: 20px;
     overflow: hidden;
     max-height: 0;
     padding: 0 20px;
     transition: max-height 0.5s ease, padding 0.5s ease;
     color: var(--text-color-light);
+}
+
+.faq-answer p {
+    text-align: left;
 }
 
 

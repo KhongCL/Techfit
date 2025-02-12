@@ -12,7 +12,7 @@ try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    // Function to fetch FAQs by category
+    
     function getFAQs($conn, $category) {
         $stmt = $conn->prepare("SELECT question, answer FROM resource WHERE type = 'faq' AND category = :category");
         $stmt->bindParam(':category', $category);
@@ -80,7 +80,16 @@ try {
                     <li>
                         <a href="#" id="profile-link">
                             <div class="profile-info">
-                                <span class="username" id="username">Admin</span>
+                                <span class="username" id="username">
+                                    <?php
+                                    
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  
+                                    } else {
+                                        echo "Guest";  
+                                    }
+                                    ?>
+                                </span>
                                 <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
                             </div>
                         </a>
@@ -91,18 +100,24 @@ try {
                                     <li><a href="system_configuration.php">System Configuration Settings</a></li>
                                 </ul>
                             </li>
-                            <li><a href="logout.php">Logout</a></li>
+                            <li><a href="#" >Logout</a></li>
                         </ul>
                     </li>                    
                 </ul>
             </div>
         </nav>
     </header>
+    
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>
 
     <section id="sitemap">
         <h2>Sitemap</h2>
         <p>Explore the structure of our website:</p>
-        <h1 class="large-font">Job Seeker</h1>
+        <h1 class="large-font" style="color:white">Job Seeker</h1>
         <div class="sitemap-container">
             <?php
             $servername = "localhost";
@@ -128,7 +143,7 @@ try {
             $mysqli->close();
             ?>
         </div>
-        <h1 class="large-font">Employer</h1>
+        <h1 class="large-font" style="color:white">Employer</h1>
         <div class="sitemap-container">
             <?php
             $servername = "localhost";
@@ -156,7 +171,7 @@ try {
         </div>
         <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
             <a href="manage_sitemap.php" id="manage_sitemap_button" style="background-color: #4CAF50; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Manage Sitemap</a>
-            <div style="height: 205px;"></div>
+            <div style="height: 50px;"></div>
         </div>
     </section>
 
@@ -174,7 +189,7 @@ try {
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -214,7 +229,7 @@ try {
                     <ul>
                         <li><a href="about.php">About</a></li>
                         <li><a href="contact.php">Contact Us</a></li>
-                        <li><a href="terms.php">Terms & Condition</a></li>
+                        <li><a href="terms.php">Terms of Service</a></li>
                         <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>
                 </div>
@@ -224,7 +239,6 @@ try {
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
-
     <script src="scripts.js"></script>
 </body>
 </html>

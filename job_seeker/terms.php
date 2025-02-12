@@ -30,45 +30,9 @@ session_write_close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assessment History - TechFit</title>
+    <title>Terms of Service - TechFit</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        .popup {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: #1e1e1e;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-        }
-        .popup h2 {
-            color: #fff;
-        }
-        .popup button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .popup .close-button {
-            background-color: #dc3545;
-            color: #fff;
-        }
-        .popup .cancel-button {
-            background-color: #007bff;
-            color: #fff;
-        }
-        .popup .close-button:hover {
-            background-color: #c82333;
-        }
-        .popup .cancel-button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+
 </head>
 <body>
     <header>
@@ -132,13 +96,13 @@ session_write_close();
 
     <section id="terms">
         <div class="container">
-            <h2>TechFit - Terms and Conditions</h2>
+            <h2>TechFit - Terms of Service</h2>
             <div id="last-updated">
                 Last Updated: December 18, 2024
             </div>
             
             <div id="terms-header">
-                By using our website, you agree to the following terms and conditions:
+                By using our website, you agree to the following Terms of Service:
             </div>
     
             <div id="terms-section">
@@ -149,9 +113,9 @@ session_write_close();
                 <ol>
                     <li>The content on our website is for informational purposes only and should not be construed as legal advice.</li>
                     <li>We do not warrant the accuracy, reliability, or completeness of any information on our website.</li>
-                    <li>We reserve the right to modify or update these terms and conditions at any time.</li>
-                    <li>By using our website, you agree to be bound by these terms and conditions.</li>
-                    <li>If you have any questions or concerns about these terms and conditions, please contact us.</li>
+                    <li>We reserve the right to modify or update these Terms of Service at any time.</li>
+                    <li>By using our website, you agree to be bound by these Terms of Service.</li>
+                    <li>If you have any questions or concerns about these Terms of Service, please contact us.</li>
                 </ol>
             </div>
     

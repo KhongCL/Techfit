@@ -18,7 +18,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 $user_id = $_SESSION['user_id'];
 
-// Fetch admin_id using user_id
+
 $admin_id_query = $mysqli->prepare("SELECT admin_id FROM admin WHERE user_id = ?");
 $admin_id_query->bind_param("s", $user_id);
 $admin_id_query->execute();
@@ -33,7 +33,7 @@ if (empty($admin_id)) {
     die(json_encode(['status' => 'error', 'message' => 'Admin ID not found']));
 }
 
-// Fetch FAQs from the database
+
 $faqs = [];
 $result = $mysqli->query("SELECT resource_id, question, answer, category FROM resource WHERE type = 'faq'");
 while ($row = $result->fetch_assoc()) {
@@ -74,7 +74,7 @@ function generateAdminResourceId($mysqli) {
     return $admin_resource_id;
 }
 
-// Function to log admin actions
+
 function logAdminAction($mysqli, $admin_id, $resource_id, $action_type, $description) {
     $timestamp = date('Y-m-d H:i:s');
     $admin_resource_id = generateAdminResourceId($mysqli);
@@ -87,7 +87,7 @@ function logAdminAction($mysqli, $admin_id, $resource_id, $action_type, $descrip
     $stmt->close();
 }
 
-// Handle Add/Edit/Delete Actions
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? null;
 
@@ -100,13 +100,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $resource_id = $_POST['id'] ?? null;
         logAdminAction($mysqli, $admin_id, $resource_id, 'deleted', 'Sitemap deleted');
         
-        // Validate the resource ID
+        
         if (!$resource_id) {
             echo json_encode(['status' => 'error', 'message' => 'Resource ID is required for deletion']);
             exit;
         }
 
-        // First, delete related rows in Admin_Resource
+        
         $stmt = $mysqli->prepare("DELETE FROM Admin_Resource WHERE resource_id = ?");
         $stmt->bind_param("s", $resource_id);
         if (!$stmt->execute()) {
@@ -116,7 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $stmt->close();
 
-        // Then, delete the row in Resource
+        
         $stmt = $mysqli->prepare("DELETE FROM Resource WHERE resource_id = ?");
         $stmt->bind_param("s", $resource_id);
         if (!$stmt->execute()) {
@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(['status' => 'success', 'message' => 'Sitemap deleted successfully']);
         exit;
     } elseif ($action === 'add') {
-        // Validate for 'add' action
+        
         $resource_id = $_POST['id'] ?? null;
         $description = trim($_POST['description'] ?? '');
         $question = trim($_POST['question'] ?? '');
@@ -141,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // Proceed with adding logic
+        
         $admin_resource_id = generateAdminResourceId($mysqli);
         $resource_id = generateResourceId($mysqli);
 
@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(['status' => 'success', 'message' => 'FAQ added successfully']);
         exit;
     } elseif ($action === 'edit') {
-        // Validate for 'edit' action
+        
         $resource_id = $_POST['id'] ?? null;
         $question = trim($_POST['question'] ?? '');
         $answer = trim($_POST['answer'] ?? '');
@@ -167,7 +167,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
 
-        // Proceed with editing logic
+        
         $stmt = $mysqli->prepare("UPDATE resource SET question = ?, answer = ?, category = ? WHERE resource_id = ?");
         $stmt->bind_param("ssss", $question, $answer, $category, $resource_id);
         $stmt->execute();
@@ -186,8 +186,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - FAQ Management</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS -->
+    <link rel="stylesheet" href="styles.css"> 
 </head>
 <header>
         <div class="logo">
@@ -216,11 +218,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="profile-info">
                                 <span class="username" id="username">
                                     <?php
-                                    // Check if the user is logged in and display their username
                                     if (isset($_SESSION['username'])) {
-                                        echo $_SESSION['username'];  // Display the username from session
+                                        echo $_SESSION['username'];
                                     } else {
-                                        echo "Guest";  // Default if not logged in
+                                        echo "Guest";
                                     }
                                     ?>
                                 </span>
@@ -241,38 +242,55 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </nav>
     </header>
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>
+    
 <body>
+<div id="formContainer">
     <h1 style="text-align: center; padding-top: 60px;">Manage FAQs</h1>
     <form id="faqForm">
         <input type="hidden" name="action" value="add">
-        <label>Question:</label><br>
-        <textarea name="question" required></textarea><br>
-        <label>Answer:</label><br>
-        <textarea name="answer" required></textarea><br>
-        <label>Category:</label><br>
-        <select name="category" required>
+        
+        <label style="margin-left: 6px;">Question:</label><br>
+        <textarea name="question" required oninput="toggleCategoryAccess()" style="resize: vertical; margin-left: 6px;"></textarea><br>
+        
+        <label style="margin-left: 6px;">Answer:</label><br>
+        <textarea name="answer" required oninput="toggleCategoryAccess()" style="resize: vertical; margin-left: 6px;"></textarea><br>
+        
+        <label style="margin-left: 6px;">Category:</label><br>
+        <select name="category" required oninput="toggleCategoryAccess()" style="margin-left: 6px;">
             <option value="" disabled selected>Select Category</option>
             <option value="jobSeeker">Job Seeker</option>
             <option value="employer">Employer</option>
         </select><br><br>
-        <label>Description:</label><br>
-        <textarea name="description" required></textarea><br><br>
-        <button type="button" onclick="submitFAQ()">Add FAQ</button>
+        
+        <label style="margin-left: 6px;">Description:</label><br>
+        <textarea name="description" required oninput="toggleCategoryAccess()" style="resize: vertical; margin-left: 6px;"></textarea><br><br>
+        
+        <div style="text-align: center;">
+            <button type="button" onclick="submitFAQ()" disabled id="submitBtn">Add FAQ</button>
+        </div>
     </form>
-    <h2 style="text-align: center;">Existing FAQs</h2>
+
     <div id="faq">
+        <h2>Existing FAQs</h2>
         <?php foreach (['jobSeeker', 'employer'] as $category): ?>
             <div class="faq-category">
-                <h3>For <?= ucfirst($category) ?>s</h3>
+                <h3>For <?= ucfirst(str_replace('jobSeeker', 'Job Seeker', $category)) ?>s</h3>
                 <?php 
                 $categoryFaqs = array_filter($faqs, fn($faq) => $faq['category'] === $category);
                 if ($categoryFaqs): 
                     foreach ($categoryFaqs as $faq): ?>
                         <div class="faq-item" data-id="<?= $faq['resource_id'] ?>">
-                            <strong>Q:</strong> <?= htmlspecialchars($faq['question']) ?><br><br>
-                            <strong>A:</strong> <?= htmlspecialchars($faq['answer']) ?><br><br>
-                            <p style="margin: 0; color: #555; font-size: 14px; text-align: justify;">
-                                <strong>Description:</strong> <?= htmlspecialchars($faqDescriptions[$faq['resource_id']] ?? 'No description available', ENT_QUOTES, 'UTF-8') ?>
+                            <div style="color: white;">
+                                <strong>Q: </strong> <?= htmlspecialchars($faq['question']) ?><br><br>
+                                <strong>A: </strong> <?= htmlspecialchars($faq['answer']) ?><br><br>
+                            </div>
+                            <p>
+                                <strong>Description: </strong> <?= htmlspecialchars($faqDescriptions[$faq['resource_id']] ?? 'No description available', ENT_QUOTES, 'UTF-8') ?>
                             </p>
                             <div style="text-align: center; margin-top: 10px;">
                                 <button style="background-color: green; color: white; padding: 5px 10px; border: none; border-radius: 3px; cursor: pointer;" onclick="editFAQ('<?= $faq['resource_id'] ?>')">Edit</button>
@@ -281,16 +299,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </div>
                     <?php endforeach; 
                 else: ?>
-                    <p>No FAQs yet for this category.</p>
+                    <p style="color: white;">No FAQs yet for this category.</p>
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
+
+        <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
+            <a href="faq.php" id="manage_faq_button">Back to FAQs</a>
+        </div>
     </div>
-    <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
-        <a href="faq.php" id="manage_faq_button" style="background-color: #4CAF50; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Back to FAQs</a>
-    </div>
+</div>
     
-    <footer>
+<footer>
         <div class="footer-content">
             <div class="footer-left">
                 <div class="footer-logo">
@@ -304,7 +324,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -344,7 +364,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <ul>
                         <li><a href="about.php">About</a></li>
                         <li><a href="contact.php">Contact Us</a></li>
-                        <li><a href="terms.php">Terms & Condition</a></li>
+                        <li><a href="terms.php">Terms of Service</a></li>
                         <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>
                 </div>
@@ -354,8 +374,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
+    
     <script src="scripts.js"></script>
     <script>
+        function toggleCategoryAccess() {
+            const questionInput = document.querySelector('textarea[name="question"]');
+            const answerInput = document.querySelector('textarea[name="answer"]');
+            const categorySelect = document.querySelector('select[name="category"]');
+            const descriptionInput = document.querySelector('textarea[name="description"]');
+            const submitButton = document.getElementById('submitBtn');
+            
+            const questionFilled = questionInput.value.trim() !== '';
+            const answerFilled = answerInput.value.trim() !== '';
+            const categorySelected = categorySelect.value !== '';
+            const descriptionFilled = descriptionInput.value.trim() !== '';
+      
+            if (questionFilled && answerFilled && categorySelected && descriptionFilled) {
+                submitButton.removeAttribute('disabled');
+                console.log("All fields are valid. Enabling submit button.");
+            }
+        }
         function submitFAQ() {
             const formData = new FormData(document.getElementById('faqForm'));
             fetch('manage_faq.php', { method: 'POST', body: formData })
@@ -386,7 +424,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             form.querySelector('[name="answer"]').value = answer;
             form.querySelector('[name="description"]').value = description;
 
-            // Add a hidden input for the resource ID
             let idField = form.querySelector('[name="id"]');
             if (!idField) {
                 idField = document.createElement('input');
@@ -396,11 +433,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             idField.value = id;
 
-            // Update the submit button to "Save FAQ Changes"
             const submitButton = form.querySelector('button[type="button"]');
             submitButton.textContent = 'Save FAQ Changes';
 
-            // Handle form submission for "Save FAQ Changes"
             submitButton.onclick = () => {
                 const formData = new FormData(form);
 
@@ -423,7 +458,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 });
             };
 
-            // Add a cancel button to reset the form
+            
             let cancelButton = form.querySelector('button.cancel-button');
             if (!cancelButton) {
                 cancelButton = document.createElement('button');
@@ -438,7 +473,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 form.appendChild(cancelButton);
             }
 
-            // Scroll to the top for visibility
             window.scrollTo({ top: 0, behavior: 'smooth' });
             } catch (error) {
             console.error('Error in editFAQ function:', error);
