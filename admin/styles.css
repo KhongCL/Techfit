@@ -7,14 +7,11 @@
     --success-color-hover: #2ecc71;
 
     --background-color: #121212;
-    --background-color-dark: #0d0d0d;
-    --background-color-buffer: #1E1E1E;
-    --background-color-medium: #333;
+    --background-color-dark: #080808;
+    --background-color-medium: #1E1E1E;
     --background-color-light: #444;
     --background-color-extra-light: #555;
     --background-color-hover: #666;
-
-    --border-color: #222;
     
     --text-color: #fafafa;
     --text-color-dark: #b0b0b0;
@@ -25,7 +22,27 @@
     
     --button-color: #007bff;
     --button-color-hover: #3c87e3;
+    --focus-border-color: #47a3e0;
     --disabled-color: #7f8c8d;
+}
+
+main {
+    flex: 1;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
 }
 
 body {
@@ -45,7 +62,7 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    background-color: var(--background-color-buffer);
+    background-color: var(--background-color-medium);
     position: fixed;
     top: 0;
     left: 0;
@@ -76,7 +93,7 @@ header {
 }
 
 .nav-list li {
-    padding-top: 10px;
+    padding-top: 5px;
     position: relative;
     margin-left: 10px;
 }
@@ -93,7 +110,7 @@ header {
     position: absolute;
     top: 100%;
     left: 0;
-    background-color: var(--background-color-medium);
+    background-color: var(--background-color-light);
     list-style: none;
     padding: 0;
     transform: translateY(-6px);
@@ -123,7 +140,7 @@ header {
 .profile-info {
     display: flex;
     align-items: center;
-    margin-top: -5px;
+    margin-top: -6px;
 }
 
 .profile-image {
@@ -173,7 +190,7 @@ header {
 }
 
 .nav-list li:hover > a {
-    background-color: var(--background-color-medium);
+    background-color: var(--background-color-light);
     transition: background-color 0.3s ease;
 }
 
@@ -298,10 +315,10 @@ header {
         padding-left: 20px; 
         
     }
-    
     .profile-image {
         display: none;
     }
+    
    
     .username {
         display: inline-block;
@@ -313,15 +330,18 @@ header {
         transition: opacity 0.3s ease, transform 0.3s ease;
     }
 
+   
     .dropdown.active {
         display: block;
         transform: translateY(0);
     }
+
    
     .nav-list li.active > a {
         background-color: var(--background-color-medium);
     }
 
+   
     .dropdown a {
         padding: 10px 15px;
         color: var(--text-color);
@@ -376,57 +396,8 @@ header {
     background-color: var(--button-color-hover);
 }
 
-*, *::before, *::after {
-    box-sizing: border-box;
-}
-
-main {
-    flex: 1;
-}
-
-#home {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 50px;
-    background-color: var(--background-color);
-    width: 100%;
-    box-sizing: border-box;
-    position: relative;
-    margin: 0;
-}
-
-
-#home h2 {
-    color: var(--text-color);
-    font-size: 2rem;
-    margin-bottom: 20px;
-}
-
-#home p {
-    color: var(--text-color);
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-}
-
-#home button {
-    padding: 10px 20px;
-    background-color: var(--button-color);
-    color: var(--text-color);
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    border-radius: 2px;
-}
-
-#home button:hover {
-    background-color: var(--button-color-hover);
-}
-
 footer {
-    background-color: var(--background-color-buffer);
+    background-color: var(--background-color-medium);
     color: var(--text-color);
     padding: 20px;
     display: flex;
@@ -438,7 +409,9 @@ footer {
     box-sizing: border-box;
     padding-left: 40px;
     padding-right: 40px;
+    margin-top: auto;
 }
+
 
 .footer-content {
     display: flex;
@@ -517,7 +490,6 @@ footer {
     margin: 10px;
     text-align: left;
 }
-
 
 .footer-column h3 {
     margin-bottom: 10px;
@@ -625,6 +597,46 @@ footer {
         flex: 1 1 100%;
         text-align: center;
     }
+}
+
+#home {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 50px;
+    background-color: var(--background-color);
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    margin: 0;
+}
+
+#home h2 {
+    color: var(--text-color);
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+#home p {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+#home button {
+    padding: 10px 20px;
+    background-color: var(--button-color);
+    color: var(--text-color);
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 2px;
+}
+
+#home button:hover {
+    background-color: var(--button-color-hover);
 }
 
 #about-us {
@@ -1128,7 +1140,7 @@ footer {
 }
 
 .faq-item {
-    background-color: var(--background-color-buffer);
+    background-color: var(--background-color-medium);
     padding: 20px;
     border-color: var(--border-color);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -1137,7 +1149,7 @@ footer {
 }
 
 .faq-item:hover {
-    background-color: var(--background-color-medium);
+    background-color: var(--background-color-light);
 }
 
 .faq-question {
@@ -1225,7 +1237,7 @@ footer {
     box-sizing: border-box;
     position: relative;
     top: 600%;
-    background-color: var(--background-color-buffer);
+    background-color: var(--background-color-medium);
 }
 
 #faqForm label {
@@ -1241,7 +1253,7 @@ footer {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
-    background-color: var(--background-color-dark);
+    background-color: var(--background-color-medium);
     border: 1px solid var(--border-color);
     border-radius: 4px;
     color: var(--text-color-light);
@@ -1507,7 +1519,7 @@ footer {
     border: none;
     border-radius: 5px;
     background-color: var(--button-color);
-    color: var(--background-color-buffer);
+    color: var(--background-color-medium);
     transition: background-color 0.3s, color 0.3s;
     cursor: pointer;
     font-size: 1rem;
@@ -1838,7 +1850,7 @@ footer {
 
 #start-assessment-button {
     background-color: var(--button-color);
-    color: var(--background-color-buffer);
+    color: var(--background-color-medium);
     padding: 12px 25px;
     border: none;
     border-radius: 25px;

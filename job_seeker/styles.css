@@ -7,11 +7,11 @@
     --success-color-hover: #2ecc71;
 
     --background-color: #121212;
-    --background-color-dark: #1E1E1E;
-    --background-color-medium: #444;
-    --background-color-light: #555;
-    --background-color-extra-light: #666;
-    --background-color-hover: #777;
+    --background-color-medium: #080808;
+    --background-color-medium: #1E1E1E;
+    --background-color-light: #444;
+    --background-color-extra-light: #555;
+    --background-color-hover: #666;
     
     --text-color: #fafafa;
     --text-color-dark: #b0b0b0;
@@ -26,6 +26,25 @@
     --disabled-color: #7f8c8d;
 }
 
+
+main {
+    flex: 1;
+}
+
+html, body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -35,6 +54,7 @@ body {
     padding-top: 60px;
     min-height: 100vh;
     overflow-x: hidden;
+    background-color: var(--background-color);
 }
 
 header {
@@ -42,7 +62,7 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px;
-    background-color: var(--background-color-dark);
+    background-color: var(--background-color-medium);
     position: fixed;
     top: 0;
     left: 0;
@@ -73,7 +93,7 @@ header {
 }
 
 .nav-list li {
-    padding-top: 10px;
+    padding-top: 5px;
     position: relative;
     margin-left: 10px;
 }
@@ -90,7 +110,7 @@ header {
     position: absolute;
     top: 100%;
     left: 0;
-    background-color: var(--background-color-medium);
+    background-color: var(--background-color-light);
     list-style: none;
     padding: 0;
     transform: translateY(-6px);
@@ -112,7 +132,7 @@ header {
     left: auto;
     right: 100%;
     top: 0;
-    background-color: var(--background-color-medium);
+    background-color: var(--background-color-light);
     border: 1px solid var(--background-color-light);
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
 }
@@ -120,7 +140,7 @@ header {
 .profile-info {
     display: flex;
     align-items: center;
-    margin-top: -5px;
+    margin-top: -6px;
 }
 
 .profile-image {
@@ -170,7 +190,7 @@ header {
 }
 
 .nav-list li:hover > a {
-    background-color: var(--background-color-medium);
+    background-color: var(--background-color-light);
     transition: background-color 0.3s ease;
 }
 
@@ -295,10 +315,10 @@ header {
         padding-left: 20px; 
         
     }
-    
     .profile-image {
         display: none;
     }
+    
    
     .username {
         display: inline-block;
@@ -310,15 +330,18 @@ header {
         transition: opacity 0.3s ease, transform 0.3s ease;
     }
 
+   
     .dropdown.active {
         display: block;
         transform: translateY(0);
     }
+
    
     .nav-list li.active > a {
         background-color: var(--background-color-medium);
     }
 
+   
     .dropdown a {
         padding: 10px 15px;
         color: var(--text-color);
@@ -373,57 +396,8 @@ header {
     background-color: var(--button-color-hover);
 }
 
-*, *::before, *::after {
-    box-sizing: border-box;
-}
-
-main {
-    flex: 1;
-}
-
-#home {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 50px;
-    background-color: var(--background-color);
-    width: 100%;
-    box-sizing: border-box;
-    position: relative;
-    margin: 0;
-}
-
-
-#home h2 {
-    color: var(--text-color);
-    font-size: 2rem;
-    margin-bottom: 20px;
-}
-
-#home p {
-    color: var(--text-color);
-    font-size: 1.2rem;
-    margin-bottom: 20px;
-}
-
-#home button {
-    padding: 10px 20px;
-    background-color: var(--button-color);
-    color: var(--text-color);
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-    border-radius: 2px;
-}
-
-#home button:hover {
-    background-color: var(--button-color-hover);
-}
-
 footer {
-    background-color: var(--background-color-dark);
+    background-color: var(--background-color-medium);
     color: var(--text-color);
     padding: 20px;
     display: flex;
@@ -435,7 +409,9 @@ footer {
     box-sizing: border-box;
     padding-left: 40px;
     padding-right: 40px;
+    margin-top: auto;
 }
+
 
 .footer-content {
     display: flex;
@@ -515,7 +491,6 @@ footer {
     text-align: left;
 }
 
-
 .footer-column h3 {
     margin-bottom: 10px;
 }
@@ -546,7 +521,6 @@ footer {
     box-sizing: border-box;
     padding: 0;
 }
-
 
 @media (max-width: 1103px) {
     .footer-content {
@@ -619,6 +593,45 @@ footer {
     }
 }
 
+#home {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 50px;
+    background-color: var(--background-color);
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    margin: 0;
+}
+
+#home h2 {
+    color: var(--text-color);
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+#home p {
+    color: var(--text-color);
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+#home button {
+    padding: 10px 20px;
+    background-color: var(--button-color);
+    color: var(--text-color);
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    border-radius: 2px;
+}
+
+#home button:hover {
+    background-color: var(--button-color-hover);
+}
 
 #about-us {
     flex: 1;
@@ -1121,16 +1134,17 @@ footer {
 }
 
 .faq-item {
-    background-color: var(--background-color-dark);
+    background-color: var(--background-color-medium);
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s;
     border-bottom: none;
+    border-right: none;
 }
 
 .faq-item:hover {
-    background-color: var(--background-color-medium);
+    background-color: var(--background-color-light);
 }
 
 .faq-question {
@@ -1467,7 +1481,7 @@ form#faqForm button:hover {
     border: none;
     border-radius: 5px;
     background-color: var(--button-color);
-    color: var(--background-color-dark);
+    color: var(--background-color-medium);
     transition: background-color 0.3s, color 0.3s;
     cursor: pointer;
     font-size: 1rem;
@@ -1798,7 +1812,7 @@ form#faqForm button:hover {
 
 #start-assessment-button {
     background-color: var(--button-color);
-    color: var(--background-color-dark);
+    color: var(--background-color-medium);
     padding: 12px 25px;
     border: none;
     border-radius: 25px;

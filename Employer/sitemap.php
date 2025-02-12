@@ -145,7 +145,7 @@ session_write_close();
                 <div class="footer-column">
                     <h3>Candidate</h3>
                     <ul>
-                        <li><a href="candidates.php">Search Candidates</a></li>
+                        <li><a href="search_candidate.php">Search Candidates</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
