@@ -33,6 +33,7 @@ session_write_close();
     <script>
         let questionCount = 0;
         let isFormDirty = false;
+        const ANSWER_DELIMITER = '<<ANSWER_BREAK>>';
 
         window.addEventListener('beforeunload', function (e) {
             if (isFormDirty) {
@@ -155,36 +156,25 @@ session_write_close();
             return choicesHtml;
         }
 
-        function getCodeQuestionOptions(id, includeEmptyTestCase = true) {
-            let testCasesHtml = `
+        function getCodeQuestionOptions(id) {
+            return `
                 <label for="code_language_${id}">Select Language:</label>
-                <select id="code_language_${id}" name="code_language_${id}" required>
+                <select id="code_language_${id}" name="code_language[]" required>
                     <option value="python">Python</option>
                     <option value="javascript">JavaScript</option>
                     <option value="java">Java</option>
                     <option value="cpp">C++</option>
                 </select><br>
 
-                <label for="code_${id}">Correct Answer:</label>
-                <textarea id="code_${id}" name="correct_choice[]" required></textarea><br>
+                <label for="code_${id}">Code Template:</label>
+                <textarea id="code_${id}" name="code_template[]" required 
+                    placeholder="Enter code with __BLANK__ placeholders"></textarea><br>
 
-                <label for="test_cases_${id}">Test Cases:</label>
-                <div id="test_cases_${id}">
+                <label for="correct_code_${id}">Correct Answers:</label>
+                <textarea id="correct_code_${id}" name="correct_choice[]" required 
+                    placeholder="Enter correct answers separated by <<ANSWER_BREAK>>"
+                    title="Enter the answers that should go in each __BLANK__ placeholder, separated by <<ANSWER_BREAK>>"></textarea>
             `;
-            if (includeEmptyTestCase) {
-                testCasesHtml += `
-                    <div class="test-case-container">
-                        <textarea name="test_cases_${id}[]" placeholder="Input" required></textarea>
-                        <textarea name="expected_output_${id}[]" placeholder="Expected Output" required></textarea>
-                        <button type="button" class="remove-icon" title="Remove Test Case" onclick="removeTestCase(this, ${id})">&#x2715;</button>
-                    </div>
-                `;
-            }
-            testCasesHtml += `
-                    <button type="button" onclick="addTestCase(${id})">Add Test Case</button>
-                </div>
-            `;
-            return testCasesHtml;
         }
 
         function addChoice(id) {
@@ -219,49 +209,10 @@ session_write_close();
             isFormDirty = true;
         }
 
-        function addTestCase(id) {
-            const testCasesDiv = document.getElementById(`test_cases_${id}`);
-            const testCaseContainer = document.createElement('div');
-            testCaseContainer.className = 'test-case-container';
-
-            const input = document.createElement('textarea');
-            input.name = `test_cases_${id}[]`;
-            input.placeholder = 'Input';
-            input.required = true;
-
-            const output = document.createElement('textarea');
-            output.name = `expected_output_${id}[]`;
-            output.placeholder = 'Expected Output';
-            output.required = true;
-
-            const removeButton = document.createElement('button');
-            removeButton.type = 'button';
-            removeButton.className = 'remove-icon';
-            removeButton.innerHTML = '&#x2715;'; // Unicode for 'X' symbol
-            removeButton.title = 'Remove Test Case'; // Tooltip text
-            removeButton.onclick = function() {
-                testCaseContainer.remove();
-                isFormDirty = true;
-            };
-
-            testCaseContainer.appendChild(input);
-            testCaseContainer.appendChild(output);
-            testCaseContainer.appendChild(removeButton);
-            testCasesDiv.insertBefore(testCaseContainer, testCasesDiv.lastElementChild);
-
-            isFormDirty = true;
-        }
-
         function removeChoice(button, id) {
             const choiceContainer = button.parentElement;
             choiceContainer.remove();
             updateCorrectChoiceDropdown(id);
-            isFormDirty = true;
-        }
-
-        function removeTestCase(button, id) {
-            const testCaseContainer = button.parentElement;
-            testCaseContainer.remove();
             isFormDirty = true;
         }
 
@@ -294,7 +245,7 @@ session_write_close();
                     const questionId = questionDiv.id.split('-')[1];
 
                     if (removedQuestionIds.includes(questionId)) {
-                        continue; // Skip validation for removed questions
+                        continue;
                     }
 
                     const questionText = questionDiv.querySelector('textarea[name="question_text[]"]');
@@ -302,7 +253,8 @@ session_write_close();
                     const answerType = questionDiv.querySelector('select[name="answer_type[]"]');
                     const correctChoice = questionDiv.querySelector('textarea[name="correct_choice[]"], input[name="correct_choice[]"], select[name="correct_choice[]"]');
 
-                    if (questionText.value.trim() === '' || questionType.value.trim() === '' || answerType.value.trim() === '' || correctChoice.value.trim() === '') {
+                    if (questionText.value.trim() === '' || questionType.value.trim() === '' || 
+                        answerType.value.trim() === '' || correctChoice.value.trim() === '') {
                         alert('All fields are required.');
                         return;
                     }
@@ -318,15 +270,52 @@ session_write_close();
                         }
                     }
 
-                    // Additional validation for code questions
+                    // Validation for code questions
                     if (answerType.value === 'code') {
-                        const testCases = questionDiv.querySelectorAll(`textarea[name="test_cases_${i + 1}[]"]`);
-                        const expectedOutputs = questionDiv.querySelectorAll(`textarea[name="expected_output_${i + 1}[]"]`);
-                        for (let j = 0; j < testCases.length; j++) {
-                            if (testCases[j].value.trim() === '' || expectedOutputs[j].value.trim() === '') {
-                                alert('All test case fields are required.');
-                                return;
-                            }
+                        const codeTemplate = questionDiv.querySelector(`textarea[name="code_template[]"]`);
+                        const correctAnswers = questionDiv.querySelector(`textarea[name="correct_choice[]"]`);
+                        const language = questionDiv.querySelector(`select[name="code_language[]"]`);
+
+                        // Check empty fields
+                        if (!codeTemplate.value.trim() || !correctAnswers.value.trim() || !language.value) {
+                            alert('Code template, answers and programming language are required for code questions.');
+                            return;
+                        }
+
+                        // Check template format
+                        if (!codeTemplate.value.includes('__BLANK__')) {
+                            alert('Code template must include at least one __BLANK__ placeholder.');
+                            return;
+                        }
+
+                        const answers = correctAnswers.value.split(ANSWER_DELIMITER);
+                        if (answers.length < 2) {
+                            alert('Please provide at least two answers separated by <<ANSWER_BREAK>>');
+                            return;
+                        }
+
+                        if (answers.some(a => a.trim() === '')) {
+                            alert('Empty or blank answers are not allowed. Please provide valid answers separated by <<ANSWER_BREAK>>');
+                            return;
+                        }
+
+                        if (codeTemplate.value.includes(ANSWER_DELIMITER)) {
+                            alert('Code template cannot contain the sequence <<ANSWER_BREAK>>');
+                            return;
+                        }
+                        
+                        // Check if any answer contains the delimiter
+                        if (correctAnswers.value.includes(ANSWER_DELIMITER + ANSWER_DELIMITER)) {
+                            alert('Answers cannot contain consecutive delimiters');
+                            return;
+                        }
+
+                        // Count blanks and answers match
+                        const blankCount = (codeTemplate.value.match(/__BLANK__/g) || []).length;
+                        const answerCount = answers.length;
+                        if (blankCount !== answerCount) {
+                            alert(`Number of blanks (${blankCount}) must match number of answers (${answerCount}).`);
+                            return;
                         }
                     }
                 }
@@ -467,21 +456,17 @@ session_write_close();
                 box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
             }
 
-            /* Choice and Test Case Containers */
-            .choice-container, .test-case-container {
+            /* Choice Containers */
+            .choice-container {
                 display: flex;
                 align-items: center;
                 margin-bottom: 15px; /* Add vertical spacing */
                 box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
             }
 
-            .choice-container input, .test-case-container textarea {
+            .choice-container input {
                 flex-grow: 1;
                 box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
-            }
-
-            .test-case-container textarea {
-                margin-right: 10px; /* Add horizontal spacing between test case input and expected output field */
             }
 
             /* Tooltip */

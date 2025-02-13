@@ -118,85 +118,60 @@ foreach ($_POST['question_id'] as $index => $question_id) {
         }
     }
 
-    // Update test cases for code questions
     if ($answer_type === 'code') {
-        $test_cases_key = "test_cases_" . ($index + 1);
-        $expected_output_key = "expected_output_" . ($index + 1);
-        $test_case_ids_key = "test_case_id_" . ($index + 1);
-
-        // Log the current state of the code_language array
-        error_log("code_language array: " . print_r($_POST['code_language'], true));
-
-        // Check if the programming language is set for the current question
-        if (isset($_POST['code_language'][0])) {
-            $programming_language = $_POST['code_language'][0]; // Get the programming language
-            error_log("Programming language for question index $index: " . $programming_language); // Log the programming language
-        } else {
+        $code_template = isset($_POST['code_template'][$index]) ? $_POST['code_template'][$index] : '';
+        $programming_language = isset($_POST['code_language'][$index]) ? $_POST['code_language'][$index] : '';
+    
+        // Validate required fields
+        if (empty($code_template) || empty($programming_language)) {
             $response['success'] = false;
-            $response['error'] = "Programming language is required for code questions.";
-            error_log("Programming language is missing for question index $index");
+            $response['error'] = "Code template and programming language are required for code questions.";
+            error_log("Missing code template or programming language for question index $index");
             break;
         }
-
-        if (isset($_POST[$test_cases_key]) && isset($_POST[$expected_output_key]) && isset($_POST[$test_case_ids_key])) {
-            $test_cases = $_POST[$test_cases_key];
-            $expected_outputs = $_POST[$expected_output_key];
-            $test_case_ids = $_POST[$test_case_ids_key];
-            foreach ($test_cases as $tc_index => $input) {
-                if (empty($input) || empty($expected_outputs[$tc_index])) {
-                    $response['success'] = false;
-                    $response['error'] = "All test case fields are required.";
-                    error_log("Validation failed for test case index $tc_index: All test case fields are required.");
-                    break 2;
-                }
-
-                // Use the test case ID provided in the form data
-                $test_case_id = isset($test_case_ids[$tc_index]) ? $test_case_ids[$tc_index] : '';
-
-                // Log the test case ID to see if it is empty
-                error_log("Test case ID for test case index $tc_index: " . $test_case_id);
-                error_log("Test case input for test case index $tc_index: " . $input);
-                error_log("Test case expected output for test case index $tc_index: " . $expected_outputs[$tc_index]);
-                error_log("Programming language for test case index $tc_index: " . $programming_language);
-
-                if (!empty($test_case_id)) {
-                    // Check if the test case input, expected output, or programming language has changed
-                    $check_test_case_sql = "SELECT input, expected_output, programming_language FROM Test_Cases WHERE test_case_id = ? AND question_id = ?";
-                    $check_test_case_stmt = $conn->prepare($check_test_case_sql);
-                    $check_test_case_stmt->bind_param("ss", $test_case_id, $question_id);
-                    $check_test_case_stmt->execute();
-                    $check_test_case_result = $check_test_case_stmt->get_result();
-                    $existing_test_case = $check_test_case_result->fetch_assoc();
-
-                    if ($existing_test_case['input'] !== $input || $existing_test_case['expected_output'] !== $expected_outputs[$tc_index] || $existing_test_case['programming_language'] !== $programming_language) {
-                        // Update existing test case
-                        $update_test_case_sql = "UPDATE Test_Cases SET input = ?, expected_output = ?, programming_language = ? WHERE test_case_id = ? AND question_id = ?";
-                        $update_test_case_stmt = $conn->prepare($update_test_case_sql);
-                        $update_test_case_stmt->bind_param("sssss", $input, $expected_outputs[$tc_index], $programming_language, $test_case_id, $question_id);
-                        if (!$update_test_case_stmt->execute()) {
-                            $response['success'] = false;
-                            $response['error'] = $update_test_case_stmt->error;
-                            error_log("Database error for test case ID $test_case_id: " . $update_test_case_stmt->error);
-                            break 2;
-                        }
-                    } else {
-                        error_log("No changes detected for test case ID $test_case_id");
-                    }
-                } else {
-                    // Insert new test case
-                    $test_case_id = generateNextId($conn, 'Test_Cases', 'test_case_id', 'T');
-                    $insert_test_case_sql = "INSERT INTO Test_Cases (test_case_id, question_id, input, expected_output, programming_language) VALUES (?, ?, ?, ?, ?)";
-                    $insert_test_case_stmt = $conn->prepare($insert_test_case_sql);
-                    $insert_test_case_stmt->bind_param("sssss", $test_case_id, $question_id, $input, $expected_outputs[$tc_index], $programming_language);
-                    if (!$insert_test_case_stmt->execute()) {
-                        $response['success'] = false;
-                        $response['error'] = $insert_test_case_stmt->error;
-                        error_log("Database error for new test case ID $test_case_id: " . $insert_test_case_stmt->error);
-                        break 2;
-                    }
-                    error_log("Inserted new test case with ID $test_case_id");
-                }
+    
+        // Validate answers format
+        $answers = explode('<<ANSWER_BREAK>>', $correct_answer);
+        if (count($answers) < 2) {
+            $response['success'] = false;
+            $response['error'] = "Please provide at least two answers separated by <<ANSWER_BREAK>>";
+            break;
+        }
+        
+        // Check for empty/blank answers
+        foreach ($answers as $answer) {
+            if (trim($answer) === '') {
+                $response['success'] = false;
+                $response['error'] = "Empty or blank answers are not allowed. Please provide valid answers separated by <<ANSWER_BREAK>>";
+                break 2;
             }
+        }
+    
+        // Count blanks and validate match with answers
+        $blank_count = substr_count($code_template, '__BLANK__');
+        if ($blank_count !== count($answers)) {
+            $response['success'] = false;
+            $response['error'] = "Number of blanks ({$blank_count}) must match number of answers (" . count($answers) . ").";
+            break;
+        }
+    
+        // Update or insert code question
+        if (empty($question_id)) {
+            $question_id = generateNextId($conn, 'Question', 'question_id', 'Q');
+            $sql = "INSERT INTO Question (question_id, assessment_id, question_text, question_type, answer_type, correct_answer, code_template, programming_language) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ssssssss", $question_id, $_POST['assessment_id'], $question_text, $question_type, $answer_type, $correct_answer, $code_template, $programming_language);
+        } else {
+            $sql = "UPDATE Question SET question_text = ?, question_type = ?, answer_type = ?, correct_answer = ?, code_template = ?, programming_language = ? WHERE question_id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("sssssss", $question_text, $question_type, $answer_type, $correct_answer, $code_template, $programming_language, $question_id);
+        }
+    
+        if (!$stmt->execute()) {
+            $response['success'] = false;
+            $response['error'] = "Error saving code question: " . $stmt->error;
+            error_log("Database error while saving code question: " . $stmt->error);
+            break;
         }
     }
 }

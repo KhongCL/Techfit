@@ -37,8 +37,25 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Retrieve current settings from the database
 $assessment_settings = $conn->query("SELECT * FROM Assessment_Settings WHERE setting_id = '1'")->fetch_assoc();
+
+// If no settings exist, set default values
+if (!$assessment_settings) {
+    // Insert default settings
+    $sql = "INSERT INTO Assessment_Settings (setting_id, default_time_limit, passing_score_percentage) 
+            VALUES ('1', 30, 70)";
+    if ($conn->query($sql) === TRUE) {
+        // Fetch the newly inserted settings
+        $assessment_settings = $conn->query("SELECT * FROM Assessment_Settings WHERE setting_id = '1'")->fetch_assoc();
+    } else {
+        // If insert fails, use default values
+        $assessment_settings = [
+            'default_time_limit' => 30,
+            'passing_score_percentage' => 70
+        ];
+    }
+}
+
 $notification_settings = $conn->query("SELECT * FROM Notification_Settings")->fetch_all(MYSQLI_ASSOC);
 
 $conn->close();
@@ -236,18 +253,6 @@ $conn->close();
                     <option value="80" <?php if ($assessment_settings['passing_score_percentage'] == 80) echo 'selected'; ?>>80%</option>
                     <option value="90" <?php if ($assessment_settings['passing_score_percentage'] == 90) echo 'selected'; ?>>90%</option>
                 </select>
-
-                <label for="question-types">Allowed Question Types:</label>
-                <div id="question-types">
-                    <?php
-                    $allowed_question_types = json_decode($assessment_settings['allowed_question_types'], true);
-                    ?>
-                    <input type="checkbox" name="question_types[]" value="Multiple Choice" <?php if (in_array('Multiple Choice', $allowed_question_types)) echo 'checked'; ?>> Multiple Choice<br>
-                    <input type="checkbox" name="question_types[]" value="True/False" <?php if (in_array('True/False', $allowed_question_types)) echo 'checked'; ?>> True/False<br>
-                    <input type="checkbox" name="question_types[]" value="Fill in the Blank" <?php if (in_array('Fill in the Blank', $allowed_question_types)) echo 'checked'; ?>> Fill in the Blank<br>
-                    <input type="checkbox" name="question_types[]" value="Essay" <?php if (in_array('Essay', $allowed_question_types)) echo 'checked'; ?>> Essay<br>
-                    <input type="checkbox" name="question_types[]" value="Coding" <?php if (in_array('Coding', $allowed_question_types)) echo 'checked'; ?>> Coding<br>
-                </div>
 
                 <button type="submit">Save Assessment Settings</button>
             </form>

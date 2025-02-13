@@ -72,7 +72,9 @@ CREATE TABLE Question (
     question_text TEXT NOT NULL,
     question_type ENUM('preliminary', 'experience', 'employer_score', 'detailed', 'technical') NOT NULL,
     answer_type ENUM('multiple choice', 'true/false', 'fill in the blank', 'essay', 'code') NOT NULL,
-    correct_answer TEXT, -- Add this column to store the correct answer
+    correct_answer TEXT,
+    code_template TEXT,
+    programming_language ENUM('python', 'javascript', 'java', 'cpp') DEFAULT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (assessment_id) REFERENCES Assessment_Admin(assessment_id)
 );
@@ -97,6 +99,7 @@ CREATE TABLE Resource (
     category VARCHAR(255) NOT NULL,
     image LONGBLOB
 );
+
 CREATE TABLE Admin_Resource (
     admin_resource_id VARCHAR(5) PRIMARY KEY,
     admin_id VARCHAR(5),
@@ -171,15 +174,6 @@ CREATE TABLE Choices (
     FOREIGN KEY (question_id) REFERENCES Question(question_id)
 );
 
-CREATE TABLE Test_Cases (
-    test_case_id VARCHAR(5) PRIMARY KEY,
-    question_id VARCHAR(5) NOT NULL,
-    input TEXT NOT NULL,
-    expected_output TEXT NOT NULL,
-    programming_language ENUM('python', 'javascript', 'java', 'cpp') NOT NULL,
-    FOREIGN KEY (question_id) REFERENCES Question(question_id)
-);
-
 CREATE TABLE Employer_Interest (
     employer_id VARCHAR(5),
     job_seeker_id VARCHAR(5),
@@ -193,8 +187,7 @@ CREATE TABLE Employer_Interest (
 CREATE TABLE Assessment_Settings (
     setting_id VARCHAR(5) PRIMARY KEY,
     default_time_limit INT NOT NULL,
-    passing_score_percentage INT NOT NULL,
-    allowed_question_types TEXT NOT NULL -- JSON array (e.g., ["Multiple Choice", "Essay"])
+    passing_score_percentage INT NOT NULL
 );
 
 CREATE TABLE Notification_Settings (
