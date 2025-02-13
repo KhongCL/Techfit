@@ -1,6 +1,34 @@
 <?php
 session_start(); 
 
+$db_host = 'localhost';
+$db_user = 'root';
+$db_pass = '';
+$db_name = 'techfit';
+
+$conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
+$check_assessment_sql = "SELECT COUNT(*) as completed 
+                        FROM Assessment_Job_Seeker 
+                        WHERE job_seeker_id = ? AND end_time IS NOT NULL";
+
+$stmt = $conn->prepare($check_assessment_sql);
+$stmt->bind_param("s", $_SESSION['job_seeker_id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+
+if ($row['completed'] > 0) {
+    echo '<script>
+        if (confirm("You have already completed an assessment. Would you like to view your assessment history?")) {
+            window.location.href = "assessment_history.php";
+        } else {
+            window.location.href = "index.php";
+        }
+    </script>';
+    exit();
+}
+$conn->close();
+
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
@@ -183,6 +211,33 @@ session_write_close();
         function logoutUser() {
             window.location.href = '/Techfit'; 
         }
+
+        // Enable/disable start button based on checkbox
+        document.getElementById('agree').addEventListener('change', function() {
+            document.getElementById('start-assessment-button').disabled = !this.checked;
+        });
+
+        // Handle start assessment button click
+        document.getElementById('start-assessment-button').addEventListener('click', function() {
+            if (!document.getElementById('agree').checked) {
+                alert('Please agree to the rules and regulations first.');
+                return;
+            }
+
+            fetch('start_assessment_session.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = 'assessment_question.php';
+                    } else {
+                        alert('Error starting assessment: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to start assessment. Please try again.');
+                });
+        });
     </script>
 </body>
 </html>

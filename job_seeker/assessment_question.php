@@ -61,12 +61,6 @@ $assessment_settings = $settings_result->fetch_assoc();
 // Set time limit from settings (convert minutes to seconds)
 $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
 
-$start_assessment_sql = "INSERT INTO Assessment_Job_Seeker (job_seeker_id, start_time) 
-                        VALUES (?, NOW())";
-$stmt = $conn->prepare($start_assessment_sql);
-$stmt->bind_param("s", $_SESSION['job_seeker_id']);
-$stmt->execute();
-
 ?>
 
 <!DOCTYPE html>
@@ -871,7 +865,7 @@ $stmt->execute();
                 if (remaining <= 0) {
                     clearInterval(timerInterval);
                     display.textContent = "Time's up!";
-                    submitAssessment(true);
+                    submitAssessment(true); // Pass true to indicate time's up
                     return;
                 }
                 
@@ -1255,45 +1249,58 @@ $stmt->execute();
             return savedAnswers.hasOwnProperty(questionId);
         }
 
-        function submitAssessment() {
-            // Get total answers across all sections
-            const allAnswers = JSON.parse(sessionStorage.getItem('allAnswers') || '{}');
-            const totalAnswered = Object.keys(allAnswers).length;
-            const totalQuestions = 20; // Total required questions
-            
-            // Check if all questions are answered
-            if (totalAnswered < totalQuestions) {
-                const remaining = totalQuestions - totalAnswered;
-                alert(`Please answer all questions before submitting. You still have ${remaining} unanswered ${remaining === 1 ? 'question' : 'questions'}.`);
-                return;
+        function submitAssessment(isTimeUp = false) {
+            // Only check for unanswered questions if not timed out
+            if (!isTimeUp) {
+                const allAnswers = JSON.parse(sessionStorage.getItem('allAnswers') || '{}');
+                const totalAnswered = Object.keys(allAnswers).length;
+                const totalQuestions = 20;
+                
+                if (totalAnswered < totalQuestions) {
+                    const remaining = totalQuestions - totalAnswered;
+                    alert(`Please answer all questions before submitting. You still have ${remaining} unanswered ${remaining === 1 ? 'question' : 'questions'}.`);
+                    return;
+                }
+
+                if (!confirm('Are you sure you want to submit your assessment? This action cannot be undone.')) {
+                    return;
+                }
             }
 
-            // Show confirmation dialog if all questions are answered
-            if (confirm('Are you sure you want to submit your assessment? This action cannot be undone.')) {
-                saveAllAnswers()
-                    .then(() => {
-                        // Update end time in database
-                        fetch('update_assessment_time.php', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                job_seeker_id: '<?php echo $_SESSION["job_seeker_id"]; ?>',
-                                end_time: new Date().toISOString()
-                            })
-                        })
-                        .then(() => {
-                            // Clear session storage and redirect
+            // Save all answers and submit
+            saveAllAnswers()
+                .then(() => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'update_assessment_time.php', true);
+                    xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            // Clear session storage
                             sessionStorage.removeItem('confirmedLanguageChoice');
+                            sessionStorage.removeItem('assessmentState');
+                            sessionStorage.removeItem('assessmentTimer');
+                            sessionStorage.removeItem('assessmentProgress');
+                            sessionStorage.removeItem('allAnswers');
+                            
+                            // Show time's up message if applicable
+                            if (isTimeUp) {
+                                alert("Time's up! Your assessment will be submitted automatically.");
+                            }
+                            
+                            // Redirect to results page
                             window.location.href = 'assessment_result.php';
-                        });
-                    })
-                    .catch(error => {
-                        console.error('Error saving answers:', error);
-                        alert('There was an error saving your answers. Please try again.');
-                    });
-            }
+                        } else {
+                            alert('Failed to submit assessment. Please try again.');
+                        }
+                    };
+                    xhr.onerror = function() {
+                        alert('Error submitting assessment. Please try again.');
+                    };
+                    xhr.send();
+                })
+                .catch(error => {
+                    console.error('Error during submission:', error);
+                    alert('There was an error submitting your assessment. Please try again.');
+                });
         }
 
         function nextQuestion() {
@@ -1519,14 +1526,17 @@ $stmt->execute();
                     'C103': 'JavaScript',
                     'C104': 'C++'
                 };
-
-                if (hasConfirmedLanguage || isSection3Active) {
-                    const inputs = document.querySelectorAll('input[name="choice"]');
-                    inputs.forEach(input => {
+                
+                // Only disable radio inputs if viewing Q209
+                const currentQuestion = questions[currentQuestionIndex];
+                if (currentQuestion && currentQuestion.question_id === 'Q209') {
+                    const radioInputs = document.querySelectorAll('input[type="radio"][name="choice"]');
+                    radioInputs.forEach(input => {
                         if (input.value === savedAnswers['Q209']) {
                             input.checked = true;
                         }
-                        input.disabled = true;
+                        // Only disable if in section 1 and section 3 is active/confirmed
+                        input.disabled = (currentSection === 1 && (isSection3Active || hasConfirmedLanguage));
                     });
                 }
                 
@@ -1534,19 +1544,6 @@ $stmt->execute();
                     section3Box.classList.remove('locked');
                     section3Box.title = `Selected language: ${languageMap[savedAnswers['Q209']]}`;
                     log('Section 3 unlocked with language:', languageMap[savedAnswers['Q209']]);
-                }
-                
-                // Only lock inputs if section 3 is active
-                const currentQuestion = questions[currentQuestionIndex];
-                
-                if (currentQuestion && currentQuestion.question_id === 'Q209' && isSection3Active) {
-                    const inputs = document.querySelectorAll('input[type="radio"]');
-                    inputs.forEach(input => {
-                        input.disabled = isSection3Active;
-                        if (input.value === savedAnswers['Q209']) {
-                            input.checked = true;
-                        }
-                    });
                 }
             }
         }
