@@ -286,7 +286,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
 // End of resume file upload handling code
 
 ?>
-?>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -439,9 +438,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
     }
     /* Add this CSS to make the user icon in the header smaller */
     .profile-info .profile-image {
+        margin-left: 10px;
         width: 30px; /* Adjusted width */
         height: 30px; /* Adjusted height */
         border-radius: 20%;
+    }
+    .nav-container {
+        display: flex;
+        justify-content: flex-end; /* Align navigation items to the right */
+        padding-right: -50px; /* Add padding to move items more to the right */
+    }
+
+    /* Adjust the nav-list to ensure items are aligned properly */
+    .nav-list {
+        list-style: none;
+        display: flex;
+        justify-content: flex-end;
+        margin: 0;
+        padding: 0;
     }
 </style>
 </head>
