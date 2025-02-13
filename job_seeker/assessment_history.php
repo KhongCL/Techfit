@@ -55,12 +55,15 @@ $sql = "
         Assessment_Job_Seeker.job_seeker_id AS 'job_id',
         Assessment_Job_Seeker.start_time AS 'start_time',
         Assessment_Job_Seeker.end_time AS 'end_time',
-        Assessment_Job_Seeker.score AS 'score'
+        Assessment_Job_Seeker.score AS 'score',
+        Assessment_Settings.passing_score_percentage
     FROM Assessment_Job_Seeker
     INNER JOIN Job_Seeker 
         ON Assessment_Job_Seeker.job_seeker_id = Job_Seeker.job_seeker_id
     INNER JOIN User
         ON Job_Seeker.user_id = User.user_id
+    INNER JOIN Assessment_Settings
+        ON Assessment_Settings.setting_id = '1'
     WHERE User.user_id = ?";
 
 $stmt = $conn->prepare($sql);
@@ -152,10 +155,19 @@ $conn->close();
             background-color: var(--background-color-light);
             margin-bottom: 15px;
             border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .date-time {
             flex: 2;
+            text-align: left;
+        }
+
+        .date-time p {
+            margin: 0;
+            line-height: 1.5;
+            color: var(--text-color);
         }
 
         .score {
@@ -172,6 +184,47 @@ $conn->close();
             font-size: 1.2em;
             margin: 5px 0 0;
             color: var(--text-color);
+        }
+
+        #assessment-history {
+            min-height: calc(100vh - 250px); /* Subtract header + footer height */
+            padding: 40px 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 50%;
+            margin: 0 auto;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .history-header {
+            margin-bottom: 30px;
+            text-align: left;
+            color: var(--text-color);
+        }
+
+        .history-header h2 {
+            font-size: 1.8em;
+            margin: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--background-color-light);
+        }
+
+        .scrollable-container {
+            max-height: calc(100vh - 350px);
+            overflow-y: auto;
+            padding-right: 10px;
+            width: 100%;
+        }
+
+        .score-passed {
+            color: var(--success-color) !important;
+        }
+
+        .score-failed {
+            color: var(--danger-color) !important;
         }
     </style>
 
@@ -241,30 +294,39 @@ $conn->close();
             <div class="history-header">
                 <h2>Assessment History</h2>
             </div>
-
-            <?php if (!empty($assessments)): ?>
-                <?php foreach ($assessments as $assessment): ?>
-                    <div class="history-item">
+            
+            <div class="scrollable-container">
+                <?php if (!empty($assessments)): ?>
+                    <?php foreach ($assessments as $assessment): ?>
+                        <div class="history-item">
                         <div class="date-time">
                             <p>
                                 <strong>Date:</strong> <?php echo htmlspecialchars(date('Y-m-d', strtotime($assessment['start_time']))); ?> 
-                                <br><strong>Avg Time Used (mins):</strong> <?php echo round((strtotime($assessment['end_time']) - strtotime($assessment['start_time'])) / 60, 2); ?>
+                                <br><strong>Time Used:</strong> <?php 
+                                    $duration = strtotime($assessment['end_time']) - strtotime($assessment['start_time']);
+                                    $minutes = floor($duration / 60);
+                                    $seconds = $duration % 60;
+                                    echo $minutes . ' minutes ' . $seconds . ' seconds';
+                                ?>
                             </p>
                         </div>
                         <div class="score">
                             <h3>Score</h3>
-                            <p><?php echo htmlspecialchars($assessment['score']); ?></p>
+                            <p class="<?php echo ($assessment['score'] >= $assessment['passing_score_percentage']) ? 'score-passed' : 'score-failed'; ?>">
+                                <?php echo htmlspecialchars($assessment['score']); ?>
+                            </p>
                         </div>
-                        <div class="actions">
-                            <a href="download_assessment_history_report.php?assessment_id=<?php echo urlencode($assessment['assessment_id']); ?>" title="Download">Download</a>
-                            <a href="share_assessment_history.php?assessment_id=<?= urlencode($assessment['assessment_id']); ?>" title="Share">Share</a>
+                            <div class="actions">
+                                <a href="download_assessment_history_report.php?assessment_id=<?php echo urlencode($assessment['assessment_id']); ?>" title="Download">Download</a>
+                                <a href="share_assessment_history.php?assessment_id=<?= urlencode($assessment['assessment_id']); ?>" title="Share">Share</a>
+                            </div>
                         </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p>No assessment history available.</p>
-<?php endif; ?>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p>No assessment history available.</p>
+    <?php endif; ?>
         </div>
+    </div>
     </section>
 
     <footer>
