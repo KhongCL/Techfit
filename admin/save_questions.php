@@ -57,14 +57,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $answer_type = $answer_types[$index];
         $correct_answer = $correct_answers[$index];
 
-        // Debugging: Log the answer type and index
-        error_log("Answer Type for Question $question_id: $answer_type (Index: $index)");
+        if ($answer_type === 'code') {
+            $code_template = $_POST['code_template'][$index];
+            $programming_language = $_POST['code_language'][$index];
 
-        // Prepare and bind
-        $stmt = $conn->prepare("INSERT INTO Question (question_id, assessment_id, question_text, question_type, answer_type, correct_answer) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param("ssssss", $question_id, $assessment_id, $question_text, $question_type, $answer_type, $correct_answer);
-
-        if ($stmt->execute() !== TRUE) {
+            // Validate answers format
+            $answers = explode('<<ANSWER_BREAK>>', $correct_answer);
+            if (count($answers) < 2) {
+                $_SESSION['error_message'] = "Please provide at least two answers separated by <<ANSWER_BREAK>>";
+                header("Location: create_questions.php?assessment_id=$assessment_id");
+                exit();
+            }
+            
+            // Check for empty/blank answers
+            foreach ($answers as $answer) {
+                if (trim($answer) === '') {
+                    $_SESSION['error_message'] = "Empty or blank answers are not allowed. Please provide valid answers separated by <<ANSWER_BREAK>>";
+                    header("Location: create_questions.php?assessment_id=$assessment_id");
+                    exit();
+                }
+            }
+    
+            $stmt = $conn->prepare("INSERT INTO Question (question_id, assessment_id, question_text, question_type, answer_type, correct_answer, code_template, programming_language) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssssss", $question_id, $assessment_id, $question_text, $question_type, $answer_type, $correct_answer, $code_template, $programming_language);
+        } else {
+            $stmt = $conn->prepare("INSERT INTO Question (question_id, assessment_id, question_text, question_type, answer_type, correct_answer) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt->bind_param("ssssss", $question_id, $assessment_id, $question_text, $question_type, $answer_type, $correct_answer);
+        }
+    
+        if (!$stmt->execute()) {
             $_SESSION['error_message'] = "Error: " . $stmt->error;
             header("Location: create_questions.php?assessment_id=$assessment_id");
             exit();
@@ -72,7 +93,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // Insert choices for multiple choice questions
         if ($answer_type === 'multiple choice') {
-            error_log("Inserting choices for Question $question_id");
             $choices_key = "choices_" . ($index + 1); // Adjust the key by adding 1
             if (isset($_POST[$choices_key])) {
                 $choices = $_POST[$choices_key];
@@ -93,37 +113,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
             } else {
                 error_log("Choices key $choices_key not found in POST data");
-            }
-        }
-
-        // Insert test cases for code questions
-        if ($answer_type === 'code') {
-            error_log("Inserting test cases for Question $question_id");
-            $test_cases_key = "test_cases_" . ($index + 1); // Adjust the key by adding 1
-            $expected_output_key = "expected_output_" . ($index + 1); // Adjust the key by adding 1
-            $programming_language_key = "code_language_" . ($index + 1); // Adjust the key by adding 1
-            $programming_language = isset($_POST[$programming_language_key]) ? $_POST[$programming_language_key] : 'python'; // Default to 'python' if not set
-            if (isset($_POST[$test_cases_key]) && isset($_POST[$expected_output_key])) {
-                $test_cases = $_POST[$test_cases_key];
-                $expected_outputs = $_POST[$expected_output_key];
-                foreach ($test_cases as $tc_index => $input) {
-                    if (empty($input) || empty($expected_outputs[$tc_index])) {
-                        $_SESSION['error_message'] = "All test case fields are required.";
-                        header("Location: create_questions.php?assessment_id=$assessment_id");
-                        exit();
-                    }
-                    $test_case_id = generateNextId($conn, 'Test_Cases', 'test_case_id', 'T');
-                    $expected_output = $expected_outputs[$tc_index];
-                    $stmt = $conn->prepare("INSERT INTO Test_Cases (test_case_id, question_id, input, expected_output, programming_language) VALUES (?, ?, ?, ?, ?)");
-                    $stmt->bind_param("sssss", $test_case_id, $question_id, $input, $expected_output, $programming_language);
-                    if ($stmt->execute() !== TRUE) {
-                        $_SESSION['error_message'] = "Error: " . $stmt->error;
-                        header("Location: create_questions.php?assessment_id=$assessment_id");
-                        exit();
-                    }
-                }
-            } else {
-                error_log("Test cases or expected output key not found in POST data for index $index");
             }
         }
     }
