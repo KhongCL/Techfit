@@ -61,6 +61,12 @@ $assessment_settings = $settings_result->fetch_assoc();
 // Set time limit from settings (convert minutes to seconds)
 $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
 
+$start_assessment_sql = "INSERT INTO Assessment_Job_Seeker (job_seeker_id, start_time) 
+                        VALUES (?, NOW())";
+$stmt = $conn->prepare($start_assessment_sql);
+$stmt->bind_param("s", $_SESSION['job_seeker_id']);
+$stmt->execute();
+
 ?>
 
 <!DOCTYPE html>
@@ -855,12 +861,6 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
             }
         }
 
-        function submitAnswer() {
-            // Handle answer submission logic here (e.g., save the answer to the database)
-            currentQuestionIndex++;
-            displayQuestion();
-        }
-
         function startTimer(display) {
             const endTime = startTime + totalTime;
             
@@ -1270,14 +1270,29 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
 
             // Show confirmation dialog if all questions are answered
             if (confirm('Are you sure you want to submit your assessment? This action cannot be undone.')) {
-                saveAllAnswers().then(() => {
-                    // Clear session storage
-                    sessionStorage.removeItem('confirmedLanguageChoice');
-                    window.location.href = 'assessment_result.php';
-                }).catch(error => {
-                    log('Error saving answers:', error);
-                    alert('There was an error saving your answers. Please try again.');
-                });
+                saveAllAnswers()
+                    .then(() => {
+                        // Update end time in database
+                        fetch('update_assessment_time.php', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                job_seeker_id: '<?php echo $_SESSION["job_seeker_id"]; ?>',
+                                end_time: new Date().toISOString()
+                            })
+                        })
+                        .then(() => {
+                            // Clear session storage and redirect
+                            sessionStorage.removeItem('confirmedLanguageChoice');
+                            window.location.href = 'assessment_result.php';
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error saving answers:', error);
+                        alert('There was an error saving your answers. Please try again.');
+                    });
             }
         }
 
