@@ -15,18 +15,16 @@ if ($conn->connect_error) {
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $default_time_limit = $_POST['default_time_limit'];
     $passing_score = $_POST['passing_score'];
-    $question_types = json_encode($_POST['question_types']);
 
     // Insert or update assessment settings in the database
-    $sql = "INSERT INTO Assessment_Settings (setting_id, default_time_limit, passing_score_percentage, allowed_question_types)
-            VALUES ('1', ?, ?, ?)
+    $sql = "INSERT INTO Assessment_Settings (setting_id, default_time_limit, passing_score_percentage)
+            VALUES ('1', ?, ?)
             ON DUPLICATE KEY UPDATE
             default_time_limit = VALUES(default_time_limit),
-            passing_score_percentage = VALUES(passing_score_percentage),
-            allowed_question_types = VALUES(allowed_question_types)";
+            passing_score_percentage = VALUES(passing_score_percentage)";
 
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("iis", $default_time_limit, $passing_score, $question_types);
+    $stmt->bind_param("ii", $default_time_limit, $passing_score);
 
     if ($stmt->execute()) {
         echo '<script>

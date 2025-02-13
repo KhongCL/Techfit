@@ -163,13 +163,39 @@ session_start();
 
                     // Additional validation for code questions
                     if (answerType.value === 'code') {
-                        const testCases = questionDiv.querySelectorAll(`textarea[name="test_cases_${i + 1}[]"]`);
-                        const expectedOutputs = questionDiv.querySelectorAll(`textarea[name="expected_output_${i + 1}[]"]`);
-                        for (let j = 0; j < testCases.length; j++) {
-                            if (testCases[j].value.trim() === '' || expectedOutputs[j].value.trim() === '') {
-                                alert('All test case fields are required.');
-                                return;
-                            }
+                        const codeTemplate = questionDiv.querySelector(`textarea[name="code_template[]"]`);
+                        const correctAnswers = questionDiv.querySelector(`textarea[name="correct_choice[]"]`);
+                        const language = questionDiv.querySelector(`select[name="code_language[]"]`);
+
+                        // Check empty fields
+                        if (!codeTemplate.value.trim() || !correctAnswers.value.trim() || !language.value) {
+                            alert('Code template, answers and programming language are required for code questions.');
+                            return;
+                        }
+
+                        // Check template format 
+                        if (!codeTemplate.value.includes('__BLANK__')) {
+                            alert('Code template must include at least one __BLANK__ placeholder.');
+                            return;
+                        }
+
+                        // Validate pipe-separated answers
+                        const answers = correctAnswers.value.split('<<ANSWER_BREAK>>');
+                        if (answers.length < 2) {
+                            alert('Please provide at least two answers separated by <<ANSWER_BREAK>>');
+                            return; 
+                        }
+                        if (answers.some(a => a.trim() === '')) {
+                            alert('Empty or blank answers are not allowed. Please provide valid answers separated by <<ANSWER_BREAK>>');
+                            return;
+                        }
+
+                        // Count blanks and answers match
+                        const blankCount = (codeTemplate.value.match(/__BLANK__/g) || []).length;
+                        const answerCount = answers.length;
+                        if (blankCount !== answerCount) {
+                            alert(`Number of blanks (${blankCount}) must match number of answers (${answerCount}).`);
+                            return;
                         }
                     }
                 }
@@ -250,8 +276,8 @@ session_start();
             return choicesHtml;
         }
 
-        function getCodeQuestionOptions(id, includeEmptyTestCase = true) {
-            let testCasesHtml = `
+        function getCodeQuestionOptions(id) {
+            return `
                 <label for="code_language_${id}">Select Language:</label>
                 <select id="code_language_${id}" name="code_language[]" required>
                     <option value="python">Python</option>
@@ -260,33 +286,15 @@ session_start();
                     <option value="cpp">C++</option>
                 </select><br>
 
-                <label for="code_${id}">Correct Answer:</label>
-                <textarea id="code_${id}" name="correct_choice[]" required></textarea><br>
+                <label for="code_${id}">Code Template:</label>
+                <textarea id="code_${id}" name="code_template[]" required 
+                    placeholder="Enter code with __BLANK__ placeholders"></textarea><br>
 
-                <label for="test_cases_${id}">Test Cases:</label>
-                <div id="test_cases_${id}">
+                <label for="correct_code_${id}">Correct Answers:</label>
+                <textarea id="correct_code_${id}" name="correct_choice[]" required 
+                    placeholder="Enter correct answers separated by <<ANSWER_BREAK>>"
+                    title="Enter the answers that should go in each __BLANK__ placeholder, separated by <<ANSWER_BREAK>>"></textarea>
             `;
-            if (includeEmptyTestCase) {
-                testCasesHtml += `
-                    <div class="test-case-container">
-                        <textarea name="test_cases_${id}[]" placeholder="Input" required></textarea>
-                        <textarea name="expected_output_${id}[]" placeholder="Expected Output" required></textarea>
-                        <button type="button" class="remove-icon" title="Remove Test Case" onclick="removeTestCase(this, ${id})">&#x2715;</button>
-                    </div>
-                `;
-            }
-            testCasesHtml += `
-                    <button type="button" onclick="addTestCase(${id})">Add Test Case</button>
-                </div>
-            `;
-            console.log('getCodeQuestionOptions:', testCasesHtml); // Log the generated HTML
-            return testCasesHtml;
-        }
-
-        function removeTestCase(button, id) {
-            const testCaseContainer = button.parentElement;
-            testCaseContainer.remove();
-            isFormDirty = true;
         }
 
         function addChoice(id, choiceId = '', choiceText = '') {
@@ -330,53 +338,6 @@ session_start();
             console.log('addChoice:', choiceContainer); // Log the added choice container
         }
 
-        function addTestCase(id, inputText = '', outputText = '', testCaseId = '') {
-            const testCasesDiv = document.getElementById(`test_cases_${id}`);
-            if (!testCasesDiv) {
-                console.error(`Test cases div not found for question ${id}`);
-                return;
-            }
-
-            const testCaseContainer = document.createElement('div');
-            testCaseContainer.className = 'test-case-container';
-
-            const input = document.createElement('textarea');
-            input.name = `test_cases_${id}[]`;
-            input.placeholder = 'Input';
-            input.required = true;
-            input.value = inputText; // Set the value of the input
-
-            const output = document.createElement('textarea');
-            output.name = `expected_output_${id}[]`;
-            output.placeholder = 'Expected Output';
-            output.required = true;
-            output.value = outputText; // Set the value of the output
-
-            const testCaseIdInput = document.createElement('input');
-            testCaseIdInput.type = 'hidden';
-            testCaseIdInput.name = `test_case_id_${id}[]`;
-            testCaseIdInput.value = testCaseId;
-
-            const removeButton = document.createElement('button');
-            removeButton.type = 'button';
-            removeButton.className = 'remove-icon';
-            removeButton.innerHTML = '&#x2715;'; // Unicode for 'X' symbol
-            removeButton.title = 'Remove Test Case'; // Tooltip text
-            removeButton.onclick = function() {
-                testCaseContainer.remove();
-                isFormDirty = true;
-            };
-
-            testCaseContainer.appendChild(input);
-            testCaseContainer.appendChild(output);
-            testCaseContainer.appendChild(testCaseIdInput);
-            testCaseContainer.appendChild(removeButton);
-            testCasesDiv.insertBefore(testCaseContainer, testCasesDiv.lastElementChild);
-
-            isFormDirty = true;
-            console.log('addTestCase:', { inputText, outputText, testCaseId }); // Log the added test case
-        }
-
         function updateCorrectChoiceDropdown(id) {
             const choices = document.getElementsByName(`choices_${id}[]`);
             const correctChoiceDropdown = document.getElementById(`correct_choice_${id}`);
@@ -418,12 +379,9 @@ session_start();
                             document.getElementById(`correct_choice_${questionCount}`).value = question.correct_answer;
                         } else if (question.answer_type === 'code') {
                             // Populate code question options
-                            document.getElementById(`code_${questionCount}`).value = question.correct_answer;
-                            document.getElementById(`code_language_${questionCount}`).value = question.programming_language; // Set the programming language
-                            // Fetch and populate test cases for code questions
-                            question.test_cases.forEach(testCase => {
-                                addTestCase(questionCount, testCase.input, testCase.expected_output, testCase.test_case_id);
-                            });
+                            document.getElementById(`code_${questionCount}`).value = question.code_template;
+                            document.getElementById(`code_language_${questionCount}`).value = question.programming_language;
+                            document.getElementById(`correct_code_${questionCount}`).value = question.correct_answer;
                         } else if (question.answer_type === 'true/false') {
                             document.getElementById(`true_false_${questionCount}`).value = question.correct_answer;
                         } else if (question.answer_type === 'fill in the blank') {
@@ -451,11 +409,25 @@ session_start();
                                 <td class="editable">${question.question_text}</td>
                                 <td>${question.question_type || 'N/A'}</td>
                                 <td>${question.answer_type || 'N/A'}</td>
-                                <td>${question.correct_answer || 'N/A'}</td>
+                                <td>${
+                                    question.answer_type === 'code' 
+                                        ? `Code Template: ${question.code_template}<br>
+                                        Language: ${question.programming_language}<br>
+                                        Answers: ${question.correct_answer}`
+                                        : (question.correct_answer || 'N/A')
+                                }</td>
                                 <td>
-                                    ${question.answer_type === 'multiple choice' ? (question.choices.length > 0 ? question.choices.map(choice => `<div>${choice}</div>`).join('') : 'No choices available') : ''}
-                                    ${question.answer_type === 'code' ? (question.test_cases.length > 0 ? question.test_cases.map(testCase => `<div>Input: ${testCase.input}, Output: ${testCase.expected_output}</div>`).join('') : 'No test cases available') : ''}
-                                    ${question.answer_type !== 'multiple choice' && question.answer_type !== 'code' ? 'This answer type does not contain choices/test cases' : ''}
+                                    ${
+                                        question.answer_type === 'multiple choice' 
+                                            ? (question.choices.length > 0 
+                                                ? question.choices.map(choice => `<div>${choice}</div>`).join('') 
+                                                : 'No choices available')
+                                            : question.answer_type === 'code'
+                                                ? `<div>Code Template with ${
+                                                    (question.code_template.match(/__BLANK__/g) || []).length
+                                                } blank(s)</div>`
+                                                : 'N/A'
+                                    }
                                 </td>
                             </tr>
                         `).join('');
@@ -931,21 +903,17 @@ session_start();
                 box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
             }
 
-            /* Choice and Test Case Containers */
-            .choice-container, .test-case-container {
+            /* Choice Containers */
+            .choice-container {
                 display: flex;
                 align-items: center;
                 margin-bottom: 15px; /* Add vertical spacing */
                 box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
             }
 
-            .choice-container input, .test-case-container textarea {
+            .choice-container input {
                 flex-grow: 1;
                 box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
-            }
-
-            .test-case-container textarea {
-                margin-right: 10px; /* Add horizontal spacing between test case input and expected output field */
             }
 
             /* Tooltip */
@@ -1088,7 +1056,7 @@ session_start();
                             <th data-column="question_type">Question Type</th>
                             <th data-column="answer_type">Answer Type</th>
                             <th data-column="correct_answer">Correct Answer</th>
-                            <th data-column="choices">Choices/Test Cases</th>
+                            <th data-column="choices">Choices</th>
                         </tr>
                     </thead>
                     <tbody id="deletedQuestionsTableBody">

@@ -1,5 +1,8 @@
 <?php
 session_start(); // Start the session to access session variables
+if (!isset($_SESSION['job_seeker_id'])) {
+    die("ERROR: No job seeker ID in session");
+}
 
 $db_host = 'localhost';
 $db_user = 'root';
@@ -11,49 +14,53 @@ if ($conn->connect_error) {
     die('Connection to techfit database failed: ' . $conn->connect_error);
 }
 
-function fetchQuestionsAndChoices($conn) {
-    $assessment_id = 'AS83';
+function fetchSectionQuestions($conn, $assessment_id) {
     $questions = [];
-
-    // Fetch questions based on the assessment_id
-    $query = "SELECT * FROM question WHERE assessment_id = ?";
-    $stmt = $conn->prepare($query);
+    $sql = "SELECT q.*, c.choice_id, c.choice_text 
+    FROM Question q 
+    LEFT JOIN Choices c ON q.question_id = c.question_id 
+    WHERE q.assessment_id = ? AND q.is_active = 1 
+    ORDER BY q.question_id";
+    
+    $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $assessment_id);
     $stmt->execute();
     $result = $stmt->get_result();
-
-    while ($question = $result->fetch_assoc()) {
-        $question_id = $question['question_id'];
-        $question_text = $question['question_text'];
-        $question_type = $question['question_type'];
-
-        // Fetch choices based on the question_id
-        $query2 = "SELECT * FROM choices WHERE question_id = ?";
-        $stmt2 = $conn->prepare($query2);
-        $stmt2->bind_param("i", $question_id);
-        $stmt2->execute();
-        $result2 = $stmt2->get_result();
-
-        $choices = [];
-        while ($choice = $result2->fetch_assoc()) {
-            $choices[] = $choice['choice_text'];
+    
+    while ($row = $result->fetch_assoc()) {
+        if (!isset($questions[$row['question_id']])) {
+            $questions[$row['question_id']] = [
+                'question_id' => $row['question_id'],
+                'question_text' => $row['question_text'],
+                'answer_type' => $row['answer_type'],
+                'choices' => []
+            ];
         }
-        $stmt2->close();
-
-        $questions[] = [
-            'question_id' => $question_id,
-            'question_text' => $question_text,
-            'question_type' => $question_type,
-            'choices' => $choices
-        ];
+        
+        if ($row['choice_id']) {
+            $questions[$row['question_id']]['choices'][] = [
+                'choice_id' => $row['choice_id'],
+                'choice_text' => $row['choice_text']
+            ];
+        }
     }
-    $stmt->close();
-
-    return $questions;
+    
+    return array_values($questions);
 }
 
-$questions = fetchQuestionsAndChoices($conn);
-$conn->close();
+// Get section 1 questions initially
+$questions = fetchSectionQuestions($conn, 'AS75');
+
+// Get assessment settings
+$settings_query = "SELECT default_time_limit, passing_score_percentage 
+                  FROM Assessment_Settings 
+                  WHERE setting_id = '1'";
+$settings_result = $conn->query($settings_query);
+$assessment_settings = $settings_result->fetch_assoc();
+
+// Set time limit from settings (convert minutes to seconds)
+$countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
+
 ?>
 
 <!DOCTYPE html>
@@ -65,87 +72,1507 @@ $conn->close();
     <link rel="stylesheet" href="styles.css">
 
 
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #1e1e1e;
+            --accent-color: #0056b3;
+            --text-color: #e0e0e0;
+            --background-color: #121212;
+            --border-color: #333;
+            --hover-background-color: #333;
+            --hover-text-color: #fff;
+            --button-hover-color: #80bdff;
+            --popup-background-color: #1a1a1a;
+            --popup-border-color: #444;
+            --danger-color: #dc3545;
+            --danger-hover-color: #c82333;
+            --success-color: #28a745;
+            --success-hover-color: #218838;
+            --lighter-text-color: #f5f5f5;
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        .popup h2 {
+            color: #fff;
+        }
+        .popup button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .popup .close-button {
+            background-color: #dc3545;
+            color: #fff;
+        }
+        .popup .cancel-button {
+            background-color: #007bff;
+            color: #fff;
+        }
+        .popup .close-button:hover {
+            background-color: #c82333;
+        }
+        .popup .cancel-button:hover {
+            background-color: #0056b3;
+        }
+
+        .assessment-container {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .question-section {
+            flex: 3;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navigation-panel {
+            flex: 1;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .timer {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+        }
+
+        .section-navigation {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .section-box {
+            padding: 10px;
+            text-align: center;
+            background: #f0f0f0;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .section-box.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .section-box.locked {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .question-list-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .question-list-header {
+            padding: 10px;
+            background: #f5f5f5;
+            cursor: pointer;
+        }
+
+        .question-list {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            padding: 10px;
+        }
+
+        .question-box {
+            padding: 10px;
+            text-align: center;
+            background: #f0f0f0;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .question-box.completed {
+            background: #28a745;
+            color: white;
+        }
+
+        .essay-input {
+            width: 100%;
+            min-height: 150px;
+            resize: none; /* Prevent manual resizing */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: inherit;
+            font-size: inherit;
+            overflow-y: hidden; /* Hide scrollbar */
+        }
+
+        .grid-2x2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-gap: 15px;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .grid-2x2 .option {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 20px;
+            background-color: #28a745;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            margin-top: 5px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .navigation-buttons button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .navigation-buttons button:hover {
+            background-color: var(--accent-color);
+        }
+
+        .navigation-buttons button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Style only the submit button (when Next button becomes Submit) */
+        .navigation-buttons button[onclick="submitAssessment"] {
+            background-color: var(--success-color);
+        }
+
+        .navigation-buttons button[onclick="submitAssessment"]:hover {
+            background-color: var(--success-hover-color);
+        }
+        
+        .question-box.current {
+            border: 2px solid #007bff;
+        }
+
+        .code-block {
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            white-space: pre;
+            line-height: 1.5;
+            tab-size: 4;
+        }
+
+        .code-block input {
+            font-family: monospace;
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 2px 4px;
+            margin: 0 4px;
+            border-radius: 3px;
+        }
+
+        .code-blank {
+            width: 120px;
+            padding: 2px 5px;
+            margin: 0 5px;
+            font-family: inherit;
+            font-size: inherit;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            background: #fff;
+        }
+
+        .code-container {
+            font-family: 'Consolas', 'Monaco', monospace;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            white-space: pre;
+            line-height: 1.5;
+            tab-size: 4;
+        }
+
+        .code-container pre {
+            margin: 0;
+            display: inline;
+            background: transparent;
+            padding: 0;
+            white-space: pre-wrap;
+        }
+
+        .language-indicator {
+            background: #e9ecef;
+            color: #495057;
+            padding: 8px 12px;
+            border-radius: 4px 4px 0 0;
+            margin-bottom: 0;
+            font-weight: bold;
+        }
+
+        .code-block {
+            font-family: monospace;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            white-space: pre;
+            line-height: 1.5;
+            position: relative;
+        }
+    </style>
 
     <script>
+
+        const DEBUG = true;
+        function log(...args) {
+        if (DEBUG) console.log(...args);
+        }
+
         let questions = <?php echo json_encode($questions); ?>;
         let currentQuestionIndex = 0;
-        let countdownTime = 300; // 5 minutes for each question
+        let isQuestionListVisible = true;
+        let countdownTime = <?php echo $countdownTime; ?>;
+        let timerInterval;
+        let savedAnswers = {};
+        let currentSection = 1;
+        let startTime = <?php echo time(); ?>;
+        let totalTime = <?php echo $countdownTime; ?>;
+        let sectionLastQuestions = {
+            '1': 4,  // Last question index in section 1
+            '2': 4,  // Last question index in section 2
+            '3': 4,  // Last question index in section 3
+            '4': 4   // Last question index in section 4
+        };
+        const ANSWER_DELIMITER = '<<ANSWER_BREAK>>';
 
         function displayQuestion() {
+            if (!questions || !questions.length) {
+                log('No questions available');
+                return;
+            }
+            
             if (currentQuestionIndex < questions.length) {
                 let question = questions[currentQuestionIndex];
-                let questionContainer = document.querySelector('.question');
-                questionContainer.innerHTML = question.question_text + " (" + question.question_type + ")";
-
-                let choicesContainer = document.createElement('div');
-                choicesContainer.className = 'options';
-
-                if (question.question_type === 'multiple choice') {
-                    question.choices.forEach((choice, index) => {
-                        let choiceElement = document.createElement('div');
-                        choiceElement.className = 'option';
-                        choiceElement.innerHTML = `<input type="radio" name="choice" value="${choice}"> ${choice}`;
-                        choicesContainer.appendChild(choiceElement);
-                    });
-                } else if (question.question_type === 'true/false') {
-                    let trueOption = document.createElement('div');
-                    trueOption.className = 'option';
-                    trueOption.innerHTML = `<input type="radio" name="choice" value="true"> True`;
-                    choicesContainer.appendChild(trueOption);
-
-                    let falseOption = document.createElement('div');
-                    falseOption.className = 'option';
-                    falseOption.innerHTML = `<input type="radio" name="choice" value="false"> False`;
-                    choicesContainer.appendChild(falseOption);
-                } else if (question.question_type === 'fill in the blank') {
-                    let inputElement = document.createElement('input');
-                    inputElement.type = 'text';
-                    inputElement.name = 'choice';
-                    inputElement.className = 'option';
-                    choicesContainer.appendChild(inputElement);
-                } else if (question.question_type === 'essay') {
-                    let textareaElement = document.createElement('textarea');
-                    textareaElement.name = 'choice';
-                    textareaElement.className = 'option';
-                    choicesContainer.appendChild(textareaElement);
+                if (!question) {
+                    log('Invalid question index');
+                    return;
                 }
 
-                questionContainer.appendChild(choicesContainer);
-                startTimer(countdownTime, document.getElementById('timer'), document.querySelector('.submit_but button'));
-            } else {
-                document.querySelector('.question').innerHTML = '<p>All questions answered. Thank you!</p>';
-                document.querySelector('.submit_but button').disabled = true;
+                if (question.question_id === 'Q209' && 
+                    document.querySelector('[data-section="3"]').classList.contains('active')) {
+                    alert('You cannot modify your programming language choice after accessing Section 3.');
+                    if (currentQuestionIndex > 0) {
+                        currentQuestionIndex--;
+                    } else {
+                        currentQuestionIndex++;
+                    }
+                    displayQuestion();
+                    return;
+                }
+
+                let questionContainer = document.querySelector('.question');
+                if (!questionContainer) {
+                    log('Question container not found');
+                    return;
+                }
+                
+                // Clear previous content
+                questionContainer.innerHTML = '';
+                
+                // Add question number and text first
+                const questionNumber = ((currentSection - 1) * 5) + (currentQuestionIndex + 1);
+                const questionText = document.createElement('h3');
+                questionText.textContent = `Question ${questionNumber}: ${question.question_text}`;
+                questionContainer.appendChild(questionText);
+
+                // Add answer section after question text
+                let answerContainer = document.createElement('div');
+                answerContainer.className = question.answer_type === 'multiple choice' ? 'options grid-2x2' : 'options';
+                
+                if (question.answer_type === 'multiple choice') {
+                    question.choices.forEach((choice, index) => {
+                        const choiceEl = document.createElement('div');
+                        choiceEl.className = 'option';
+                        choiceEl.innerHTML = `
+                            <input type="radio" name="choice" value="${choice.choice_id}" id="choice${index}"
+                                ${savedAnswers[question.question_id] === choice.choice_id ? 'checked' : ''}>
+                            <label for="choice${index}">${['A', 'B', 'C', 'D'][index]}. ${choice.choice_text}</label>
+                        `;
+                        answerContainer.appendChild(choiceEl);
+                    });
+                } else if (question.answer_type === 'essay') {
+                    const textarea = document.createElement('textarea');
+                    textarea.name = 'answer';
+                    textarea.className = 'essay-input';
+                    textarea.value = savedAnswers[question.question_id] || '';
+                    answerContainer.appendChild(textarea);
+                    autoExpandTextarea(textarea);
+                } else if (question.answer_type === 'code') {
+                    const codeBlock = document.createElement('div');
+                    codeBlock.className = 'code-block';
+                    
+                    // Add language indicator
+                    const languageIndicator = document.createElement('div');
+                    languageIndicator.className = 'language-indicator';
+                    const language = question.programming_language.toLowerCase();
+                    languageIndicator.textContent = `Language: ${language.charAt(0).toUpperCase() + language.slice(1)}`;
+                    questionContainer.appendChild(languageIndicator);
+                    
+                    // Create code container
+                    const codeContainer = document.createElement('div');
+                    codeContainer.className = 'code-container';
+                    
+                    // Parse code template
+                    const template = question.code_template
+                        .replace(/\\u([0-9a-fA-F]{4})/g, (match, group) => 
+                            String.fromCharCode(parseInt(group, 16)))  // Convert unicode escapes
+                        .replace(/\\n/g, '\n')  // Convert escaped newlines
+                        .split('__BLANK__');
+                        
+                        const savedValues = savedAnswers[question.question_id] ? 
+                            savedAnswers[question.question_id].split(ANSWER_DELIMITER) : [];
+                    
+                    template.forEach((part, index) => {
+                        // Create pre element for code segment
+                        const codePart = document.createElement('pre');
+                        codePart.className = 'code-segment';
+                        codePart.textContent = part;
+                        codeContainer.appendChild(codePart);
+                        
+                        if (index < template.length - 1) {
+                            const input = document.createElement('input');
+                            input.type = 'text';
+                            input.className = 'code-blank';
+                            input.dataset.blankIndex = index;
+                            input.value = savedValues[index] || '';
+                            codeContainer.appendChild(input);
+                        }
+                    });
+                    
+                    // Update CSS for code formatting
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .code-segment {
+                            white-space: pre;
+                            display: inline;
+                            font-family: 'Consolas', 'Monaco', monospace;
+                            margin: 0;
+                            padding: 0;
+                            tab-size: 4;
+                        }
+                        .code-container {
+                            font-family: 'Consolas', 'Monaco', monospace;
+                            background: #f8f9fa;
+                            padding: 15px;
+                            border-radius: 4px;
+                            margin: 10px 0;
+                            line-height: 1.5;
+                            white-space: pre;
+                            tab-size: 4;
+                            overflow-x: auto;
+                        }
+                        .code-blank {
+                            font-family: 'Consolas', 'Monaco', monospace;
+                            font-size: inherit;
+                            padding: 2px 4px;
+                            margin: 0 4px;
+                            border: 1px solid #ccc;
+                            border-radius: 3px;
+                            background: #fff;
+                            min-width: 60px;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                    
+                    codeBlock.appendChild(codeContainer);
+                    answerContainer.appendChild(codeBlock);
+                }
+                
+                questionContainer.appendChild(answerContainer);
+                updateNavigationButtons();
+                updateQuestionList();
+                checkAndUnlockSection3();
             }
         }
 
-        function submitAnswer() {
-            // Handle answer submission logic here (e.g., save the answer to the database)
-            currentQuestionIndex++;
-            displayQuestion();
-        }
+        function runCode(code, language) {
+            const outputTerminal = document.querySelector('.output-terminal');
+            outputTerminal.textContent = 'Running...';
 
-        function startTimer(duration, display, button) {
-            let timer = duration, minutes, seconds;
-            let interval = setInterval(function () {
-                minutes = parseInt(timer / 60, 10);
-                seconds = parseInt(timer % 60, 10);
-
-                minutes = minutes < 10 ? "0" + minutes : minutes;
-                seconds = seconds < 10 ? "0" + seconds : seconds;
-
-                display.textContent = "Time Remaining: " + minutes + ":" + seconds;
-
-                if (--timer < 0) {
-                    clearInterval(interval);
-                    button.disabled = true;
-                    display.textContent = "Time's up!";
+            const formData = new FormData();
+            formData.append('code', code);
+            formData.append('language', language);
+            
+            return fetch('run_code.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Display output in terminal instead of alert
+                if (data.success) {
+                    outputTerminal.textContent = data.output;
+                } else {
+                    outputTerminal.textContent = `Error:\n${data.error}`;
                 }
-            }, 1000);
+                return data;
+            })
+            .catch(error => {
+                outputTerminal.textContent = `Error running code: ${error.message}`;
+                console.error('Error:', error);
+            });
         }
 
-        window.onload = function() {
-            displayQuestion();
+        function getProgrammingAssessmentId() {
+            // Log the saved answer for debugging
+            log('Q209 answer:', savedAnswers['Q209']);
+            
+            // Use choice IDs instead of language names
+            const assessmentMap = {
+                'C101': 'AS77', // Python
+                'C102': 'AS78', // Java
+                'C103': 'AS79', // JavaScript 
+                'C104': 'AS80'  // C++
+            };
+            
+            return savedAnswers['Q209'] ? assessmentMap[savedAnswers['Q209']] : null;
         }
+        
+        function loadSectionQuestions(sectionId) {
+            return new Promise((resolve, reject) => {
+                if (!sectionId) {
+                    log('Error: Invalid section ID');
+                    reject(new Error('Invalid section ID'));
+                    return;
+                }
+
+                const assessmentIds = {
+                    '1': 'AS75',
+                    '2': 'AS76', 
+                    '3': getProgrammingAssessmentId(),
+                    '4': 'AS81'
+                };
+
+                const assessmentId = assessmentIds[sectionId];
+
+                if (!assessmentId) {
+                    reject(new Error('Invalid assessment ID'));
+                    return;
+                }
+
+                saveAllAnswers().then(() => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('GET', `get_section_questions.php?assessment_id=${assessmentId}`, true);
+                    xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            try {
+                                const responseText = xhr.responseText.trim();
+                                if (!responseText) {
+                                    log('Error: Empty response from server');
+                                    reject(new Error('Empty response from server'));
+                                    return;
+                                }
+
+                                const QUESTION_DELIMITER = '<<QUESTION_BREAK>>';
+                                const FIELD_DELIMITER = '<<FIELD>>';
+
+                                const questionsData = responseText.split(QUESTION_DELIMITER);
+                                questions = questionsData.map(q => {
+                                    const parts = q.split(FIELD_DELIMITER);
+                                    log('Raw question parts:', parts);
+
+                                    // Destructure with proper names
+                                    const [
+                                        questionId = '',
+                                        questionText = '',
+                                        answerType = '',
+                                        choicesStr = '',
+                                        codeTemplate = '',
+                                        language = ''
+                                    ] = parts;
+
+                                    // Clean up the programming language
+                                    const cleanLanguage = language.toLowerCase().trim();
+
+                                    // Parse choices if they exist
+                                    const choices = choicesStr ? choicesStr.split('~').map(choice => {
+                                        const [choiceId, choiceText] = choice.split('=');
+                                        return { choice_id: choiceId, choice_text: choiceText };
+                                    }) : [];
+
+                                    // Return properly structured question object
+                                    return {
+                                        question_id: questionId,
+                                        question_text: questionText,
+                                        answer_type: answerType,
+                                        code_template: codeTemplate.replace(/\\n/g, '\n'),
+                                        programming_language: cleanLanguage,
+                                        choices: choices
+                                    };
+                                });
+
+                                currentQuestionIndex = 0;
+                                currentSection = parseInt(sectionId);
+                                
+                                // Update UI
+                                displayQuestion();
+                                updateQuestionList();
+                                loadSavedAnswers(assessmentId);
+                                updateNavigationButtons();
+                                updateSectionUI(sectionId);
+                                resolve();
+
+                            } catch (e) {
+                                log('Error parsing questions:', e);
+                                reject(e);
+                            }
+                        } else {
+                            log('Error loading section:', xhr.statusText);
+                            reject(new Error(`HTTP error! status: ${xhr.status}`));
+                        }
+                    };
+
+                    xhr.onerror = () => reject(new Error('Network error'));
+                    xhr.send();
+                }).catch(error => reject(error));
+            });
+        }
+
+        function updateSectionUI(sectionId) {
+            const sections = {
+                '1': 'General Questions',
+                '2': 'Scenario-Based Questions', 
+                '3': 'Programming Questions',
+                '4': 'Work-Style and Personality'
+            };
+            
+            log('Updating section UI for section:', sectionId);
+
+            // Update section title
+            document.getElementById('section-title').textContent = 
+                `Section ${sectionId}: ${sections[sectionId]}`;
+                
+            // Update active section box
+            document.querySelectorAll('.section-box').forEach(box => {
+                box.classList.remove('active');
+            });
+            document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+        }
+
+        function loadSavedAnswers(assessmentId) {
+            if (!assessmentId) {
+                log('Error: No assessment ID provided');
+                return;
+            }
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', `get_answers.php?assessment_id=${assessmentId}&job_seeker_id=<?php echo $_SESSION["job_seeker_id"]; ?>`, true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    try {
+                        log('Raw server response:', xhr.responseText);
+                        const answers = xhr.responseText.trim() ? xhr.responseText.split('<<ANSWER_SET>>').map(a => {
+                            const [qid, ans] = a.split('<<QA_BREAK>>');
+                            log('Parsing answer:', {qid, ans});
+                            return [qid, ans];
+                        }) : [];
+                        
+                        savedAnswers = {};
+                        answers.forEach(([questionId, answer]) => {
+                            if (!questionId || !answer) return;
+                            
+                            const question = questions.find(q => q.question_id === questionId);
+                            log('Processing answer:', {questionId, answer, type: question?.answer_type});
+                            
+                            // For code answers, only replace pipes that are between code blanks
+                            if (answer && question?.answer_type === 'code') {
+                                // Split by existing ANSWER_DELIMITER first
+                                const parts = answer.split(ANSWER_DELIMITER);
+                                savedAnswers[questionId] = parts.join(ANSWER_DELIMITER);
+                            } else {
+                                savedAnswers[questionId] = answer;
+                            }
+                        });
+
+                        log('Final savedAnswers:', savedAnswers);
+                        displaySavedAnswers();
+                        checkAndUnlockSection3();
+                        updateProgress();
+                    } catch (e) {
+                        log('Error parsing saved answers:', e);
+                        alert('Failed to load saved answers. Please try again.');
+                    }
+                }
+            };
+            xhr.send();
+        }
+
+        function displaySavedAnswers() {
+            const questionContainer = document.querySelector('.question');
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            if (!currentQuestion) return;
+            
+            log('Displaying answer for:', {
+                questionId: currentQuestion.question_id,
+                type: currentQuestion.answer_type,
+                savedAnswer: savedAnswers[currentQuestion.question_id]
+            });
+
+            const savedAnswer = savedAnswers[currentQuestion.question_id];
+            
+            if (savedAnswer) {
+                if (currentQuestion.answer_type === 'multiple choice') {
+                    const radio = questionContainer.querySelector(`input[value="${savedAnswer}"]`);
+                    if (radio) radio.checked = true;
+                } else if (currentQuestion.answer_type === 'essay') {
+                    const textarea = questionContainer.querySelector('textarea');
+                    if (textarea) {
+                        textarea.value = savedAnswer;
+                        autoExpandTextarea(textarea);
+                    }
+                } else if (currentQuestion.answer_type === 'code') {
+                    const inputs = questionContainer.querySelectorAll('.code-blank');
+                    // Use ANSWER_DELIMITER for code answers only
+                    const savedValues = savedAnswer.split(ANSWER_DELIMITER);
+                    
+                    inputs.forEach((input, index) => {
+                        input.value = savedValues[index] || '';
+                    });
+                }
+                
+                updateQuestionList();
+            }
+        }
+
+        function checkProgrammingLanguages() {
+            fetch('get_programming_answer.php?question_id=Q209')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.answer) {
+                        document.querySelector('[data-section="3"]').classList.remove('locked');
+                        // Don't auto-load section 3 questions here
+                        log('Programming language selected:', data.answer);
+                    }
+                })
+                .catch(error => {
+                    log('Error checking programming answer:', error);
+                });
+        }
+
+        function handleSection3Access() {
+            const section3Box = document.querySelector('[data-section="3"]');
+            log('Handling Section 3 access, Q209 answer:', savedAnswers['Q209']);
+            
+            return fetch('get_programming_answer.php?question_id=Q209')
+                .then(response => response.json())
+                .then(data => {
+                    log('Programming language data:', data);
+                    if (data.answer) {
+                        savedAnswers['Q209'] = data.answer;
+                        section3Box.classList.remove('locked');
+                        return loadSectionQuestions('3');
+                    } else {
+                        throw new Error('No programming language selected');
+                    }
+                })
+                .then(() => {
+                    updateNavigationButtons();
+                    updateSectionUI('3');
+                })
+                .catch(error => {
+                    log('Section 3 access error:', error);
+                    alert('Please complete Question 4 in Section 1 to access the programming section.');
+                });
+        }
+
+        function loadSection3Questions(language) {
+            const languageAssessments = {
+                'C101': 'AS77', // Python
+                'C102': 'AS78', // Java  
+                'C103': 'AS79', // JavaScript
+                'C104': 'AS80'  // C++
+            };
+            
+            // Get assessment ID based on choice ID rather than language name
+            const assessmentId = languageAssessments[savedAnswers['Q209']];
+            if (assessmentId) {
+                loadSectionQuestions('3'); // Pass section ID 3
+            } else {
+                log('Invalid programming language choice');
+            }
+        }
+
+        function startTimer(display) {
+            const endTime = startTime + totalTime;
+            
+            function updateDisplay() {
+                const now = Math.floor(Date.now() / 1000);
+                const remaining = endTime - now;
+                
+                if (remaining <= 0) {
+                    clearInterval(timerInterval);
+                    display.textContent = "Time's up!";
+                    submitAssessment(true); // Pass true to indicate time's up
+                    return;
+                }
+                
+                const minutes = Math.floor(remaining / 60);
+                const seconds = remaining % 60;
+                display.textContent = `Time Remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            }
+            
+            updateDisplay();
+            timerInterval = setInterval(updateDisplay, 1000);
+        }
+
+        function saveTimerState() {
+            sessionStorage.setItem('assessmentTimer', JSON.stringify({
+                startTime: startTime,
+                totalTime: totalTime
+            }));
+        }
+
+        function saveProgress() {
+            sessionStorage.setItem('assessmentProgress', JSON.stringify({
+                savedAnswers,
+                currentSection,
+                currentQuestionIndex
+            }));
+        }
+
+        function loadProgress() {
+            const saved = sessionStorage.getItem('assessmentProgress');
+            if (saved) {
+                const progress = JSON.parse(saved);
+                savedAnswers = progress.savedAnswers;
+                currentSection = progress.currentSection;
+                currentQuestionIndex = progress.currentQuestionIndex;
+            }
+        }
+
+        // Add to window.onload
+        window.onload = function() {
+            const savedState = sessionStorage.getItem('assessmentState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                // Just restore state without calling loadProgress() and loadState()
+                currentSection = state.currentSection;
+                currentQuestionIndex = state.currentQuestionIndex;
+                savedAnswers = state.savedAnswers;
+                startTime = state.startTime;
+                totalTime = state.totalTime;
+                
+                // Load questions for current section
+                loadSectionQuestions(currentSection.toString());
+            } else {
+                // Initialize fresh assessment
+                currentSection = 1;
+                loadSectionQuestions('1');
+            }
+            
+            startTimer(document.getElementById('timer'));
+            updateQuestionList();
+            checkProgrammingLanguages();
+        }
+
+        function updateProgress() {
+            const allAnswers = JSON.parse(sessionStorage.getItem('allAnswers') || '{}');
+            Object.assign(allAnswers, savedAnswers);
+            sessionStorage.setItem('allAnswers', JSON.stringify(allAnswers));
+            
+            const totalQuestions = 20;
+            const completed = Object.keys(allAnswers).length;
+            const progress = (completed / totalQuestions) * 100;
+            
+            document.querySelector('.progress-bar').style.width = `${progress}%`;
+            document.querySelector('.progress-text').textContent = 
+                `${completed}/${totalQuestions} questions answered`;
+        }
+
+        function saveAnswer(questionId, answer) {
+            const currentQuestion = questions[currentQuestionIndex];
+
+            log('Attempting to save answer:', {
+                questionId,
+                answer,
+                type: currentQuestion?.answer_type
+            });
+
+            const hasConfirmedLanguage = sessionStorage.getItem('confirmedLanguageChoice');
+            const isSection3Active = document.querySelector('[data-section="3"]').classList.contains('active');
+
+            if (currentQuestion?.answer_type === 'code' && (!answer || answer === '||')) {
+                log('Skipping empty code answer');
+                return;
+            }
+
+            // First check if trying to modify Q209 after section 3 access
+            if (questionId === 'Q209' && isSection3Active) {
+                alert('You cannot modify your programming language choice after accessing Section 3.');
+                // Revert radio button selection
+                const inputs = document.querySelectorAll('input[type="radio"]');
+                inputs.forEach(input => {
+                    input.checked = input.value === savedAnswers[questionId];
+                });
+                return;
+            }
+
+            // Then check if trying to modify after confirmation
+            if (questionId === 'Q209' && hasConfirmedLanguage && answer !== savedAnswers['Q209']) {
+                alert('You cannot modify your programming language choice after confirmation.');
+                // Revert radio button selection
+                const inputs = document.querySelectorAll('input[type="radio"]');
+                inputs.forEach(input => {
+                    input.checked = input.value === savedAnswers[questionId];
+                });
+                return;
+            }
+
+            let formData = new FormData();
+
+            if (!answer || answer.trim() === '') {
+                if (savedAnswers[questionId]) {
+                    delete savedAnswers[questionId];
+                    updateProgress();
+                    updateQuestionList();
+                    
+                    const allQuestionBoxes = document.querySelectorAll('.question-box');
+                    const currentQuestionNumber = ((currentSection - 1) * 5) + currentQuestionIndex;
+                    if (allQuestionBoxes[currentQuestionNumber]) {
+                        allQuestionBoxes[currentQuestionNumber].classList.remove('completed');
+                    }
+                }
+                return;
+            }
+
+            if (!questionId || !answer) {
+                log('Invalid question ID or answer');
+                return;
+            }
+
+            // Handle programming language selection confirmation
+            if (questionId === 'Q209' && !hasConfirmedLanguage) {
+                const languageMap = {
+                    'C101': 'Python', 
+                    'C102': 'Java',
+                    'C103': 'JavaScript',
+                    'C104': 'C++'
+                };
+
+                if (!confirm(`You have selected ${languageMap[answer]} as your programming language. This choice will determine your programming questions in Section 3 and cannot be changed after confirmation. Are you sure?`)) {
+                    // If user cancels, revert the radio button selection
+                    const inputs = document.querySelectorAll('input[type="radio"]');
+                    inputs.forEach(input => {
+                        input.checked = input.value === savedAnswers[questionId];
+                    });
+                    return;
+                }
+                // Store confirmation in session storage
+                sessionStorage.setItem('confirmedLanguageChoice', 'true');
+            }
+
+            // Set form data based on question type
+            if (currentQuestion && currentQuestion.answer_type === 'code') {
+                const inputs = document.querySelectorAll('.code-blank');
+                const answerText = Array.from(inputs)
+                    .map(input => input.value.trim())
+                    .join(ANSWER_DELIMITER);
+                
+                formData.append('question_id', questionId);
+                formData.append('answer_text', answerText);
+                formData.append('answer_type', 'code');
+                formData.append('job_seeker_id', '<?php echo $_SESSION["job_seeker_id"]; ?>');
+            } else {
+                formData.append('question_id', questionId);
+                formData.append('answer_text', answer);
+                formData.append('job_seeker_id', '<?php echo $_SESSION["job_seeker_id"]; ?>');
+            }
+
+            // Send to server
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', 'save_answer.php', true);
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    const response = xhr.responseText;
+                    if (response.startsWith('SUCCESS')) {
+                        savedAnswers[questionId] = answer;
+                        updateProgress();
+                        updateQuestionList();
+                        
+                        // Check and unlock section 3 immediately after saving Q209 answer
+                        if (questionId === 'Q209') {
+                            checkAndUnlockSection3();
+                            // Remove locked class and enable click handler
+                            const section3Box = document.querySelector('[data-section="3"]');
+                            if (section3Box) {
+                                section3Box.classList.remove('locked');
+                                section3Box.style.cursor = 'pointer';
+                            }
+                        }
+                        
+                        log('Answer saved successfully');
+                    } else {
+                        log('Failed to save answer:', response);
+                        alert('Failed to save answer. Please try again.');
+                    }
+                } else {
+                    log('Failed to save answer:', xhr.statusText);
+                    alert('Failed to save answer. Please try again.');
+                }
+            };
+
+            xhr.onerror = function() {
+                console.error('Error saving answer');
+                alert('Network error while saving answer. Please try again.');
+            };
+            xhr.send(formData);
+        }
+
+        function autoExpandTextarea(element) {
+            element.style.height = 'auto';
+            element.style.height = (element.scrollHeight) + 'px';
+        }
+
+        document.addEventListener('input', function(e) {
+            if (e.target.matches('.code-blank')) {
+                const currentQuestion = questions[currentQuestionIndex];
+                const inputs = document.querySelectorAll('.code-blank');
+                const answer = Array.from(inputs)
+                    .map(input => input.value.trim())
+                    .join(ANSWER_DELIMITER);
+                saveAnswer(currentQuestion.question_id, answer);
+            }
+        });
+
+        // Add event listener for textareas
+        document.addEventListener('input', function(e) {
+            if (e.target.matches('textarea.essay-input')) {
+                const currentQuestion = questions[currentQuestionIndex];
+                autoExpandTextarea(e.target);
+                saveAnswer(currentQuestion.question_id, e.target.value);
+            }
+        });
+
+        document.addEventListener('input', function(e) {
+            if (e.target.matches('textarea.essay-input')) {
+                const currentQuestion = questions[currentQuestionIndex];
+                log('Essay input changed:', e.target.value);
+                saveAnswer(currentQuestion.question_id, e.target.value);
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.target.matches('textarea.essay-input') && e.key === 'Enter') {
+                autoExpandTextarea(e.target);
+            }
+        });
+
+        // Add event listeners for answer changes
+        document.addEventListener('change', function(e) {
+            if (e.target.matches('input[type="radio"][name="choice"]')) {
+                const currentQuestion = questions[currentQuestionIndex];
+                saveAnswer(currentQuestion.question_id, e.target.value);
+            }
+        });
+
+        function saveAllAnswers() {
+            if (Object.keys(savedAnswers).length === 0) {
+                return Promise.resolve();
+            }
+
+            const promises = Object.entries(savedAnswers).map(([questionId, answer]) => {
+                return new Promise((resolve, reject) => {
+                    const formData = new FormData();
+                    formData.append('question_id', questionId);
+                    formData.append('answer_text', answer);
+                    formData.append('job_seeker_id', '<?php echo $_SESSION["job_seeker_id"]; ?>');
+
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'save_answer.php', true);
+                    xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            resolve();
+                        } else {
+                            reject(new Error(`HTTP error! status: ${xhr.status}`));
+                        }
+                    };
+                    xhr.onerror = function() {
+                        reject(new Error('Network error'));
+                    };
+                    xhr.send(formData);
+                });
+            });
+            return Promise.all(promises);
+        }
+
+        window.addEventListener('beforeunload', function(e) {
+            saveAllAnswers();
+            saveTimerState();
+        });
+
+        function toggleQuestionList() {
+            const questionList = document.getElementById('question-list');
+            const header = document.querySelector('.question-list-header');
+            
+            isQuestionListVisible = !isQuestionListVisible;
+            questionList.style.display = isQuestionListVisible ? 'grid' : 'none';
+            header.innerHTML = `Question List ${isQuestionListVisible ? '▼' : '▲'}`;
+        }
+
+        function updateNavigationButtons() {
+            // Hide previous button on first question
+            const prevBtn = document.getElementById('prev-btn');
+            prevBtn.style.display = (currentQuestionIndex === 0 && currentSection === 1) ? 'none' : 'block';
+            
+            // Update next/submit button
+            const nextBtn = document.getElementById('next-btn');
+            if (currentSection === 4 && currentQuestionIndex === questions.length - 1) {
+                nextBtn.textContent = 'Submit';
+                nextBtn.onclick = submitAssessment;
+                // Add success color styles
+                nextBtn.style.backgroundColor = 'var(--success-color)';
+                nextBtn.style.color = 'white';
+                nextBtn.addEventListener('mouseover', function() {
+                    this.style.backgroundColor = 'var(--success-hover-color)';
+                });
+                nextBtn.addEventListener('mouseout', function() {
+                    this.style.backgroundColor = 'var(--success-color)';
+                });
+            } else {
+                nextBtn.textContent = 'Next';
+                nextBtn.onclick = nextQuestion;
+                // Reset to primary color styles
+                nextBtn.style.backgroundColor = 'var(--primary-color)';
+                nextBtn.style.color = 'white';
+                nextBtn.addEventListener('mouseover', function() {
+                    this.style.backgroundColor = 'var(--accent-color)';
+                });
+                nextBtn.addEventListener('mouseout', function() {
+                    this.style.backgroundColor = 'var(--primary-color)';
+                });
+            }
+        }
+
+        function updateQuestionList() {
+            const questionList = document.getElementById('question-list');
+            questionList.innerHTML = '';
+            
+            const allAnswers = JSON.parse(sessionStorage.getItem('allAnswers') || '{}');
+            
+            // Only show boxes for actual questions
+            const validQuestions = questions.filter(q => q && q.question_id);
+            
+            validQuestions.forEach((question, index) => {
+                const box = document.createElement('div');
+                const isQ209 = question.question_id === 'Q209';
+                const isSection3Active = document.querySelector('[data-section="3"]').classList.contains('active');
+                
+                // Calculate global question number (1-20)
+                const globalQuestionNumber = ((currentSection - 1) * 5) + (index + 1);
+                
+                // Only create box if question number is valid (1-20)
+                if (globalQuestionNumber <= 20) {
+                    box.className = `question-box${
+                        (savedAnswers[question.question_id] || allAnswers[question.question_id]) ? ' completed' : ''
+                    }${index === currentQuestionIndex ? ' current' : ''}${
+                        isQ209 && isSection3Active ? ' locked' : ''
+                    }`;
+                    
+                    box.textContent = globalQuestionNumber;
+                    box.onclick = () => jumpToQuestion(index);
+                    
+                    if (isQ209 && isSection3Active) {
+                        box.style.cursor = 'not-allowed';
+                        box.title = 'This question cannot be modified after accessing Section 3';
+                    }
+                    
+                    questionList.appendChild(box);
+                }
+            });
+        }
+
+        function isQuestionAnswered(questionId) {
+            // Check if question has an answer in the database
+            return savedAnswers.hasOwnProperty(questionId);
+        }
+
+        function submitAssessment(isTimeUp = false) {
+            // Only check for unanswered questions if not timed out
+            if (!isTimeUp) {
+                const allAnswers = JSON.parse(sessionStorage.getItem('allAnswers') || '{}');
+                const totalAnswered = Object.keys(allAnswers).length;
+                const totalQuestions = 20;
+                
+                if (totalAnswered < totalQuestions) {
+                    const remaining = totalQuestions - totalAnswered;
+                    alert(`Please answer all questions before submitting. You still have ${remaining} unanswered ${remaining === 1 ? 'question' : 'questions'}.`);
+                    return;
+                }
+
+                if (!confirm('Are you sure you want to submit your assessment? This action cannot be undone.')) {
+                    return;
+                }
+            }
+
+            // Save all answers and submit
+            saveAllAnswers()
+                .then(() => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'update_assessment_time.php', true);
+                    xhr.onload = function() {
+                        if (xhr.status === 200) {
+                            // Clear session storage
+                            sessionStorage.removeItem('confirmedLanguageChoice');
+                            sessionStorage.removeItem('assessmentState');
+                            sessionStorage.removeItem('assessmentTimer');
+                            sessionStorage.removeItem('assessmentProgress');
+                            sessionStorage.removeItem('allAnswers');
+                            
+                            // Show time's up message if applicable
+                            if (isTimeUp) {
+                                alert("Time's up! Your assessment will be submitted automatically.");
+                            }
+                            
+                            // Redirect to results page
+                            window.location.href = 'assessment_result.php';
+                        } else {
+                            alert('Failed to submit assessment. Please try again.');
+                        }
+                    };
+                    xhr.onerror = function() {
+                        alert('Error submitting assessment. Please try again.');
+                    };
+                    xhr.send();
+                })
+                .catch(error => {
+                    console.error('Error during submission:', error);
+                    alert('There was an error submitting your assessment. Please try again.');
+                });
+        }
+
+        function nextQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            if (!currentQuestion) return;
+            
+            const answer = getAnswerValue();
+                if (answer !== null && answer !== '') {
+                    log('Saving answer:', {
+                        questionId: currentQuestion.question_id,
+                        answer: answer
+                    });
+                    saveAnswer(currentQuestion.question_id, answer);
+                }
+            
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            } else if (currentSection < 4) {
+                const nextSection = currentSection + 1;
+                if (nextSection === 3) {
+                    // Check if Q209 is answered by fetching from server first
+                    fetch('get_programming_answer.php?question_id=Q209')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.answer) {
+                                savedAnswers['Q209'] = data.answer;
+                                handleSection3Access();
+                            } else {
+                                alert('Please complete Question 4 in Section 1 to access the programming section.');
+                            }
+                        })
+                        .catch(error => {
+                            log('Error checking programming answer:', error);
+                            alert('Please complete Question 4 in Section 1 to access the programming section.');
+                        });
+                } else {
+                    switchSection(nextSection.toString());
+                }
+            } else {
+                document.getElementById('next-btn').textContent = 'Submit';
+                document.getElementById('next-btn').onclick = submitAssessment;
+            }
+            
+            saveState();
+        }
+
+        function previousQuestion() {
+            const currentQuestion = questions[currentQuestionIndex];
+            if (!currentQuestion) return;
+
+            // Save current answer before moving
+            const answer = getAnswerValue();
+            if (answer !== null && answer !== '') {
+                saveAnswer(currentQuestion.question_id, answer);
+            }
+            
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
+            } else if (currentSection > 1) {
+                const prevSection = currentSection - 1;
+                if (currentSection === 4) {
+                    // Check if trying to access section 3
+                    fetch('get_programming_answer.php?question_id=Q209')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (!data.answer) {
+                                alert('Please complete Question 4 in Section 1 to access the programming section.');
+                                return;
+                            }
+                            savedAnswers['Q209'] = data.answer;
+                            if (prevSection === 3) {
+                                // Going back to section 3
+                                switchSection('3', 4); // Go to last question
+                            } else {
+                                switchSection(prevSection.toString(), 4);
+                            }
+                        })
+                        .catch(error => {
+                            log('Error checking programming answer:', error);
+                            alert('Please complete Question 4 in Section 1 to access the programming section.');
+                        });
+                } else {
+                    switchSection(prevSection.toString(), 4);
+                }
+            }
+            
+            saveState();
+        }
+
+        function getAnswerValue() {
+            const questionContainer = document.querySelector('.question');
+            const currentQuestion = questions[currentQuestionIndex];
+            
+            if (!currentQuestion) {
+                log('No current question found');
+                return null;
+            }
+            
+            if (currentQuestion.answer_type === 'multiple choice') {
+                const radio = questionContainer.querySelector('input[name="choice"]:checked');
+                if (radio) {
+                    log('Got multiple choice answer:', radio.value);
+                    return radio.value;
+                }
+            } else if (currentQuestion.answer_type === 'essay') {
+                const textarea = questionContainer.querySelector('textarea');
+                if (textarea && textarea.value.trim()) {
+                    log('Got essay answer:', textarea.value);
+                    return textarea.value.trim();
+                }
+            }
+
+            if (currentQuestion.answer_type === 'code') {
+                const inputs = questionContainer.querySelectorAll('.code-blank');
+                const values = Array.from(inputs)
+                    .map(input => input.value.trim());
+                
+                // Check if any value exists
+                if (values.some(v => v !== '')) {
+                    log('Got code answer:', values.join(ANSWER_DELIMITER));
+                    return values.join(ANSWER_DELIMITER);
+                }
+                log('No code answer found');
+                return null;
+            }
+            
+            log('No answer value found');
+            return null;
+        }
+
+        function jumpToQuestion(index) {
+            if (index >= 0 && index < questions.length) {
+                // Check if trying to access Q209 after section 3 access
+                if (questions[index].question_id === 'Q209' && 
+                    document.querySelector('[data-section="3"]').classList.contains('active')) {
+                    alert('You cannot modify your programming language choice after accessing Section 3.');
+                    return;
+                }
+                currentQuestionIndex = index;
+                displayQuestion();
+            }
+        }
+
+        function switchSection(sectionId, startIndex = 0) {
+            log('Switching to section:', sectionId);
+
+            // Validate section ID
+            if (!['1', '2', '3', '4'].includes(sectionId)) {
+                log('Invalid section ID:', sectionId);
+                return;
+            }
+
+            // Check if trying to access section 3
+            if (sectionId === '3' && !savedAnswers['Q209']) {
+                alert('Please complete Question 4 in Section 1 to access the programming section.');
+                return;
+            }
+
+            // Check if trying to modify programming language after section 3
+            if (sectionId === '1' && savedAnswers['Q209'] && 
+                document.querySelector('[data-section="3"]').classList.contains('active')) {
+                alert('You cannot modify your programming language after accessing Section 3.');
+                return;
+            }
+
+            // Update section tracking
+            currentSection = parseInt(sectionId);
+            sessionStorage.setItem('currentSection', sectionId);
+            
+            // Load section questions
+            loadSectionQuestions(sectionId)
+                .then(() => {
+                    currentQuestionIndex = startIndex;
+                    displayQuestion();
+                    updateNavigationButtons();
+                    updateSectionUI(sectionId);
+                })
+                .catch(error => {
+                    log('Error loading section questions:', error);
+                    alert('Error loading questions. Please try again.');
+                });
+        }
+
+        function saveState() {
+            const state = {
+                currentSection: currentSection,
+                currentQuestionIndex: currentQuestionIndex,
+                savedAnswers: savedAnswers,
+                startTime: startTime,
+                totalTime: totalTime
+            };
+            sessionStorage.setItem('assessmentState', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const state = JSON.parse(sessionStorage.getItem('assessmentState'));
+            if (state) {
+                currentSection = state.currentSection;
+                currentQuestionIndex = state.currentQuestionIndex;
+                savedAnswers = state.savedAnswers;
+                startTime = state.startTime;
+                totalTime = state.totalTime;
+                
+                // Don't call switchSection here as it will cause recursion
+                loadSectionQuestions(currentSection.toString());
+            } else {
+                // Initialize with section 1
+                currentSection = 1;
+                loadSectionQuestions('1');
+            }
+        }
+
+        function checkAndUnlockSection3() {
+            if (savedAnswers['Q209']) {
+                const section3Box = document.querySelector('[data-section="3"]');
+                const hasConfirmedLanguage = sessionStorage.getItem('confirmedLanguageChoice');
+                const isSection3Active = document.querySelector('[data-section="3"]').classList.contains('active');
+                const languageMap = {
+                    'C101': 'Python',
+                    'C102': 'Java',
+                    'C103': 'JavaScript',
+                    'C104': 'C++'
+                };
+                
+                // Only disable radio inputs if viewing Q209
+                const currentQuestion = questions[currentQuestionIndex];
+                if (currentQuestion && currentQuestion.question_id === 'Q209') {
+                    const radioInputs = document.querySelectorAll('input[type="radio"][name="choice"]');
+                    radioInputs.forEach(input => {
+                        if (input.value === savedAnswers['Q209']) {
+                            input.checked = true;
+                        }
+                        // Only disable if in section 1 and section 3 is active/confirmed
+                        input.disabled = (currentSection === 1 && (isSection3Active || hasConfirmedLanguage));
+                    });
+                }
+                
+                if (section3Box) {
+                    section3Box.classList.remove('locked');
+                    section3Box.title = `Selected language: ${languageMap[savedAnswers['Q209']]}`;
+                    log('Section 3 unlocked with language:', languageMap[savedAnswers['Q209']]);
+                }
+            }
+        }
+
+        // Save state on all state changes
+        window.addEventListener('beforeunload', saveState);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.section-box').forEach(box => {
+                box.addEventListener('click', () => {
+                    const sectionId = box.dataset.section;
+                    log('Section box clicked:', sectionId);
+                    
+                    if (box.classList.contains('locked')) {
+                        log('Section is locked');
+                        return;
+                    }
+
+                    if (sectionId === '3') {
+                        log('Attempting to access section 3');
+                        handleSection3Access();
+                    } else {
+                        log('Switching to section:', sectionId);
+                        switchSection(sectionId);
+                    }
+                });
+            });
+        });
     </script>
 </head>
 <body>
@@ -209,40 +1636,43 @@ $conn->close();
         <button class="cancel-button" onclick="closePopup('logout-popup')">No</button>
     </div>
 
-    <!-- Questions Container -->
-    <div class="questions-container">
-        <div id="question-container">
-            <h3 id="question-text"></h3>
-            <div id="choices-container" class="options"></div>
-            <button onclick="submitAnswer()">Next</button>
-        </div>
+    <div class="progress-container">
+        <div class="progress-bar"></div>
+        <div class="progress-text">0/5 questions answered</div>
     </div>
 
-    <div class="que_container">
-        <div class="left-section">
-            <div class="question">
-                <!-- The question text and answer container will be dynamically inserted here -->
+    <div class="assessment-container">
+        <!-- Left Section - Question Display -->
+        <div class="question-section">
+            <h2 id="section-title">Section 1: General Questions</h2>
+            <div class="question"></div>
+            <div class="navigation-buttons">
+                <button id="prev-btn" onclick="previousQuestion()">Previous</button>
+                <button id="next-btn" onclick="nextQuestion()">Next</button>
             </div>
-            <div class="answer_area"></div>
         </div>
-        <div class="right-section">
-            <div id="timer" class="timer">Time Remaining: 0:00</div>
-            <div class="question-list">
-                <div>
-                    <label>Question 1</label>
-                    <input type="checkbox">
-                </div>
-                <div>
-                    <label>Question 2</label>
-                    <input type="checkbox">
-                </div>
-                <div>
-                    <label>Question 3</label>
-                    <input type="checkbox">
-                </div>
+
+        <!-- Right Section - Navigation Panel -->
+        <div class="navigation-panel">
+            <!-- Timer -->
+            <div id="timer" class="timer">Time Remaining: 00:00</div>
+
+            <!-- Section Navigation -->
+            <div class="section-navigation">
+                <div class="section-box active" data-section="1">Section 1</div>
+                <div class="section-box" data-section="2">Section 2</div>
+                <div class="section-box locked" data-section="3">Section 3</div>
+                <div class="section-box" data-section="4">Section 4</div>
             </div>
-            <div class="submit_but">
-                <button onclick="submitAnswer()">Submit</button>
+
+            <!-- Question List (Collapsible) -->
+            <div class="question-list-container">
+                <div class="question-list-header" onclick="toggleQuestionList()">
+                    Question List ▼
+                </div>
+                <div id="question-list" class="question-list">
+                    <!-- Question boxes will be inserted here -->
+                </div>
             </div>
         </div>
     </div>
