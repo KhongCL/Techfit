@@ -94,28 +94,6 @@ document.querySelectorAll('.faq-question').forEach(item => {
     });
 });
 
-// Preliminary questions
-document.addEventListener('DOMContentLoaded', function() {
-    // Only run this code if we're on the preliminary page
-    const checkbox = document.getElementById('agree');
-    if (checkbox) { // Check if checkbox exists before trying to use it
-        checkbox.checked = false;
-
-        const startButton = document.getElementById('start-assessment-button');
-        if (startButton) {
-            startButton.disabled = true;
-
-            checkbox.addEventListener('change', function() {
-                startButton.disabled = !this.checked;
-            });
-
-            startButton.addEventListener('click', function() {
-                window.location.href = 'assessment_question.php';
-            });
-        }
-    }
-});
-
 function createFaqElement(faq) {
     const faqItem = document.createElement('div');
     faqItem.classList.add('faq-item');

@@ -59,8 +59,6 @@ CREATE TABLE Assessment_Job_Seeker (
     start_time DATETIME,
     end_time DATETIME,
     score INT,
-    summary TEXT,
-    feedback TEXT,
     PRIMARY KEY (assessment_id, job_seeker_id),
     FOREIGN KEY (assessment_id) REFERENCES Assessment_Admin(assessment_id),
     FOREIGN KEY (job_seeker_id) REFERENCES Job_Seeker(job_seeker_id)
@@ -84,7 +82,8 @@ CREATE TABLE Answer (
     job_seeker_id VARCHAR(5) NOT NULL,
     question_id VARCHAR(5) NOT NULL,
     answer_text TEXT,
-    is_correct BOOLEAN, -- Add this column to indicate if the answer is correct
+    is_correct BOOLEAN,
+    score_percentage DECIMAL(5,2) DEFAULT NULL,
     FOREIGN KEY (job_seeker_id) REFERENCES Job_Seeker(job_seeker_id),
     FOREIGN KEY (question_id) REFERENCES Question(question_id)
 );

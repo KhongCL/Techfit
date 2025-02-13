@@ -216,13 +216,18 @@ $conn->close();
                                     <li><a href="system_configuration.php">System Configuration Settings</a></li>
                                 </ul>
                             </li>
-                            <li><a href="logout.php">Logout</a></li>
+                            <li><a href="#" >Logout</a></li>
                         </ul>
                     </li>                    
                 </ul>
             </div>
         </nav>
-    </header>   
+    </header> 
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>  
     <main>
     <div class="sidebar">
         <a href="#assessment-settings">Assessment Settings</a>
@@ -231,7 +236,6 @@ $conn->close();
     <div class="content">
         <h1>System Configuration Settings</h1>
 
-        <!-- Assessment Settings Section -->
         <div id="assessment-settings" class="form-section">
             <h2>Assessment Settings</h2>
             <form method="POST" action="save_assessment_settings.php">
@@ -258,7 +262,6 @@ $conn->close();
             </form>
         </div>
 
-        <!-- Notification Settings Section -->
         <div id="notification-settings" class="form-section">
             <h2>Notification Settings</h2>
             <form method="POST" action="save_notification_settings.php">
@@ -302,7 +305,7 @@ $conn->close();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -342,7 +345,7 @@ $conn->close();
                     <ul>
                         <li><a href="about.php">About</a></li>
                         <li><a href="contact.php">Contact Us</a></li>
-                        <li><a href="terms.php">Terms & Condition</a></li>
+                        <li><a href="terms.php">Terms of Service</a></li>
                         <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>
                 </div>
