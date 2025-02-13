@@ -104,7 +104,6 @@ session_start();
             <table>
                 <thead>
                     <tr>
-                        <th><input type="checkbox"></th>
                         <th data-column="name">Name</th>
                         <th data-column="education_level">Education Level</th>
                         <th data-column="years_of_experience">Years of Experience</th>
@@ -136,7 +135,7 @@ session_start();
                                 AVG(ajs.score) AS avg_score
                             FROM Job_Seeker js
                             JOIN User u ON js.user_id = u.user_id
-                            LEFT JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
+                            LEFT JOIN  Assessment_Job_Seeker_Old ajs ON js.job_seeker_id = ajs.job_seeker_id
                             LEFT JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id AND ei.employer_id = '$employer_id'
                             WHERE ei.employer_id IS NULL AND ajs.assessment_id IS NOT NULL
                             GROUP BY js.job_seeker_id";
@@ -145,7 +144,6 @@ session_start();
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
                             echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
-                            echo "<td><input type='checkbox'></td>";
                             echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
                             
                                 $education_level = !empty($row['education_level']) ? htmlspecialchars($row['education_level']) : 'null';
@@ -166,7 +164,7 @@ session_start();
                             echo "</tr>";
                         }
                     } else {
-                        echo "<tr id='no-candidates-active'><td colspan='6'>No candidates found</td></tr>";
+                        echo "<tr id='no-candidates-active'><td colspan='6' class='no-candidates-message'>No candidates found</td></tr>";
                     }
 
                     $conn->close();
@@ -187,7 +185,7 @@ session_start();
                                 AVG(ajs.score) AS avg_score
                             FROM Job_Seeker js
                             JOIN User u ON js.user_id = u.user_id
-                            LEFT JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
+                            LEFT JOIN  Assessment_Job_Seeker_Old ajs ON js.job_seeker_id = ajs.job_seeker_id
                             JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
                             WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'interested' AND ei.is_active = 1 AND ajs.assessment_id IS NOT NULL
                             GROUP BY js.job_seeker_id";
@@ -196,7 +194,6 @@ session_start();
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
                             echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
-                            echo "<td><input type='checkbox'></td>";
                             echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
                             
                                 $education_level = !empty($row['education_level']) ? htmlspecialchars($row['education_level']) : 'null';
@@ -216,7 +213,7 @@ session_start();
                             echo "</tr>";
                         }
                     } else {
-                        echo "<tr id='no-candidates-interested'><td colspan='6'>No candidates found</td></tr>";
+                        echo "<tr id='no-candidates-interested'><td colspan='6'class='no-candidates-message'>No candidates found</td></tr>";
                     }
 
                     $conn->close();
@@ -237,7 +234,7 @@ session_start();
                                 AVG(ajs.score) AS avg_score
                             FROM Job_Seeker js
                             JOIN User u ON js.user_id = u.user_id
-                            LEFT JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
+                            LEFT JOIN  Assessment_Job_Seeker_Old ajs ON js.job_seeker_id = ajs.job_seeker_id
                             JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
                             WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'uninterested' AND ei.is_active = 1 AND ajs.assessment_id IS NOT NULL
                             GROUP BY js.job_seeker_id";
@@ -246,7 +243,6 @@ session_start();
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
                             echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
-                            echo "<td><input type='checkbox'></td>";
                             echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
                             
                                 $education_level = !empty($row['education_level']) ? htmlspecialchars($row['education_level']) : 'null';
@@ -266,7 +262,7 @@ session_start();
                             echo "</tr>";
                         }
                     } else {
-                        echo "<tr id='no-candidates-uninterested'><td colspan='6'>No candidates found</td></tr>";
+                        echo "<tr id='no-candidates-uninterested'><td colspan='6'class='no-candidates-message'>No candidates found</td></tr>";
                     }
 
                     $conn->close();
@@ -286,7 +282,7 @@ session_start();
                                 AVG(ajs.score) AS avg_score
                             FROM Job_Seeker js
                             JOIN User u ON js.user_id = u.user_id
-                            LEFT JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
+                            LEFT JOIN  Assessment_Job_Seeker_Old ajs ON js.job_seeker_id = ajs.job_seeker_id
                             JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
                             WHERE ei.employer_id = '$employer_id' AND ei.is_active = 0 AND ajs.assessment_id IS NOT NULL
                             GROUP BY js.job_seeker_id";
@@ -295,7 +291,6 @@ session_start();
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
                             echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
-                            echo "<td><input type='checkbox'></td>";
                             echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
                             
                             
@@ -307,7 +302,7 @@ session_start();
                             echo "<td>" . $experience . "</td>";
                             
                             
-                            $scores_display = !empty($row['scores']) ? htmlspecialchars($row['scores']) : 'null';
+                            $scores_display = !empty($row['scores']) ? htmlspecialchars($row['scores']) : 'N/A';
                             echo "<td>" . $scores_display . "</td>";
                             
                             echo "<td class='actions'>";
@@ -320,7 +315,7 @@ session_start();
                             echo "</tr>";
                         }
                     } else {
-                        echo "<tr id='no-candidates-deleted'><td colspan='6'>No candidates found</td></tr>";
+                        echo "<tr id='no-candidates-deleted'><td colspan='6'class='no-candidates-message'>No candidates found</td></tr>";
                     }
                     $conn->close();
                     ?>
@@ -483,7 +478,6 @@ session_start();
                     const row = document.createElement('tr');
                     row.id = 'row-' + candidate.job_seeker_id;
                     row.innerHTML = `
-                        <td><input type='checkbox'></td>
                         <td>${candidate.name}</td>
                         <td>${candidate.education_level}</td>
                         <td>${candidate.years_of_experience}</td>

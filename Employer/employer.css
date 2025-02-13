@@ -514,6 +514,12 @@ table td {
       border-radius: 0;
   }
 
+  .sort-controls span {
+      transform: translateY(-35px);
+      position: absolute;
+      left: 25px;
+  }
+
   .sort-controls-wrapper {
       flex-direction: column;
       align-items: stretch;
@@ -626,5 +632,10 @@ table td {
   .view {
       padding: 6px 10px;
       font-size: 0.9rem;
+  }
+
+  .no-candidates-message {
+      font-size: 1.0rem;
+      text-align: center;
   }
 }

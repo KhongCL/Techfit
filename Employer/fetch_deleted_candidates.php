@@ -22,7 +22,7 @@ $sql = "SELECT js.job_seeker_id, u.first_name, u.last_name, js.education_level, 
         FROM Employer_Interest ei
         JOIN Job_Seeker js ON ei.job_seeker_id = js.job_seeker_id
         JOIN User u ON js.user_id = u.user_id
-        LEFT JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
+        LEFT JOIN Assessment_Job_Seeker_Old ajs ON js.job_seeker_id = ajs.job_seeker_id
         WHERE ei.employer_id = '$employer_id' AND ei.is_active = 0
         GROUP BY js.job_seeker_id";
 

@@ -200,17 +200,6 @@ session_write_close();
 
     <script src="scripts.js"></script>
     <script>
-    const agreeCheckbox = document.getElementById('agree');
-    const startButton = document.getElementById('start-assessment-button');
-
-    agreeCheckbox.addEventListener('change', function() {
-        startButton.disabled = !agreeCheckbox.checked;
-    });
-
-    startButton.addEventListener('click', function() {
-        window.location.href = 'assessment_question.php';
-    });
-
     // Enable/disable start button based on checkbox
     document.getElementById('agree').addEventListener('change', function() {
         document.getElementById('start-assessment-button').disabled = !this.checked;
