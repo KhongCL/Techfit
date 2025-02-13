@@ -172,17 +172,16 @@ session_write_close();
 
     <script src="scripts.js"></script>
     <script>
-        function openPopup(popupId) {
-            document.getElementById(popupId).style.display = 'block';
-        }
+    const agreeCheckbox = document.getElementById('agree');
+    const startButton = document.getElementById('start-assessment-button');
 
-        function closePopup(popupId) {
-            document.getElementById(popupId).style.display = 'none';
-        }
+    agreeCheckbox.addEventListener('change', function() {
+        startButton.disabled = !agreeCheckbox.checked;
+    });
 
-        function logoutUser() {
-            window.location.href = '/Techfit'; 
-        }
+    startButton.addEventListener('click', function() {
+        window.location.href = 'assessment_question.php';
+    });
     </script>
 </body>
 </html>
