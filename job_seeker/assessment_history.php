@@ -51,7 +51,7 @@ $user_id = $_SESSION['user_id'];
 
 $sql = "
     SELECT 
-        Assessment_Job_Seeker.assessment_id AS 'assessment_id',
+        Assessment_Job_Seeker.result_id AS 'assessment_id', 
         Assessment_Job_Seeker.job_seeker_id AS 'job_id',
         Assessment_Job_Seeker.start_time AS 'start_time',
         Assessment_Job_Seeker.end_time AS 'end_time',
@@ -85,6 +85,95 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assessment History - TechFit</title>
     <link rel="stylesheet" href="styles.css">
+
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --accent-color: #5c7dff; 
+            --danger-color: #e74c3c; 
+            --danger-color-hover: #c0392b;
+            --success-color: #28a745;
+            --success-color-hover: #2ecc71;
+
+            --background-color: #121212;
+            --background-color-medium: #080808;
+            --background-color-medium: #1E1E1E;
+            --background-color-light: #444;
+            --background-color-extra-light: #555;
+            --background-color-hover: #666;
+            
+            --text-color: #fafafa;
+            --text-color-dark: #b0b0b0;
+            --text-color-medium: #e0e0e0;
+            --text-color-light: #f7f7f7;
+            --text-color-extra-light: #ffffff;
+            --text-color-hover: #b0b0b0;
+            
+            --button-color: #007bff;
+            --button-color-hover: #3c87e3;
+            --focus-border-color: #47a3e0;
+            --disabled-color: #7f8c8d;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .actions a {
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            color: var(--text-color);
+            transition: background-color 0.3s ease;
+        }
+
+        .actions a[title="Download"] {
+            background-color: var(--primary-color);
+        }
+
+        .actions a[title="Download"]:hover {
+            background-color: var(--button-color-hover);
+        }
+
+        .actions a[title="Share"] {
+            background-color: var(--success-color);
+        }
+
+        .actions a[title="Share"]:hover {
+            background-color: var(--success-color-hover);
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--background-color-light);
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+
+        .date-time {
+            flex: 2;
+        }
+
+        .score {
+            flex: 1;
+            text-align: center;
+        }
+
+        .score h3 {
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .score p {
+            font-size: 1.2em;
+            margin: 5px 0 0;
+            color: var(--text-color);
+        }
+    </style>
 
 </head>
 <body>

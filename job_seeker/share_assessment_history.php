@@ -24,16 +24,55 @@ if (!isset($_GET['assessment_id']) || empty($_GET['assessment_id'])) {
 $assessment_id = $_GET['assessment_id'];
 
 // Fetch assessment details
-$sql = "
+$sql = "WITH SectionScores AS (
     SELECT 
-        Assessment_Job_Seeker.assessment_id, 
-        Assessment_Job_Seeker.job_seeker_id, 
-        Assessment_Job_Seeker.start_time, 
-        Assessment_Job_Seeker.end_time, 
-        Assessment_Job_Seeker.score
-    FROM Assessment_Job_Seeker
-    WHERE assessment_id = ?
-";
+        a.job_seeker_id,
+        q.assessment_id,
+        ROUND(
+            AVG(CASE 
+                WHEN a.is_correct = 1 THEN 100
+                WHEN a.score_percentage IS NOT NULL THEN a.score_percentage
+                ELSE 0
+            END), 1
+        ) as section_score
+    FROM Answer a
+    JOIN Question q ON a.question_id = q.question_id
+    WHERE q.assessment_id IN ('AS76', 'AS77', 'AS78', 'AS79', 'AS80')
+    GROUP BY a.job_seeker_id, q.assessment_id
+)
+SELECT 
+    ajs.result_id as assessment_id,
+    ajs.job_seeker_id,
+    ajs.start_time,
+    ajs.end_time,
+    ajs.score,
+    asts.passing_score_percentage,
+    TIMESTAMPDIFF(SECOND, ajs.start_time, ajs.end_time) as duration,
+    GROUP_CONCAT(
+        CONCAT(
+            CASE 
+                WHEN ss.assessment_id = 'AS76' THEN 'Scenario-Based Questions'
+                WHEN ss.assessment_id = 'AS77' THEN 'Python Programming'
+                WHEN ss.assessment_id = 'AS78' THEN 'Java Programming'
+                WHEN ss.assessment_id = 'AS79' THEN 'JavaScript Programming'
+                WHEN ss.assessment_id = 'AS80' THEN 'C++ Programming'
+            END,
+            ': ',
+            ss.section_score,
+            '%'
+        ) ORDER BY ss.assessment_id
+    ) as section_scores
+FROM Assessment_Job_Seeker ajs
+JOIN Assessment_Settings asts ON asts.setting_id = '1'
+LEFT JOIN SectionScores ss ON ss.job_seeker_id = ajs.job_seeker_id
+WHERE ajs.result_id = ?
+GROUP BY 
+    ajs.result_id,
+    ajs.job_seeker_id,
+    ajs.start_time,
+    ajs.end_time,
+    ajs.score,
+    asts.passing_score_percentage";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $assessment_id);
@@ -55,57 +94,113 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assessment History Report</title>
     <style>
-    body {
-        font-family: Arial, sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-        min-height: 100vh;
-        margin: 0;
-        background-color: #f9f9f9;
-    }
+        :root {
+            --primary-color: #007bff;
+            --accent-color: #5c7dff; 
+            --danger-color: #e74c3c; 
+            --danger-color-hover: #c0392b;
+            --success-color: #28a745;
+            --success-color-hover: #2ecc71;
+            --background-color: #121212;
+            --background-color-medium: #1E1E1E;
+            --background-color-light: #444;
+            --text-color: #fafafa;
+            --text-color-dark: #b0b0b0;
+            --button-color: #007bff;
+            --button-color-hover: #3c87e3;
+        }
 
-    .report-card {
-        background-color: white;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        width: 400px;
-        text-align: left;
-        margin-top: 10vh;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
 
-    .report-card h2 {
-        text-align: center;
-        margin-bottom: 20px;
-    }
+        .report-card {
+            background-color: var(--background-color-medium);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            width: 400px;
+            text-align: left;
+            margin-top: 10vh;
+        }
 
-    .report-row {
-        display: flex;
-        justify-content: space-between;
-        padding: 5px 0;
-    }
+        .report-card h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
 
-    .report-label {
-        font-weight: bold;
-    }
+        .status {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
 
-    .share-btn {
-        margin-top: 20px;
-        display: block;
-        background-color: #007bff;
-        color: white;
-        text-align: center;
-        padding: 10px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        width: 100%;
-    }
+        .passed { color: var(--success-color); }
+        .failed { color: var(--danger-color); }
 
-    .share-btn:hover {
-        background-color: #0056b3;
-    }
+        .report-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--background-color-light);
+        }
+
+        .report-label {
+            font-weight: bold;
+            color: var(--text-color-dark);
+        }
+
+        .share-btn {
+            margin-top: 20px;
+            display: block;
+            background-color: var(--button-color);
+            color: var(--text-color);
+            text-align: center;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        .share-btn:hover {
+            background-color: var(--button-color-hover);
+        }
+
+        .section-scores {
+            margin-top: 20px;
+        }
+
+        .section-score {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+        }
+
+        .time-spent {
+            background-color: var(--background-color-light);
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .section-scores h3 {
+            color: var(--text-color);
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--background-color-light);
+        }
     </style>
     <script>
         function copyToClipboard() {
@@ -122,6 +217,10 @@ $conn->close();
 <body>
     <div class="report-card">
         <h2>Assessment History Report</h2>
+        
+        <div class="status <?= $assessment['score'] >= 90 ? 'passed' : 'failed' ?>">
+            <?= $assessment['score'] >= 90 ? 'PASSED' : 'FAILED' ?>
+        </div>
 
         <div class="report-row">
             <span class="report-label">Assessment ID:</span>
@@ -144,10 +243,38 @@ $conn->close();
             <span><?= htmlspecialchars($assessment['score']) ?></span>
         </div>
 
+        <div class="report-row">
+            <span class="report-label">Passing Score:</span>
+            <span><?= htmlspecialchars($assessment['passing_score_percentage']) ?>%</span>
+        </div>
+        <div class="report-row">
+            <span class="report-label">Time Spent:</span>
+            <span>
+                <?php
+                $minutes = floor($assessment['duration'] / 60);
+                $seconds = $assessment['duration'] % 60;
+                echo "{$minutes} minutes {$seconds} seconds";
+                ?>
+            </span>
+        </div>
+        
+        <div class="section-scores">
+            <h3>Section Scores</h3>
+            <?php 
+            $scores = array_filter(explode(',', $assessment['section_scores']));
+            foreach ($scores as $score): 
+                list($name, $value) = explode(':', $score);
+                ?>
+                <div class="section-score">
+                    <span><?= trim($name) ?></span>
+                    <span><?= trim($value) ?></span>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
         <?php if (!$is_shared): ?>
             <button class="share-btn" onclick="copyToClipboard()">Share</button>
         <?php endif; ?>
-
     </div>
 </body>
 </html>
