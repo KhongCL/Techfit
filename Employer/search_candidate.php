@@ -131,13 +131,13 @@ session_start();
                     $employer_id = $_SESSION['employer_id'];
 
                     $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
-                                GROUP_CONCAT(ajs.score ORDER BY ajs.assessment_id SEPARATOR ', ') AS scores,
+                                GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
                                 AVG(ajs.score) AS avg_score
                             FROM Job_Seeker js
                             JOIN User u ON js.user_id = u.user_id
-                            LEFT JOIN  Assessment_Job_Seeker_Old ajs ON js.job_seeker_id = ajs.job_seeker_id
+                            LEFT JOIN  Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
                             LEFT JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id AND ei.employer_id = '$employer_id'
-                            WHERE ei.employer_id IS NULL AND ajs.assessment_id IS NOT NULL
+                            WHERE ei.employer_id IS NULL AND ajs.result_id IS NOT NULL
                             GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
 
@@ -181,13 +181,13 @@ session_start();
                     }
 
                     $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
-                                GROUP_CONCAT(ajs.score ORDER BY ajs.assessment_id SEPARATOR ', ') AS scores,
+                                GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
                                 AVG(ajs.score) AS avg_score
                             FROM Job_Seeker js
                             JOIN User u ON js.user_id = u.user_id
-                            LEFT JOIN  Assessment_Job_Seeker_Old ajs ON js.job_seeker_id = ajs.job_seeker_id
+                            LEFT JOIN  Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
                             JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
-                            WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'interested' AND ei.is_active = 1 AND ajs.assessment_id IS NOT NULL
+                            WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'interested' AND ei.is_active = 1 AND ajs.result_id IS NOT NULL
                             GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
 
@@ -230,13 +230,13 @@ session_start();
                     }
 
                     $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
-                                GROUP_CONCAT(ajs.score ORDER BY ajs.assessment_id SEPARATOR ', ') AS scores,
+                                GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
                                 AVG(ajs.score) AS avg_score
                             FROM Job_Seeker js
                             JOIN User u ON js.user_id = u.user_id
-                            LEFT JOIN  Assessment_Job_Seeker_Old ajs ON js.job_seeker_id = ajs.job_seeker_id
+                            LEFT JOIN  Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
                             JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
-                            WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'uninterested' AND ei.is_active = 1 AND ajs.assessment_id IS NOT NULL
+                            WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'uninterested' AND ei.is_active = 1 AND ajs.result_id IS NOT NULL
                             GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
 
@@ -278,13 +278,13 @@ session_start();
                     }
 
                     $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
-                                GROUP_CONCAT(ajs.score ORDER BY ajs.assessment_id SEPARATOR ', ') AS scores,
+                                GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
                                 AVG(ajs.score) AS avg_score
                             FROM Job_Seeker js
                             JOIN User u ON js.user_id = u.user_id
-                            LEFT JOIN  Assessment_Job_Seeker_Old ajs ON js.job_seeker_id = ajs.job_seeker_id
+                            LEFT JOIN  Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
                             JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
-                            WHERE ei.employer_id = '$employer_id' AND ei.is_active = 0 AND ajs.assessment_id IS NOT NULL
+                            WHERE ei.employer_id = '$employer_id' AND ei.is_active = 0 AND ajs.result_id IS NOT NULL
                             GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
 
