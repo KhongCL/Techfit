@@ -1220,32 +1220,41 @@ session_write_close();
             </div>
             <div class="footer-right">
                 <div class="footer-column">
-                    <h3>Assessment</h3>
+                    <h3>Assessments</h3>
                     <ul>
-                        <li><a href="start_assessment.php">Start Assessment</a></li>
-                        <li><a href="assessment_history.php">Assessment History</a></li>
-                        <li><a href="assessment_summary.php">Assessment Summary</a></li>
+                        <li><a href="create_assessment.php">Create New Assessment</a></li>
+                        <li><a href="manage_assessments.php">Manage Assessments</a></li>
+                        <li><a href="view_assessment_results.php">View Assessment Results</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Users</h3>
+                    <ul>
+                        <li><a href="manage_users.php">Manage Users</a></li>
+                        <li><a href="user_feedback.php">User Feedback</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Reports</h3>
+                    <ul>
+                        <li><a href="assessment_performance.php">Assessment Performance</a></li>
+                        <li><a href="user_engagement.php">User Engagement Statistics</a></li>
+                        <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.php">Useful Links</a></li>
-                        <li><a href="faq.php">FAQ</a></li>
-                        <li><a href="sitemap.php">Sitemap</a></li>
+                        <li><a href="useful_links.php">Manage Useful Links</a></li>
+                        <li><a href="faq.php">Manage FAQs</a></li>
+                        <li><a href="sitemap.php">Manage Sitemap</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>About</h3>
+                    <ul>
                         <li><a href="about.php">About</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Contact</h3>
-                    <ul>
                         <li><a href="contact.php">Contact Us</a></li>
-                        <li><a href="feedback.php">Feedback</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Legal</h3>
-                    <ul>
                         <li><a href="terms.php">Terms of Service</a></li>
                         <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>

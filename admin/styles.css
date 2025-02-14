@@ -9,9 +9,9 @@
     --background-color: #121212;
     --background-color-dark: #080808;
     --background-color-medium: #1E1E1E;
-    --background-color-light: #444;
-    --background-color-extra-light: #555;
-    --background-color-hover: #666;
+    --background-color-light: #333;
+    --background-color-extra-light: #444;
+    --background-color-hover: #555;
     
     --text-color: #fafafa;
     --text-color-dark: #b0b0b0;
@@ -31,7 +31,6 @@ main {
 }
 
 html, body {
-    height: 100%;
     margin: 0;
     display: flex;
     flex-direction: column;
@@ -594,7 +593,6 @@ footer {
 
     .footer-column {
         margin: 10px 0;
-        flex: 1 1 100%;
         text-align: center;
     }
 }
@@ -1127,7 +1125,7 @@ footer {
     font-weight: 700;
     text-align: center;
     margin-bottom: 30px;
-    color: var(--text-color);
+    color: #333;
 }
 
 .faq-container {
@@ -1142,7 +1140,7 @@ footer {
 .faq-item {
     background-color: var(--background-color-medium);
     padding: 20px;
-    border-color: var(--border-color);
+    border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s;
     border-bottom: none;
@@ -1219,88 +1217,58 @@ footer {
     margin-top: 20px;
 }
 
-#formContainer h1 {
-    font-size: 2.0rem;
-    text-align: center;
-    margin-bottom: 20px;
-    color: var(--text-color);
-}   
 
-#faqForm {
+form#faqForm {
+    max-width: 600px;
+    margin: 0 auto 40px;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
     border-radius: 8px;
-    padding: 30px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 80%;
-    max-width: 800px;
-    margin: 0 auto;
-    color: var(--text-color);
-    box-sizing: border-box;
-    position: relative;
-    top: 600%;
-    background-color: var(--background-color-medium);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-#faqForm label {
-    font-size: 1.1rem;
-    color: var(--text-color-light);
+form#faqForm label {
+    font-weight: bold;
     display: block;
-    margin-bottom: 5px;
+    margin: 10px 0 5px;
 }
 
-#faqForm textarea,
-#faqForm input[type="url"],
-#faqForm select {
+form#faqForm textarea,
+form#faqForm select {
     width: 100%;
     padding: 10px;
-    margin-bottom: 15px;
-    background-color: var(--background-color-medium);
-    border: 1px solid var(--border-color);
+    border: 1px solid #ccc;
     border-radius: 4px;
-    color: var(--text-color-light);
-    font-size: 1rem;
+    font-size: 14px;
 }
 
-#faqForm textarea:focus,
-#faqForm input[type="url"]:focus,
-#faqForm select:focus {
-    border-color: var(--primary-color);
-    outline: none;
+form#faqForm textarea {
+    resize: vertical;
+    min-height: 80px;
 }
 
-#faqForm button {
-    background-color: var(--button-color);
-    color: var(--text-color-extra-light);
+form#faqForm button {
+    display: block;
+    margin: 20px auto 0;
+    background-color: #4CAF50;
+    color: #fff;
     border: none;
-    padding: 12px 20px;
-    font-size: 1.1rem;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 4px;
     cursor: pointer;
-    border-radius: 5px;
-    transition: background-color 0.3s ease;
 }
 
-#faqForm button:hover {
-    background-color: var(--button-color-hover);
-}
-
-#faqForm button:disabled {
-    background-color: var(--disabled-color);
-    cursor: not-allowed;
-}
-
-#faqForm select:disabled {
-    background-color: var(--background-color-medium);
-}
-
-#faqForm textarea[disabled],
-#faqForm input[type="url"]:disabled {
-    background-color: var(--background-color-medium);
+form#faqForm button:hover {
+    background-color: #45a049;
 }
 
 .faq-category {
-    max-width: 1080px;
+    max-width: 800px;
     margin: 0 auto;
-    background-color: var(--background-color);
-    border: 1px solid var(--background-color);
+    background-color: #fff;
+    border: 1px solid #ddd;
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 20px;
@@ -1309,21 +1277,21 @@ footer {
 
 .faq-category h3 {
     font-size: 20px;
-    color: var(--text-color);
+    color: var(--background-color-medium);
     margin-bottom: 15px;
-    border-bottom: 1px solid var(--text-color-dark);
+    border-bottom: 1px solid #eee;
     padding-bottom: 5px;
 }
 
 .faq-item strong {
-    color: var(--text-color-dark);
+    color: #222;
 }
 
 .faq-item button {
     margin: 10px 5px 0 0;
     padding: 6px 12px;
     font-size: 14px;
-    color: var(--button-color);
+    color: #fff;
     background-color: #007BFF;
     border: none;
     border-radius: 4px;
@@ -1335,16 +1303,17 @@ footer {
 }
 
 .faq-item button:nth-child(2) {
-    background-color: var(--danger-color);
+    background-color: #dc3545;
 }
 
 .faq-item button:nth-child(2):hover {
-    background-color: var(--danger-color-hover);
+    background-color: #c82333;
 }
+
 
 .faq-category p {
     text-align: center;
-    color: var(--text-color-light);
+    color: #999;
     font-style: italic;
     margin: 10px 0;
 }
@@ -1428,10 +1397,6 @@ footer {
     height: auto;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.sitemap-item strong{
-    color: var(--text-color-dark);
 }
 
 @media (max-width: 768px) {
@@ -1872,12 +1837,7 @@ footer {
     color: var(--text-color);
 }
 
-.content {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-  }
-  
-  .tabs {
+.tabs {
     display: flex;
     margin-bottom: 20px;
   }
@@ -1895,9 +1855,7 @@ footer {
   }
   
   .delete_button{
-    background-color: #fff;
-    border: 1px solid #ccc;
-    padding: 20px;
+    border: 0.1px solid var(--background-color);
     border-radius: 5px;
   }
   
