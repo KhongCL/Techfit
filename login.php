@@ -160,6 +160,12 @@ $conn->close();
         a:hover {
             text-decoration: underline;
         }
+
+        label {
+        display: block;
+        text-align: left;
+        margin-bottom: 5px;
+    }
     </style>
 </head>
 <body>
