@@ -204,7 +204,7 @@ $usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
             </div>
         </section>
     <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
-        <a href="manage_useful_links.php" id="manage_useful_links_button" style="background-color: #4CAF50; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Manage Useful Links</a>
+        <a href="manage_useful_links.php" id="manage_useful_links_button" style="padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Manage Useful Links</a>
         <div style="height: 110px;"></div>
     </div>
     
