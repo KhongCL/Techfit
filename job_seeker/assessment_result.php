@@ -758,7 +758,7 @@ $sections['AS81'] = 'Work-Style and Personality';
                             </div>
                         </div>
                         <div class="button-container">
-                            <button class="continue" onclick="window.location.href='assessment_summary.php'">Continue</button>
+                            <button class="continue" onclick="window.location.href='assessment_history.php'">Continue</button>
                         </div>
                     </div>
                 </div>
