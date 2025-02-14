@@ -1,5 +1,4 @@
 <?php
-// Get saved answers for the assessment
 session_start();
 header('Content-Type: text/plain');
 

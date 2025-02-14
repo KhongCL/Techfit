@@ -1,6 +1,32 @@
 <?php
 session_start();
 
+function displayLoginMessage() {
+    echo '<script>
+        if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
+            window.location.href = "../login.php";
+        } else {
+            window.location.href = "../index.php";
+        }
+    </script>';
+    exit();
+}
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage();
+}
+
+// Check if user is a job seeker
+if ($_SESSION['role'] !== 'Job Seeker') {
+    displayLoginMessage();
+}
+
+// Check if job_seeker_id exists
+if (!isset($_SESSION['job_seeker_id'])) {
+    displayLoginMessage();
+}
+
 $db_host = 'localhost';
 $db_user = 'root'; 
 $db_pass = '';
@@ -158,6 +184,46 @@ $update_sql = "UPDATE Assessment_Job_Seeker
 $stmt = $conn->prepare($update_sql);
 $stmt->bind_param("is", $final_score, $job_seeker_id);
 $stmt->execute();
+
+$programming_sql = "SELECT DISTINCT q.assessment_id 
+FROM Answer a 
+JOIN Question q ON a.question_id = q.question_id 
+WHERE a.job_seeker_id = ? 
+AND q.assessment_id IN ('AS77', 'AS78', 'AS79', 'AS80')";
+$stmt = $conn->prepare($programming_sql);
+$stmt->bind_param("s", $job_seeker_id);
+$stmt->execute();
+$prog_result = $stmt->get_result();
+$row = $prog_result->fetch_assoc();
+$programming_section = $row ? $row['assessment_id'] : null; 
+
+// Define sections, only including the taken programming section
+$sections = [
+'AS75' => 'General Questions',
+'AS76' => 'Scenario-Based Questions'
+];
+
+// Add the specific programming section
+$programming_names = [
+'AS77' => 'Python Programming',
+'AS78' => 'Java Programming',
+'AS79' => 'JavaScript Programming',
+'AS80' => 'C++ Programming'
+];
+if ($programming_section) {
+$sections[$programming_section] = $programming_names[$programming_section];
+}
+
+$sections['AS81'] = 'Work-Style and Personality';
+
+$check_answers_sql = "SELECT COUNT(*) as answer_count 
+                     FROM Answer 
+                     WHERE job_seeker_id = ?";
+$stmt = $conn->prepare($check_answers_sql);
+$stmt->bind_param("s", $job_seeker_id);
+$stmt->execute();
+$answer_count_result = $stmt->get_result();
+$answer_count = $answer_count_result->fetch_assoc()['answer_count'];
 ?>
 
 <!DOCTYPE html>
@@ -168,6 +234,12 @@ $stmt->execute();
     <title>Assessment Results - TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <style>
+        .main-content {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            width: 100%;
+        }
 
         .main-wrapper {
             min-height: 100vh;
@@ -183,18 +255,21 @@ $stmt->execute();
 
         .assessment-container {
             display: flex;
+            flex-direction: column;
             gap: 40px;
             padding: 20px;
             max-width: 1400px;
             margin: 0 auto;
-            align-items: stretch; /* Change from flex-start to stretch */
+            align-items: center;
             min-height: fit-content;
         }
 
         .questions-section {
             flex: 2;
+            width: 100%;
             min-width: 0;
-            background: white;
+            background-color: var(--background-color-medium);
+            color: var(--text-color);
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -207,8 +282,11 @@ $stmt->execute();
 
         .results-container {
             flex: 1;
+            display: flex;
+            flex-direction: column;
             min-width: 300px;
-            background: white;
+            background-color: var(--background-color-medium);
+            color: var(--text-color);
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -221,7 +299,7 @@ $stmt->execute();
             text-align: center;
             margin-bottom: 30px;
             padding: 20px;
-            background: #f8f9fa;
+            background-color: var(--background-color-light);
             border-radius: 8px;
         }
 
@@ -237,7 +315,7 @@ $stmt->execute();
         .time-spent {
             margin: 20px 0;
             padding: 15px;
-            background: #e9ecef;
+            background-color: var(--background-color-light);
             border-radius: 4px;
         }
 
@@ -252,11 +330,17 @@ $stmt->execute();
             border-bottom: 1px solid #dee2e6;
         }
 
+        .section-questions {
+            scroll-margin-top: 100px;
+        }
+
         .button-container {
+            width: 100%;
+            max-width: 400px; 
             display: flex;
             justify-content: center;
             gap: 20px;
-            margin-top: 30px;
+            margin-top: 20px;
         }
 
         .button-container button {
@@ -275,6 +359,7 @@ $stmt->execute();
         .continue {
             background-color: var(--success-color);
             color: white;
+            min-width: 120px; 
         }
 
         .close {
@@ -318,6 +403,8 @@ $stmt->execute();
         }
 
         .question-item {
+            border-color: var(--background-color-light);
+            background-color: var(--background-color);
             margin-bottom: 20px;
             padding: 15px;
             border: 1px solid #eee;
@@ -333,7 +420,8 @@ $stmt->execute();
 
         .your-answer, .correct-answer {
             padding: 10px;
-            background: #f8f9fa;
+            background-color: var(--background-color-light);
+            color: var(--text-color);
             border-radius: 4px;
         }
 
@@ -360,7 +448,8 @@ $stmt->execute();
 
         .code-container {
             font-family: 'Consolas', monospace;
-            background: #f8f9fa;
+            background-color: var(--background-color);
+            color: var(--text-color);
             padding: 20px;
             border-radius: 4px;
             margin-top: 10px;
@@ -396,7 +485,8 @@ $stmt->execute();
         }
 
         .language-indicator {
-            background: #e9ecef;
+            background-color: var(--background-color-light);
+            color: var(--text-color);
             padding: 8px 12px;
             border-radius: 4px 4px 0 0;
             font-weight: bold;
@@ -409,7 +499,61 @@ $stmt->execute();
             margin-left: 10px;
         }
 
+        .section-navigator {
+            width: 100%;
+            position: static;
+            top: 20px;
+            background-color: var(--background-color-medium);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--background-color-light);
+        }
+
+        .section-nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .section-nav-item {
+            padding: 8px 12px;
+            background-color: var(--background-color-light);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            color: var(--text-color);
+        }
+
+        .section-nav-item:hover,
+        .section-nav-item.active {
+            background-color: var(--primary-color);
+        }
+
+        .no-answers-message, .no-scores-message {
+            background-color: var(--background-color-light);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .no-answers-message h3 {
+            margin-bottom: 10px;
+        }
+
+        .no-answers-message p {
+            color: var(--text-color);
+            line-height: 1.5;
+        }
+
         @media screen and (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+
             .assessment-container {
                 flex-direction: column;
             }
@@ -483,171 +627,176 @@ $stmt->execute();
 
         <div class="content-wrapper">
             <div class="assessment-container">
-                <div class="questions-section">
-                    <?php
-                    // Get questions and answers grouped by section
-                    $sections_sql = "SELECT 
-                        q.assessment_id,
-                        q.question_text,
-                        q.answer_type,
-                        q.correct_answer,
-                        q.programming_language,
-                        q.code_template,
-                        a.answer_text,
-                        a.is_correct,
-                        CASE 
-                            WHEN q.answer_type = 'multiple choice' THEN c.choice_text
-                            ELSE a.answer_text 
-                        END as display_answer
-                    FROM Answer a
-                    JOIN Question q ON a.question_id = q.question_id
-                    LEFT JOIN Choices c ON (q.answer_type = 'multiple choice' AND a.answer_text = c.choice_id)
-                    WHERE a.job_seeker_id = ?
-                    ORDER BY q.assessment_id, q.question_id";
+                <div class="section-navigator">
+                    <ul class="section-nav-list">
+                        <?php foreach ($sections as $id => $name): ?>
+                            <li class="section-nav-item" onclick="scrollToSection('<?php echo $id; ?>')"><?php echo $name; ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
 
-                    $stmt = $conn->prepare($sections_sql);
-                    $stmt->bind_param("s", $job_seeker_id);
-                    $stmt->execute();
-                    $result = $stmt->get_result();
+                <div class="main-content">
+                    <div class="questions-section">
+                        <?php if ($answer_count === 0): ?>
+                            <div class="no-answers-message" style="text-align: center; padding: 20px;">
+                                <h3 style="color: var(--danger-color);">No Questions Answered</h3>
+                                <p>You did not provide any answers during the assessment.</p>
+                            </div>
+                        <?php else: ?>
+                            <?php
+                            // Get questions and answers grouped by section
+                            $sections_sql = "SELECT 
+                                q.assessment_id,
+                                q.question_text,
+                                q.answer_type,
+                                q.correct_answer,
+                                q.programming_language,
+                                q.code_template,
+                                a.answer_text,
+                                a.is_correct,
+                                CASE 
+                                    WHEN q.answer_type = 'multiple choice' THEN c.choice_text
+                                    ELSE a.answer_text 
+                                END as display_answer
+                            FROM Answer a
+                            JOIN Question q ON a.question_id = q.question_id
+                            LEFT JOIN Choices c ON (q.answer_type = 'multiple choice' AND a.answer_text = c.choice_id)
+                            WHERE a.job_seeker_id = ?
+                            ORDER BY q.assessment_id, q.question_id";
 
-                    error_log("Section query results:");
-                    while ($row = $result->fetch_assoc()) {
-                        error_log(print_r($row, true));
-                    }
+                            $stmt = $conn->prepare($sections_sql);
+                            $stmt->bind_param("s", $job_seeker_id);
+                            $stmt->execute();
+                            $result = $stmt->get_result();
 
-                    $result->data_seek(0);
+                            $current_section = '';
 
-                    $current_section = '';
-                    $sections = [
-                        'AS75' => 'General Questions',
-                        'AS76' => 'Scenario-Based Questions',
-                        'AS77' => 'Python Programming',
-                        'AS78' => 'Java Programming',
-                        'AS79' => 'JavaScript Programming',
-                        'AS80' => 'C++ Programming',
-                        'AS81' => 'Work-Style and Personality'
-                    ];
-
-                    while ($row = $result->fetch_assoc()) {
-                        if ($current_section !== $row['assessment_id']) {
+                            while ($row = $result->fetch_assoc()) {
+                                if ($current_section !== $row['assessment_id']) {
+                                    if ($current_section !== '') {
+                                        echo "</div>";
+                                    }
+                                    $current_section = $row['assessment_id'];
+                                    echo "<h2 class='section-header'>{$sections[$current_section]}</h2>";
+                                    echo "<div id='{$current_section}' class='section-questions'>";
+                                }
+                            
+                                echo "<div class='question-item'>";
+                                echo "<p class='question-text'>" . htmlspecialchars($row['question_text']) . "</p>";
+                                
+                                echo "<div class='answer-pair'>";
+                                if ($row['answer_type'] !== 'code') {
+                                    echo "<div class='your-answer'>Your Answer: " . htmlspecialchars($row['display_answer']) . "</div>";
+                                }
+                                
+                                // Show correct answer for all questions except AS75 and AS81 (which are not scored)
+                                if (in_array($row['assessment_id'], ['AS76', 'AS77', 'AS78', 'AS79', 'AS80'])) {
+                                    if ($row['answer_type'] === 'code') {
+                                        // Code question display logic (keep existing code block display)
+                                        if (!empty($row['programming_language'])) {
+                                            echo "<div class='language-indicator'>";
+                                            echo "Language: " . ucfirst($row['programming_language']);
+                                            echo "</div>";
+                                        }
+                                
+                                        if (!empty($row['code_template'])) {
+                                            echo "<div class='code-container'>";
+                                            echo "<pre class='code-template'>" . htmlspecialchars($row['code_template']) . "</pre>";
+                                        }
+                                        
+                                        echo "<div class='answers-section'>";
+                                        echo "<h4>Your Answers:</h4>";
+                                        $user_answers = explode('<<ANSWER_BREAK>>', $row['display_answer']);
+                                        $correct_answers = explode('<<ANSWER_BREAK>>', $row['correct_answer']);
+                                        
+                                        echo "<ol class='answer-list'>";
+                                        foreach ($user_answers as $index => $answer) {
+                                            $is_correct = trim($answer) === trim($correct_answers[$index]);
+                                            $point_value = round(100/count($correct_answers))/100; // Convert to decimal
+                                            echo "<li>" . htmlspecialchars($answer);
+                                            echo "<span class='status-indicator " . 
+                                                ($is_correct ? 'status-correct' : 'status-incorrect') . "'>" .
+                                                ($is_correct ? '✓' : '✗') . "</span>";
+                                            // Format point value with 2 decimal places
+                                            echo "<span class='point-value'>(" . number_format($point_value, 2) . " points)</span></li>";
+                                        }
+                                        echo "</ol>";
+                                        
+                                        // Add correct answers section
+                                        echo "<h4>Correct Answers:</h4>";
+                                        echo "<ol class='answer-list'>";
+                                        foreach ($correct_answers as $answer) {
+                                            echo "<li class='correct-answer'>" . htmlspecialchars($answer) . "</li>";
+                                        }
+                                        echo "</ol>";
+                                        echo "</div>";
+                            
+                                        if (!empty($row['code_template'])) {
+                                            echo "</div>"; // Close code-container
+                                        }
+                                    } else {
+                                        // Non-code questions (multiple choice, etc.)
+                                        $status_class = $row['is_correct'] ? 'status-correct' : 'status-incorrect';
+                                        $status_symbol = $row['is_correct'] ? '✓' : '✗';
+                                        echo "<span class='status-indicator {$status_class}'>{$status_symbol}</span>";
+                                        echo "<div class='correct-answer'>Correct Answer: " . htmlspecialchars($row['correct_answer']) . "</div>";
+                                    }
+                                }
+                                
+                                echo "</div></div>";
+                            }
+                            
                             if ($current_section !== '') {
                                 echo "</div>";
                             }
-                            $current_section = $row['assessment_id'];
-                            echo "<h2 class='section-header'>{$sections[$current_section]}</h2>";
-                            echo "<div class='section-questions'>";
-                        }
-                    
-                        echo "<div class='question-item'>";
-                        echo "<p class='question-text'>" . htmlspecialchars($row['question_text']) . "</p>";
-                        
-                        echo "<div class='answer-pair'>";
-                        if ($row['answer_type'] !== 'code') {
-                            echo "<div class='your-answer'>Your Answer: " . htmlspecialchars($row['display_answer']) . "</div>";
-                        }
-                        
-                        // Show correct answer for all questions except AS75 and AS81 (which are not scored)
-                        if (in_array($row['assessment_id'], ['AS76', 'AS77', 'AS78', 'AS79', 'AS80'])) {
-                            if ($row['answer_type'] === 'code') {
-                                // Code question display logic (keep existing code block display)
-                                if (!empty($row['programming_language'])) {
-                                    echo "<div class='language-indicator'>";
-                                    echo "Language: " . ucfirst($row['programming_language']);
-                                    echo "</div>";
-                                }
-                        
-                                if (!empty($row['code_template'])) {
-                                    echo "<div class='code-container'>";
-                                    echo "<pre class='code-template'>" . htmlspecialchars($row['code_template']) . "</pre>";
-                                }
-                                
-                                echo "<div class='answers-section'>";
-                                echo "<h4>Your Answers:</h4>";
-                                $user_answers = explode('<<ANSWER_BREAK>>', $row['display_answer']);
-                                $correct_answers = explode('<<ANSWER_BREAK>>', $row['correct_answer']);
-                                
-                                echo "<ol class='answer-list'>";
-                                foreach ($user_answers as $index => $answer) {
-                                    $is_correct = trim($answer) === trim($correct_answers[$index]);
-                                    $point_value = round(100/count($correct_answers))/100; // Convert to decimal
-                                    echo "<li>" . htmlspecialchars($answer);
-                                    echo "<span class='status-indicator " . 
-                                         ($is_correct ? 'status-correct' : 'status-incorrect') . "'>" .
-                                         ($is_correct ? '✓' : '✗') . "</span>";
-                                    // Format point value with 2 decimal places
-                                    echo "<span class='point-value'>(" . number_format($point_value, 2) . " points)</span></li>";
-                                }
-                                echo "</ol>";
-                                
-                                // Add correct answers section
-                                echo "<h4>Correct Answers:</h4>";
-                                echo "<ol class='answer-list'>";
-                                foreach ($correct_answers as $answer) {
-                                    echo "<li class='correct-answer'>" . htmlspecialchars($answer) . "</li>";
-                                }
-                                echo "</ol>";
-                                echo "</div>";
-                    
-                                if (!empty($row['code_template'])) {
-                                    echo "</div>"; // Close code-container
-                                }
-                            } else {
-                                // Non-code questions (multiple choice, etc.)
-                                $status_class = $row['is_correct'] ? 'status-correct' : 'status-incorrect';
-                                $status_symbol = $row['is_correct'] ? '✓' : '✗';
-                                echo "<span class='status-indicator {$status_class}'>{$status_symbol}</span>";
-                                echo "<div class='correct-answer'>Correct Answer: " . htmlspecialchars($row['correct_answer']) . "</div>";
-                            }
-                        }
-                        
-                        echo "</div></div>";
-                    }
-                    
-                    if ($current_section !== '') {
-                        echo "</div>";
-                    }
-                    ?>
-                </div>
-
-                <div class="results-container">
-                    <h1>Assessment Results</h1>
-                    
-                    <div class="score-summary">
-                        <h2>Final Score: <?php echo number_format($overall_score, 1); ?>%</h2>
-                        <p class="result-status <?php echo $passed ? 'passed' : 'failed'; ?>">
-                            <?php echo $passed ? 'PASSED' : 'FAILED'; ?>
-                        </p>
-                        <p>Passing Score: <?php echo $passing_score; ?>%</p>
-                        
-                        <div class="time-spent">
-                        <h3>Time Spent: <?php echo $minutes; ?> minutes <?php echo $seconds; ?> seconds</h3>
-                        </div>
-                        
-                        <div class="section-scores">
-                            <h3>Section Scores</h3>
-                            <?php
-                            // Map assessment IDs to section names
-                            $section_names = [
-                                'AS76' => 'Scenario-Based Questions',
-                                'AS77' => 'Python Programming',
-                                'AS78' => 'Java Programming', 
-                                'AS79' => 'JavaScript Programming',
-                                'AS80' => 'C++ Programming'
-                            ];
-
-                            foreach ($section_scores as $assessment_id => $score) {
-                                $section_name = $section_names[$assessment_id] ?? 'Unknown Section';
-                                echo "<div class='section-score'>";
-                                echo "<span>{$section_name}</span>";
-                                echo "<span>" . number_format($score['percentage'], 1) . "%</span>";
-                                echo "</div>";
-                            }
                             ?>
-                        </div>
+                        <?php endif; ?>
                     </div>
 
-                    <div class="button-container">
-                        <button class="continue" onclick="window.location.href='assessment_summary.php'">Continue</button>
+                    <div class="results-container">
+                        <h1>Assessment Results</h1>
+                        
+                        <div class="score-summary">
+                            <h2>Final Score: <?php echo number_format($overall_score, 1); ?>%</h2>
+                            <p class="result-status <?php echo $passed ? 'passed' : 'failed'; ?>">
+                                <?php echo $passed ? 'PASSED' : 'FAILED'; ?>
+                            </p>
+                            <p>Passing Score: <?php echo $passing_score; ?>%</p>
+                            
+                            <div class="time-spent">
+                            <h3>Time Spent: <?php echo $minutes; ?> minutes <?php echo $seconds; ?> seconds</h3>
+                            </div>
+                            
+                            <div class="section-scores">
+                                <h3>Section Scores</h3>
+                                <?php if ($answer_count === 0): ?>
+                                    <div class="no-scores-message" style="text-align: center; padding: 10px; color: var(--danger-color);">
+                                        <p>No section scores available - no questions were answered</p>
+                                    </div>
+                                <?php else: ?>
+                                    <?php
+                                    $section_names = [
+                                        'AS76' => 'Scenario-Based Questions',
+                                        'AS77' => 'Python Programming',
+                                        'AS78' => 'Java Programming', 
+                                        'AS79' => 'JavaScript Programming',
+                                        'AS80' => 'C++ Programming'
+                                    ];
+
+                                    foreach ($section_scores as $assessment_id => $score) {
+                                        $section_name = $section_names[$assessment_id] ?? 'Unknown Section';
+                                        echo "<div class='section-score'>";
+                                        echo "<span>{$section_name}</span>";
+                                        echo "<span>" . number_format($score['percentage'], 1) . "%</span>";
+                                        echo "</div>";
+                                    }
+                                    ?>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="button-container">
+                            <button class="continue" onclick="window.location.href='assessment_history.php'">Continue</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -667,7 +816,7 @@ $stmt->execute();
                             <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                             <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                         </div>
-                        <p>techfit@gmail.com</p>
+                        <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                     </div>
                 </div>
                 <div class="footer-right">
@@ -722,6 +871,42 @@ $stmt->execute();
         function logoutUser() {
             window.location.href = '/Techfit';
         }
+
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // Update active state
+                document.querySelectorAll('.section-nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                const activeItem = document.querySelector(`[onclick="scrollToSection('${sectionId}')"]`);
+                if (activeItem) {
+                    activeItem.classList.add('active');
+                }
+            }
+        }
+
+        // Track scroll position to update active section
+        document.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.section-questions');
+            let currentSection = '';
+            
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= 100) {
+                    currentSection = section.id;
+                }
+            });
+            
+            if (currentSection) {
+                document.querySelectorAll('.section-nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector(`[onclick="scrollToSection('${currentSection}')"]`)?.classList.add('active');
+            }
+        });
     </script>
 </body>
 </html>

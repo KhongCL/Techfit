@@ -16,6 +16,18 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+if ($_SERVER["REQUEST_METHOD"] != "POST") {
+    unset($_SESSION['entered_username']);
+    unset($_SESSION['entered_first_name']); 
+    unset($_SESSION['entered_last_name']);
+    unset($_SESSION['entered_email']);
+    unset($_SESSION['entered_birthday']);
+    unset($_SESSION['entered_gender']);
+    unset($_SESSION['entered_role']);
+    unset($_SESSION['entered_job_position']);
+    unset($_SESSION['entered_confirm_password']);
+}
+
 // Function to generate the next ID with a given prefix
 function generateNextId($conn, $table, $column, $prefix) {
     $sql = "SELECT MAX(CAST(SUBSTRING($column, LENGTH('$prefix') + 1) AS UNSIGNED)) AS max_id FROM $table WHERE $column LIKE '$prefix%'";

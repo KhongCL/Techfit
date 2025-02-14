@@ -77,7 +77,7 @@ CREATE TABLE Question (
 );
 
 CREATE TABLE Answer (
-    answer_id VARCHAR(5) PRIMARY KEY,
+    answer_id VARCHAR(10) PRIMARY KEY,
     job_seeker_id VARCHAR(5) NOT NULL,
     question_id VARCHAR(5) NOT NULL,
     answer_text TEXT,

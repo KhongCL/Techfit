@@ -35,50 +35,37 @@ session_write_close();
 <?php
 session_start(); 
 
+
 $host = 'localhost';
 $username = 'root';
 $password = '';
-$database = 'techfit'; 
+$database = 'techfit';
 
 $conn = new mysqli($host, $username, $password, $database);
-
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-$user_id = $_SESSION['user_id']; 
 
+$job_seeker_id = $_SESSION['job_seeker_id'];
 
 $sql = "
     SELECT 
-        Assessment_Job_Seeker.result_id AS 'assessment_id', 
-        Assessment_Job_Seeker.job_seeker_id AS 'job_id',
-        Assessment_Job_Seeker.start_time AS 'start_time',
-        Assessment_Job_Seeker.end_time AS 'end_time',
-        Assessment_Job_Seeker.score AS 'score',
-        Assessment_Settings.passing_score_percentage
+        Assessment_Job_Seeker.end_time AS assessment_date,
+        Assessment_Job_Seeker.start_time,
+        Assessment_Job_Seeker.result_id AS assessment_id,
+        Assessment_Job_Seeker.score,
+        Assessment_Settings.passing_score_percentage,
+        TIMESTAMPDIFF(SECOND, Assessment_Job_Seeker.start_time, Assessment_Job_Seeker.end_time) as duration
     FROM Assessment_Job_Seeker
-    INNER JOIN Job_Seeker 
-        ON Assessment_Job_Seeker.job_seeker_id = Job_Seeker.job_seeker_id
-    INNER JOIN User
-        ON Job_Seeker.user_id = User.user_id
-    INNER JOIN Assessment_Settings
-        ON Assessment_Settings.setting_id = '1'
-    WHERE User.user_id = ?";
+    JOIN Assessment_Settings ON Assessment_Settings.setting_id = '1'
+    WHERE Assessment_Job_Seeker.job_seeker_id = ?
+    ORDER BY Assessment_Job_Seeker.end_time DESC";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $user_id);
+$stmt->bind_param("s", $job_seeker_id);
 $stmt->execute();
 $result = $stmt->get_result();
-
-$assessments = [];
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $assessments[] = $row;
-    }
-}
-$stmt->close();
-$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -88,7 +75,6 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assessment History - TechFit</title>
     <link rel="stylesheet" href="styles.css">
-
     <style>
         :root {
             --primary-color: #007bff;
@@ -97,134 +83,75 @@ $conn->close();
             --danger-color-hover: #c0392b;
             --success-color: #28a745;
             --success-color-hover: #2ecc71;
-
             --background-color: #121212;
-            --background-color-medium: #080808;
             --background-color-medium: #1E1E1E;
             --background-color-light: #444;
-            --background-color-extra-light: #555;
-            --background-color-hover: #666;
-            
             --text-color: #fafafa;
             --text-color-dark: #b0b0b0;
-            --text-color-medium: #e0e0e0;
-            --text-color-light: #f7f7f7;
-            --text-color-extra-light: #ffffff;
-            --text-color-hover: #b0b0b0;
-            
-            --button-color: #007bff;
-            --button-color-hover: #3c87e3;
-            --focus-border-color: #47a3e0;
-            --disabled-color: #7f8c8d;
-        }
-        
-        .actions {
-            display: flex;
-            gap: 10px;
         }
 
-        .actions a {
+        .summary_header {
+            padding: 20px;
+            border-bottom: 2px solid var(--background-color-light);
+            text-align: left;
+        }
+
+        .summary-item {
+            background-color: var(--background-color-light);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .view-answers-button {
             padding: 8px 16px;
             text-decoration: none;
             border-radius: 4px;
             color: var(--text-color);
-            transition: background-color 0.3s ease;
-        }
-
-        .actions a[title="Download"] {
             background-color: var(--primary-color);
+            transition: background-color 0.3s ease;
+            align-self: flex-start;
+            margin-left: 20px;
         }
 
-        .actions a[title="Download"]:hover {
+        .view-answers-button:hover {
             background-color: var(--button-color-hover);
         }
 
-        .actions a[title="Share"] {
-            background-color: var(--success-color);
+        .status {
+            font-weight: bold;
+            margin-top: 10px;
         }
 
-        .actions a[title="Share"]:hover {
-            background-color: var(--success-color-hover);
+        .status.passed {
+            color: var(--success-color);
         }
 
-        .history-item {
+        .status.failed {
+            color: var(--danger-color);
+        }
+
+        .summary-details {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            background-color: var(--background-color-light);
-            margin-bottom: 15px;
-            border-radius: 8px;
-            width: 100%;
-            box-sizing: border-box;
+            flex-direction: column;
+            gap: 5px;
+            text-align: left;
+            flex-grow: 1;
         }
 
-        .date-time {
-            flex: 2;
+        .summary-details h3 {
+            margin-bottom: 10px;
+            color: var(--text-color);
             text-align: left;
         }
 
-        .date-time p {
+        .summary-details p {
             margin: 0;
-            line-height: 1.5;
-            color: var(--text-color);
-        }
-
-        .score {
-            flex: 1;
-            text-align: center;
-        }
-
-        .score h3 {
-            margin: 0;
-            color: var(--text-color);
-        }
-
-        .score p {
-            font-size: 1.2em;
-            margin: 5px 0 0;
-            color: var(--text-color);
-        }
-
-        #assessment-history {
-            min-height: calc(100vh - 250px); /* Subtract header + footer height */
-            padding: 40px 0;
-        }
-
-        .container {
-            max-width: 1400px;
-            width: 50%;
-            margin: 0 auto;
-            padding: 0 20px;
-            box-sizing: border-box;
-        }
-
-        .history-header {
-            margin-bottom: 30px;
+            color: var(--text-color-dark);
             text-align: left;
-            color: var(--text-color);
-        }
-
-        .history-header h2 {
-            font-size: 1.8em;
-            margin: 0;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--background-color-light);
-        }
-
-        .scrollable-container {
-            max-height: calc(100vh - 350px);
-            overflow-y: auto;
-            padding-right: 10px;
-            width: 100%;
-        }
-
-        .score-passed {
-            color: var(--success-color) !important;
-        }
-
-        .score-failed {
-            color: var(--danger-color) !important;
         }
     </style>
 
@@ -288,45 +215,31 @@ $conn->close();
         <button class="close-button" onclick="logoutUser()">Yes</button>
         <button class="cancel-button" onclick="closePopup('logout-popup')">No</button>
     </div>
-    
-    <section id="assessment-history">
-        <div class="container">
-            <div class="history-header">
-                <h2>Assessment History</h2>
-            </div>
-            
-            <div class="scrollable-container">
-                <?php if (!empty($assessments)): ?>
-                    <?php foreach ($assessments as $assessment): ?>
-                        <div class="history-item">
-                        <div class="date-time">
-                            <p>
-                                <strong>Date:</strong> <?php echo htmlspecialchars(date('Y-m-d', strtotime($assessment['start_time']))); ?> 
-                                <br><strong>Time Used:</strong> <?php 
-                                    $duration = strtotime($assessment['end_time']) - strtotime($assessment['start_time']);
-                                    $minutes = floor($duration / 60);
-                                    $seconds = $duration % 60;
-                                    echo $minutes . ' minutes ' . $seconds . ' seconds';
-                                ?>
+
+    <section id="assessment-summary">
+        <div class="container_a_s">
+            <div class="summary_header">Assessment History</div>
+            <div class="scrollable">
+                <?php if ($result->num_rows > 0): ?>
+                    <?php while ($row = $result->fetch_assoc()): ?>
+                        <div class="summary-item">
+                        <div class="summary-details">
+                            <h3>Assessment <?= $row['assessment_id']; ?></h3>
+                            <p>Date: <?= date('Y-m-d', strtotime($row['assessment_date'])); ?></p>
+                            <p>Time Spent: <?= floor($row['duration']/60) ?> minutes <?= $row['duration']%60 ?> seconds</p>
+                            <p>Score: <?= $row['score']; ?>%</p>
+                            <p class="status <?= ($row['score'] >= $row['passing_score_percentage']) ? 'passed' : 'failed' ?>">
+                                Status: <?= ($row['score'] >= $row['passing_score_percentage']) ? 'PASSED' : 'FAILED' ?>
                             </p>
                         </div>
-                        <div class="score">
-                            <h3>Score</h3>
-                            <p class="<?php echo ($assessment['score'] >= $assessment['passing_score_percentage']) ? 'score-passed' : 'score-failed'; ?>">
-                                <?php echo htmlspecialchars($assessment['score']); ?>
-                            </p>
+                            <a href="view_answers.php?assessment_id=<?= urlencode($row['assessment_id']); ?>" class="view-answers-button">View answers</a>
                         </div>
-                            <div class="actions">
-                                <a href="download_assessment_history_report.php?assessment_id=<?php echo urlencode($assessment['assessment_id']); ?>" title="Download">Download</a>
-                                <a href="share_assessment_history.php?assessment_id=<?= urlencode($assessment['assessment_id']); ?>" title="Share">Share</a>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+                    <?php endwhile; ?>
                 <?php else: ?>
-                    <p>No assessment history available.</p>
-    <?php endif; ?>
+                    <p>No assessments found.</p>
+                <?php endif; ?>
+            </div>
         </div>
-    </div>
     </section>
 
     <footer>

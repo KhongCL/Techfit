@@ -1,5 +1,35 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start();
+
+function displayLoginMessage() {
+    echo '<script>
+        if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
+            window.location.href = "../login.php";
+        } else {
+            window.location.href = "../index.php";
+        }
+    </script>';
+    exit();
+}
+
+
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage(); 
+}
+
+
+if ($_SESSION['role'] !== 'Job Seeker') {
+    displayLoginMessage(); 
+}
+
+
+if (!isset($_SESSION['job_seeker_id'])) {
+    displayLoginMessage(); 
+}
+
+
+session_write_close();
+
 if (!isset($_SESSION['job_seeker_id'])) {
     die("ERROR: No job seeker ID in session");
 }
@@ -12,6 +42,27 @@ $db_name = 'techfit';
 $conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
 if ($conn->connect_error) {
     die('Connection to techfit database failed: ' . $conn->connect_error);
+}
+
+$check_assessment_sql = "SELECT COUNT(*) as completed 
+                        FROM Assessment_Job_Seeker 
+                        WHERE job_seeker_id = ? AND end_time IS NOT NULL";
+
+$stmt = $conn->prepare($check_assessment_sql);
+$stmt->bind_param("s", $_SESSION['job_seeker_id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+
+if ($row['completed'] > 0) {
+    echo '<script>
+        if (confirm("You have already completed an assessment. Would you like to view your assessment history?")) {
+            window.location.href = "assessment_history.php";
+        } else {
+            window.location.href = "index.php";
+        }
+    </script>';
+    exit();
 }
 
 function fetchSectionQuestions($conn, $assessment_id) {
@@ -128,24 +179,43 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
             background-color: #0056b3;
         }
 
+        .main-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Add content wrapper styles */
+        .content-wrapper {
+            flex: 1;
+            margin-bottom: 0;
+            padding-bottom: 40px;
+        }
+
         .assessment-container {
             display: flex;
-            gap: 20px;
+            gap: 40px;
             padding: 20px;
+            width: 100%;
+            margin: 0 auto;
+            min-width: 900px;
         }
 
         .question-section {
-            flex: 3;
+            flex: 2;
+            background-color: var(--background-color-medium);
+            color: var(--text-color);
             padding: 20px;
-            background: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .navigation-panel {
             flex: 1;
+            min-width: 300px;
+            background-color: var(--background-color-medium);
+            color: var(--text-color);
             padding: 20px;
-            background: white;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
@@ -156,8 +226,9 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
             text-align: center;
             margin-bottom: 20px;
             padding: 10px;
-            background: #f5f5f5;
-            border-radius: 4px;
+            background-color: var(--background-color-light);
+            color: var(--text-color);
+            border-radius: 8px;
         }
 
         .section-navigation {
@@ -170,13 +241,14 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
         .section-box {
             padding: 10px;
             text-align: center;
-            background: #f0f0f0;
+            background-color: var(--background-color-light);
+            color: var(--text-color);
             border-radius: 4px;
             cursor: pointer;
         }
 
         .section-box.active {
-            background: #007bff;
+            background-color: var(--primary-color);
             color: white;
         }
 
@@ -188,11 +260,14 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
         .question-list-container {
             border: 1px solid #ddd;
             border-radius: 4px;
+            background-color: var(--background-color);
+            border-color: var(--background-color-light);
         }
 
         .question-list-header {
             padding: 10px;
-            background: #f5f5f5;
+            background-color: var(--background-color-light);
+            color: var(--text-color);
             cursor: pointer;
         }
 
@@ -206,7 +281,8 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
         .question-box {
             padding: 10px;
             text-align: center;
-            background: #f0f0f0;
+            background-color: var(--background-color-light);
+            color: var(--text-color);
             border-radius: 4px;
             cursor: pointer;
         }
@@ -219,14 +295,16 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
         .essay-input {
             width: 100%;
             min-height: 150px;
-            resize: none; /* Prevent manual resizing */
+            resize: none;
             padding: 10px;
-            border: 1px solid #ddd;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
             border-radius: 4px;
             margin-top: 10px;
             font-family: inherit;
             font-size: inherit;
-            overflow-y: hidden; /* Hide scrollbar */
+            overflow-y: hidden;
         }
 
         .grid-2x2 {
@@ -245,14 +323,15 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
 
         .progress-container {
             width: 100%;
-            background-color: #f0f0f0;
-            border-radius: 4px;
-            margin-bottom: 20px;
+            margin: 10px auto;
+            background-color: var(--background-color-medium);
+            border-radius: 8px;
+            padding: 15px;
         }
 
         .progress-bar {
             width: 0%;
-            height: 20px;
+            height: 10px;
             background-color: #28a745;
             border-radius: 4px;
             transition: width 0.3s ease;
@@ -262,7 +341,7 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
             text-align: center;
             margin-top: 5px;
             font-size: 14px;
-            color: #666;
+            color: var(--text-color);
         }
 
         .navigation-buttons {
@@ -305,44 +384,74 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
 
         .code-block {
             font-family: monospace;
-            background: #f8f9fa;
+            background-color: var(--background-color);
+            color: var(--text-color);
             padding: 15px;
             border-radius: 4px;
             margin: 10px 0;
             white-space: pre;
             line-height: 1.5;
-            tab-size: 4;
+            position: relative;
+            border: 1px solid var(--border-color);
         }
 
         .code-block input {
             font-family: monospace;
-            background: #fff;
-            border: 1px solid #ccc;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid #555;
             padding: 2px 4px;
             margin: 0 4px;
             border-radius: 3px;
+            transition: all 0.2s ease;
+        }
+
+        .code-block input:hover {
+            border-color: #666;
+        }
+
+        .code-block input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--hover-background-color);
+            box-shadow: 0 0 0 1px var(--primary-color);
         }
 
         .code-blank {
             width: 120px;
             padding: 2px 5px;
             margin: 0 5px;
-            font-family: inherit;
+            font-family: 'Consolas', 'Monaco', monospace;
             font-size: inherit;
-            border: 1px solid #ccc;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid #555; 
             border-radius: 3px;
-            background: #fff;
+            transition: all 0.2s ease;
+        }
+
+        .code-blank:hover {
+            border-color: #666; /* Even lighter on hover */
+        }
+
+        .code-blank:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--hover-background-color);
+            box-shadow: 0 0 0 1px var(--primary-color); /* Add glow effect on focus */
         }
 
         .code-container {
             font-family: 'Consolas', 'Monaco', monospace;
-            background: #f8f9fa;
+            background-color: var(--background-color);
+            color: var(--text-color);
             padding: 15px;
             border-radius: 4px;
             margin: 10px 0;
             white-space: pre;
             line-height: 1.5;
             tab-size: 4;
+            border: 1px solid var(--border-color);
         }
 
         .code-container pre {
@@ -354,8 +463,8 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
         }
 
         .language-indicator {
-            background: #e9ecef;
-            color: #495057;
+            background-color: var(--background-color-light);
+            color: var(--text-color);
             padding: 8px 12px;
             border-radius: 4px 4px 0 0;
             margin-bottom: 0;
@@ -364,13 +473,41 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
 
         .code-block {
             font-family: monospace;
-            background: #f8f9fa;
+            background-color: var(--background-color);
+            color: var(--text-color);
             padding: 15px;
             border-radius: 4px;
             margin: 10px 0;
             white-space: pre;
             line-height: 1.5;
             position: relative;
+            border: 1px solid var(--border-color);
+        }
+
+        input[type="radio"] {
+            accent-color: var(--primary-color);
+        }
+
+        .option {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .option:hover {
+            background-color: var(--hover-background-color);
+        }
+
+        @media screen and (max-width: 1024px) {
+            .assessment-container {
+                width: 90%;
+                min-width: auto;
+                flex-direction: column;
+            }
+            
+            .navigation-panel {
+                width: 100%;
+            }
         }
     </style>
 
@@ -512,10 +649,13 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
                             margin: 0;
                             padding: 0;
                             tab-size: 4;
+                            color: var(--text-color);
                         }
+
                         .code-container {
                             font-family: 'Consolas', 'Monaco', monospace;
-                            background: #f8f9fa;
+                            background-color: var(--background-color); 
+                            color: var(--text-color);
                             padding: 15px;
                             border-radius: 4px;
                             margin: 10px 0;
@@ -523,16 +663,31 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
                             white-space: pre;
                             tab-size: 4;
                             overflow-x: auto;
+                            border: 1px solid var(--border-color);
                         }
+
                         .code-blank {
+                            width: 120px;
+                            padding: 2px 5px;
+                            margin: 0 5px;
                             font-family: 'Consolas', 'Monaco', monospace;
                             font-size: inherit;
-                            padding: 2px 4px;
-                            margin: 0 4px;
-                            border: 1px solid #ccc;
+                            background-color: var(--background-color);
+                            color: var(--text-color);
+                            border: 1px solid #555; /* Lighter border color for better visibility */
                             border-radius: 3px;
-                            background: #fff;
-                            min-width: 60px;
+                            transition: all 0.2s ease;
+                        }
+
+                        .code-blank:hover {
+                            border-color: #666; /* Even lighter on hover */
+                        }
+
+                        .code-blank:focus {
+                            outline: none;
+                            border-color: var(--primary-color);
+                            background-color: var(--hover-background-color);
+                            box-shadow: 0 0 0 1px var(--primary-color); /* Add glow effect on focus */
                         }
                     `;
                     document.head.appendChild(style);
@@ -858,21 +1013,33 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
 
         function startTimer(display) {
             const endTime = startTime + totalTime;
-            
+            let hasExpired = false;  // Add flag to track timer expiration
+
             function updateDisplay() {
                 const now = Math.floor(Date.now() / 1000);
                 const remaining = endTime - now;
                 
-                if (remaining <= 0) {
+                log('Timer check:', {
+                    now,
+                    endTime,
+                    remaining,
+                    hasExpired
+                });
+                
+                if (remaining <= 0 && !hasExpired) {
+                    // Only submit if timer hasn't already expired
+                    hasExpired = true;  // Set flag to prevent multiple submissions
                     clearInterval(timerInterval);
                     display.textContent = "Time's up!";
-                    submitAssessment(true); // Pass true to indicate time's up
+                    submitAssessment(true);
                     return;
                 }
                 
-                const minutes = Math.floor(remaining / 60);
-                const seconds = remaining % 60;
-                display.textContent = `Time Remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                if (remaining > 0) {
+                    const minutes = Math.floor(remaining / 60);
+                    const seconds = remaining % 60;
+                    display.textContent = `Time Remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                }
             }
             
             updateDisplay();
@@ -1130,33 +1297,50 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
         });
 
         function saveAllAnswers() {
-            if (Object.keys(savedAnswers).length === 0) {
+            const answers = Object.entries(savedAnswers);
+            if (answers.length === 0) {
+                log('No answers to save');
                 return Promise.resolve();
             }
 
-            const promises = Object.entries(savedAnswers).map(([questionId, answer]) => {
+            log('Saving all answers:', answers.length);
+
+            const savePromises = answers.map(([questionId, answer]) => {
                 return new Promise((resolve, reject) => {
                     const formData = new FormData();
                     formData.append('question_id', questionId);
                     formData.append('answer_text', answer);
                     formData.append('job_seeker_id', '<?php echo $_SESSION["job_seeker_id"]; ?>');
-
+                    
                     const xhr = new XMLHttpRequest();
                     xhr.open('POST', 'save_answer.php', true);
+                    
                     xhr.onload = function() {
+                        log('Save answer response:', questionId, xhr.status);
                         if (xhr.status === 200) {
                             resolve();
                         } else {
                             reject(new Error(`HTTP error! status: ${xhr.status}`));
                         }
                     };
-                    xhr.onerror = function() {
+                    
+                    xhr.onerror = function(e) {
+                        log('Network error saving answer:', questionId, e);
                         reject(new Error('Network error'));
                     };
+                    
                     xhr.send(formData);
                 });
             });
-            return Promise.all(promises);
+
+            return Promise.all(savePromises)
+                .then(() => {
+                    log('All answers saved successfully');
+                })
+                .catch(error => {
+                    log('Error saving answers:', error);
+                    throw error;
+                });
         }
 
         window.addEventListener('beforeunload', function(e) {
@@ -1182,7 +1366,10 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
             const nextBtn = document.getElementById('next-btn');
             if (currentSection === 4 && currentQuestionIndex === questions.length - 1) {
                 nextBtn.textContent = 'Submit';
-                nextBtn.onclick = submitAssessment;
+                nextBtn.onclick = () => {
+                    log('Submit button clicked - calling submitAssessment with isTimeUp=false');
+                    submitAssessment(false);
+                };
                 // Add success color styles
                 nextBtn.style.backgroundColor = 'var(--success-color)';
                 nextBtn.style.color = 'white';
@@ -1251,6 +1438,18 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
         }
 
         function submitAssessment(isTimeUp = false) {
+            // Prevent multiple submissions
+            if (document.querySelectorAll('button, input, textarea')[0].disabled) {
+                return;
+            }
+
+            log('submitAssessment entry point:', {
+                isTimeUp,
+                calledFrom: new Error().stack,
+                currentSection,
+                currentQuestionIndex
+            });
+
             // Only check for unanswered questions if not timed out
             if (!isTimeUp) {
                 const allAnswers = JSON.parse(sessionStorage.getItem('allAnswers') || '{}');
@@ -1268,40 +1467,60 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
                 }
             }
 
-            // Save all answers and submit
+            // Disable navigation and inputs while saving
+            document.querySelectorAll('button, input, textarea').forEach(el => el.disabled = true);
+
+            // Save all answers first
             saveAllAnswers()
                 .then(() => {
-                    const xhr = new XMLHttpRequest();
-                    xhr.open('POST', 'update_assessment_time.php', true);
-                    xhr.onload = function() {
-                        if (xhr.status === 200) {
-                            // Clear session storage
-                            sessionStorage.removeItem('confirmedLanguageChoice');
-                            sessionStorage.removeItem('assessmentState');
-                            sessionStorage.removeItem('assessmentTimer');
-                            sessionStorage.removeItem('assessmentProgress');
-                            sessionStorage.removeItem('allAnswers');
-                            
-                            // Show time's up message if applicable
-                            if (isTimeUp) {
-                                alert("Time's up! Your assessment will be submitted automatically.");
-                            }
-                            
-                            // Redirect to results page
-                            window.location.href = 'assessment_result.php';
-                        } else {
-                            alert('Failed to submit assessment. Please try again.');
-                        }
-                    };
-                    xhr.onerror = function() {
-                        alert('Error submitting assessment. Please try again.');
-                    };
-                    xhr.send();
+                    log('All answers saved, updating assessment time');
+                    return new Promise((resolve, reject) => {
+                        const xhr = new XMLHttpRequest();
+                        xhr.open('POST', 'update_assessment_time.php', true);
+                        xhr.onload = () => resolve(xhr.status === 200);
+                        xhr.onerror = () => reject(new Error('Network error'));
+                        xhr.send();
+                    });
+                })
+                .then((success) => {
+                    log('Assessment time update complete:', success);
+                    if (isTimeUp) {
+                        alert("Time's up! Your assessment will be submitted automatically.");
+                    }
+                    return cleanupAndRedirect(); // Wait for cleanup to complete
                 })
                 .catch(error => {
-                    console.error('Error during submission:', error);
-                    alert('There was an error submitting your assessment. Please try again.');
+                    log('Error during submission:', error);
+                    // Re-enable inputs if there was an error
+                    document.querySelectorAll('button, input, textarea').forEach(el => el.disabled = false);
+                    if (!isTimeUp) {
+                        alert('There was an error submitting your assessment. Please try again.');
+                    }
                 });
+        }
+
+        function cleanupAndRedirect() {
+            log('Starting cleanup before redirect');
+            
+            return new Promise((resolve) => {
+                // Clear any running intervals
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                }
+                
+                // Remove window unload handler
+                window.removeEventListener('beforeunload', saveState);
+                
+                // Clear session storage
+                sessionStorage.clear();
+                
+                // Use timeout to ensure all cleanup is complete
+                setTimeout(() => {
+                    log('Cleanup complete, redirecting to results page');
+                    window.location.replace('assessment_result.php');
+                    resolve();
+                }, 500);
+            });
         }
 
         function nextQuestion() {
@@ -1691,7 +1910,7 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">

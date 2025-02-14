@@ -13,7 +13,7 @@ if ($conn->connect_error) {
 
 $job_seeker_id = $_SESSION['job_seeker_id'];
 
-// Only update end_time, score will be calculated in assessment_result.php
+
 $sql = "UPDATE Assessment_Job_Seeker 
         SET end_time = NOW() 
         WHERE job_seeker_id = ? 

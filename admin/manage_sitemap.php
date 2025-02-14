@@ -215,7 +215,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Sitemap Management</title>
+    <title>Sitemap Management - TechFit</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <header>
@@ -324,7 +324,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                             <img src="data:image/jpeg;base64,<?= base64_encode($sitemap['image']) ?>" alt="Sitemap Image" class="sitemap-image" style="max-width: 50%; height: auto; margin-bottom: 10px;"><br>
                             <button class="edit-button" onclick="editSitemap('<?= $sitemap['resource_id'] ?>')" style="margin-right: 10px; padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">Edit</button>
                             <button class="delete-button" onclick="deleteSitemap('<?= $sitemap['resource_id'] ?>')" style="padding: 5px 10px; background-color: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer;">Delete</button><br><br>
-                            <strong style="display: block; margin-bottom: 5px;">Description:</strong>
+                            <strong style="display: block; margin-bottom: 5px; color: white;">Description:</strong>
                             <p style="margin: 0; color: #555; font-size: 14px;">
                                 <?= htmlspecialchars($sitemapDescriptions[$sitemap['resource_id']] ?? 'No description available', ENT_QUOTES, 'UTF-8') ?>
                             </p>

@@ -1,7 +1,7 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message
+
 function displayLoginMessage() {
     echo '<script>
         alert("You need to log in to access this page.");
@@ -9,17 +9,17 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Admin') {
-    displayLoginMessage(); // Display message if the role is not Admin
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 ?>
 
@@ -31,7 +31,7 @@ $database = 'techfit';
 
 $conn = new mysqli($host, $username, $password, $database);
 
-// Fetch Job Seeker data
+
 $jobSeekerQuery = "
     SELECT 
         job_seeker.user_id AS 'name', 
@@ -46,7 +46,7 @@ $jobSeekerQuery = "
     WHERE User.is_active = 1";
 $jobSeekerResult = $conn->query($jobSeekerQuery);
 
-// Fetch Employer data
+
 $employerQuery = "
     SELECT 
         employer.user_id AS 'name', 
@@ -58,7 +58,7 @@ $employerQuery = "
     WHERE User.is_active = 1";
 $employerResult = $conn->query($employerQuery);
 
-// Fetch inactive users for restoration
+
 $restoreUserQuery = "
     SELECT 
         user_id AS 'name', 
@@ -71,21 +71,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['delete'])) {
         $userIds = $_POST['user_ids'];
         foreach ($userIds as $userId) {
-            // Set is_active to 0 for the selected users
+            
             $updateQuery = "UPDATE User SET is_active = 0 WHERE user_id = '$userId'";
             $conn->query($updateQuery);
         }
-        // Refresh the page to reflect changes
+        
         header('Location: manage_users.php');
         exit();
     } elseif (isset($_POST['restore'])) {
         $userIds = $_POST['restore_user_ids'];
         foreach ($userIds as $userId) {
-            // Set is_active to 1 for the selected users
+            
             $updateQuery = "UPDATE User SET is_active = 1 WHERE user_id = '$userId'";
             $conn->query($updateQuery);
         }
-        // Refresh the page to reflect changes
+        
         header('Location: manage_users.php');
         exit();
     }
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Techfit</title>
+    <title>Manage Users - Techfit</title>
     <link rel="stylesheet" href="styles.css">   
 </head>
 <body>

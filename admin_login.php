@@ -6,15 +6,15 @@ $username = "root";
 $password = "";
 $dbname = "techfit";
 
-// Create connection
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Check for unique key in URL
+
 $admin_key = "techfit";
 if (!isset($_GET['key']) || $_GET['key'] !== $admin_key) {
     die("Access denied.");
@@ -30,12 +30,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         if (password_verify($password, $row['password'])) {
-            // Start session and set session variables
+            
             $_SESSION['user_id'] = $row['user_id'];
             $_SESSION['username'] = $row['username'];
             $_SESSION['role'] = $row['role'];
 
-            // Redirect to admin dashboard
+            
             header("Location: admin/index.php");
             exit();
         } else {
@@ -135,7 +135,6 @@ $conn->close();
 
         
         }
-        
     </style>
 
 </head>

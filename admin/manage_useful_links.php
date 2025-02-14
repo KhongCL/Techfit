@@ -186,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Useful Links Management</title>
+    <title>Useful Links Management - TechFit</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <header>
@@ -463,7 +463,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
             <?php endforeach; ?>
             <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
-                <a href="useful_links.php" id="manage_useful_links_button" style="background-color: #4CAF50; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Back to Useful Links</a>
+                <a href="useful_links.php" id="manage_useful_links_button" style="padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Back to Useful Links</a>
             </div>
     </div>
     <footer>

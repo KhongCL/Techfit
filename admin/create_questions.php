@@ -1,7 +1,7 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message
+
 function displayLoginMessage() {
     echo '<script>
         alert("You need to log in to access this page.");
@@ -9,17 +9,17 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Admin') {
-    displayLoginMessage(); // Display message if the role is not Admin
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 ?>
 
@@ -38,8 +38,8 @@ session_write_close();
         window.addEventListener('beforeunload', function (e) {
             if (isFormDirty) {
                 const confirmationMessage = 'You have unsaved changes. Are you sure you want to leave this page?';
-                e.returnValue = confirmationMessage; // Gecko, Trident, Chrome 34+
-                return confirmationMessage; // Gecko, WebKit, Chrome <34
+                e.returnValue = confirmationMessage; 
+                return confirmationMessage; 
             }
         });
 
@@ -83,7 +83,7 @@ session_write_close();
                 <hr>
             `;
             document.getElementById('questions').appendChild(questionDiv);
-            updateCorrectChoiceDropdown(questionCount); // Ensure the dropdown is updated initially
+            updateCorrectChoiceDropdown(questionCount); 
         }
 
         function removeQuestion(id) {
@@ -110,7 +110,7 @@ session_write_close();
 
             if (answerType === 'multiple choice') {
                 answerOptionsDiv.innerHTML = getMultipleChoiceOptions(id, includeEmptyChoice);
-                updateCorrectChoiceDropdown(id); // Ensure the dropdown is updated initially
+                updateCorrectChoiceDropdown(id); 
             } else if (answerType === 'true/false') {
                 answerOptionsDiv.innerHTML = `
                     <label for="true_false_${id}">Answer:</label>
@@ -192,8 +192,8 @@ session_write_close();
             const removeButton = document.createElement('button');
             removeButton.type = 'button';
             removeButton.className = 'remove-icon';
-            removeButton.innerHTML = '&#x2715;'; // Unicode for 'X' symbol
-            removeButton.title = 'Remove Choice'; // Tooltip text
+            removeButton.innerHTML = '&#x2715;'; 
+            removeButton.title = 'Remove Choice'; 
             removeButton.onclick = function() {
                 choiceContainer.remove();
                 updateCorrectChoiceDropdown(id);
@@ -204,7 +204,7 @@ session_write_close();
             choiceContainer.appendChild(removeButton);
             choicesDiv.insertBefore(choiceContainer, choicesDiv.lastElementChild);
 
-            // Update the correct choice dropdown
+            
             updateCorrectChoiceDropdown(id);
             isFormDirty = true;
         }
@@ -222,7 +222,7 @@ session_write_close();
             correctChoiceDropdown.innerHTML = '';
 
             choices.forEach((choice, index) => {
-                if (choice.value.trim() !== '') { // Only add non-empty choices
+                if (choice.value.trim() !== '') { 
                     const option = document.createElement('option');
                     option.value = choice.value;
                     option.text = choice.value;
@@ -235,7 +235,7 @@ session_write_close();
             if (confirm('Are you sure you want to save the changes?')) {
                 const form = document.getElementById('questions-form');
                 
-                // Client-side validation
+                
                 const questionDivs = form.querySelectorAll('div[id^="question-"]');
                 const removedQuestions = form.querySelectorAll('input[name="removed_questions[]"]');
                 const removedQuestionIds = Array.from(removedQuestions).map(input => input.value);
@@ -259,7 +259,7 @@ session_write_close();
                         return;
                     }
 
-                    // Additional validation for multiple choice questions
+                    
                     if (answerType.value === 'multiple choice') {
                         const choices = questionDiv.querySelectorAll(`input[name="choices_${i + 1}[]"]`);
                         for (let choice of choices) {
@@ -270,19 +270,19 @@ session_write_close();
                         }
                     }
 
-                    // Validation for code questions
+                    
                     if (answerType.value === 'code') {
                         const codeTemplate = questionDiv.querySelector(`textarea[name="code_template[]"]`);
                         const correctAnswers = questionDiv.querySelector(`textarea[name="correct_choice[]"]`);
                         const language = questionDiv.querySelector(`select[name="code_language[]"]`);
 
-                        // Check empty fields
+                        
                         if (!codeTemplate.value.trim() || !correctAnswers.value.trim() || !language.value) {
                             alert('Code template, answers and programming language are required for code questions.');
                             return;
                         }
 
-                        // Check template format
+                        
                         if (!codeTemplate.value.includes('__BLANK__')) {
                             alert('Code template must include at least one __BLANK__ placeholder.');
                             return;
@@ -304,13 +304,13 @@ session_write_close();
                             return;
                         }
                         
-                        // Check if any answer contains the delimiter
+                        
                         if (correctAnswers.value.includes(ANSWER_DELIMITER + ANSWER_DELIMITER)) {
                             alert('Answers cannot contain consecutive delimiters');
                             return;
                         }
 
-                        // Count blanks and answers match
+                        
                         const blankCount = (codeTemplate.value.match(/__BLANK__/g) || []).length;
                         const answerCount = answers.length;
                         if (blankCount !== answerCount) {
@@ -327,26 +327,26 @@ session_write_close();
     </script>
 
         <style>
-            /* Color Theme */
+           
             :root {
-                --primary-color: #007bff; /* Blue */
-                --secondary-color: #1e1e1e; /* Dark Grey */
-                --accent-color: #0056b3; /* Darker Blue */
-                --text-color: #e0e0e0; /* Slightly Darker White */
-                --background-color: #121212; /* Very Dark Grey */
-                --border-color: #333; /* Dark Grey */
-                --hover-background-color: #333; /* Slightly Lighter Dark Grey */
-                --hover-text-color: #fff; /* White */
-                --button-hover-color: #80bdff; /* Lighter Blue */
-                --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
-                --popup-border-color: #444; /* Slightly Lighter Dark Grey */
-                --danger-color: #dc3545; /* Red */
-                --danger-hover-color: #c82333; /* Darker Red */
-                --success-color: #28a745; /* Green */
-                --success-hover-color: #218838; /* Darker Green */
+                --primary-color: #007bff;
+                --secondary-color: #1e1e1e;
+                --accent-color: #0056b3;
+                --text-color: #e0e0e0;
+                --background-color: #121212;
+                --border-color: #333;
+                --hover-background-color: #333;
+                --hover-text-color: #fff;
+                --button-hover-color: #80bdff;
+                --popup-background-color: #1a1a1a;
+                --popup-border-color: #444;
+                --danger-color: #dc3545;
+                --danger-hover-color: #c82333;
+                --success-color: #28a745;
+                --success-hover-color: #218838;
             }
 
-            /* General Styles */
+           
             body {
                 font-family: Arial, sans-serif;
                 color: var(--text-color);
@@ -357,7 +357,7 @@ session_write_close();
                 padding: 20px;
             }
 
-            /* Buttons */
+           
             button {
                 background-color: var(--primary-color);
                 color: var(--text-color);
@@ -367,7 +367,7 @@ session_write_close();
                 transition: background-color 0.3s ease, color 0.3s ease;
                 border-radius: 5px;
                 font-weight: bold;
-                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+                box-sizing: border-box;
             }
 
             button:hover {
@@ -399,7 +399,7 @@ session_write_close();
                 cursor: pointer;
                 margin-left: 10px;
                 vertical-align: middle;
-                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+                box-sizing: border-box;
             }
 
             button.remove-icon:hover {
@@ -407,12 +407,12 @@ session_write_close();
             }
 
             button[type="button"] {
-                margin-right: 10px; /* Add horizontal spacing between buttons */
+                margin-right: 10px;
             }
 
-            /* Input Fields and Dropdowns */
+           
             input[type="text"], textarea, select {
-                width: 100%; /* Ensure full width */
+                width: 100%;
                 padding: 10px;
                 margin-bottom: 10px;
                 border: 1px solid var(--border-color);
@@ -420,7 +420,7 @@ session_write_close();
                 background-color: var(--secondary-color);
                 color: var(--text-color);
                 transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+                box-sizing: border-box;
             }
 
             input[type="text"]:hover, textarea:hover, select:hover {
@@ -432,44 +432,44 @@ session_write_close();
             }
 
             label, textarea, select, input[type="text"], button {
-                margin-bottom: 15px; /* Add vertical spacing */
+                margin-bottom: 15px;
             }
 
-            /* Dropdown Container */
+           
             .dropdown-container {
                 display: flex;
                 justify-content: space-between;
                 gap: 20px;
-                margin-bottom: 15px; /* Add vertical spacing */
-                width: 100%; /* Match the width of the question text input field */
-                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
-                padding: 0; /* Remove padding to align with the question text input field */
+                margin-bottom: 15px;
+                width: 100%;
+                box-sizing: border-box;
+                padding: 0;
             }
 
             .dropdown-item {
                 flex: 1;
-                margin: 0; /* Remove margin to align with the question text input field */
+                margin: 0;
             }
 
             .dropdown-item select {
-                width: 100%; /* Ensure the dropdowns take the full width of their container */
-                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+                width: 100%;
+                box-sizing: border-box;
             }
 
-            /* Choice Containers */
+           
             .choice-container {
                 display: flex;
                 align-items: center;
-                margin-bottom: 15px; /* Add vertical spacing */
-                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+                margin-bottom: 15px;
+                box-sizing: border-box;
             }
 
             .choice-container input {
                 flex-grow: 1;
-                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+                box-sizing: border-box;
             }
 
-            /* Tooltip */
+           
             button.remove-icon[title]:hover::after {
                 content: attr(title);
                 position: absolute;
@@ -484,10 +484,10 @@ session_write_close();
                 white-space: nowrap;
                 z-index: 1000;
                 box-shadow: 0 0 10px rgba(0,0,0,0.1);
-                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+                box-sizing: border-box;
             }
 
-            /* Spacing */
+           
             .form-group {
                 margin-bottom: 20px;
             }
@@ -609,41 +609,32 @@ session_write_close();
             </div>
             <div class="footer-right">
                 <div class="footer-column">
-                    <h3>Assessments</h3>
+                    <h3>Assessment</h3>
                     <ul>
-                        <li><a href="create_assessment.php">Create New Assessment</a></li>
-                        <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                        <li><a href="view_assessment_results.php">View Assessment Results</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Users</h3>
-                    <ul>
-                        <li><a href="manage_users.php">Manage Users</a></li>
-                        <li><a href="user_feedback.php">User Feedback</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Reports</h3>
-                    <ul>
-                        <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                        <li><a href="user_engagement.php">User Engagement Statistics</a></li>
-                        <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
+                        <li><a href="start_assessment.php">Start Assessment</a></li>
+                        <li><a href="assessment_history.php">Assessment History</a></li>
+                        <li><a href="assessment_summary.php">Assessment Summary</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.php">Manage Useful Links</a></li>
-                        <li><a href="faq.php">Manage FAQs</a></li>
-                        <li><a href="sitemap.php">Manage Sitemap</a></li>
+                        <li><a href="useful_links.php">Useful Links</a></li>
+                        <li><a href="faq.php">FAQ</a></li>
+                        <li><a href="sitemap.php">Sitemap</a></li>
+                        <li><a href="about.php">About</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
-                    <h3>About</h3>
+                    <h3>Contact</h3>
                     <ul>
-                        <li><a href="about.php">About</a></li>
                         <li><a href="contact.php">Contact Us</a></li>
+                        <li><a href="feedback.php">Feedback</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul>
                         <li><a href="terms.php">Terms of Service</a></li>
                         <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>

@@ -80,7 +80,7 @@ session_write_close();
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
                             <li><a href="profile.php">Settings</a></li>
-                            <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li> <!-- Updated Logout link -->
+                            <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li>
                         </ul>
                     </li>
                 </ul>

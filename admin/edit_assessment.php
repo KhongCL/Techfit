@@ -1,7 +1,7 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message
+
 function displayLoginMessage() {
     echo '<script>
         alert("You need to log in to access this page.");
@@ -9,17 +9,17 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Admin') {
-    displayLoginMessage(); // Display message if the role is not Admin
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 ?>
 
@@ -40,8 +40,8 @@ session_start();
         window.addEventListener('beforeunload', function (e) {
             if (isFormDirty) {
                 const confirmationMessage = 'You have unsaved changes. Are you sure you want to leave this page?';
-                e.returnValue = confirmationMessage; // Gecko, Trident, Chrome 34+
-                return confirmationMessage; // Gecko, WebKit, Chrome <34
+                e.returnValue = confirmationMessage; 
+                return confirmationMessage; 
             }
         });
 
@@ -86,7 +86,7 @@ session_start();
                 <hr>
             `;
             document.getElementById('questions').appendChild(questionDiv);
-            console.log('addQuestion:', questionDiv.innerHTML); // Log the initial state of the question div
+            console.log('addQuestion:', questionDiv.innerHTML); 
         }
 
         function removeQuestion(id) {
@@ -100,7 +100,7 @@ session_start();
                 questionDiv.appendChild(input);
                 isFormDirty = true;
 
-                // Send AJAX request to update is_active to false
+                
                 const questionId = document.getElementById(`question_id_${id}`).value;
                 fetch('update_question_status.php', {
                     method: 'POST',
@@ -127,7 +127,7 @@ session_start();
             if (confirm('Are you sure you want to save the changes?')) {
                 const form = document.getElementById('questions-form');
                 
-                // Client-side validation
+                
                 const questionDivs = form.querySelectorAll('div[id^="question-"]');
                 const removedQuestions = form.querySelectorAll('input[name="removed_questions[]"]');
                 const removedQuestionIds = Array.from(removedQuestions).map(input => input.value);
@@ -137,7 +137,7 @@ session_start();
                     const questionId = questionDiv.id.split('-')[1];
 
                     if (removedQuestionIds.includes(questionId)) {
-                        continue; // Skip validation for removed questions
+                        continue; 
                     }
 
                     const questionText = questionDiv.querySelector('textarea[name="question_text[]"]');
@@ -150,7 +150,7 @@ session_start();
                         return;
                     }
 
-                    // Additional validation for multiple choice questions
+                    
                     if (answerType.value === 'multiple choice') {
                         const choices = questionDiv.querySelectorAll(`input[name="choices_${i + 1}[]"]`);
                         for (let choice of choices) {
@@ -161,25 +161,25 @@ session_start();
                         }
                     }
 
-                    // Additional validation for code questions
+                    
                     if (answerType.value === 'code') {
                         const codeTemplate = questionDiv.querySelector(`textarea[name="code_template[]"]`);
                         const correctAnswers = questionDiv.querySelector(`textarea[name="correct_choice[]"]`);
                         const language = questionDiv.querySelector(`select[name="code_language[]"]`);
 
-                        // Check empty fields
+                        
                         if (!codeTemplate.value.trim() || !correctAnswers.value.trim() || !language.value) {
                             alert('Code template, answers and programming language are required for code questions.');
                             return;
                         }
 
-                        // Check template format 
+                        
                         if (!codeTemplate.value.includes('__BLANK__')) {
                             alert('Code template must include at least one __BLANK__ placeholder.');
                             return;
                         }
 
-                        // Validate pipe-separated answers
+                        
                         const answers = correctAnswers.value.split('<<ANSWER_BREAK>>');
                         if (answers.length < 2) {
                             alert('Please provide at least two answers separated by <<ANSWER_BREAK>>');
@@ -190,7 +190,7 @@ session_start();
                             return;
                         }
 
-                        // Count blanks and answers match
+                        
                         const blankCount = (codeTemplate.value.match(/__BLANK__/g) || []).length;
                         const answerCount = answers.length;
                         if (blankCount !== answerCount) {
@@ -203,7 +203,7 @@ session_start();
                 isFormDirty = false;
                 const formData = new FormData(form);
 
-                // Log the form data
+                
                 for (let pair of formData.entries()) {
                     console.log(pair[0] + ': ' + pair[1]);
                 }
@@ -232,7 +232,7 @@ session_start();
 
             if (answerType === 'multiple choice') {
                 answerOptionsDiv.innerHTML = getMultipleChoiceOptions(id, includeEmptyChoice);
-                console.log('showAnswerOptions (multiple choice):', answerOptionsDiv.innerHTML); // Log the generated HTML
+                console.log('showAnswerOptions (multiple choice):', answerOptionsDiv.innerHTML); 
             } else if (answerType === 'true/false') {
                 answerOptionsDiv.innerHTML = `
                     <label for="true_false_${id}">Answer:</label>
@@ -272,7 +272,7 @@ session_start();
                 <label for="correct_choice_${id}">Correct Choice:</label>
                 <select id="correct_choice_${id}" name="correct_choice[]" required></select>
             `;
-            console.log('getMultipleChoiceOptions:', choicesHtml); // Log the generated HTML
+            console.log('getMultipleChoiceOptions:', choicesHtml); 
             return choicesHtml;
         }
 
@@ -305,7 +305,7 @@ session_start();
             input.type = 'text';
             input.name = `choices_${id}[]`;
             input.required = true;
-            input.value = choiceText; // Set the value of the choice input
+            input.value = choiceText; 
 
             const choiceIdInput = document.createElement('input');
             choiceIdInput.type = 'hidden';
@@ -315,8 +315,8 @@ session_start();
             const removeButton = document.createElement('button');
             removeButton.type = 'button';
             removeButton.className = 'remove-icon';
-            removeButton.innerHTML = '&#x2715;'; // Unicode for 'X' symbol
-            removeButton.title = 'Remove Choice'; // Tooltip text
+            removeButton.innerHTML = '&#x2715;'; 
+            removeButton.title = 'Remove Choice'; 
             removeButton.onclick = function() {
                 choiceContainer.remove();
                 updateCorrectChoiceDropdown(id);
@@ -332,10 +332,10 @@ session_start();
             choiceContainer.appendChild(removeButton);
             choicesDiv.insertBefore(choiceContainer, choicesDiv.lastElementChild);
 
-            // Update the correct choice dropdown
+            
             updateCorrectChoiceDropdown(id);
             isFormDirty = true;
-            console.log('addChoice:', choiceContainer); // Log the added choice container
+            console.log('addChoice:', choiceContainer); 
         }
 
         function updateCorrectChoiceDropdown(id) {
@@ -344,23 +344,23 @@ session_start();
             correctChoiceDropdown.innerHTML = '';
 
             choices.forEach((choice, index) => {
-                if (choice.value.trim() !== '') { // Only add non-empty choices
+                if (choice.value.trim() !== '') { 
                     const option = document.createElement('option');
                     option.value = choice.value;
                     option.text = choice.value;
                     correctChoiceDropdown.appendChild(option);
                 }
             });
-            console.log('updateCorrectChoiceDropdown:', correctChoiceDropdown); // Log the updated dropdown
+            console.log('updateCorrectChoiceDropdown:', correctChoiceDropdown); 
         }
 
-        // Fetch existing questions for the assessment
+        
         document.addEventListener('DOMContentLoaded', function() {
             const assessmentId = "<?php echo htmlspecialchars($_GET['assessment_id']); ?>";
             fetch(`get_questions.php?assessment_id=${assessmentId}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Fetched questions:', data); // Log fetched questions
+                    console.log('Fetched questions:', data); 
                     data.forEach(question => {
                         addQuestion();
                         document.getElementById(`question_id_${questionCount}`).value = question.question_id;
@@ -368,17 +368,17 @@ session_start();
                         document.getElementById(`question_text_${questionCount}`).value = question.question_text;
                         document.getElementById(`question_type_${questionCount}`).value = question.question_type;
                         document.getElementById(`answer_type_${questionCount}`).value = question.answer_type;
-                        showAnswerOptions(questionCount, false); // Do not include empty choice for existing questions
+                        showAnswerOptions(questionCount, false); 
                         if (question.answer_type === 'multiple choice') {
-                            // Populate choices for multiple choice questions
-                            console.log('Fetched choices for question:', question.question_id, question.choices); // Log fetched choices
+                            
+                            console.log('Fetched choices for question:', question.question_id, question.choices); 
                             question.choices.forEach(choice => {
                                 addChoice(questionCount, choice.choice_id, choice.choice_text);
                             });
-                            updateCorrectChoiceDropdown(questionCount); // Update the correct choice dropdown
+                            updateCorrectChoiceDropdown(questionCount); 
                             document.getElementById(`correct_choice_${questionCount}`).value = question.correct_answer;
                         } else if (question.answer_type === 'code') {
-                            // Populate code question options
+                            
                             document.getElementById(`code_${questionCount}`).value = question.code_template;
                             document.getElementById(`code_language_${questionCount}`).value = question.programming_language;
                             document.getElementById(`correct_code_${questionCount}`).value = question.correct_answer;
@@ -394,7 +394,7 @@ session_start();
         });
 
 
-        // Function to fetch and display deleted questions
+        
         function viewDeletedQuestions() {
             const assessmentId = "<?php echo htmlspecialchars($_GET['assessment_id']); ?>";
             fetch(`get_deleted_questions.php?assessment_id=${assessmentId}`)
@@ -436,13 +436,13 @@ session_start();
                     }
                     document.getElementById('deleted-questions-popup').style.display = 'block';
 
-                    // Add event listener for select all checkbox
+                    
                     document.getElementById('select-all-deleted').addEventListener('change', function() {
                         const checkboxes = document.querySelectorAll('input[name="restore_questions[]"]');
                         checkboxes.forEach(checkbox => checkbox.checked = this.checked);
                     });
 
-                    // Add search functionality
+                    
                     document.getElementById('searchDeletedQuestions').addEventListener('input', function() {
                         const filter = this.value.toLowerCase();
                         const rows = document.querySelectorAll('#deletedQuestionsTableBody tr');
@@ -488,7 +488,7 @@ session_start();
                         }
                     });
 
-                    // Add sort functionality
+                    
                     document.querySelectorAll('#deleted-questions-popup th[data-column]').forEach(th => {
                         th.addEventListener('mouseenter', function() {
                             const tooltip = document.createElement('div');
@@ -530,13 +530,13 @@ session_start();
                             });
                             rows.forEach(row => document.querySelector('#deletedQuestionsTableBody').appendChild(row));
 
-                            // Update chevron
+                            
                             document.querySelectorAll('#deleted-questions-popup th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
                             this.classList.add(order === 1 ? 'asc' : 'desc');
                         });
                     });
 
-                    // Add shift-click selection for deleted questions
+                    
                     let lastDeletedChecked = null;
                     document.querySelectorAll('.selectDeletedQuestion').forEach(function(checkbox) {
                         checkbox.addEventListener('click', function(event) {
@@ -583,7 +583,7 @@ session_start();
                 .then(data => {
                     if (data.success) {
                         alert('Selected questions restored successfully.');
-                        location.reload(); // Reload the page to update the restored questions
+                        location.reload(); 
                     } else {
                         alert('Failed to restore selected questions.');
                     }
@@ -596,26 +596,26 @@ session_start();
         }
     </script>
         <style>
-            /* Color Theme */
+           
             :root {
-                --primary-color: #007bff; /* Blue */
-                --secondary-color: #1e1e1e; /* Dark Grey */
-                --accent-color: #0056b3; /* Darker Blue */
-                --text-color: #e0e0e0; /* Slightly Darker White */
-                --background-color: #121212; /* Very Dark Grey */
-                --border-color: #333; /* Dark Grey */
-                --hover-background-color: #333; /* Slightly Lighter Dark Grey */
-                --hover-text-color: #fff; /* White */
-                --button-hover-color: #80bdff; /* Lighter Blue */
-                --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
-                --popup-border-color: #444; /* Slightly Lighter Dark Grey */
-                --danger-color: #dc3545; /* Red */
-                --danger-hover-color: #c82333; /* Darker Red */
-                --success-color: #28a745; /* Green */
-                --success-hover-color: #218838; /* Darker Green */
+                --primary-color: #007bff;
+                --secondary-color: #1e1e1e;
+                --accent-color: #0056b3;
+                --text-color: #e0e0e0;
+                --background-color: #121212;
+                --border-color: #333;
+                --hover-background-color: #333;
+                --hover-text-color: #fff;
+                --button-hover-color: #80bdff;
+                --popup-background-color: #1a1a1a;
+                --popup-border-color: #444;
+                --danger-color: #dc3545;
+                --danger-hover-color: #c82333;
+                --success-color: #28a745;
+                --success-hover-color: #218838;
             }
 
-            /* General Styles */
+           
             body {
                 font-family: Arial, sans-serif;
                 color: var(--text-color);
@@ -626,7 +626,7 @@ session_start();
                 padding: 20px;
             }
 
-            /* Header Controls */
+           
             .header-controls {
                 display: flex;
                 justify-content: space-between;
@@ -689,7 +689,7 @@ session_start();
                 display: none;
                 position: absolute;
                 top: calc(100% + 10px);
-                left: 0; /* Ensure left alignment with the search field */
+                left: 0;
                 background: var(--popup-background-color);
                 color: var(--text-color);
                 padding: 10px;
@@ -700,7 +700,7 @@ session_start();
                 z-index: 1000;
             }
 
-            /* Buttons */
+           
             button {
                 background-color: var(--primary-color);
                 color: var(--text-color);
@@ -710,7 +710,7 @@ session_start();
                 transition: background-color 0.3s ease, color 0.3s ease;
                 border-radius: 5px;
                 font-weight: bold;
-                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+                box-sizing: border-box;
             }
 
             button:hover {
@@ -742,7 +742,7 @@ session_start();
                 cursor: pointer;
                 margin-left: 10px;
                 vertical-align: middle;
-                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+                box-sizing: border-box;
             }
 
             button.remove-icon:hover {
@@ -750,11 +750,11 @@ session_start();
             }
 
             button[type="button"] {
-                margin-right: 10px; /* Add horizontal spacing between buttons */
+                margin-right: 10px;
             }
 
 
-            /* Table */
+           
             table {
                 width: 100%;
                 border-collapse: collapse;
@@ -772,7 +772,7 @@ session_start();
                 cursor: pointer;
                 position: relative;
                 transition: background-color 0.3s ease;
-                padding-right: 20px; /* Add space for chevron */
+                padding-right: 20px;
             }
 
             th[data-column]:hover {
@@ -785,7 +785,7 @@ session_start();
                 color: var(--hover-text-color);
             }
 
-            /* Chevron */
+           
             th[data-column]::after {
                 content: '';
                 position: absolute;
@@ -816,7 +816,7 @@ session_start();
                 border-bottom-color: var(--hover-text-color);
             }
 
-            /* Deleted Questions Popup */
+           
             #deleted-questions-popup {
                 display: none;
                 position: fixed;
@@ -848,18 +848,18 @@ session_start();
                 color: var(--text-color);
                 font-size: 24px;
                 cursor: pointer;
-                transition: color 0.3s ease, transform 0.3s ease; /* Add transition for smooth effect */
+                transition: color 0.3s ease, transform 0.3s ease;
             }
 
             .assessment-close-button:hover {
-                color: var(--accent-color); /* Use a less prominent color for hover */
-                transform: scale(1.1); /* Slightly enlarge the button on hover */
-                background: none; /* Ensure no background color on hover */
+                color: var(--accent-color);
+                transform: scale(1.1);
+                background: none;
             }
 
-            /* Input Fields and Dropdowns */
+           
             input[type="text"], textarea, select {
-                width: 100%; /* Ensure full width */
+                width: 100%;
                 padding: 10px;
                 margin-bottom: 10px;
                 border: 1px solid var(--border-color);
@@ -867,7 +867,7 @@ session_start();
                 background-color: var(--secondary-color);
                 color: var(--text-color);
                 transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+                box-sizing: border-box;
             }
 
             input[type="text"]:hover, textarea:hover, select:hover {
@@ -879,44 +879,44 @@ session_start();
             }
 
             label, textarea, select, input[type="text"], button {
-                margin-bottom: 15px; /* Add vertical spacing */
+                margin-bottom: 15px;
             }
 
-            /* Dropdown Container */
+           
             .dropdown-container {
                 display: flex;
                 justify-content: space-between;
                 gap: 20px;
-                margin-bottom: 15px; /* Add vertical spacing */
-                width: 100%; /* Match the width of the question text input field */
-                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
-                padding: 0; /* Remove padding to align with the question text input field */
+                margin-bottom: 15px;
+                width: 100%;
+                box-sizing: border-box;
+                padding: 0;
             }
 
             .dropdown-item {
                 flex: 1;
-                margin: 0; /* Remove margin to align with the question text input field */
+                margin: 0;
             }
 
             .dropdown-item select {
-                width: 100%; /* Ensure the dropdowns take the full width of their container */
-                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+                width: 100%;
+                box-sizing: border-box;
             }
 
-            /* Choice Containers */
+           
             .choice-container {
                 display: flex;
                 align-items: center;
-                margin-bottom: 15px; /* Add vertical spacing */
-                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+                margin-bottom: 15px;
+                box-sizing: border-box;
             }
 
             .choice-container input {
                 flex-grow: 1;
-                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+                box-sizing: border-box;
             }
 
-            /* Tooltip */
+           
             button.remove-icon[title]:hover::after {
                 content: attr(title);
                 position: absolute;
@@ -931,10 +931,10 @@ session_start();
                 white-space: nowrap;
                 z-index: 1000;
                 box-shadow: 0 0 10px rgba(0,0,0,0.1);
-                box-sizing: border-box; /* Ensure padding is included in the element's total width and height */
+                box-sizing: border-box;
             }
 
-            /* Spacing */
+           
             .form-group {
                 margin-bottom: 20px;
             }
@@ -1060,7 +1060,6 @@ session_start();
                         </tr>
                     </thead>
                     <tbody id="deletedQuestionsTableBody">
-                        <!-- Deleted questions will be populated here -->
                     </tbody>
                 </table>
             </form>
@@ -1093,41 +1092,32 @@ session_start();
             </div>
             <div class="footer-right">
                 <div class="footer-column">
-                    <h3>Assessments</h3>
+                    <h3>Assessment</h3>
                     <ul>
-                        <li><a href="create_assessment.php">Create New Assessment</a></li>
-                        <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                        <li><a href="view_assessment_results.php">View Assessment Results</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Users</h3>
-                    <ul>
-                        <li><a href="manage_users.php">Manage Users</a></li>
-                        <li><a href="user_feedback.php">User Feedback</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Reports</h3>
-                    <ul>
-                        <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                        <li><a href="user_engagement.php">User Engagement Statistics</a></li>
-                        <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
+                        <li><a href="start_assessment.php">Start Assessment</a></li>
+                        <li><a href="assessment_history.php">Assessment History</a></li>
+                        <li><a href="assessment_summary.php">Assessment Summary</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.php">Manage Useful Links</a></li>
-                        <li><a href="faq.php">Manage FAQs</a></li>
-                        <li><a href="sitemap.php">Manage Sitemap</a></li>
+                        <li><a href="useful_links.php">Useful Links</a></li>
+                        <li><a href="faq.php">FAQ</a></li>
+                        <li><a href="sitemap.php">Sitemap</a></li>
+                        <li><a href="about.php">About</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
-                    <h3>About</h3>
+                    <h3>Contact</h3>
                     <ul>
-                        <li><a href="about.php">About</a></li>
                         <li><a href="contact.php">Contact Us</a></li>
+                        <li><a href="feedback.php">Feedback</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul>
                         <li><a href="terms.php">Terms of Service</a></li>
                         <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>

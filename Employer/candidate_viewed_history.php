@@ -1,7 +1,7 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message and options
+
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
@@ -13,17 +13,17 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message and options if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Employer') {
-    displayLoginMessage(); // Display message and options if the role is not Employer
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 ?>
 
@@ -32,7 +32,7 @@ session_write_close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us - TechFit</title>
+    <title>Candidates Viewed History - TechFit</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -74,57 +74,50 @@ session_write_close();
         </nav>
     </header>
     
-    <section class="about-us">
+    <section id="about-us">
         <div class="container">
-          <h1>About Us</h1>
-          
-          <!-- Mission Section -->
-            <div class="about-block">
-            <div class="text-left">
-                <h2>Our Mission</h2>
-                <p>We are committed to helping job seekers achieve their goals by offering effective, skill-assessing tools that match them with the right opportunities.</p>
-            </div>
-            <div class="image-right">
-                <img src="https://picsum.photos/500/300?random=1" alt="Our Mission in Action">
-            </div>
-            </div>
+            <h2>About Us</h2>
 
-            <!-- Vision Section --> 
-            <div class="about-block">
-                <div class="image-left">
-                    <img src="https://picsum.photos/1600/900?random=2" alt="Vision Image">
+            <div id="mission" class="about-block">
+                <div id="mission-text" class="text-left">
+                    <h3>Our Mission</h3>
+                    <p>To help job seekers achieve their goals by offering effective, skill-assessing tools that match them with the right employers.</p>
                 </div>
-                <div class="text-right">
-                    <h2>Our Vision</h2>
-                    <p>Our vision is to revolutionize the way people interact with technology, creating a future where innovation and sustainability go hand in hand. We aim to lead the way in providing cutting-edge solutions that empower businesses and individuals alike.</p>
+                <div id="mission-image" class="image-right">
+                    <img src="images/mission.png" alt="Our Mission in Action">
                 </div>
             </div>
+    
+            <div id="vision" class="about-block">
+                <div id="vision-image" class="image-left">
+                    <img src="images/vision.png" alt="Visions We Share">    
+                </div>
+                <div id="vision-text" class="text-right">
+                    <h3>Our Vision</h3>
+                    <p>To make job searching and hiring easy and effective for everyone, making meaningful connections that benefit both job seekers and employers.</p>
+                </div>
+            </div>
+    
+            <h3 id="values-title">Our Values</h3>
+            <div id="values-gallery" class="values-gallery">
+                <div class="value-item">
+                    <img src="images/innovation.jpg" alt="Innovation">
+                    <p>Innovation</p>
+                </div>
+                <div class="value-item">
+                    <img src="images/integrity.jpg" alt="Integrity">
+                    <p>Integrity</p>
+                </div>
+                <div class="value-item">
+                    <img src="images/collaboration.jpg" alt="Collaboration">
+                    <p>Collaboration</p>
+                </div>
+                </div>
+            </div>
+        </div>
+    </section> 
 
-          
-            <!-- Values Section-->
-            <h2>Our Values</h2>
-            <div class="values-gallery">
-            <div class="value-item">
-                <img src="https://picsum.photos/300/300?random=1" alt="Innovation">
-                <p>Innovation</p>
-            </div>
-            <div class="value-item">
-                <img src="https://picsum.photos/300/300?random=2" alt="Integrity">
-                <p>Integrity</p>
-            </div>
-            <div class="value-item">
-                <img src="https://picsum.photos/300/300?random=3" alt="Collaboration">
-                <p>Collaboration</p>
-            </div>
-            <div class="value-item">
-                <img src="https://picsum.photos/300/300?random=4" alt="Excellence">
-                <p>Excellence</p>
-            </div>
-            </div>
-            </div>
-      </section>   
-
-      <footer>
+    <footer>
         <div class="footer-content">
             <div class="footer-left">
                 <div class="footer-logo">
@@ -138,14 +131,16 @@ session_write_close();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
                 <div class="footer-column">
-                    <h3>Candidate</h3>
+                    <h3>Assessment</h3>
                     <ul>
-                        <li><a href="search_candidate.php">Search Candidates</a></li>
+                        <li><a href="start_assessment.php">Start Assessment</a></li>
+                        <li><a href="assessment_history.php">Assessment History</a></li>
+                        <li><a href="assessment_summary.php">Assessment Summary</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">

@@ -164,7 +164,7 @@ try {
             <?php endif; ?>
         </div>
         <div style="text-align: center; margin-top: 30px; padding-bottom: 30px;">
-            <a href="manage_faq.php" id="manage_faq_button" style="background-color: #4CAF50; padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Manage FAQs</a>
+            <a href="manage_faq.php" id="manage_faq_button" style="padding: 10px 20px; color: white; text-decoration: none; border-radius: 5px;">Manage FAQs</a>
         </div>
     </section>
 

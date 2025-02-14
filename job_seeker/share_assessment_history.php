@@ -1,11 +1,11 @@
 <?php
 session_start();
 
-// Check if the URL is accessed as shared
+
 $is_shared = isset($_GET['shared']) && $_GET['shared'] === 'true';
 
 
-// Database connection
+
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -16,14 +16,14 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Validate and get assessment ID from query parameter
+
 if (!isset($_GET['assessment_id']) || empty($_GET['assessment_id'])) {
     die("Invalid assessment ID.");
 }
 
 $assessment_id = $_GET['assessment_id'];
 
-// Fetch assessment details
+
 $sql = "WITH SectionScores AS (
     SELECT 
         a.job_seeker_id,
@@ -92,7 +92,7 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assessment History Report</title>
+    <title>Assessment History Report - TechFit</title>
     <style>
         :root {
             --primary-color: #007bff;

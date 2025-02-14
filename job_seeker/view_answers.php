@@ -1,7 +1,7 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message and options
+
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
@@ -13,25 +13,25 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message and options if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Job Seeker') {
-    displayLoginMessage(); // Display message and options if the role is not Job Seeker
+    displayLoginMessage(); 
 }
 
-// Check if the job seeker ID is set
+
 if (!isset($_SESSION['job_seeker_id'])) {
-    displayLoginMessage(); // Display message and options if job seeker ID is not set
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 
-// Database connection
+
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -42,10 +42,10 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Retrieve assessment ID from query parameter
+
 $assessment_id = $_GET['assessment_id'];
 
-// Fetch assessment details and answers
+
 $sql = "
     SELECT 
     Assessment_Job_Seeker.end_time AS assessment_date, 
@@ -77,6 +77,48 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
+
+$programming_sql = "SELECT DISTINCT q.assessment_id 
+FROM Question q
+WHERE q.assessment_id IN ('AS77', 'AS78', 'AS79', 'AS80')
+AND q.question_id IN (
+    SELECT a.question_id 
+    FROM Answer a 
+    WHERE a.job_seeker_id = ? 
+    AND job_seeker_id IN (
+        SELECT job_seeker_id 
+        FROM Assessment_Job_Seeker 
+        WHERE result_id = ?
+    )
+)";
+
+$stmt = $conn->prepare($programming_sql);
+$stmt->bind_param("ss", $_SESSION['job_seeker_id'], $assessment_id);
+$stmt->execute();
+$prog_result = $stmt->get_result();
+$row = $prog_result->fetch_assoc();
+$programming_section = $row ? $row['assessment_id'] : null;
+
+
+$sections = [
+    'AS75' => 'General Questions',
+    'AS76' => 'Scenario-Based Questions'
+];
+
+
+$programming_names = [
+    'AS77' => 'Python Programming',
+    'AS78' => 'Java Programming',
+    'AS79' => 'JavaScript Programming',
+    'AS80' => 'C++ Programming'
+];
+
+if ($programming_section) {
+    $sections[$programming_section] = $programming_names[$programming_section];
+}
+
+
+$sections['AS81'] = 'Work-Style and Personality';
 ?>
 
 <!DOCTYPE html>
@@ -84,7 +126,7 @@ $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechFit</title>
+    <title>View Answers - TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         :root {
@@ -117,20 +159,21 @@ $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         .summary_header {
-            background: white;
-            padding: 20px;
+            background-color: var(--background-color-medium);
+            padding: 15px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            text-align: left;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            margin-bottom: 15px;
             width: 100%;
         }
 
         .summary_header h2 {
             margin: 0;
-            color: #333;
+            color: var(--text-color);
             font-size: 1.5em;
             margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--background-color-light);
         }
 
         .summary_header p {
@@ -138,6 +181,12 @@ $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
             color: #666;
             font-size: 1em;
             line-height: 1.4;
+        }
+
+        .summary_details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .summary-item {
@@ -193,7 +242,8 @@ $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
 
         .code-container {
             font-family: 'Consolas', monospace;
-            background: #f8f9fa;
+            background-color: var(--background-color);
+            color: var(--text-color);
             padding: 20px;
             border-radius: 4px;
             margin-top: 10px;
@@ -229,11 +279,17 @@ $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         .language-indicator {
-            background: #e9ecef;
+            background-color: var(--background-color-light);
+            color: var(--text-color);
             padding: 8px 12px;
             border-radius: 4px 4px 0 0;
             font-weight: bold;
             margin-bottom: 0;
+        }
+
+        .your-answer, .correct-answer {
+            background-color: var(--background-color-light);
+            color: var(--text-color);
         }
 
         .point-value {
@@ -255,19 +311,26 @@ $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
             color: var(--danger-color);
         }
 
+        .page-wrapper {
+            width: 75%;
+            margin: 0 auto;
+            min-width: 900px;
+        }
+
         .assessment-container {
             display: flex;
             flex-direction: column;
             gap: 20px;
             padding: 20px;
-            max-width: 1400px;
+            width: 100%;
             margin: 0 auto;
         }
 
         .questions-section {
             flex: 2;
             min-width: 0;
-            background: white;
+            background-color: var(--background-color-medium);
+            color: var(--text-color);
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -287,19 +350,104 @@ $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         .question-item {
+            background-color: var(--background-color);
+            border-color: var(--background-color-light);
             margin-bottom: 20px;
             padding: 15px;
-            border: 1px solid #eee;
+            border: 1px solid var(--background-color-light);
             border-radius: 4px;
         }
 
+        .section-navigator {
+            width: 100%;
+            position: static;
+            top: 20px;
+            background-color: var(--background-color-medium);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid var(--background-color-light);
+        }
+
+        .section-nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .section-nav-item {
+            padding: 8px 12px;
+            background-color: var(--background-color-light);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            color: var(--text-color);
+        }
+
+        .section-nav-item:hover,
+        .section-nav-item.active {
+            background-color: var(--primary-color);
+        }
+
+        .detail_item {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background-color: var(--background-color);
+            border-radius: 6px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .detail_label {
+            color: var(--text-color-dark);
+            font-weight: 500;
+            font-size: 0.75em;
+        }
+
+        .detail_value {
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 0.75em;
+        }
+
+        .detail_value.score {
+            color: var(--success-color);
+            font-size: 0.85em;
+        }
+
         @media screen and (max-width: 1024px) {
+            .page-wrapper {
+                width: 90%;
+                min-width: auto;
+            }
+
             .assessment-container {
                 flex-direction: column;
             }
             
             .questions-section {
                 width: 100%;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .summary_header {
+                padding: 20px;
+            }
+
+            .detail_item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .detail_label {
+                min-width: auto;
             }
         }
     </style>
@@ -333,11 +481,11 @@ $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
                             <div class="profile-info">
                                 <span class="username" id="username">
                                     <?php
-                                    // Check if the user is logged in and display their username
+                                    
                                     if (isset($_SESSION['username'])) {
-                                        echo $_SESSION['username'];  // Display the username from session
+                                        echo $_SESSION['username'];  
                                     } else {
-                                        echo "Guest";  // Default if not logged in
+                                        echo "Guest";  
                                     }
                                     ?>
                                 </span>
@@ -366,114 +514,132 @@ $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
         <button class="cancel-button" onclick="closePopup('logout-popup')">No</button>
     </div>
 
-    <div class="assessment-container">
-        <div class="summary_header">
-            <h2>View Answers</h2>
-            <?php if (!empty($assessment_details)): ?>
-                <p>Assessment ID: <?= $assessment_id; ?></p>
-                <p>Assessment Date: <?= date('d/m/Y', strtotime($assessment_details[0]['assessment_date'])); ?></p>
-                <p>Score: <?= $assessment_details[0]['score']; ?>%</p>
-            <?php endif; ?>
-        </div>
-        <div class="questions-section">
-            <?php if (!empty($assessment_details)): ?>
-                <?php
-                $current_section = '';
-                $sections = [
-                    'AS75' => 'General Questions',
-                    'AS76' => 'Scenario-Based Questions',
-                    'AS77' => 'Python Programming',
-                    'AS78' => 'Java Programming',
-                    'AS79' => 'JavaScript Programming',
-                    'AS80' => 'C++ Programming',
-                    'AS81' => 'Work-Style and Personality'
-                ];
-
-                foreach ($assessment_details as $detail):
-                    if (in_array($detail['assessment_id'], ['AS77', 'AS78', 'AS79']) && 
-                        $detail['programming_language'] !== 'cpp') {
-                        continue;
-                    }
-
-                    if ($detail['assessment_id'] !== $current_section) {
-                        if ($current_section !== '') {
-                            echo "</div>";
-                        }
-                        $current_section = $detail['assessment_id'];
-                        echo "<h2 class='section-header'>{$sections[$current_section]}</h2>";
-                        echo "<div class='section-questions'>";
-                    }
-                ?>
-                    <div class="question-item">
-                        <p class="question-text"><?= htmlspecialchars($detail['question_text']); ?></p>
-                        <div class="answer-pair">
-                            <?php if ($detail['answer_type'] === 'code'): ?>
-                                <!-- Code question display -->
-                                <?php if (!empty($detail['programming_language'])): ?>
-                                    <div class="language-indicator">
-                                        Language: <?= ucfirst($detail['programming_language']); ?>
-                                    </div>
-                                <?php endif; ?>
-
-                                <?php if (!empty($detail['code_template'])): ?>
-                                    <div class="code-container">
-                                        <pre class="code-template"><?= htmlspecialchars($detail['code_template']); ?></pre>
-                                    </div>
-                                <?php endif; ?>
-
-                                <div class="answers-section">
-                                    <h4>Your Answers:</h4>
-                                    <?php
-                                    $user_answers = explode('<<ANSWER_BREAK>>', $detail['user_answer']);
-                                    $correct_answers = explode('<<ANSWER_BREAK>>', $detail['correct_answer']);
-                                    ?>
-                                    <ol class="answer-list">
-                                        <?php foreach ($user_answers as $index => $answer): ?>
-                                            <?php
-                                            $is_correct = isset($correct_answers[$index]) && 
-                                                        trim($answer) === trim($correct_answers[$index]);
-                                            $point_value = round(100/count($correct_answers))/100;
-                                            ?>
-                                            <li>
-                                                <?= htmlspecialchars($answer); ?>
-                                                <?php if (!in_array($detail['assessment_id'], ['AS75', 'AS81'])): ?>
-                                                    <span class="status-indicator <?= $is_correct ? 'status-correct' : 'status-incorrect' ?>">
-                                                        <?= $is_correct ? '✓' : '✗' ?>
-                                                    </span>
-                                                    <span class="point-value">(<?= number_format($point_value, 2) ?> points)</span>
-                                                <?php endif; ?>
-                                            </li>
-                                        <?php endforeach; ?>
-                                    </ol>
-
-                                    <?php if (!in_array($detail['assessment_id'], ['AS75', 'AS81'])): ?>
-                                        <h4>Correct Answers:</h4>
-                                        <ol class="answer-list">
-                                            <?php foreach ($correct_answers as $answer): ?>
-                                                <li class="correct-answer"><?= htmlspecialchars($answer); ?></li>
-                                            <?php endforeach; ?>
-                                        </ol>
-                                    <?php endif; ?>
-                                </div>
-                            <?php else: ?>
-                                <!-- Multiple choice question display -->
-                                <div class="your-answer">Your Answer: <?= htmlspecialchars($detail['display_answer']); ?></div>
-                                <?php if (!in_array($detail['assessment_id'], ['AS75', 'AS81'])): ?>
-                                    <div class="correct-answer">
-                                        Correct Answer: <?= htmlspecialchars($detail['correct_answer']); ?>
-                                        <span class="status-indicator <?= $detail['is_correct'] ? 'status-correct' : 'status-incorrect' ?>">
-                                            <?= $detail['is_correct'] ? '✓' : '✗' ?>
-                                        </span>
-                                    </div>
-                                <?php endif; ?>
-                            <?php endif; ?>
+    <div class="page-wrapper">
+        <div class="assessment-container">
+            <div class="summary_header">
+                <h2>View Answers</h2>
+                <?php if (!empty($assessment_details)): ?>
+                    <div class="summary_details">
+                        <div class="detail_item">
+                            <span class="detail_label">Assessment ID:</span>
+                            <span class="detail_value"><?= $assessment_id; ?></span>
+                        </div>
+                        <div class="detail_item">
+                            <span class="detail_label">Assessment Date:</span>
+                            <span class="detail_value"><?= date('d/m/Y', strtotime($assessment_details[0]['assessment_date'])); ?></span>
+                        </div>
+                        <div class="detail_item">
+                            <span class="detail_label">Score:</span>
+                            <span class="detail_value score"><?= $assessment_details[0]['score']; ?>%</span>
                         </div>
                     </div>
-                <?php endforeach; ?>
-                <?php if ($current_section !== '') echo "</div>"; ?>
-            <?php else: ?>
-                <p>No answers found for this assessment.</p>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
+            <div class="section-navigator">
+                <ul class="section-nav-list">
+                    <?php foreach ($sections as $id => $name): ?>
+                        <li class="section-nav-item" onclick="scrollToSection('<?php echo $id; ?>')"><?php echo $name; ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <div class="questions-section">
+                <?php if (!empty($assessment_details)): ?>
+                    <?php
+                    $current_section = '';
+                    $sections = [
+                        'AS75' => 'General Questions',
+                        'AS76' => 'Scenario-Based Questions',
+                        'AS77' => 'Python Programming',
+                        'AS78' => 'Java Programming',
+                        'AS79' => 'JavaScript Programming',
+                        'AS80' => 'C++ Programming',
+                        'AS81' => 'Work-Style and Personality'
+                    ];
+
+                    foreach ($assessment_details as $detail):
+                        if (in_array($detail['assessment_id'], ['AS77', 'AS78', 'AS79']) && 
+                            $detail['programming_language'] !== 'cpp') {
+                            continue;
+                        }
+
+                        if ($detail['assessment_id'] !== $current_section) {
+                            if ($current_section !== '') {
+                                echo "</div>";
+                            }
+                            $current_section = $detail['assessment_id'];
+                            echo "<h2 class='section-header'>{$sections[$current_section]}</h2>";
+                            echo "<div id='{$current_section}' class='section-questions'>";
+                        }
+                    ?>
+                        <div class="question-item">
+                            <p class="question-text"><?= htmlspecialchars($detail['question_text']); ?></p>
+                            <div class="answer-pair">
+                                <?php if ($detail['answer_type'] === 'code'): ?>
+                                    <?php if (!empty($detail['programming_language'])): ?>
+                                        <div class="language-indicator">
+                                            Language: <?= ucfirst($detail['programming_language']); ?>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <?php if (!empty($detail['code_template'])): ?>
+                                        <div class="code-container">
+                                            <pre class="code-template"><?= htmlspecialchars($detail['code_template']); ?></pre>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <div class="answers-section">
+                                        <h4>Your Answers:</h4>
+                                        <?php
+                                        $user_answers = explode('<<ANSWER_BREAK>>', $detail['user_answer']);
+                                        $correct_answers = explode('<<ANSWER_BREAK>>', $detail['correct_answer']);
+                                        ?>
+                                        <ol class="answer-list">
+                                            <?php foreach ($user_answers as $index => $answer): ?>
+                                                <?php
+                                                $is_correct = isset($correct_answers[$index]) && 
+                                                            trim($answer) === trim($correct_answers[$index]);
+                                                $point_value = round(100/count($correct_answers))/100;
+                                                ?>
+                                                <li>
+                                                    <?= htmlspecialchars($answer); ?>
+                                                    <?php if (!in_array($detail['assessment_id'], ['AS75', 'AS81'])): ?>
+                                                        <span class="status-indicator <?= $is_correct ? 'status-correct' : 'status-incorrect' ?>">
+                                                            <?= $is_correct ? '✓' : '✗' ?>
+                                                        </span>
+                                                        <span class="point-value">(<?= number_format($point_value, 2) ?> points)</span>
+                                                    <?php endif; ?>
+                                                </li>
+                                            <?php endforeach; ?>
+                                        </ol>
+
+                                        <?php if (!in_array($detail['assessment_id'], ['AS75', 'AS81'])): ?>
+                                            <h4>Correct Answers:</h4>
+                                            <ol class="answer-list">
+                                                <?php foreach ($correct_answers as $answer): ?>
+                                                    <li class="correct-answer"><?= htmlspecialchars($answer); ?></li>
+                                                <?php endforeach; ?>
+                                            </ol>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="your-answer">Your Answer: <?= htmlspecialchars($detail['display_answer']); ?></div>
+                                    <?php if (!in_array($detail['assessment_id'], ['AS75', 'AS81'])): ?>
+                                        <div class="correct-answer">
+                                            Correct Answer: <?= htmlspecialchars($detail['correct_answer']); ?>
+                                            <span class="status-indicator <?= $detail['is_correct'] ? 'status-correct' : 'status-incorrect' ?>">
+                                                <?= $detail['is_correct'] ? '✓' : '✗' ?>
+                                            </span>
+                                        </div>
+                                    <?php endif; ?>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                    <?php if ($current_section !== '') echo "</div>"; ?>
+                <?php else: ?>
+                    <p>No answers found for this assessment.</p>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 
@@ -491,7 +657,7 @@ $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -546,6 +712,42 @@ $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
         function logoutUser() {
             window.location.href = '/Techfit'; 
         }
+
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                
+                document.querySelectorAll('.section-nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                const activeItem = document.querySelector(`[onclick="scrollToSection('${sectionId}')"]`);
+                if (activeItem) {
+                    activeItem.classList.add('active');
+                }
+            }
+        }
+
+        
+        document.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.section-questions');
+            let currentSection = '';
+            
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= 100) {
+                    currentSection = section.id;
+                }
+            });
+            
+            if (currentSection) {
+                document.querySelectorAll('.section-nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector(`[onclick="scrollToSection('${currentSection}')"]`)?.classList.add('active');
+            }
+        });
     </script>
 
 </body>

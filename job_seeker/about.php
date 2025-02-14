@@ -104,20 +104,20 @@ session_write_close();
     <section id="about-us">
         <div class="container">
             <h2>About Us</h2>
-    
+
             <div id="mission" class="about-block">
                 <div id="mission-text" class="text-left">
                     <h3>Our Mission</h3>
                     <p>To help job seekers achieve their goals by offering effective, skill-assessing tools that match them with the right employers.</p>
                 </div>
                 <div id="mission-image" class="image-right">
-                    <img src="https://picsum.photos/500/300?random=1" alt="Our Mission in Action">
+                    <img src="images/mission.png" alt="Our Mission in Action">
                 </div>
             </div>
     
             <div id="vision" class="about-block">
                 <div id="vision-image" class="image-left">
-                    <img src="https://picsum.photos/1600/900?random=2" alt="Vision Image">
+                    <img src="images/vision.png" alt="Visions We Share">    
                 </div>
                 <div id="vision-text" class="text-right">
                     <h3>Our Vision</h3>
@@ -128,16 +128,17 @@ session_write_close();
             <h3 id="values-title">Our Values</h3>
             <div id="values-gallery" class="values-gallery">
                 <div class="value-item">
-                    <img src="https://picsum.photos/300/300?random=1" alt="Innovation">
+                    <img src="images/innovation.jpg" alt="Innovation">
                     <p>Innovation</p>
                 </div>
                 <div class="value-item">
-                    <img src="https://picsum.photos/300/300?random=2" alt="Integrity">
+                    <img src="images/integrity.jpg" alt="Integrity">
                     <p>Integrity</p>
                 </div>
                 <div class="value-item">
-                    <img src="https://picsum.photos/300/300?random=3" alt="Collaboration">
+                    <img src="images/collaboration.jpg" alt="Collaboration">
                     <p>Collaboration</p>
+                </div>
                 </div>
             </div>
         </div>

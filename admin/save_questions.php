@@ -8,15 +8,15 @@ $username = "root";
 $password = "";
 $dbname = "techfit";
 
-// Create connection
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Function to generate the next ID with a given prefix
+
 function generateNextId($conn, $table, $column, $prefix) {
     $sql = "SELECT MAX(CAST(SUBSTRING($column, LENGTH('$prefix') + 1) AS UNSIGNED)) AS max_id FROM $table WHERE $column LIKE '$prefix%'";
     $result = $conn->query($sql);
@@ -27,7 +27,7 @@ function generateNextId($conn, $table, $column, $prefix) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Log the entire $_POST array
+    
     error_log("POST data: " . print_r($_POST, true));
 
     $assessment_id = $_POST['assessment_id'];
@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $answer_types = $_POST['answer_type'];
     $correct_answers = $_POST['correct_choice'];
 
-    // Check if the assessment_id exists in the Assessment_Admin table
+    
     $assessment_check_sql = "SELECT assessment_id FROM Assessment_Admin WHERE assessment_id = '$assessment_id'";
     $assessment_check_result = $conn->query($assessment_check_sql);
     if ($assessment_check_result->num_rows == 0) {
@@ -61,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $code_template = $_POST['code_template'][$index];
             $programming_language = $_POST['code_language'][$index];
 
-            // Validate answers format
+            
             $answers = explode('<<ANSWER_BREAK>>', $correct_answer);
             if (count($answers) < 2) {
                 $_SESSION['error_message'] = "Please provide at least two answers separated by <<ANSWER_BREAK>>";
@@ -69,7 +69,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit();
             }
             
-            // Check for empty/blank answers
+            
             foreach ($answers as $answer) {
                 if (trim($answer) === '') {
                     $_SESSION['error_message'] = "Empty or blank answers are not allowed. Please provide valid answers separated by <<ANSWER_BREAK>>";
@@ -91,9 +91,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         }
 
-        // Insert choices for multiple choice questions
+        
         if ($answer_type === 'multiple choice') {
-            $choices_key = "choices_" . ($index + 1); // Adjust the key by adding 1
+            $choices_key = "choices_" . ($index + 1); 
             if (isset($_POST[$choices_key])) {
                 $choices = $_POST[$choices_key];
                 foreach ($choices as $choice_text) {
@@ -117,7 +117,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Update the last_modified column in the Assessment_Admin table
+    
     $update_last_modified_sql = "UPDATE Assessment_Admin SET last_modified = NOW() WHERE assessment_id = '$assessment_id'";
     if ($conn->query($update_last_modified_sql) !== TRUE) {
         $_SESSION['error_message'] = "Error updating last modified date: " . $conn->error;

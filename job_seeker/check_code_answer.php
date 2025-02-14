@@ -27,12 +27,12 @@ function checkCodeAnswer($conn, $questionId, $userAnswers) {
     $userParts = explode('<<ANSWER_BREAK>>', $userAnswers);
     $correctParts = explode('<<ANSWER_BREAK>>', $questionDetails['correct_answer']); 
     
-    // Check if number of answers matches
+    
     if (count($userParts) !== count($correctParts)) {
         return false;
     }
     
-    // Compare each answer
+    
     for ($i = 0; $i < count($userParts); $i++) {
         if (trim($userParts[$i]) !== trim($correctParts[$i])) {
             return false;
