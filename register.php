@@ -27,22 +27,22 @@ function generateNextId($conn, $table, $column, $prefix) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $user_id = generateNextId($conn, 'User', 'user_id', 'U');
-    $username = $_POST['username'];
-    $first_name = $_POST['first_name'];
-    $last_name = $_POST['last_name'];
-    $email = $_POST['email'];
+    // Store input values in session
+    $_SESSION['entered_username'] = $_POST['username'];
+    $_SESSION['entered_first_name'] = $_POST['first_name'];
+    $_SESSION['entered_last_name'] = $_POST['last_name'];
+    $_SESSION['entered_email'] = $_POST['email'];
+    $_SESSION['entered_birthday'] = $_POST['birthday'];
+    $_SESSION['entered_gender'] = $_POST['gender'];
+    $_SESSION['entered_role'] = $_POST['role'];
+    $_SESSION['entered_job_position'] = isset($_POST['job_position_interested']) ? $_POST['job_position_interested'] : '';
+    $_SESSION['entered_confirm_password'] = $_POST['confirm_password']; // Store confirm password
+    
+    // Hash password but don't store it in session for security reasons
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $birthday = $_POST['birthday'];
-    $gender = $_POST['gender'];
-    $role = $_POST['role'];
-    $job_positions_interested = isset($_POST['job_position_interested']) ? $_POST['job_position_interested'] : '';
-
-    // Debugging: Print the job positions interested
-    error_log("Job Positions Interested: " . $job_positions_interested);
 
     // Check for duplicate username or email
-    $check_sql = "SELECT * FROM User WHERE username='$username' OR email='$email'";
+    $check_sql = "SELECT * FROM User WHERE username='{$_POST['username']}' OR email='{$_POST['email']}'";
     $check_result = $conn->query($check_sql);
     if ($check_result->num_rows > 0) {
         $_SESSION['error_message'] = "Username or email already exists.";
@@ -50,27 +50,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
+    // Insert user data into the database
+    $user_id = generateNextId($conn, 'User', 'user_id', 'U');
     $sql = "INSERT INTO User (user_id, username, first_name, last_name, email, password, birthday, gender, role, is_active)
-            VALUES ('$user_id', '$username', '$first_name', '$last_name', '$email', '$password', '$birthday', '$gender', '$role', TRUE)";
-
-    // Debugging: Print the SQL query
-    error_log("SQL Query: " . $sql);
+            VALUES ('$user_id', '{$_POST['username']}', '{$_POST['first_name']}', '{$_POST['last_name']}', '{$_POST['email']}', '$password', '{$_POST['birthday']}', '{$_POST['gender']}', '{$_POST['role']}', TRUE)";
 
     if ($conn->query($sql) === TRUE) {
-        if ($role == 'Job Seeker') {
+        if ($_POST['role'] == 'Job Seeker') {
             $job_seeker_id = generateNextId($conn, 'Job_Seeker', 'job_seeker_id', 'J');
             $sql = "INSERT INTO Job_Seeker (job_seeker_id, user_id, job_position_interested)
-                    VALUES ('$job_seeker_id', '$user_id', '$job_positions_interested')";
-        } else if ($role == 'Employer') {
+                    VALUES ('$job_seeker_id', '$user_id', '{$_POST['job_position_interested']}')";
+        } else if ($_POST['role'] == 'Employer') {
             $employer_id = generateNextId($conn, 'Employer', 'employer_id', 'E');
             $sql = "INSERT INTO Employer (employer_id, user_id, job_position_interested)
-                    VALUES ('$employer_id', '$user_id', '$job_positions_interested')";
+                    VALUES ('$employer_id', '$user_id', '{$_POST['job_position_interested']}')";
         }
-    
-        // Debugging: Print the SQL query for Job_Seeker or Employer
-        error_log("SQL Query for Role: " . $sql);
-    
+
         if ($conn->query($sql) === TRUE) {
+            // Clear session values on successful registration
+            session_unset();
             header("Location: login.php");
             exit();
         } else {
@@ -84,6 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 }
+
 
 $conn->close();
 ?>
@@ -344,49 +343,67 @@ $conn->close();
                 }
                 ?>
         </div>
-        <form action="register.php" method="post" onsubmit="return validateForm()">
-            <div class="form-row">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-row">
-                <label for="first_name">First Name:</label>
-                <input type="text" id="first_name" name="first_name" required>
-                <label for="last_name">Last Name:</label>
-                <input type="text" id="last_name" name="last_name" required>
-            </div>
-            <div class="form-row">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-                <label for="confirm_password">Confirm Password:</label>
-                <input type="password" id="confirm_password" name="confirm_password" required>
-            </div>
-            <div class="form-row">
-                <label for="birthday">Birthday:</label>
-                <input type="date" id="birthday" name="birthday" required>
-                <label for="gender">Gender:</label>
-                <select id="gender" name="gender">
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                </select>
-            </div>
-            <div class="form-row">
-                <label for="role">Role:</label>
-                <select id="role" name="role">
-                    <option value="Job Seeker">Job Seeker</option>
-                    <option value="Employer">Employer</option>
-                </select>
-                <label for="job_position_interested">Job Position Interested:</label>
-                <input type="text" id="job_position_interested" name="job_position_interested" readonly onclick="openPopup()" value="Select">
-            </div>
-            <div class="form-row checkbox-row">
-                <input type="checkbox" id="terms" name="terms" required>
-                <label for="terms">I agree to the Terms of Service and privacy policy</label>
-            </div>
-            <input type="submit" value="Register">
-        </form>
+            <form action="register.php" method="post" onsubmit="return validateForm()">
+        <div class="form-row">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" 
+                value="<?php echo isset($_SESSION['entered_username']) ? htmlspecialchars($_SESSION['entered_username']) : ''; ?>" required>
+            
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" 
+                value="<?php echo isset($_SESSION['entered_email']) ? htmlspecialchars($_SESSION['entered_email']) : ''; ?>" required>
+        </div>
+
+        <div class="form-row">
+            <label for="first_name">First Name:</label>
+            <input type="text" id="first_name" name="first_name" 
+                value="<?php echo isset($_SESSION['entered_first_name']) ? htmlspecialchars($_SESSION['entered_first_name']) : ''; ?>" required>
+            
+            <label for="last_name">Last Name:</label>
+            <input type="text" id="last_name" name="last_name" 
+                value="<?php echo isset($_SESSION['entered_last_name']) ? htmlspecialchars($_SESSION['entered_last_name']) : ''; ?>" required>
+        </div>
+
+        <div class="form-row">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" id="confirm_password" name="confirm_password"
+                value="<?php echo isset($_SESSION['entered_confirm_password']) ? htmlspecialchars($_SESSION['entered_confirm_password']) : ''; ?>" required>
+        </div>
+
+        <div class="form-row">
+            <label for="birthday">Birthday:</label>
+            <input type="date" id="birthday" name="birthday"
+                value="<?php echo isset($_SESSION['entered_birthday']) ? htmlspecialchars($_SESSION['entered_birthday']) : ''; ?>" required>
+            
+            <label for="gender">Gender:</label>
+            <select id="gender" name="gender">
+                <option value="Male" <?php echo (isset($_SESSION['entered_gender']) && $_SESSION['entered_gender'] == 'Male') ? 'selected' : ''; ?>>Male</option>
+                <option value="Female" <?php echo (isset($_SESSION['entered_gender']) && $_SESSION['entered_gender'] == 'Female') ? 'selected' : ''; ?>>Female</option>
+            </select>
+        </div>
+
+        <div class="form-row">
+            <label for="role">Role:</label>
+            <select id="role" name="role">
+                <option value="Job Seeker" <?php echo (isset($_SESSION['entered_role']) && $_SESSION['entered_role'] == 'Job Seeker') ? 'selected' : ''; ?>>Job Seeker</option>
+                <option value="Employer" <?php echo (isset($_SESSION['entered_role']) && $_SESSION['entered_role'] == 'Employer') ? 'selected' : ''; ?>>Employer</option>
+            </select>
+
+            <label for="job_position_interested">Job Position Interested:</label>
+            <input type="text" id="job_position_interested" name="job_position_interested" readonly onclick="openPopup()" 
+                value="<?php echo isset($_SESSION['entered_job_position']) ? htmlspecialchars($_SESSION['entered_job_position']) : 'Select'; ?>">
+        </div>
+
+        <div class="form-row checkbox-row">
+            <input type="checkbox" id="terms" name="terms" required>
+            <label for="terms">I agree to the Terms of Service and privacy policy</label>
+        </div>
+
+        <input type="submit" value="Register">
+    </form>
         <p>Already have an account? <a href="login.php">Login here</a></p>
     </div>
 
