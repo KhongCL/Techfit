@@ -6,20 +6,25 @@ $username = "root";
 $password = "";
 $dbname = "techfit";
 
-
+// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-
+// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
+}
+
+if ($_SERVER["REQUEST_METHOD"] != "POST") {
+    unset($_SESSION['entered_username']);
+    unset($_SESSION['entered_password']);
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $_SESSION['entered_username'] = $username; 
-    $_SESSION['entered_password'] = $password; 
+    $_SESSION['entered_username'] = $username; // Store username
+    $_SESSION['entered_password'] = $password; // Store password (optional)
 
     $stmt = $conn->prepare("SELECT * FROM User WHERE username=?");
     $stmt->bind_param("s", $username);
@@ -29,20 +34,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         if (password_verify($password, $row['password'])) {
-            
+            // Check if the user is an admin
             if ($row['role'] == 'Admin') {
                 $_SESSION['error_message'] = "No Job Seeker or Employer found with that username.";
                 header("Location: login.php");
                 exit();
             }
 
-            
+            // Start session and set session variables
             $_SESSION['user_id'] = $row['user_id'];
             $_SESSION['username'] = $row['username'];
             $_SESSION['email'] = $row['email'];
             $_SESSION['role'] = $row['role'];
 
-            
+            // Check if the user is a job seeker and store the job seeker ID
             if ($row['role'] == 'Job Seeker') {
                 $stmt = $conn->prepare("SELECT job_seeker_id FROM Job_Seeker WHERE user_id=?");
                 $stmt->bind_param("s", $row['user_id']);

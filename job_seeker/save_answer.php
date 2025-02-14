@@ -20,12 +20,12 @@ $question_id = $_POST['question_id'];
 $answer_text = $_POST['answer_text'];
 $answer_type = $_POST['answer_type'] ?? '';
 
-
+// Validate inputs
 if (!$job_seeker_id || !$question_id || !isset($answer_text)) {
     die("ERROR: Missing required fields");
 }
 
-
+// Get question details
 $check_sql = "SELECT question_id, answer_type FROM Question WHERE question_id = ?";
 $check_stmt = $conn->prepare($check_sql);
 $check_stmt->bind_param("s", $question_id);
@@ -38,7 +38,7 @@ if ($result->num_rows === 0) {
 
 $question = $result->fetch_assoc();
 
-
+// Check if answer is correct for code questions
 $is_correct = null;
 if ($answer_type === 'code') {
     $answer_parts = explode('<<ANSWER_BREAK>>', $answer_text);
@@ -50,7 +50,7 @@ if ($answer_type === 'code') {
     $question = $result->fetch_assoc();
     $is_correct = checkCodeAnswer($conn, $question_id, $answer_text);
     
-    
+    // Count blanks in template
     $blank_count = substr_count($question['code_template'], '__BLANK__');
 
     error_log("Answer parts count: " . count($answer_parts));
@@ -64,57 +64,57 @@ if ($answer_type === 'code') {
 }
 
 function generateAnswerId($conn) {
-    // Check if table is empty
-    $check_sql = "SELECT COUNT(*) as count FROM Answer";
-    $check_result = $conn->query($check_sql);
-    if (!$check_result) {
-        return false;
-    }
-    
-    $row = $check_result->fetch_assoc();
-    if ($row['count'] == 0) {
-        return 'ANS01'; // Start from ANS01 if table is empty
-    }
-
-    // Get the maximum numeric value after 'ANS' prefix
+    // Get the maximum numeric value after 'ANS' prefix using direct MAX function
     $sql = "SELECT MAX(CAST(SUBSTRING(answer_id, 4) AS UNSIGNED)) AS max_id 
             FROM Answer 
             WHERE answer_id LIKE 'ANS%'";
     
+    error_log("Executing query: " . $sql);
+    
     $result = $conn->query($sql);
     if (!$result) {
+        error_log("Query failed: " . $conn->error);
         return false;
     }
     
     $row = $result->fetch_assoc();
     $max_id = $row['max_id'] ?? 0;
+    error_log("Current max_id: " . $max_id);
     
     // Simply increment and concatenate
     $next_id = $max_id + 1;
+    error_log("Next ID number: " . $next_id);
     
-    // Generate next ID with 'ANS' prefix and zero-padded number
-    return 'ANS' . str_pad($max_id + 1, 2, '0', STR_PAD_LEFT);
+    // Build final answer ID
+    $answer_id = 'ANS' . $next_id;
+    error_log("Generated answer_id: " . $answer_id);
+    
+    return $answer_id;
 }
 
-
+// Check if answer exists
 $stmt = $conn->prepare("SELECT answer_id FROM Answer WHERE job_seeker_id = ? AND question_id = ?");
 $stmt->bind_param("ss", $job_seeker_id, $question_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows > 0) {
-    
+    // Update existing answer
     $row = $result->fetch_assoc();
     $answer_id = $row['answer_id'];
     
     $stmt = $conn->prepare("UPDATE Answer SET answer_text = ?, is_correct = ? WHERE answer_id = ?");
     $stmt->bind_param("sis", $answer_text, $is_correct, $answer_id);
 } else {
-    
+    // Create new answer
     $answer_id = generateAnswerId($conn);
+    error_log("Using generated answer_id: " . $answer_id);
     if (!$answer_id) {
         die("ERROR: Failed to generate answer ID");
     }
+    
+    // Log the SQL that will be executed
+    error_log("Preparing to execute INSERT with answer_id: " . $answer_id);
     
     $stmt = $conn->prepare("INSERT INTO Answer (answer_id, job_seeker_id, question_id, answer_text, is_correct) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("ssssi", $answer_id, $job_seeker_id, $question_id, $answer_text, $is_correct);

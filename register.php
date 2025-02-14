@@ -8,15 +8,27 @@ $username = "root";
 $password = "";
 $dbname = "techfit";
 
-
+// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-
+// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+if ($_SERVER["REQUEST_METHOD"] != "POST") {
+    unset($_SESSION['entered_username']);
+    unset($_SESSION['entered_first_name']); 
+    unset($_SESSION['entered_last_name']);
+    unset($_SESSION['entered_email']);
+    unset($_SESSION['entered_birthday']);
+    unset($_SESSION['entered_gender']);
+    unset($_SESSION['entered_role']);
+    unset($_SESSION['entered_job_position']);
+    unset($_SESSION['entered_confirm_password']);
+}
 
+// Function to generate the next ID with a given prefix
 function generateNextId($conn, $table, $column, $prefix) {
     $sql = "SELECT MAX(CAST(SUBSTRING($column, LENGTH('$prefix') + 1) AS UNSIGNED)) AS max_id FROM $table WHERE $column LIKE '$prefix%'";
     $result = $conn->query($sql);
@@ -27,7 +39,7 @@ function generateNextId($conn, $table, $column, $prefix) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
+    // Store input values in session
     $_SESSION['entered_username'] = $_POST['username'];
     $_SESSION['entered_first_name'] = $_POST['first_name'];
     $_SESSION['entered_last_name'] = $_POST['last_name'];
@@ -36,12 +48,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['entered_gender'] = $_POST['gender'];
     $_SESSION['entered_role'] = $_POST['role'];
     $_SESSION['entered_job_position'] = isset($_POST['job_position_interested']) ? $_POST['job_position_interested'] : '';
-    $_SESSION['entered_confirm_password'] = $_POST['confirm_password']; 
+    $_SESSION['entered_confirm_password'] = $_POST['confirm_password']; // Store confirm password
     
-    
+    // Hash password but don't store it in session for security reasons
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-    
+    // Check for duplicate username or email
     $check_sql = "SELECT * FROM User WHERE username='{$_POST['username']}' OR email='{$_POST['email']}'";
     $check_result = $conn->query($check_sql);
     if ($check_result->num_rows > 0) {
@@ -50,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    
+    // Insert user data into the database
     $user_id = generateNextId($conn, 'User', 'user_id', 'U');
     $sql = "INSERT INTO User (user_id, username, first_name, last_name, email, password, birthday, gender, role, is_active)
             VALUES ('$user_id', '{$_POST['username']}', '{$_POST['first_name']}', '{$_POST['last_name']}', '{$_POST['email']}', '$password', '{$_POST['birthday']}', '{$_POST['gender']}', '{$_POST['role']}', TRUE)";
@@ -67,7 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         if ($conn->query($sql) === TRUE) {
-            
+            // Clear session values on successful registration
             session_unset();
             header("Location: login.php");
             exit();
@@ -100,12 +112,12 @@ $conn->close();
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: flex-start; /* Align items from the top */
             height: 100vh;
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
-            overflow: auto;
+            overflow: auto; /* Enable scrolling */
         }
 
         .logo {
@@ -118,7 +130,7 @@ $conn->close();
         }
 
         h2 {
-            margin-top: -25px;
+            margin-top: -25px; /* Move title up by 25px */
         }
 
         .container {
@@ -127,32 +139,32 @@ $conn->close();
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             width: 100%;
-            max-width: 900px;
+            max-width: 900px; /* Set max width */
             text-align: center;
             box-sizing: border-box;
-            overflow: auto;
+            overflow: auto; /* Enable scrolling */
         }
         .form-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 35px;
-            flex-wrap: wrap;
+            margin-bottom: 35px; /* Increased spacing */
+            flex-wrap: wrap; /* Allow wrapping */
         }
         .form-row label {
             flex: 1;
-            margin-right: 10px;
+            margin-right: 10px; /* Increased spacing */
         }
         .form-row input, .form-row select {
             flex: 1;
-            padding: 15px;
+            padding: 15px; /* Increased padding */
             border: none;
             border-radius: 10px;
             background-color: #333;
             color: #fff;
-            margin-bottom: 10px;
+            margin-bottom: 10px; /* Add margin for spacing */
         }
         .form-row.full-width input, .form-row.full-width select {
-            width: calc(100% - 30px);
+            width: calc(100% - 30px); /* Adjusted width */
         }
         .form-row input[type="checkbox"] {
             flex: 0;
@@ -160,8 +172,8 @@ $conn->close();
         }
         input[type="submit"] {
             width: 100%;
-            padding: 15px;
-            margin: 20px 0;
+            padding: 15px; /* Increased padding */
+            margin: 20px 0; /* Increased spacing */
             border: none;
             border-radius: 5px;
             background-color: #007bff;
@@ -182,11 +194,11 @@ $conn->close();
             flex-direction: column;
         }
         .form-row.full-width input, .form-row.full-width select {
-            width: calc(100% - 30px);
+            width: calc(100% - 30px); /* Adjusted width */
         }
         .form-row.checkbox-row {
             align-items: center;
-            justify-content: center;
+            justify-content: center; /* Center align the checkbox row */
         }
         .form-row.checkbox-row label {
             flex: none;
@@ -237,7 +249,7 @@ $conn->close();
         @media (max-width: 850px) {
             .container {
                 padding: 20px;
-                overflow: auto;
+                overflow: auto; /* Enable scrolling */
             }
             .form-row {
                 flex-direction: column;
@@ -248,7 +260,7 @@ $conn->close();
                 margin-bottom: 10px;
             }
             .form-row input, .form-row select {
-                padding: 10px;
+                padding: 10px; /* Reduce padding */
             }
             .form-row input[type="checkbox"] {
                 margin-right: 10px;
@@ -260,7 +272,7 @@ $conn->close();
             let isValid = true;
             let errorMessage = "";
 
-            
+            // Password validation
             const password = document.getElementById("password").value;
             const confirmPassword = document.getElementById("confirm_password").value;
             if (password.length < 8) {
@@ -284,14 +296,14 @@ $conn->close();
                 isValid = false;
             }
 
-            
+            // Birthday validation
             const birthday = document.getElementById("birthday").value;
             if (!birthday) {
                 errorMessage += "Please enter your birthday.<br>";
                 isValid = false;
             }
 
-            
+            // First name and last name validation
             const firstName = document.getElementById("first_name").value;
             const lastName = document.getElementById("last_name").value;
             if (!/^[a-zA-Z-]+$/.test(firstName)) {
@@ -303,7 +315,7 @@ $conn->close();
                 isValid = false;
             }
 
-            
+            // Display error message
             if (!isValid) {
                 document.getElementById("error-message").innerHTML = errorMessage;
             }
@@ -334,7 +346,7 @@ $conn->close();
         <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
     </div>
     <div class="container">
-        <h2 style="margin-top: -25px;">Register</h2>
+        <h2 style="margin-top: -25px;">Register</h2> <!-- Move title up by 25px -->
         <div id="error-message" class="error-message">
             <?php
                 if (isset($_SESSION['error_message'])) {
