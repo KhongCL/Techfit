@@ -22,7 +22,7 @@ if (isset($_POST['restore_questions'])) {
         $stmt->bind_param("s", $question_id);
         if (!$stmt->execute()) {
             $response['success'] = false;
-            $response['error'] = $stmt->error;f
+            $response['error'] = $stmt->error;
             break;
         }
         $stmt->close();

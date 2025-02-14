@@ -425,7 +425,7 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
             font-size: inherit;
             background-color: var(--background-color);
             color: var(--text-color);
-            border: 1px solid #555; /* Lighter border color for better visibility */
+            border: 1px solid #555; 
             border-radius: 3px;
             transition: all 0.2s ease;
         }
