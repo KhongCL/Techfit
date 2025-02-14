@@ -321,6 +321,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
     .bottom-edit-button:hover {
         background-color: #0056b3;
     }
+    .separate-config-button {
+        padding: 4px 16px; /* Adjust the padding to reduce the distance */
+        font-size: 14px;
+        margin: 10px 0;
+        background-color: #007bff; /* Blue color */
+        color: #fff;
+        border: none;
+        border-radius: 5px; /* Match the border-radius of the logout button */
+        cursor: pointer;
+        width: fit-content;
+        margin-top: 10px; /* Move the button down by 3px */
+    }
+
+    .separate-config-button:hover {
+        background-color: #0056b3; /* Same hover color as the Edit Username button */
+    }
+
+    .button-container {
+        display: flex;
+        gap: 15px; /* 10px gap between buttons */
+    }
     </style>
 </head>
 <body>
@@ -395,7 +416,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
 </header>
 <main>
     <section id="profile">
-        <div class="profile-details" style="padding-left: 50px;">
+            <div class="profile-details" style="padding-left: 50px;">
             <h2>Edit Profile</h2>
             <?php if (isset($success_message)) { echo '<p class="success-message">' . $success_message . '</p>'; } ?>
             <?php if (isset($error_message)) { echo '<p class="error-message">' . $error_message . '</p>'; } ?>
@@ -414,7 +435,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
                 <span>Password</span>
                 <button class="edit-button" onclick="openPopup('password-popup')"><i class="fas fa-edit"></i> Edit Password</button>
             </div>
-            <button class="logout-button" onclick="openPopup('logout-popup')">Logout</button>
+            <div class="button-container">
+                <button class="logout-button" onclick="openPopup('logout-popup')">Logout</button>
+                <button class="config-button separate-config-button" onclick="window.location.href='system_configuration.php'">Edit System Configuration Settings</button>
+            </div>
         </div>
     </section>
 </main>
