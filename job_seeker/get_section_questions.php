@@ -55,7 +55,6 @@ foreach ($questions as $qid => $q) {
     error_log("Question $qid: " . print_r($q, true));
 }
 
-
 foreach ($questions as $question) {
     $formatted = [
         'id' => $question['question_id'],
@@ -70,10 +69,9 @@ foreach ($questions as $question) {
 $QUESTION_DELIMITER = '<<QUESTION_BREAK>>';
 $FIELD_DELIMITER = '<<FIELD>>';
 
-
 $output = [];
 foreach ($questions as $question) {
-    
+    // Format choices as simple string
     $choices = '';
     if (!empty($question['choices'])) {
         $choices = implode('~', array_map(function($choice) {
@@ -81,39 +79,28 @@ foreach ($questions as $question) {
         }, $question['choices']));
     }
 
-    
     $code_template = '';
     if (!empty($question['code_template'])) {
-        
         $template = preg_replace_callback('/\\\\u([0-9a-fA-F]{4})/', function ($matches) {
             return mb_convert_encoding(pack('H*', $matches[1]), 'UTF-8', 'UCS-2BE');
         }, $question['code_template']);
         
-        
         $template = str_replace(["\r\n", "\r"], "\n", $template);
-        
         
         $template = str_replace("\t", "    ", $template);
         
-        
-        $template = str_replace('\/\/', '
-        
+        $template = str_replace('\/\/', '//', $template);
         
         $code_template = json_encode($template);
         
-        
         $code_template = substr($code_template, 1, -1);
-        
         
         $code_template = str_replace('\/', '/', $code_template);
     }
     
-    
     $programming_language = strtolower(trim($question['programming_language'] ?? ''));
     
-    
     $question_text = str_replace('|', '&#124;', $question['question_text']);
-    
     
     $output[] = implode($FIELD_DELIMITER, [
         $question['question_id'],          

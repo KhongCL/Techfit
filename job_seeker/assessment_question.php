@@ -244,7 +244,6 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
             width: 100%;
             min-height: 150px;
             resize: none;
-            resize: none;
             padding: 10px;
             background-color: var(--background-color);
             color: var(--text-color);
@@ -374,7 +373,7 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
             font-size: inherit;
             background-color: var(--background-color);
             color: var(--text-color);
-            border: 1px solid #555;
+            border: 1px solid #555; 
             border-radius: 3px;
             transition: all 0.2s ease;
         }
@@ -387,7 +386,7 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
             outline: none;
             border-color: var(--primary-color);
             background-color: var(--hover-background-color);
-            box-shadow: 0 0 0 1px var(--primary-color);
+            box-shadow: 0 0 0 1px var(--primary-color); 
         }
 
         .code-container {
@@ -623,20 +622,20 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
                             font-size: inherit;
                             background-color: var(--background-color);
                             color: var(--text-color);
-                            border: 1px solid #555;
+                            border: 1px solid #555; /* Lighter border color for better visibility */
                             border-radius: 3px;
                             transition: all 0.2s ease;
                         }
 
                         .code-blank:hover {
-                            border-color: #666;
+                            border-color: #666; /* Even lighter on hover */
                         }
 
                         .code-blank:focus {
                             outline: none;
                             border-color: var(--primary-color);
                             background-color: var(--hover-background-color);
-                            box-shadow: 0 0 0 1px var(--primary-color);
+                            box-shadow: 0 0 0 1px var(--primary-color); /* Add glow effect on focus */
                         }
                     `;
                     document.head.appendChild(style);
@@ -966,7 +965,6 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
             function updateDisplay() {
                 const now = Math.floor(Date.now() / 1000);
                 const remaining = endTime - now;
-                
                 
                 log('Timer update:', {
                     now,
@@ -1382,7 +1380,6 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
         }
 
         function submitAssessment(isTimeUp = false) {
-            
             if (!isTimeUp) {
                 const allAnswers = JSON.parse(sessionStorage.getItem('allAnswers') || '{}');
                 const totalAnswered = Object.keys(allAnswers).length;
@@ -1399,25 +1396,21 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
                 }
             }
 
-            
             saveAllAnswers()
                 .then(() => {
                     const xhr = new XMLHttpRequest();
                     xhr.open('POST', 'update_assessment_time.php', true);
                     xhr.onload = function() {
                         if (xhr.status === 200) {
-                            
                             sessionStorage.removeItem('confirmedLanguageChoice');
                             sessionStorage.removeItem('assessmentState');
                             sessionStorage.removeItem('assessmentTimer');
                             sessionStorage.removeItem('assessmentProgress');
                             sessionStorage.removeItem('allAnswers');
                             
-                            
                             if (isTimeUp) {
                                 alert("Time's up! Your assessment will be submitted automatically.");
                             }
-                            
                             
                             window.location.href = 'assessment_result.php';
                         } else {
@@ -1442,17 +1435,13 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
         function cleanupAndRedirect() {
             log('Cleaning up before redirect');
             
-            
             if (timerInterval) {
                 clearInterval(timerInterval);
             }
             
-            
             window.removeEventListener('beforeunload', saveState);
             
-            
             sessionStorage.clear();
-            
             
             setTimeout(() => {
                 log('Redirecting to results page');
@@ -1888,7 +1877,6 @@ $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
-    
     <script src="scripts.js"></script>
     <script>
         function openPopup(popupId) {
