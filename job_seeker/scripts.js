@@ -50,8 +50,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const profileLink = document.getElementById('profile-link');
     const logoutPopup = document.getElementById('logout-popup');
-    const logoutConfirmButton = document.getElementById('logout-confirm-button');
-    const logoutCancelButton = document.getElementById('logout-cancel-button');
+    const closeButton = document.querySelector('.close-button');
+    const cancelButton = document.querySelector('.cancel-button'); 
     const profileDropdown = document.getElementById('profile-dropdown');
 
     profileLink.addEventListener('click', function(event) {
@@ -69,11 +69,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    logoutConfirmButton.addEventListener('click', function() {
+    closeButton.addEventListener('click', function() {
         logoutUser();
     });
 
-    logoutCancelButton.addEventListener('click', function() {
+    cancelButton.addEventListener('click', function() {
         closePopup('logout-popup');
     });
 });

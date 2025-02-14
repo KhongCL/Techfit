@@ -64,7 +64,7 @@ if ($answer_type === 'code') {
 }
 
 function generateAnswerId($conn) {
-    
+    // Check if table is empty
     $check_sql = "SELECT COUNT(*) as count FROM Answer";
     $check_result = $conn->query($check_sql);
     if (!$check_result) {
@@ -73,10 +73,10 @@ function generateAnswerId($conn) {
     
     $row = $check_result->fetch_assoc();
     if ($row['count'] == 0) {
-        return 'ANS01'; 
+        return 'ANS01'; // Start from ANS01 if table is empty
     }
 
-    
+    // Get the maximum numeric value after 'ANS' prefix
     $sql = "SELECT MAX(CAST(SUBSTRING(answer_id, 4) AS UNSIGNED)) AS max_id 
             FROM Answer 
             WHERE answer_id LIKE 'ANS%'";
@@ -87,9 +87,12 @@ function generateAnswerId($conn) {
     }
     
     $row = $result->fetch_assoc();
-    $max_id = $row['max_id'] ? $row['max_id'] : 0;
+    $max_id = $row['max_id'] ?? 0;
     
+    // Simply increment and concatenate
+    $next_id = $max_id + 1;
     
+    // Generate next ID with 'ANS' prefix and zero-padded number
     return 'ANS' . str_pad($max_id + 1, 2, '0', STR_PAD_LEFT);
 }
 
