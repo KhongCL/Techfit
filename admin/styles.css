@@ -2135,3 +2135,23 @@ canvas {
 .feedback-icon {
     font-size: 40px;
 }
+
+.label_white{
+    border-color: white;
+    border-radius: 5px;
+}
+
+select {
+    align-self: right;
+    padding: 7px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: white;
+    cursor: pointer;
+}
+label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 5px;
+}
