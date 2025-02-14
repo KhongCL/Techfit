@@ -18,6 +18,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
+    $_SESSION['entered_username'] = $username; // Store username
+    $_SESSION['entered_password'] = $password; // Store password (optional)
+
     $stmt = $conn->prepare("SELECT * FROM User WHERE username=?");
     $stmt->bind_param("s", $username);
     $stmt->execute();
@@ -32,13 +35,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 header("Location: login.php");
                 exit();
             }
-    
+
             // Start session and set session variables
             $_SESSION['user_id'] = $row['user_id'];
             $_SESSION['username'] = $row['username'];
             $_SESSION['email'] = $row['email'];
             $_SESSION['role'] = $row['role'];
-    
+
             // Check if the user is a job seeker and store the job seeker ID
             if ($row['role'] == 'Job Seeker') {
                 $stmt = $conn->prepare("SELECT job_seeker_id FROM Job_Seeker WHERE user_id=?");
@@ -176,10 +179,12 @@ $conn->close();
         <img src="images/usericon.png" alt="User Icon">
         <form action="login.php" method="post">
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required><br>
+            <input type="text" id="username" name="username"
+                value="<?php echo isset($_SESSION['entered_username']) ? htmlspecialchars($_SESSION['entered_username']) : ''; ?>" required><br>
 
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required><br>
+            <input type="password" id="password" name="password"
+                value="<?php echo isset($_SESSION['entered_password']) ? htmlspecialchars($_SESSION['entered_password']) : ''; ?>" required><br>
 
             <input type="submit" value="Login">
         </form>
