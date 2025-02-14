@@ -25,6 +25,7 @@
     --button-color-hover: #3c87e3;
     --focus-border-color: #47a3e0;
     --disabled-color: #7f8c8d;
+    --border-color-light: #444;
 }
 
 
@@ -1253,7 +1254,7 @@ form#faqForm {
     margin: 0 auto 40px;
     padding: 20px;
     background-color: var(--background-color-medium);
-    border: 1px solid var();
+    border: 1px solid var(--border-color-light);
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     color: var(--text-color);
