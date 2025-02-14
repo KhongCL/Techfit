@@ -4,10 +4,10 @@ $username = "root";
 $password = "";
 $dbname = "techfit";
 
-// Create connection
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $default_time_limit = $_POST['default_time_limit'];
     $passing_score = $_POST['passing_score'];
 
-    // Insert or update assessment settings in the database
+    
     $sql = "INSERT INTO Assessment_Settings (setting_id, default_time_limit, passing_score_percentage)
             VALUES ('1', ?, ?)
             ON DUPLICATE KEY UPDATE

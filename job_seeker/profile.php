@@ -1,7 +1,7 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message and options
+
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
@@ -13,29 +13,29 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message and options if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Job Seeker') {
-    displayLoginMessage(); // Display message and options if the role is not Job Seeker
+    displayLoginMessage(); 
 }
 
-// Check if the job seeker ID is set
+
 if (!isset($_SESSION['job_seeker_id'])) {
-    displayLoginMessage(); // Display message and options if job seeker ID is not set
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 ?>
 
 <?php
 session_start();
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['username']) || !isset($_SESSION['email']) || !isset($_SESSION['user_id'])) {
     header('Location: login.php');
     exit();
@@ -45,26 +45,26 @@ $username = $_SESSION['username'];
 $email = $_SESSION['email'];
 $user_id = $_SESSION['user_id'];
 
-// Handle logout
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])) {
     session_unset();
     session_destroy();
-    header('Location: /Techfit'); // Redirect to the root directory
+    header('Location: /Techfit'); 
     exit();
 }
 
-// Handle username update
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_username'])) {
     $new_username = $_POST['new_username'];
 
-    // Validate new username
+    
     if (preg_match('/^[a-zA-Z0-9_]{5,20}$/', $new_username)) {
         $conn = new mysqli("localhost", "root", "", "techfit");
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        // Check if the new username already exists
+        
         $stmt = $conn->prepare("SELECT * FROM User WHERE username=?");
         $stmt->bind_param("s", $new_username);
         $stmt->execute();
@@ -73,9 +73,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_username'])) {
         if ($result->num_rows > 0) {
             $error_message = "Username already exists. Please choose a different username.";
         } else {
-            // Update the username for the logged-in user
+            
             $stmt = $conn->prepare("UPDATE User SET username=? WHERE user_id=?");
-            $stmt->bind_param("ss", $new_username, $user_id); // Treat user_id as a string
+            $stmt->bind_param("ss", $new_username, $user_id); 
             if ($stmt->execute()) {
                 $_SESSION['username'] = $new_username;
                 $username = $new_username;
@@ -92,18 +92,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_username'])) {
     }
 }
 
-// Handle email update
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_email'])) {
     $new_email = $_POST['new_email'];
 
-    // Validate new email
+    
     if (filter_var($new_email, FILTER_VALIDATE_EMAIL)) {
         $conn = new mysqli("localhost", "root", "", "techfit");
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        // Check if the new email already exists
+        
         $stmt = $conn->prepare("SELECT * FROM User WHERE email=?");
         $stmt->bind_param("s", $new_email);
         $stmt->execute();
@@ -112,9 +112,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_email'])) {
         if ($result->num_rows > 0) {
             $error_message = "Email already exists. Please choose a different email.";
         } else {
-            // Update the email for the logged-in user
+            
             $stmt = $conn->prepare("UPDATE User SET email=? WHERE user_id=?");
-            $stmt->bind_param("ss", $new_email, $user_id); // Treat user_id as a string
+            $stmt->bind_param("ss", $new_email, $user_id); 
             if ($stmt->execute()) {
                 $_SESSION['email'] = $new_email;
                 $email = $new_email;
@@ -131,21 +131,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_email'])) {
     }
 }
 
-// Handle password update
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
     $new_password = $_POST['new_password'];
 
-    // Validate new password
+    
     if (preg_match('/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $new_password)) {
         $conn = new mysqli("localhost", "root", "", "techfit");
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        // Update the password for the logged-in user
+        
         $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
         $stmt = $conn->prepare("UPDATE User SET password=? WHERE user_id=?");
-        $stmt->bind_param("ss", $hashed_password, $user_id); // Treat user_id as a string
+        $stmt->bind_param("ss", $hashed_password, $user_id); 
         if ($stmt->execute()) {
             $success_message = "Password updated successfully.";
         } else {
@@ -158,20 +158,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
         $error_message = "Invalid password. Must be at least 8 characters long and contain at least one letter, one number, and one special character.";
     }
 }
-// Handle LinkedIn link update
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_linkedin'])) {
     $new_linkedin = $_POST['new_linkedin'];
 
-    // Validate LinkedIn URL
+    
     if (filter_var($new_linkedin, FILTER_VALIDATE_URL)) {
         $conn = new mysqli("localhost", "root", "", "techfit");
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        // Update the LinkedIn link for the logged-in user
+        
         $stmt = $conn->prepare("UPDATE Job_Seeker SET linkedin_link=? WHERE user_id=?");
-        $stmt->bind_param("ss", $new_linkedin, $user_id); // Treat user_id as a string
+        $stmt->bind_param("ss", $new_linkedin, $user_id); 
         if ($stmt->execute()) {
             $success_message = "LinkedIn profile updated successfully.";
         } else {
@@ -185,20 +185,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_linkedin'])) {
     }
 }
 
-// Handle resume link update
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_resume'])) {
     $new_resume = $_POST['new_resume'];
 
-    // Validate resume URL
+    
     if (filter_var($new_resume, FILTER_VALIDATE_URL)) {
         $conn = new mysqli("localhost", "root", "", "techfit");
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        // Update the resume link for the logged-in user
+        
         $stmt = $conn->prepare("UPDATE Job_Seeker SET resume=? WHERE user_id=?");
-        $stmt->bind_param("ss", $new_resume, $user_id); // Treat user_id as a string
+        $stmt->bind_param("ss", $new_resume, $user_id); 
         if ($stmt->execute()) {
             $success_message = "Resume link updated successfully.";
         } else {
@@ -212,7 +212,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_resume'])) {
     }
 }
 
-// Fetch LinkedIn link for display
+
 $conn = new mysqli("localhost", "root", "", "techfit");
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
@@ -240,16 +240,16 @@ $stmt->close();
 $conn->close();
 
 
-// Start of resume file upload handling code
+
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
     $resume_file = $_FILES['resume_file'];
 
-    // Validate file type
+    
     $allowed_types = ['application/pdf'];
     if (in_array($resume_file['type'], $allowed_types)) {
         $upload_dir = 'job_seeker/resumes/';
         
-        // Create the directory if it doesn't exist
+        
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
@@ -257,16 +257,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
         $file_name = 'resume_' . $user_id . '.pdf';
         $upload_path = $upload_dir . $file_name;
 
-        // Move the uploaded file to the server
+        
         if (move_uploaded_file($resume_file['tmp_name'], $upload_path)) {
             $conn = new mysqli("localhost", "root", "", "techfit");
             if ($conn->connect_error) {
                 die("Connection failed: " . $conn->connect_error);
             }
 
-            // Update the resume link for the logged-in user
+            
             $stmt = $conn->prepare("UPDATE Job_Seeker SET resume=? WHERE user_id=?");
-            $stmt->bind_param("ss", $file_name, $user_id); // Treat user_id as a string
+            $stmt->bind_param("ss", $file_name, $user_id); 
             if ($stmt->execute()) {
                 $success_message = "Resume uploaded successfully.";
                 echo "<script>updateResumeLink('$file_name');</script>";
@@ -283,7 +283,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
         $error_message = "Invalid file type. Only PDF files are allowed.";
     }
 }
-// End of resume file upload handling code
+
 
 ?>
 
@@ -292,29 +292,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechFit - Profile</title>
+    <title>Job Seeker Profile - TechFit</title>
     <link rel="stylesheet" href="styles.css?v=2.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
     body {
         font-family: Arial, sans-serif;
-        color: #e0e0e0; /* White color for text */
-        background-color: #121212; /* Very Dark Grey */
+        color: #e0e0e0;
+        background-color: #121212;
     }
 
     #profile {
         display: flex;
         align-items: flex-start;
         justify-content: flex-start;
-        margin-top: 80px; /* Add space between header and image */
-        margin-bottom: 80px; /* Add space between image and footer */
+        margin-top: 80px;
+        margin-bottom: 80px;
     }
     .profile-image {
-        margin-right: 50px; /* Space between image and text */
-        margin-left: 50px; /* Space between image and left wall */
-        width: auto; /* Ensure the image retains its original width */
-        height: auto; /* Ensure the image retains its original height */
-        border-radius: 0; /* Remove any border-radius to keep the original shape */
+        margin-right: 50px;
+        margin-left: 50px;
+        width: auto;
+        height: auto;
+        border-radius: 0;
     }
     .profile-details {
         display: flex;
@@ -324,41 +324,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
     .profile-details h2 {
         margin: 0;
         margin-bottom: 30px;
-        font-size: 35px; /* Increase font size */
-        color: #e0e0e0; /* White color for text */
+        font-size: 35px;
+        color: #e0e0e0;
     }
     .profile-details .detail-line {
         display: flex;
         align-items: center;
-        margin-bottom: 20px; /* Space between lines */
+        margin-bottom: 20px;
     }
     .profile-details .detail-line i {
-        margin-right: 10px; /* Space between icon and text */
+        margin-right: 10px;
     }
     .profile-details .detail-line span,
     .profile-details .detail-line a {
-        font-size: 20px; /* Font size for the text */
-        color: #e0e0e0; /* White color for text */
+        font-size: 20px;
+        color: #e0e0e0;
     }
     .profile-details .edit-button {
-        margin-left: 100px; /* Space between text and button */
-        padding: 5px 10px; /* Reduce padding */
-        font-size: 14px; /* Reduce font size */
+        margin-left: 100px;
+        padding: 5px 10px;
+        font-size: 14px;
         background-color: #007bff;
         color: #fff;
         border: none;
         border-radius: 5px;
         cursor: pointer;
-        width: fit-content; /* Reduce horizontal size */
+        width: fit-content;
     }
     .profile-details .edit-button:hover {
         background-color: #0056b3;
     }
     .logout-button {
-        margin-top: 20px; /* Space above the logout button */
+        margin-top: 20px;
         padding: 10px 20px;
         font-size: 14px;
-        background-color: #dc3545; /* Red background color */
+        background-color: #dc3545;
         color: #fff;
         border: none;
         border-radius: 5px;
@@ -381,7 +381,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
         z-index: 1000;
     }
     .popup h2 {
-        color: #fff; /* Set the heading text color to white */
+        color: #fff;
     }
     .popup input[type="text"],
     .popup input[type="password"] {
@@ -429,27 +429,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
     .bottom-edit-button {
         display: flex;
         justify-content: left;
-        margin-bottom: 50px; /* Space above the footer */
-        margin-left: 290px; /* Move the button 80px to the left */
+        margin-bottom: 50px;
+        margin-left: 290px;
         margin-top: -50px;
     }
     .bottom-edit-button:hover {
         background-color: #0056b3;
     }
-    /* Add this CSS to make the user icon in the header smaller */
+   
     .profile-info .profile-image {
         margin-left: 10px;
-        width: 30px; /* Adjusted width */
-        height: 30px; /* Adjusted height */
+        width: 30px;
+        height: 30px;
         border-radius: 20%;
     }
     .nav-container {
         display: flex;
-        justify-content: flex-end; /* Align navigation items to the right */
-        padding-right: -50px; /* Add padding to move items more to the right */
+        justify-content: flex-end;
+        padding-right: -50px;
     }
 
-    /* Adjust the nav-list to ensure items are aligned properly */
+   
     .nav-list {
         list-style: none;
         display: flex;
@@ -534,7 +534,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
                     <span>Password</span>
                     <button class="edit-button" onclick="openPopup('password-popup')"><i class="fas fa-edit"></i> Edit Password</button>
                 </div>
-                <!-- New LinkedIn Profile Row -->
                 <div class="detail-line">
                     <img src="images/linkedin.png" alt="LinkedIn" style="width: 20px; height: 20px; margin-right: 10px;">
                     <span>LinkedIn Profile</span>
@@ -545,13 +544,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
                     <a href="<?php echo htmlspecialchars($linkedin_link); ?>" target="_blank" style="color: #007bff;"><?php echo htmlspecialchars($linkedin_link); ?></a>
                 </div>
                 <?php endif; ?>
-                <!-- New Resume Row -->
                 <div class="detail-line" style="margin-bottom: 20px;">
                     <i class="fas fa-file-alt"></i>
                     <span>Resume</span>
                     <button class="edit-button" onclick="openPopup('resume-popup')"><i class="fas fa-edit"></i> Edit Resume</button>
                 </div>
-                <!-- Start of resume link display section -->
                 <div class="detail-line" id="resume-link-container">
                     <?php if ($resume): ?>
                     <a href="job_seeker/resumes/<?php echo htmlspecialchars($resume); ?>" target="_blank" style="color: #007bff;">View Resume</a>
@@ -562,7 +559,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
         </section>
     </main>
 
-    <!-- Edit Profile Button at the Bottom -->
     <div class="bottom-edit-button">
         <button class="edit-button" onclick="openPopup('edit-profile-popup')"><i class="fas fa-edit"></i> Edit Profile</button>
     </div>
@@ -594,7 +590,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
         </form>
     </div>
 
-    <!-- New LinkedIn Popup -->
     <div id="linkedin-popup" class="popup">
         <form action="profile.php" method="post">
             <h2>Edit LinkedIn Profile</h2>
@@ -604,7 +599,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
         </form>
     </div>
 
-    <!-- New Resume Popup -->
     <div id="resume-popup" class="popup">
         <form action="profile.php" method="post" enctype="multipart/form-data">
             <h2>Edit Resume</h2>
@@ -637,7 +631,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -652,7 +646,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="resources.php">Resources</a></li>
+                        <li><a href="useful_links.php">Useful Links</a></li>
+                        <li><a href="faq.php">FAQ</a></li>
+                        <li><a href="sitemap.php">Sitemap</a></li>
                         <li><a href="about.php">About</a></li>
                     </ul>
                 </div>

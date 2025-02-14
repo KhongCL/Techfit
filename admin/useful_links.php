@@ -82,7 +82,7 @@ $usefulLinks = $result->fetch_all(MYSQLI_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Useful Links Management</title>
+    <title>Useful Links Management - TechFit</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <header>

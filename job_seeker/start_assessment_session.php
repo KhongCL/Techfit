@@ -14,7 +14,7 @@ $db_name = 'techfit';
 $conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
 
 function generateResultId($conn) {
-    // Get max ID number
+    
     $sql = "SELECT MAX(CAST(SUBSTRING(result_id, 4) AS UNSIGNED)) as max_num 
             FROM Assessment_Job_Seeker 
             WHERE result_id LIKE 'ASJ%'";

@@ -1,3 +1,43 @@
+<?php
+session_start(); 
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "techfit";
+
+$mysqli = new mysqli($servername, $username, $password, $dbname);
+
+if ($mysqli->connect_error) {
+    die("Database connection failed: " . $mysqli->connect_error);
+}
+
+function displayLoginMessage() {
+    echo '<script>
+        if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
+            window.location.href = "../login.php";
+        } else {
+            window.location.href = "../index.php";
+        }
+    </script>';
+    exit();
+}
+
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage(); 
+}
+if ($_SESSION['role'] !== 'Job Seeker') {
+    displayLoginMessage(); 
+}
+if (!isset($_SESSION['job_seeker_id'])) {
+    displayLoginMessage(); 
+}
+
+session_write_close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

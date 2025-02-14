@@ -12,7 +12,7 @@ if ($conn->connect_error) {
 
 $assessment_id = $_GET['assessment_id'];
 
-// Fetch assessment details including section scores
+
 $sql = "WITH SectionScores AS (
     SELECT 
         a.job_seeker_id,
@@ -75,11 +75,11 @@ if ($result->num_rows === 0) {
 
 $row = $result->fetch_assoc();
 
-// Calculate minutes and seconds
+
 $minutes = floor($row['duration'] / 60);
 $seconds = $row['duration'] % 60;
 
-// Determine pass/fail status
+
 $passed = $row['score'] >= $row['passing_score_percentage'];
 $status = $passed ? "PASSED" : "FAILED";
 
@@ -101,7 +101,7 @@ Section Scores:
 {$formatted_scores}
 ";
 
-// Serve the file as a download
+
 header('Content-Type: text/plain');
 header('Content-Disposition: attachment; filename="assessment_report_' . $row['assessment_id'] . '.txt"');
 echo $reportContent;

@@ -8,21 +8,21 @@ $username = "root";
 $password = "";
 $dbname = "techfit";
 
-// Create connection
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Check for unique key in URL
+
 $admin_key = "techfit";
 if (!isset($_GET['key']) || $_GET['key'] !== $admin_key) {
     die("Access denied.");
 }
 
-// Function to generate the next ID with a given prefix
+
 function generateNextId($conn, $table, $column, $prefix) {
     $sql = "SELECT MAX(CAST(SUBSTRING($column, LENGTH('$prefix') + 1) AS UNSIGNED)) AS max_id FROM $table WHERE $column LIKE '$prefix%'";
     $result = $conn->query($sql);
@@ -41,9 +41,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $birthday = $_POST['birthday'];
     $gender = $_POST['gender'];
-    $role = 'Admin'; // Fixed role for admin registration
+    $role = 'Admin'; 
 
-    // Check for duplicate username or email
+    
     $check_sql = "SELECT * FROM User WHERE username='$username' OR email='$email'";
     $check_result = $conn->query($check_sql);
     if ($check_result->num_rows > 0) {
@@ -106,7 +106,7 @@ $conn->close();
         }
 
         h2 {
-            margin-top: -25px; /* Move title up by 25px */
+            margin-top: -25px;
         }
 
         .container {
@@ -114,28 +114,28 @@ $conn->close();
             padding: 50px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            width: 900px; /* Increased width */
+            width: 900px;
             text-align: center;
         }
         .form-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 35px; /* Increased spacing */
+            margin-bottom: 35px;
         }
         .form-row label {
             flex: 1;
-            margin-right: 10px; /* Increased spacing */
+            margin-right: 10px;
         }
         .form-row input, .form-row select {
             flex: 1;
-            padding: 15px; /* Increased padding */
+            padding: 15px;
             border: none;
             border-radius: 10px;
             background-color: #333;
             color: #fff;
         }
         .form-row.full-width input, .form-row.full-width select {
-            width: calc(100% - 30px); /* Adjusted width */
+            width: calc(100% - 30px);
         }
         .form-row input[type="checkbox"] {
             flex: 0;
@@ -144,8 +144,8 @@ $conn->close();
         
         input[type="submit"] {
             width: 100%;
-            padding: 15px; /* Increased padding */
-            margin: 20px 0; /* Increased spacing */
+            padding: 15px;
+            margin: 20px 0;
             border: none;
             border-radius: 5px;
             background-color: #007bff;
@@ -169,11 +169,11 @@ $conn->close();
             flex-direction: column;
         }
         .form-row.full-width input, .form-row.full-width select {
-            width: calc(100% - 30px); /* Adjusted width */
+            width: calc(100% - 30px);
         }
         .form-row.checkbox-row {
             align-items: center;
-            justify-content: center; /* Center align the checkbox row */
+            justify-content: center;
         }
         .form-row.checkbox-row label {
             flex: none;
@@ -234,7 +234,7 @@ $conn->close();
             }
 
             h2 {
-                margin-top: 0; /* Remove top margin for mobile */
+                margin-top: 0;
             }
         }
         
@@ -244,7 +244,7 @@ $conn->close();
             let isValid = true;
             let errorMessage = "";
 
-            // Password validation
+            
             const password = document.getElementById("password").value;
             const confirmPassword = document.getElementById("confirm_password").value;
             if (password.length < 8) {
@@ -268,14 +268,14 @@ $conn->close();
                 isValid = false;
             }
 
-            // Birthday validation
+            
             const birthday = document.getElementById("birthday").value;
             if (!birthday) {
                 errorMessage += "Please enter your birthday.<br>";
                 isValid = false;
             }
 
-            // First name and last name validation
+            
             const firstName = document.getElementById("first_name").value;
             const lastName = document.getElementById("last_name").value;
             if (!/^[a-zA-Z-]+$/.test(firstName)) {
@@ -287,7 +287,7 @@ $conn->close();
                 isValid = false;
             }
 
-            // Display error message
+            
             if (!isValid) {
                 document.getElementById("error-message").innerHTML = errorMessage;
             }

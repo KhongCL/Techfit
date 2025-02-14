@@ -8,15 +8,15 @@ $username = "root";
 $password = "";
 $dbname = "techfit";
 
-// Create connection
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Function to generate the next ID with a given prefix
+
 function generateNextId($conn, $table, $column, $prefix) {
     $sql = "SELECT MAX(CAST(SUBSTRING($column, LENGTH('$prefix') + 1) AS UNSIGNED)) AS max_id FROM $table WHERE $column LIKE '$prefix%'";
     $result = $conn->query($sql);
@@ -28,7 +28,7 @@ function generateNextId($conn, $table, $column, $prefix) {
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $feedback_id = generateNextId($conn, 'Feedback', 'feedback_id', 'F');
-    $user_id = $_SESSION['user_id']; // Assuming user_id is stored in session
+    $user_id = $_SESSION['user_id']; 
     $feedback_text = $_POST['feedback_text'];
     $timestamp = date('Y-m-d H:i:s');
 

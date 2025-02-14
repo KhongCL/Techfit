@@ -1,7 +1,7 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message
+
 function displayLoginMessage() {
     echo '<script>
         alert("You need to log in to access this page.");
@@ -9,17 +9,17 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Admin') {
-    displayLoginMessage(); // Display message if the role is not Admin
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 ?>
 
@@ -31,26 +31,26 @@ session_write_close();
     <title>Manage Assessments - TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Color Theme */
+       
         :root {
-                --primary-color: #007bff; /* Blue */
-                --secondary-color: #1e1e1e; /* Dark Grey */
-                --accent-color: #0056b3; /* Darker Blue */
-                --text-color: #e0e0e0; /* Slightly Darker White */
-                --background-color: #121212; /* Very Dark Grey */
-                --border-color: #333; /* Dark Grey */
-                --hover-background-color: #333; /* Slightly Lighter Dark Grey */
-                --hover-text-color: #fff; /* White */
-                --button-hover-color: #80bdff; /* Lighter Blue */
-                --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
-                --popup-border-color: #444; /* Slightly Lighter Dark Grey */
-                --danger-color: #dc3545; /* Red */
-                --danger-hover-color: #c82333; /* Darker Red */
-                --success-color: #28a745; /* Green */
-                --success-hover-color: #218838; /* Darker Green */
+                --primary-color: #007bff;
+                --secondary-color: #1e1e1e;
+                --accent-color: #0056b3;
+                --text-color: #e0e0e0;
+                --background-color: #121212;
+                --border-color: #333;
+                --hover-background-color: #333;
+                --hover-text-color: #fff;
+                --button-hover-color: #80bdff;
+                --popup-background-color: #1a1a1a;
+                --popup-border-color: #444;
+                --danger-color: #dc3545;
+                --danger-hover-color: #c82333;
+                --success-color: #28a745;
+                --success-hover-color: #218838;
             }
 
-        /* General Styles */
+       
         body {
             font-family: Arial, sans-serif;
             color: var(--text-color);
@@ -61,7 +61,7 @@ session_write_close();
             padding: 20px;
         }
 
-        /* Header Controls */
+       
         .header-controls {
             display: flex;
             justify-content: space-between;
@@ -70,7 +70,7 @@ session_write_close();
 
         .button-group {
             display: flex;
-            gap: 10px; /* Add spacing between buttons */
+            gap: 10px;
         }
 
         .search-sort-controls {
@@ -85,7 +85,7 @@ session_write_close();
             white-space: nowrap;
         }
 
-        /* Sort Dropdown */
+       
         #sortDropdown {
             margin-right: 10px;
             padding: 10px;
@@ -103,10 +103,10 @@ session_write_close();
         #sortDropdown option {
             background-color: var(--background-color);
             color: var(--text-color);
-            border-radius: 2px; /* Smaller radius for dropdown options */
+            border-radius: 2px;
         }
 
-        /* Search Input */
+       
         .search-container {
             position: relative;
             flex-grow: 1;
@@ -147,7 +147,7 @@ session_write_close();
             display: none;
             position: absolute;
             top: calc(100% + 10px);
-            left: 10px; /* Ensure left alignment with the search field */
+            left: 10px;
             background: var(--popup-background-color);
             color: var(--text-color);
             padding: 10px;
@@ -158,7 +158,7 @@ session_write_close();
             z-index: 1000;
         }
 
-        /* Buttons */
+       
         button {
             background-color: var(--primary-color);
             color: var(--text-color);
@@ -191,7 +191,7 @@ session_write_close();
             background-color: var(--success-hover-color);
         }
 
-        /* Specific Buttons */
+       
         #deleteSelected {
             background-color: var(--danger-color);
         }
@@ -205,13 +205,13 @@ session_write_close();
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
-            gap: 20px; /* Add spacing between button and search container */
+            gap: 20px;
         }
 
         #restoreSelectedButton {
             background-color: var(--success-color);
             margin-right: 20px;
-            flex-shrink: 0; /* Prevent button from shrinking */
+            flex-shrink: 0;
             margin-right: 0;
         }
 
@@ -219,12 +219,12 @@ session_write_close();
             background-color: var(--success-hover-color);
         }
 
-        /* Table */
+       
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            table-layout: fixed; /* Ensure fixed table layout */
+            table-layout: fixed;
         }
 
         th, td {
@@ -238,7 +238,7 @@ session_write_close();
             cursor: pointer;
             position: relative;
             transition: background-color 0.3s ease;
-            padding-right: 20px; /* Add space for chevron */
+            padding-right: 20px;
         }
 
         th[data-column]:hover {
@@ -251,7 +251,7 @@ session_write_close();
             color: var(--hover-text-color);
         }
 
-        /* Column Resizer */
+       
         .resizer {
             display: inline-block;
             width: 5px;
@@ -263,43 +263,43 @@ session_write_close();
             z-index: 1;
         }
 
-        /* Set specific column widths */
+       
         th:first-child, td:first-child {
-            width: 50px; /* Set fixed width for the checkbox column */
+            width: 50px;
         }
 
         th[data-column="description"], td[data-column="description"] {
-            max-width: 150px; /* Reduce the width of the description column */
+            max-width: 150px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            position: relative; /* Ensure resizer is positioned correctly */
+            position: relative;
         }
 
         th[data-column="assessment_name"], td[data-column="assessment_name"] {
-            max-width: 150px; /* Reduce the width of the assessment name column */
+            max-width: 150px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            position: relative; /* Ensure resizer is positioned correctly */
+            position: relative;
         }
 
         th[data-column="actions"], td[data-column="actions"] {
-            width: 200px; /* Set a fixed width for the Actions column */
+            width: 200px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            position: relative; /* Ensure resizer is positioned correctly */
+            position: relative;
         }
 
-        /* Actions Column Links */
+       
         td a {
             color: var(--primary-color);
             text-decoration: none;
             font-weight: bold;
-            margin-right: 5px; /* Reduced margin */
+            margin-right: 5px;
             transition: color 0.3s ease;
-            display: inline-block; /* Ensure inline-block display */
+            display: inline-block;
         }
 
         td a:hover {
@@ -307,9 +307,9 @@ session_write_close();
         }
 
         .action-separator {
-            margin: 0 5px; /* Reduced margin */
+            margin: 0 5px;
             color: var (--text-color);
-            display: inline-block; /* Ensure inline-block display */
+            display: inline-block;
         }
 
         td a.deleteAssessment {
@@ -320,7 +320,7 @@ session_write_close();
             color: var(--danger-hover-color);
         }
 
-        /* Chevron */
+       
         th[data-column]::after {
             content: '';
             position: absolute;
@@ -338,7 +338,7 @@ session_write_close();
 
         th[data-column].desc::after {
             display: inline-block;
-            border-top-color: var(--text-color); /* Corrected from var (--text-color) to var(--text-color) */
+            border-top-color: var(--text-color);
         }
 
         th[data-column]:hover.asc::after {
@@ -351,9 +351,9 @@ session_write_close();
             border-bottom-color: var(--hover-text-color);
         }
 
-        /* Tooltip */
+       
         .tooltip {
-            position: absolute; /* Ensure the tooltip is positioned relative to the element */
+            position: absolute;
             background: var(--popup-background-color);
             color: var(--text-color);
             padding: 5px;
@@ -367,9 +367,9 @@ session_write_close();
             pointer-events: none;
         }
 
-        /* Editable Cell Tooltip */
+       
         .editable {
-            position: relative; /* Ensure the tooltip is positioned relative to the cell */
+            position: relative;
         }
 
         .editable:hover::after {
@@ -386,28 +386,28 @@ session_write_close();
             white-space: nowrap;
             z-index: 1000;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            opacity: 1; /* Ensure the tooltip is visible */
-            visibility: visible; /* Ensure the tooltip is visible */
-            pointer-events: none; /* Ensure the tooltip does not interfere with mouse events */
+            opacity: 1;
+            visibility: visible;
+            pointer-events: none;
         }
 
-        /* Input Field for Editable Cells */
+       
         .editable input {
-            /* Add styles for the input field */
+           
             width: 100%;
             padding: 5px;
             border: 1px solid var(--border-color);
             border-radius: 5px;
             background-color: var(--secondary-color);
             color: var(--text-color);
-            resize: vertical; /* Allow vertical resizing */
-            box-sizing: border-box; /* Ensure padding and border are included in the element's total width and height */
+            resize: vertical;
+            box-sizing: border-box;
         }
 
-        /* Deleted Assessments Tab */
+       
         #deleted-assessments-tab {
             display: none;
-            position: fixed; /* Change from relative to fixed */
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -497,7 +497,7 @@ session_write_close();
             display: none;
             position: absolute;
             top: calc(100% + 10px);
-            left: 10px; /* Ensure left alignment with the search field */
+            left: 10px;
             background: var(--popup-background-color);
             color: var(--text-color);
             padding: 10px;
@@ -508,7 +508,7 @@ session_write_close();
             z-index: 1000;
         }
 
-        /* Close Button */
+       
         .assessment-close-button {
             position: absolute;
             top: 10px;
@@ -523,9 +523,9 @@ session_write_close();
         }
 
         .assessment-close-button:hover {
-            color: var(--accent-color); /* Use a less prominent color for hover */
-            transform: scale(1.1); /* Slightly enlarge the button on hover */
-            background: none; /* Ensure no background color on hover */
+            color: var(--accent-color);
+            transform: scale(1.1);
+            background: none;
         }
     </style>
     <script>
@@ -608,13 +608,13 @@ session_write_close();
                         }
                         document.getElementById('deleted-assessments-tab').style.display = 'block';
 
-                        // Add event listener for select all checkbox
+                        
                         document.getElementById('select-all-deleted').addEventListener('change', function() {
                             const checkboxes = document.querySelectorAll('input[name="restore_assessments[]"]');
                             checkboxes.forEach(checkbox => checkbox.checked = this.checked);
                         });
 
-                        // Add shift-click selection for deleted assessments
+                        
                         let lastDeletedChecked = null;
                         document.querySelectorAll('.selectDeletedAssessment').forEach(function(checkbox) {
                             checkbox.addEventListener('click', function(event) {
@@ -636,16 +636,16 @@ session_write_close();
                             });
                         });
 
-                        // Add event listener for restore selected button
+                        
                         document.getElementById('restoreSelectedButton').addEventListener('click', restoreSelectedAssessments);
 
-                        // Add event listeners for sorting columns in the deleted assessments table
+                        
                         document.querySelectorAll('#deleted-assessments-tab th[data-column]').forEach(th => {
                             th.addEventListener('click', function() {
                                 const column = this.getAttribute('data-column');
                                 const currentOrder = this.dataset.order || -1;
-                                const order = this.dataset.order = currentOrder * -1; // Toggle order
-                                console.log(`Sorting deleted assessments table column: ${column}, Order: ${order}`); // Debug log
+                                const order = this.dataset.order = currentOrder * -1; 
+                                console.log(`Sorting deleted assessments table column: ${column}, Order: ${order}`); 
                                 const rows = Array.from(document.querySelectorAll('#deleted-assessments tr'));
                                 rows.sort((a, b) => {
                                     const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
@@ -654,7 +654,7 @@ session_write_close();
                                 });
                                 rows.forEach(row => document.querySelector('#deleted-assessments').appendChild(row));
 
-                                // Update chevron
+                                
                                 document.querySelectorAll('#deleted-assessments-tab th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
                                 this.classList.add(order === 1 ? 'asc' : 'desc');
                             });
@@ -662,7 +662,7 @@ session_write_close();
                     });
             });
 
-            // Add event listeners for sorting columns in the main table
+            
             document.querySelectorAll('th[data-column]').forEach(th => {
                 th.addEventListener('mouseenter', function(event) {
                     const tooltip = document.createElement('div');
@@ -670,9 +670,9 @@ session_write_close();
                     tooltip.textContent = 'Click to sort';
                     document.body.appendChild(tooltip);
                     const rect = th.getBoundingClientRect();
-                    tooltip.style.top = `${rect.bottom + window.scrollY}px`; // Position below the header
-                    tooltip.style.left = `${rect.left + window.scrollX}px`; // Align with the header
-                    th._tooltip = tooltip; // Store reference to tooltip
+                    tooltip.style.top = `${rect.bottom + window.scrollY}px`; 
+                    tooltip.style.left = `${rect.left + window.scrollX}px`; 
+                    th._tooltip = tooltip; 
                 });
 
                 th.addEventListener('mouseleave', function() {
@@ -684,12 +684,12 @@ session_write_close();
 
                 th.addEventListener('click', function() {
                     if (this.closest('#deleted-assessments-tab')) {
-                        return; // Skip sorting for deleted assessments table
+                        return; 
                     }
                     const column = this.getAttribute('data-column');
                     const currentOrder = this.dataset.order || -1;
-                    const order = this.dataset.order = currentOrder * -1; // Toggle order
-                    console.log(`Sorting main table column: ${column}, Order: ${order}`); // Debug log
+                    const order = this.dataset.order = currentOrder * -1; 
+                    console.log(`Sorting main table column: ${column}, Order: ${order}`); 
                     const rows = Array.from(document.querySelectorAll('#assessmentsTableBody tr'));
                     rows.sort((a, b) => {
                         const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
@@ -698,7 +698,7 @@ session_write_close();
                     });
                     rows.forEach(row => document.querySelector('#assessmentsTableBody').appendChild(row));
 
-                    // Update chevron
+                    
                     document.querySelectorAll('th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
                     this.classList.add(order === 1 ? 'asc' : 'desc');
                 });
@@ -754,7 +754,7 @@ session_write_close();
                 if (tab) {
                     tab.style.display = 'none';
                 }
-                // Remove all tooltips when closing
+                
                 document.querySelectorAll('.tooltip').forEach(tooltip => tooltip.remove());
             }
 
@@ -777,7 +777,7 @@ session_write_close();
                     .then(data => {
                         if (data.success) {
                             alert('Selected assessments restored successfully.');
-                            location.reload(); // Reload the page to update the restored assessments
+                            location.reload(); 
                         } else {
                             alert('Failed to restore selected assessments.');
                         }
@@ -880,12 +880,12 @@ session_write_close();
             document.querySelectorAll('th[data-column]').forEach(th => {
                 th.addEventListener('click', function() {
                     if (this.closest('#deleted-assessments-tab')) {
-                        return; // Skip sorting for deleted assessments table
+                        return; 
                     }
                     const column = this.getAttribute('data-column');
                     const currentOrder = this.dataset.order || -1;
-                    const order = this.dataset.order = currentOrder * -1; // Toggle order
-                    console.log(`Sorting main table column: ${column}, Order: ${order}`); // Debug log
+                    const order = this.dataset.order = currentOrder * -1; 
+                    console.log(`Sorting main table column: ${column}, Order: ${order}`); 
                     const rows = Array.from(document.querySelectorAll('#assessmentsTableBody tr'));
                     rows.sort((a, b) => {
                         const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
@@ -894,13 +894,13 @@ session_write_close();
                     });
                     rows.forEach(row => document.querySelector('#assessmentsTableBody').appendChild(row));
 
-                    // Update chevron
+                    
                     document.querySelectorAll('th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
                     this.classList.add(order === 1 ? 'asc' : 'desc');
-                }, { once: true }); // Ensure the event listener is added only once
+                }, { once: true }); 
             });
 
-            // Editable cells
+            
             document.querySelectorAll('.editable').forEach(cell => {
                 cell.addEventListener('mouseenter', function(event) {
                     const tooltip = document.createElement('div');
@@ -908,9 +908,9 @@ session_write_close();
                     tooltip.textContent = 'Double-click to edit';
                     document.body.appendChild(tooltip);
                     const rect = cell.getBoundingClientRect();
-                    tooltip.style.top = `${rect.bottom + window.scrollY}px`; // Position below the cell
-                    tooltip.style.left = `${rect.left + window.scrollX}px`; // Align with the cell
-                    cell._tooltip = tooltip; // Store reference to tooltip
+                    tooltip.style.top = `${rect.bottom + window.scrollY}px`; 
+                    tooltip.style.left = `${rect.left + window.scrollX}px`; 
+                    cell._tooltip = tooltip; 
                 });
 
                 cell.addEventListener('mouseleave', function() {
@@ -922,7 +922,7 @@ session_write_close();
 
                 cell.addEventListener('dblclick', function() {
                     const originalText = this.textContent;
-                    const input = document.createElement('textarea'); // Changed from input to textarea
+                    const input = document.createElement('textarea'); 
                     input.value = originalText;
                     input.style.width = '100%';
                     this.textContent = '';
@@ -970,7 +970,7 @@ session_write_close();
             });
         });
 
-            // Add resizers to each column header
+            
             document.querySelectorAll('th').forEach(th => {
                 const resizer = document.createElement('div');
                 resizer.classList.add('resizer');
@@ -990,8 +990,8 @@ session_write_close();
 
             function resizeColumn(e) {
                 const newWidth = startWidth + (e.clientX - startX);
-                const maxWidth = 500; // Set a maximum width for the columns
-                const minWidth = 50; // Set a minimum width for the columns
+                const maxWidth = 500; 
+                const minWidth = 50; 
                 if (newWidth > maxWidth) {
                     resizer.parentElement.style.width = maxWidth + 'px';
                     resizer.parentElement.style.minWidth = maxWidth + 'px';
@@ -1135,10 +1135,10 @@ session_write_close();
                     $password = "";
                     $dbname = "techfit";
 
-                    // Create connection
+                    
                     $conn = new mysqli($servername, $username, $password, $dbname);
 
-                    // Check connection
+                    
                     if ($conn->connect_error) {
                         die("Connection failed: " . $conn->connect_error);
                     }
@@ -1201,7 +1201,7 @@ session_write_close();
                 <button type="button" class="assessment-close-button" onclick="closeDeletedAssessments()">&#x2715;</button>
             </div>
         </main>
-    <footer>
+        <footer>
         <div class="footer-content">
             <div class="footer-left">
                 <div class="footer-logo">
@@ -1220,41 +1220,32 @@ session_write_close();
             </div>
             <div class="footer-right">
                 <div class="footer-column">
-                    <h3>Assessments</h3>
+                    <h3>Assessment</h3>
                     <ul>
-                        <li><a href="create_assessment.php">Create New Assessment</a></li>
-                        <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                        <li><a href="view_assessment_results.php">View Assessment Results</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Users</h3>
-                    <ul>
-                        <li><a href="manage_users.php">Manage Users</a></li>
-                        <li><a href="user_feedback.php">User Feedback</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Reports</h3>
-                    <ul>
-                        <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                        <li><a href="user_engagement.php">User Engagement Statistics</a></li>
-                        <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
+                        <li><a href="start_assessment.php">Start Assessment</a></li>
+                        <li><a href="assessment_history.php">Assessment History</a></li>
+                        <li><a href="assessment_summary.php">Assessment Summary</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.php">Manage Useful Links</a></li>
-                        <li><a href="faq.php">Manage FAQs</a></li>
-                        <li><a href="sitemap.php">Manage Sitemap</a></li>
+                        <li><a href="useful_links.php">Useful Links</a></li>
+                        <li><a href="faq.php">FAQ</a></li>
+                        <li><a href="sitemap.php">Sitemap</a></li>
+                        <li><a href="about.php">About</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
-                    <h3>About</h3>
+                    <h3>Contact</h3>
                     <ul>
-                        <li><a href="about.php">About</a></li>
                         <li><a href="contact.php">Contact Us</a></li>
+                        <li><a href="feedback.php">Feedback</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul>
                         <li><a href="terms.php">Terms of Service</a></li>
                         <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>

@@ -19,15 +19,15 @@ $employer_id = $_SESSION['employer_id'];
 $job_seeker_id = $_POST['job_seeker_id'];
 $interest_status = $_POST['interest_status'];
 
-// Check if the record exists
+
 $sql = "SELECT * FROM Employer_Interest WHERE employer_id = '$employer_id' AND job_seeker_id = '$job_seeker_id'";
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
-    // Update the existing record
+    
     $sql = "UPDATE Employer_Interest SET interest_status = '$interest_status', is_active = 1 WHERE employer_id = '$employer_id' AND job_seeker_id = '$job_seeker_id'";
 } else {
-    // Insert a new record
+    
     $sql = "INSERT INTO Employer_Interest (employer_id, job_seeker_id, interest_status, is_active) VALUES ('$employer_id', '$job_seeker_id', '$interest_status', 1)";
 }
 

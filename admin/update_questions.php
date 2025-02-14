@@ -8,15 +8,15 @@ $username = "root";
 $password = "";
 $dbname = "techfit";
 
-// Create connection
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Function to generate the next ID with a given prefix
+
 function generateNextId($conn, $table, $column, $prefix) {
     $sql = "SELECT MAX(CAST(SUBSTRING($column, LENGTH('$prefix') + 1) AS UNSIGNED)) AS max_id FROM $table WHERE $column LIKE '$prefix%'";
     $result = $conn->query($sql);
@@ -28,7 +28,7 @@ function generateNextId($conn, $table, $column, $prefix) {
 
 $response = array('success' => true);
 
-// Log the received POST data
+
 error_log("Received POST data: " . print_r($_POST, true));
 
 foreach ($_POST['question_id'] as $index => $question_id) {
@@ -37,14 +37,14 @@ foreach ($_POST['question_id'] as $index => $question_id) {
     $answer_type = $_POST['answer_type'][$index];
     $correct_answer = $_POST['correct_choice'][$index];
 
-    // Validate input fields
+    
     if (empty($question_text) || empty($question_type) || empty($answer_type) || empty($correct_answer)) {
         $response['success'] = false;
         $response['error'] = "All fields are required.";
         break;
     }
 
-    // Check if the question ID is empty (new question)
+    
     if (empty($question_id)) {
         $question_id = generateNextId($conn, 'Question', 'question_id', 'Q');
         $sql = "INSERT INTO Question (question_id, assessment_id, question_text, question_type, answer_type, correct_answer) VALUES (?, ?, ?, ?, ?, ?)";
@@ -62,7 +62,7 @@ foreach ($_POST['question_id'] as $index => $question_id) {
         break;
     }
 
-    // Update choices for multiple choice questions
+    
     if ($answer_type === 'multiple choice') {
         $choices_key = "choices_" . ($index + 1);
         $choice_ids_key = "choice_id_" . ($index + 1);
@@ -76,12 +76,12 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                     break 2;
                 }
 
-                // Use the choice ID provided in the form data
+                
                 $choice_id = isset($choice_ids[$choice_index]) ? $choice_ids[$choice_index] : '';
 
-                // Log the choice ID to see if it is empty
+                
                 if (!empty($choice_id)) {
-                    // Check if the choice text has changed
+                    
                     $check_choice_sql = "SELECT choice_text FROM Choices WHERE choice_id = ? AND question_id = ?";
                     $check_choice_stmt = $conn->prepare($check_choice_sql);
                     $check_choice_stmt->bind_param("ss", $choice_id, $question_id);
@@ -90,7 +90,7 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                     $existing_choice = $check_choice_result->fetch_assoc();
 
                     if ($existing_choice['choice_text'] !== $choice_text) {
-                        // Update existing choice
+                        
                         $update_choice_sql = "UPDATE Choices SET choice_text = ? WHERE choice_id = ? AND question_id = ?";
                         $update_choice_stmt = $conn->prepare($update_choice_sql);
                         $update_choice_stmt->bind_param("sss", $choice_text, $choice_id, $question_id);
@@ -103,7 +103,7 @@ foreach ($_POST['question_id'] as $index => $question_id) {
                         error_log("No changes detected for choice ID $choice_id");
                     }
                 } else {
-                    // Insert new choice
+                    
                     $choice_id = generateNextId($conn, 'Choices', 'choice_id', 'C');
                     $insert_choice_sql = "INSERT INTO Choices (choice_id, question_id, choice_text) VALUES (?, ?, ?)";
                     $insert_choice_stmt = $conn->prepare($insert_choice_sql);
@@ -122,7 +122,7 @@ foreach ($_POST['question_id'] as $index => $question_id) {
         $code_template = isset($_POST['code_template'][$index]) ? $_POST['code_template'][$index] : '';
         $programming_language = isset($_POST['code_language'][$index]) ? $_POST['code_language'][$index] : '';
     
-        // Validate required fields
+        
         if (empty($code_template) || empty($programming_language)) {
             $response['success'] = false;
             $response['error'] = "Code template and programming language are required for code questions.";
@@ -130,7 +130,7 @@ foreach ($_POST['question_id'] as $index => $question_id) {
             break;
         }
     
-        // Validate answers format
+        
         $answers = explode('<<ANSWER_BREAK>>', $correct_answer);
         if (count($answers) < 2) {
             $response['success'] = false;
@@ -138,7 +138,7 @@ foreach ($_POST['question_id'] as $index => $question_id) {
             break;
         }
         
-        // Check for empty/blank answers
+        
         foreach ($answers as $answer) {
             if (trim($answer) === '') {
                 $response['success'] = false;
@@ -147,7 +147,7 @@ foreach ($_POST['question_id'] as $index => $question_id) {
             }
         }
     
-        // Count blanks and validate match with answers
+        
         $blank_count = substr_count($code_template, '__BLANK__');
         if ($blank_count !== count($answers)) {
             $response['success'] = false;
@@ -155,7 +155,7 @@ foreach ($_POST['question_id'] as $index => $question_id) {
             break;
         }
     
-        // Update or insert code question
+        
         if (empty($question_id)) {
             $question_id = generateNextId($conn, 'Question', 'question_id', 'Q');
             $sql = "INSERT INTO Question (question_id, assessment_id, question_text, question_type, answer_type, correct_answer, code_template, programming_language) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
@@ -176,7 +176,7 @@ foreach ($_POST['question_id'] as $index => $question_id) {
     }
 }
 
-// Update the last_modified column in the Assessment_Admin table
+
 $update_last_modified_sql = "UPDATE Assessment_Admin SET last_modified = NOW() WHERE assessment_id = ?";
 $update_last_modified_stmt = $conn->prepare($update_last_modified_sql);
 $update_last_modified_stmt->bind_param("s", $_POST['assessment_id']);

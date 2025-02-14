@@ -7,7 +7,7 @@ session_start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechFit Employer - Candidate Answer</title>
+    <title>Candidate Answer - TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="employer.css">
 </head>
@@ -71,7 +71,7 @@ session_start();
             <div class="assessment-dropdown">
                 <select id="assessment-select" onchange="updateAssessment()">
                     <?php
-                    // Database connection
+                    
                     $servername = "localhost";
                     $username = "root";
                     $password = "";
@@ -105,7 +105,7 @@ session_start();
                             $selected = ($row['assessment_id'] == $assessment_id) ? 'selected' : '';
                             echo "<option value='" . $row['assessment_id'] . "' $selected>" . $row['assessment_name'] . "</option>";
                         }
-                        // If no assessment_id is set, use the first one and reload the page
+                        
                         if ($assessment_id === null && $first_assessment_id !== null) {
                             $assessment_id = $first_assessment_id;
                             echo "<script>window.location.href = '?job_seeker_id=$job_seeker_id&assessment_id=$assessment_id';</script>";
@@ -122,7 +122,7 @@ session_start();
 
         <div class="row-2 candidate-score-row">
             <?php
-            // Database connection (re-establish for candidate info and score)
+            
             $servername = "localhost";
             $username = "root";
             $password = "";
@@ -149,16 +149,16 @@ session_start();
                 echo "<img src='images/usericon.png' alt='User Icon'>";
                 echo "<div class='name'>" . $row_candidate['first_name'] . " " . $row_candidate['last_name'] . "</div>";
                 echo "<div class='details'>";
-                // LinkedIn Link
+                
                 if (!empty($row_candidate['linkedin_link'])) {
                     echo "<a href='" . htmlspecialchars($row_candidate['linkedin_link']) . "' target='_blank'>LinkedIn Profile</a><br>";
                 } else {
-                    echo "LinkedIn Profile: N/A<br>"; // Display "N/A" if empty
+                    echo "LinkedIn Profile: N/A<br>"; 
                 }
-                // Education Level
+                
                 $education_level = !empty($row_candidate['education_level']) ? htmlspecialchars($row_candidate['education_level']) : 'N/A';
                 echo "<div class='education'>Education Level: " . $education_level . "</div>";
-                // Years of Experience
+                
                 $experience = (!empty($row_candidate['year_of_experience']) || $row_candidate['year_of_experience'] === '0') ? htmlspecialchars($row_candidate['year_of_experience']) . " Years" : 'N/A';
                 echo "<div class='experience'>Years of Experience: " . $experience . "</div>";
                 echo "</div>";
@@ -168,7 +168,7 @@ session_start();
             }
 
 
-            // Fetch score and time used
+            
             $score = "N/A";
             $time_used = "N/A";
             if ($assessment_id) {
@@ -179,9 +179,9 @@ session_start();
 
                 if ($result_score_time->num_rows > 0) {
                     $row_score_time = $result_score_time->fetch_assoc();
-                    $score = !is_null($row_score_time['score']) ? $row_score_time['score'] : 'N/A'; // Handle null score
+                    $score = !is_null($row_score_time['score']) ? $row_score_time['score'] : 'N/A'; 
                     $time_used_value = $row_score_time['time_used'];
-                    $time_used = !empty($time_used_value) ? $time_used_value : 'N/A'; // Handle empty time_used
+                    $time_used = !empty($time_used_value) ? $time_used_value : 'N/A'; 
                 }
             }
 
@@ -202,7 +202,7 @@ session_start();
             <div class="questions-title">Questions</div>
             <div class="questions-container">
                 <?php
-                // Database connection (re-establish for questions)
+                
                 $servername = "localhost";
                 $username = "root";
                 $password = "";
@@ -217,21 +217,21 @@ session_start();
                 $assessment_id = isset($_GET['assessment_id']) ? $_GET['assessment_id'] : null;
 
                 if ($assessment_id) {
-                    // Fetch questions and correct answers based on the selected assessment ID
+                    
                     $sql_questions = "SELECT q.question_text, q.correct_answer
                                                  FROM question q
                                                  WHERE q.assessment_id = '$assessment_id'";
                     $result_questions = $conn->query($sql_questions);
 
                     if ($result_questions->num_rows > 0) {
-                        $question_counter = 1; // Initialize the question counter
+                        $question_counter = 1; 
                         while ($row_question = $result_questions->fetch_assoc()) {
                             echo "<div class='question'>";
                             echo "<div class='question-text'><strong>Question $question_counter:</strong> " . htmlspecialchars($row_question['question_text']) . "</div>";
-                            echo "<div class='job-seeker-answer'><strong>Job Seeker's Answer:</strong> </div>"; // Leave blank for now
+                            echo "<div class='job-seeker-answer'><strong>Job Seeker's Answer:</strong> </div>"; 
                             echo "<div class='correct-answer'><strong>Correct Answer:</strong> " . htmlspecialchars($row_question['correct_answer']) . "</div>";
                             echo "</div>";
-                            $question_counter++; // Increment the question counter
+                            $question_counter++; 
                         }
                     } else {
                         echo "<div>No questions found for this assessment.</div>";
@@ -262,14 +262,16 @@ session_start();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p><a href="mailto:/a></p>techfit@gmail.com">techfit@gmail.com</a></p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
                 <div class="footer-column">
-                    <h3>Candidate</h3>
+                    <h3>Assessment</h3>
                     <ul>
-                        <li><a href="search_candidate.php">Search Candidates</a></li>
+                        <li><a href="start_assessment.php">Start Assessment</a></li>
+                        <li><a href="assessment_history.php">Assessment History</a></li>
+                        <li><a href="assessment_summary.php">Assessment Summary</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -300,7 +302,7 @@ session_start();
         <div class="footer-bottom">
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
-    </footer> 
+    </footer>
 <script>
     function updateAssessment() {
         const assessmentSelect = document.getElementById('assessment-select');

@@ -1,7 +1,7 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message
+
 function displayLoginMessage() {
     echo '<script>
         alert("You need to log in to access this page.");
@@ -9,17 +9,17 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Admin') {
-    displayLoginMessage(); // Display message if the role is not Admin
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 ?>
 
@@ -31,7 +31,7 @@ $database = 'techfit';
 
 $conn = new mysqli($host, $username, $password, $database);
 
-// Fetch Job Seeker data
+
 $jobSeekerQuery = "
     SELECT 
         job_seeker.user_id AS 'name', 
@@ -46,7 +46,7 @@ $jobSeekerQuery = "
     WHERE User.is_active = 1";
 $jobSeekerResult = $conn->query($jobSeekerQuery);
 
-// Fetch Employer data
+
 $employerQuery = "
     SELECT 
         employer.user_id AS 'name', 
@@ -58,7 +58,7 @@ $employerQuery = "
     WHERE User.is_active = 1";
 $employerResult = $conn->query($employerQuery);
 
-// Fetch inactive users for restoration
+
 $restoreUserQuery = "
     SELECT 
         user_id AS 'name', 
@@ -71,21 +71,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['delete'])) {
         $userIds = $_POST['user_ids'];
         foreach ($userIds as $userId) {
-            // Set is_active to 0 for the selected users
+            
             $updateQuery = "UPDATE User SET is_active = 0 WHERE user_id = '$userId'";
             $conn->query($updateQuery);
         }
-        // Refresh the page to reflect changes
+        
         header('Location: manage_users.php');
         exit();
     } elseif (isset($_POST['restore'])) {
         $userIds = $_POST['restore_user_ids'];
         foreach ($userIds as $userId) {
-            // Set is_active to 1 for the selected users
+            
             $updateQuery = "UPDATE User SET is_active = 1 WHERE user_id = '$userId'";
             $conn->query($updateQuery);
         }
-        // Refresh the page to reflect changes
+        
         header('Location: manage_users.php');
         exit();
     }
@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Techfit</title>
+    <title>Manage Users - Techfit</title>
     <link rel="stylesheet" href="styles.css">   
 </head>
 <body>
@@ -282,41 +282,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
             <div class="footer-right">
                 <div class="footer-column">
-                    <h3>Assessments</h3>
+                    <h3>Assessment</h3>
                     <ul>
-                        <li><a href="create_assessment.php">Create New Assessment</a></li>
-                        <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                        <li><a href="view_assessment_results.php">View Assessment Results</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Users</h3>
-                    <ul>
-                        <li><a href="manage_users.php">Manage Users</a></li>
-                        <li><a href="user_feedback.php">User Feedback</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Reports</h3>
-                    <ul>
-                        <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                        <li><a href="user_engagement.php">User Engagement Statistics</a></li>
-                        <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
+                        <li><a href="start_assessment.php">Start Assessment</a></li>
+                        <li><a href="assessment_history.php">Assessment History</a></li>
+                        <li><a href="assessment_summary.php">Assessment Summary</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.php">Manage Useful Links</a></li>
-                        <li><a href="faq.php">Manage FAQs</a></li>
-                        <li><a href="sitemap.php">Manage Sitemap</a></li>
+                        <li><a href="useful_links.php">Useful Links</a></li>
+                        <li><a href="faq.php">FAQ</a></li>
+                        <li><a href="sitemap.php">Sitemap</a></li>
+                        <li><a href="about.php">About</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
-                    <h3>About</h3>
+                    <h3>Contact</h3>
                     <ul>
-                        <li><a href="about.php">About</a></li>
                         <li><a href="contact.php">Contact Us</a></li>
+                        <li><a href="feedback.php">Feedback</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul>
                         <li><a href="terms.php">Terms of Service</a></li>
                         <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>

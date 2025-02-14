@@ -13,9 +13,8 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 if ($_SESSION['role'] !== 'Admin') {
-    displayLoginMessage(); // Display message if the role is not Admin
+    displayLoginMessage();
 }
 
-// Close the session
 session_write_close();
 ?>

@@ -1,7 +1,7 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message
+
 function displayLoginMessage() {
     echo '<script>
         alert("You need to log in to access this page.");
@@ -9,17 +9,17 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Admin') {
-    displayLoginMessage(); // Display message if the role is not Admin
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 ?>
 
@@ -29,26 +29,26 @@ $username = "root";
 $password = "";
 $dbname = "techfit";
 
-// Create connection
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
 $assessment_settings = $conn->query("SELECT * FROM Assessment_Settings WHERE setting_id = '1'")->fetch_assoc();
 
-// If no settings exist, set default values
+
 if (!$assessment_settings) {
-    // Insert default settings
+    
     $sql = "INSERT INTO Assessment_Settings (setting_id, default_time_limit, passing_score_percentage) 
             VALUES ('1', 30, 70)";
     if ($conn->query($sql) === TRUE) {
-        // Fetch the newly inserted settings
+        
         $assessment_settings = $conn->query("SELECT * FROM Assessment_Settings WHERE setting_id = '1'")->fetch_assoc();
     } else {
-        // If insert fails, use default values
+        
         $assessment_settings = [
             'default_time_limit' => 30,
             'passing_score_percentage' => 70
@@ -71,23 +71,23 @@ $conn->close();
     <title>System Configuration Settings - TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        /* Color Theme */
+       
         :root {
-            --primary-color: #007bff; /* Blue */
-            --secondary-color: #1e1e1e; /* Dark Grey */
-            --accent-color: #0056b3; /* Darker Blue */
-            --text-color: #e0e0e0; /* Slightly Darker White */
-            --background-color: #121212; /* Very Dark Grey */
-            --border-color: #333; /* Dark Grey */
-            --hover-background-color: #333; /* Slightly Lighter Dark Grey */
-            --hover-text-color: #fff; /* White */
-            --button-hover-color: #80bdff; /* Lighter Blue */
-            --popup-background-color: #1a1a1a; /* Slightly Lighter Dark Grey */
-            --popup-border-color: #444; /* Slightly Lighter Dark Grey */
-            --danger-color: #dc3545; /* Red */
-            --danger-hover-color: #c82333; /* Darker Red */
-            --success-color: #28a745; /* Green */
-            --success-hover-color: #218838; /* Darker Green */
+            --primary-color: #007bff;
+            --secondary-color: #1e1e1e;
+            --accent-color: #0056b3;
+            --text-color: #e0e0e0;
+            --background-color: #121212;
+            --border-color: #333;
+            --hover-background-color: #333;
+            --hover-text-color: #fff;
+            --button-hover-color: #80bdff;
+            --popup-background-color: #1a1a1a;
+            --popup-border-color: #444;
+            --danger-color: #dc3545;
+            --danger-hover-color: #c82333;
+            --success-color: #28a745;
+            --success-hover-color: #218838;
         }
 
         body {
@@ -291,7 +291,7 @@ $conn->close();
         </div>
     </div>
 </main>
-        <footer>
+<footer>
         <div class="footer-content">
             <div class="footer-left">
                 <div class="footer-logo">
@@ -310,41 +310,32 @@ $conn->close();
             </div>
             <div class="footer-right">
                 <div class="footer-column">
-                    <h3>Assessments</h3>
+                    <h3>Assessment</h3>
                     <ul>
-                        <li><a href="create_assessment.php">Create New Assessment</a></li>
-                        <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                        <li><a href="view_assessment_results.php">View Assessment Results</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Users</h3>
-                    <ul>
-                        <li><a href="manage_users.php">Manage Users</a></li>
-                        <li><a href="user_feedback.php">User Feedback</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Reports</h3>
-                    <ul>
-                        <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                        <li><a href="user_engagement.php">User Engagement Statistics</a></li>
-                        <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
+                        <li><a href="start_assessment.php">Start Assessment</a></li>
+                        <li><a href="assessment_history.php">Assessment History</a></li>
+                        <li><a href="assessment_summary.php">Assessment Summary</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.php">Manage Useful Links</a></li>
-                        <li><a href="faq.php">Manage FAQs</a></li>
-                        <li><a href="sitemap.php">Manage Sitemap</a></li>
+                        <li><a href="useful_links.php">Useful Links</a></li>
+                        <li><a href="faq.php">FAQ</a></li>
+                        <li><a href="sitemap.php">Sitemap</a></li>
+                        <li><a href="about.php">About</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
-                    <h3>About</h3>
+                    <h3>Contact</h3>
                     <ul>
-                        <li><a href="about.php">About</a></li>
                         <li><a href="contact.php">Contact Us</a></li>
+                        <li><a href="feedback.php">Feedback</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Legal</h3>
+                    <ul>
                         <li><a href="terms.php">Terms of Service</a></li>
                         <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>

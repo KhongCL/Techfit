@@ -58,7 +58,7 @@ session_write_close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assessment History - TechFit</title>
+    <title>Start Assessment - TechFit</title>
     <link rel="stylesheet" href="styles.css">
 
 </head>
@@ -200,12 +200,12 @@ session_write_close();
 
     <script src="scripts.js"></script>
     <script>
-    // Enable/disable start button based on checkbox
+    
     document.getElementById('agree').addEventListener('change', function() {
         document.getElementById('start-assessment-button').disabled = !this.checked;
     });
 
-    // Handle start assessment button click
+    
     document.getElementById('start-assessment-button').addEventListener('click', function() {
         if (!document.getElementById('agree').checked) {
             alert('Please agree to the rules and regulations first.');

@@ -93,7 +93,7 @@ $result = $stmt->get_result();
         .summary_header {
             padding: 20px;
             border-bottom: 2px solid var(--background-color-light);
-            text-align: left; /* Change from center to left */
+            text-align: left;
         }
 
         .summary-item {
@@ -101,9 +101,9 @@ $result = $stmt->get_result();
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 15px;
-            display: flex; /* Add display flex */
-            justify-content: space-between; /* Space between summary details and button */
-            align-items: flex-start; /* Align items to top */
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
         }
 
         .view-answers-button {
@@ -113,8 +113,8 @@ $result = $stmt->get_result();
             color: var(--text-color);
             background-color: var(--primary-color);
             transition: background-color 0.3s ease;
-            align-self: flex-start; /* Align button to top */
-            margin-left: 20px; /* Add spacing between content and button */
+            align-self: flex-start;
+            margin-left: 20px;
         }
 
         .view-answers-button:hover {
@@ -138,20 +138,20 @@ $result = $stmt->get_result();
             display: flex;
             flex-direction: column;
             gap: 5px;
-            text-align: left; /* Ensure text alignment is left */
-            flex-grow: 1; /* Allow details section to grow */
+            text-align: left;
+            flex-grow: 1;
         }
 
         .summary-details h3 {
             margin-bottom: 10px;
             color: var(--text-color);
-            text-align: left; /* Ensure heading is left aligned */
+            text-align: left;
         }
 
         .summary-details p {
             margin: 0;
             color: var(--text-color-dark);
-            text-align: left; /* Ensure paragraphs are left aligned */
+            text-align: left;
         }
     </style>
 

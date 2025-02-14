@@ -1,7 +1,7 @@
 <?php
-session_start(); // Start the session to access session variables
+session_start(); 
 
-// Function to display the message and options
+
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
@@ -13,25 +13,25 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if the user is logged in
+
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); // Display message and options if not logged in
+    displayLoginMessage(); 
 }
 
-// Check if the user has the correct role
+
 if ($_SESSION['role'] !== 'Job Seeker') {
-    displayLoginMessage(); // Display message and options if the role is not Job Seeker
+    displayLoginMessage(); 
 }
 
-// Check if the job seeker ID is set
+
 if (!isset($_SESSION['job_seeker_id'])) {
-    displayLoginMessage(); // Display message and options if job seeker ID is not set
+    displayLoginMessage(); 
 }
 
-// Close the session
+
 session_write_close();
 
-// Database connection
+
 $host = 'localhost';
 $username = 'root';
 $password = '';
@@ -42,10 +42,10 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Retrieve assessment ID from query parameter
+
 $assessment_id = $_GET['assessment_id'];
 
-// Fetch assessment details and answers
+
 $sql = "
     SELECT 
     Assessment_Job_Seeker.end_time AS assessment_date, 
@@ -99,13 +99,13 @@ $prog_result = $stmt->get_result();
 $row = $prog_result->fetch_assoc();
 $programming_section = $row ? $row['assessment_id'] : null;
 
-// Define base sections
+
 $sections = [
     'AS75' => 'General Questions',
     'AS76' => 'Scenario-Based Questions'
 ];
 
-// Add the specific programming section if it exists
+
 $programming_names = [
     'AS77' => 'Python Programming',
     'AS78' => 'Java Programming',
@@ -117,7 +117,7 @@ if ($programming_section) {
     $sections[$programming_section] = $programming_names[$programming_section];
 }
 
-// Add Work-Style section
+
 $sections['AS81'] = 'Work-Style and Personality';
 ?>
 
@@ -126,7 +126,7 @@ $sections['AS81'] = 'Work-Style and Personality';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechFit</title>
+    <title>View Answers - TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         :root {
@@ -322,7 +322,7 @@ $sections['AS81'] = 'Work-Style and Personality';
             flex-direction: column;
             gap: 20px;
             padding: 20px;
-            width: 100%; /* Take full width of wrapper */
+            width: 100%;
             margin: 0 auto;
         }
 
@@ -481,11 +481,11 @@ $sections['AS81'] = 'Work-Style and Personality';
                             <div class="profile-info">
                                 <span class="username" id="username">
                                     <?php
-                                    // Check if the user is logged in and display their username
+                                    
                                     if (isset($_SESSION['username'])) {
-                                        echo $_SESSION['username'];  // Display the username from session
+                                        echo $_SESSION['username'];  
                                     } else {
-                                        echo "Guest";  // Default if not logged in
+                                        echo "Guest";  
                                     }
                                     ?>
                                 </span>
@@ -659,7 +659,7 @@ $sections['AS81'] = 'Work-Style and Personality';
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p>techfit@gmail.com</p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
@@ -720,7 +720,7 @@ $sections['AS81'] = 'Work-Style and Personality';
             if (section) {
                 section.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 
-                // Update active state
+                
                 document.querySelectorAll('.section-nav-item').forEach(item => {
                     item.classList.remove('active');
                 });
@@ -731,7 +731,7 @@ $sections['AS81'] = 'Work-Style and Personality';
             }
         }
 
-        // Track scroll position to update active section
+        
         document.addEventListener('scroll', () => {
             const sections = document.querySelectorAll('.section-questions');
             let currentSection = '';

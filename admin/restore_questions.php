@@ -4,10 +4,10 @@ $username = "root";
 $password = "";
 $dbname = "techfit";
 
-// Create connection
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
@@ -22,7 +22,7 @@ if (isset($_POST['restore_questions'])) {
         $stmt->bind_param("s", $question_id);
         if (!$stmt->execute()) {
             $response['success'] = false;
-            $response['error'] = $stmt->error;
+            $response['error'] = $stmt->error;f
             break;
         }
         $stmt->close();
