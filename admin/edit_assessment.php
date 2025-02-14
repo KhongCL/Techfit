@@ -839,7 +839,7 @@ session_start();
                 opacity: 1;
             }
 
-            .close-button {
+            .assessment-close-button {
                 position: absolute;
                 top: 10px;
                 right: 10px;
@@ -851,7 +851,7 @@ session_start();
                 transition: color 0.3s ease, transform 0.3s ease; /* Add transition for smooth effect */
             }
 
-            .close-button:hover {
+            .assessment-close-button:hover {
                 color: var(--accent-color); /* Use a less prominent color for hover */
                 transform: scale(1.1); /* Slightly enlarge the button on hover */
                 background: none; /* Ensure no background color on hover */
@@ -1064,7 +1064,7 @@ session_start();
                     </tbody>
                 </table>
             </form>
-            <button type="button" class="close-button" onclick="closeDeletedQuestions()">&#x2715;</button>
+            <button type="button" class="assessment-close-button" onclick="closeDeletedQuestions()">&#x2715;</button>
         </div>
         <form id="questions-form" action="update_questions.php" method="post">
             <input type="hidden" name="assessment_id" value="<?php echo htmlspecialchars($_GET['assessment_id']); ?>">

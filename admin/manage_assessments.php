@@ -30,193 +30,6 @@ session_write_close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Assessments - TechFit</title>
     <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-<header>
-        <div class="logo">
-            <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
-        </div>
-        <nav>
-            <div class="nav-container">
-                <div class="hamburger" id="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-                <ul class="nav-list">
-                    <li><a href="#">Assessments</a>
-                        <ul class="dropdown">
-                            <li><a href="create_assessment.php">Create New Assessment</a></li>
-                            <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                            <li><a href="view_assessment_results.php">View Assessment Results</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#">Users</a>
-                        <ul class="dropdown">
-                            <li><a href="manage_users.php">Manage Users</a></li>
-                            <li><a href="user_feedback.php">User Feedback</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#">Reports</a>
-                        <ul class="dropdown">
-                            <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                            <li><a href="user_engagement.php">User Engagement Statistics</a></li>
-                            <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#">Resources</a>
-                        <ul class="dropdown">
-                            <li><a href="useful_links.php">Manage Useful Links</a></li>
-                            <li><a href="faq.php">Manage FAQs</a></li>
-                            <li><a href="sitemap.php">Manage Sitemap</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="about.php">About</a></li>
-                    <li>
-                        <a href="#" id="profile-link">
-                            <div class="profile-info">
-                                <span class="username" id="username">
-                                    <?php
-                                    
-                                    if (isset($_SESSION['username'])) {
-                                        echo $_SESSION['username'];  
-                                    } else {
-                                        echo "Guest";  
-                                    }
-                                    ?>
-                                </span>
-                                <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
-                            </div>
-                        </a>
-                        <ul class="dropdown" id="profile-dropdown">
-                            <li><a href="settings.php">Settings</a>
-                                <ul class="dropdown">
-                                    <li><a href="manage_profile.php">Manage Profile</a></li>
-                                    <li><a href="system_configuration.php">System Configuration Settings</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="#" >Logout</a></li>
-                        </ul>
-                    </li>                    
-                </ul>
-            </div>
-        </nav>
-    </header>    
-    <div id="logout-popup" class="popup">
-        <h2>Are you sure you want to Log Out?</h2>
-        <button class="close-button" id="logout-confirm-button">Yes</button>
-        <button class="cancel-button" id="logout-cancel-button">No</button>
-    </div>
-        <main>
-        <h1>Manage Assessments</h1>
-        <div class="header-controls">
-            <div class="button-group">
-                <button onclick="window.location.href='create_assessment.php'">Create New Assessment</button>
-                <button id="deleteSelected" class="danger">Delete Selected Assessment</button>
-                <button id="viewDeleted">View Deleted Assessments</button>
-            </div>
-            <div class="search-sort-controls">
-                <span>Sort by key:</span>
-                <select id="sortDropdown">
-                    <option value="none">None</option>
-                    <option value="assessment_id_asc">Assessment ID ASC</option>
-                    <option value="assessment_id_desc">Assessment ID DESC</option>
-                    <option value="admin_id_asc">Admin ID ASC</option>
-                    <option value="admin_id_desc">Admin ID DESC</option>
-                </select>
-                <div class="search-container">
-                    <div class="search-field-container">
-                        <input type="text" id="searchInput" placeholder="Search...">
-                        <span id="clearSearch">&#x2715;</span>
-                        <div id="noMatchesPopup">No matches found.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th><input type="checkbox" id="selectAll"></th>
-                        <th data-column="assessment_id">Assessment ID</th>
-                        <th data-column="admin_id">Admin ID</th>
-                        <th data-column="assessment_name">Assessment Name</th>
-                        <th data-column="description">Description</th>
-                        <th data-column="last_modified">Last Modified</th>
-                        <th data-column="timestamp">Timestamp</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="assessmentsTableBody">
-                    <?php
-                    $servername = "localhost";
-                    $username = "root";
-                    $password = "";
-                    $dbname = "techfit";
-
-                    // Create connection
-                    $conn = new mysqli($servername, $username, $password, $dbname);
-
-                    // Check connection
-                    if ($conn->connect_error) {
-                        die("Connection failed: " . $conn->connect_error);
-                    }
-
-                    $sql = "SELECT assessment_id, admin_id, assessment_name, description, timestamp, last_modified FROM Assessment_Admin WHERE is_active = 1";
-                    $result = $conn->query($sql);
-
-                    if ($result->num_rows > 0) {
-                        while($row = $result->fetch_assoc()) {
-                            echo "<tr>";
-                            echo "<td><input type='checkbox' class='selectAssessment' value='" . htmlspecialchars($row['assessment_id']) . "'></td>";
-                            echo "<td>" . htmlspecialchars($row['assessment_id']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['admin_id']) . "</td>";
-                            echo "<td class='editable' data-id='" . htmlspecialchars($row['assessment_id']) . "' data-column='assessment_name'>" . htmlspecialchars($row['assessment_name']) . "</td>";
-                            echo "<td class='editable' data-id='" . htmlspecialchars($row['assessment_id']) . "' data-column='description'>" . htmlspecialchars($row['description']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['last_modified']) . "</td>";
-                            echo "<td>" . htmlspecialchars($row['timestamp']) . "</td>";
-                            echo "<td><a href='edit_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Edit</a> <span class='action-separator'>|</span> <a href='#' class='deleteAssessment' data-id='" . htmlspecialchars($row['assessment_id']) . "'>Delete</a></td>";
-                            echo "</tr>";
-                        }
-                    } else {
-                        echo "<tr><td colspan='8'>No assessments found</td></tr>";
-                    }
-
-                    $conn->close();
-                    ?>
-                </tbody>
-            </table>
-            <div id="deleted-assessments-tab" style="display:none;">
-                <h3>Deleted Assessments</h3>
-                <button type="button" class="close-button" onclick="closeDeletedAssessments()">&#x2715;</button>
-                <div class="header-controls">
-                    <button type="button" id="restoreSelectedButton" class="success" onclick="restoreSelectedAssessments()">Restore Selected Assessments</button>
-                    <div class="deleted-search-container">
-                        <div class="search-field-container">
-                            <input type="text" id="deletedSearchInput" placeholder="Search...">
-                            <span id="deletedClearSearch">&#x2715;</span>
-                            <div id="deletedNoMatchesPopup">No matches found.</div>
-                        </div>
-                    </div>
-                </div>
-                <form id="restore-form">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th><input type="checkbox" id="select-all-deleted"></th>
-                                <th data-column="assessment_id">Assessment ID</th>
-                                <th data-column="assessment_name">Assessment Name</th>
-                                <th data-column="description">Description</th>
-                                <th data-column="last_modified">Last Modified</th>
-                                <th data-column="timestamp">Timestamp</th>
-
-                            </tr>
-                        </thead>
-                        <tbody id="deleted-assessments"></tbody>
-                    </table>
-                </form>
-            </div>
-        </main>
-
     <style>
         /* Color Theme */
         :root {
@@ -387,8 +200,19 @@ session_write_close();
             background-color: var(--danger-hover-color);
         }
 
+        .action-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 20px; /* Add spacing between button and search container */
+        }
+
         #restoreSelectedButton {
             background-color: var(--success-color);
+            margin-right: 20px;
+            flex-shrink: 0; /* Prevent button from shrinking */
+            margin-right: 0;
         }
 
         #restoreSelectedButton:hover {
@@ -583,6 +407,23 @@ session_write_close();
         /* Deleted Assessments Tab */
         #deleted-assessments-tab {
             display: none;
+            position: fixed; /* Change from relative to fixed */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--background-color);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 1000;
+            width: 90%;
+            transition: opacity 0.3s ease;
+        }
+
+        #deleted-assessments-tab {
+            display: none;
             position: fixed;
             top: 50%;
             left: 50%;
@@ -618,13 +459,17 @@ session_write_close();
             justify-content: flex-end;
         }
 
+        .deleted-search-container {
+            flex-grow: 1;
+            margin-left: 20px;
+        }
+
         .search-field-container {
             position: relative;
         }
 
         #deletedSearchInput {
-            padding-right: 40px;
-            padding: 10px 10px 10px 40px;
+            padding: 10px 40px 10px 40px;
             border: 1px solid var(--border-color);
             border-radius: 5px;
             background: url('images/search_icon.png') no-repeat 10px center;
@@ -632,6 +477,7 @@ session_write_close();
             transition: border-color 0.3s ease;
             color: var(--text-color);
             background-color: var(--secondary-color);
+            box-sizing: border-box;
         }
 
         #deletedSearchInput:hover {
@@ -672,7 +518,8 @@ session_write_close();
             color: var(--text-color);
             font-size: 24px;
             cursor: pointer;
-            transition: color 0.1s ease, transform 0.1s ease; /* Add transition for smooth effect */
+            transition: color 0.3s ease, transform 0.3s ease;
+            z-index: 1001;
         }
 
         .assessment-close-button:hover {
@@ -736,6 +583,10 @@ session_write_close();
                 }
             });
 
+            document.querySelector('#deleted-assessments-tab .assessment-close-button').addEventListener('click', function() {
+                closeDeletedAssessments();
+            });
+
             document.getElementById('viewDeleted').addEventListener('click', function() {
                 fetch('get_deleted_assessments.php')
                     .then(response => response.json())
@@ -753,7 +604,7 @@ session_write_close();
                                 </tr>
                             `).join('');
                         } else {
-                            deletedAssessmentsDiv.innerHTML = '<tr><td colspan="5">No deleted assessments found</td></tr>';
+                            deletedAssessmentsDiv.innerHTML = '<tr><td colspan="6">No deleted assessments found</td></tr>';
                         }
                         document.getElementById('deleted-assessments-tab').style.display = 'block';
 
@@ -784,9 +635,6 @@ session_write_close();
                                 lastDeletedChecked = this;
                             });
                         });
-
-                        // Add event listener for close button
-                        document.querySelector('.assessment-close-button').addEventListener('click', closeDeletedAssessments);
 
                         // Add event listener for restore selected button
                         document.getElementById('restoreSelectedButton').addEventListener('click', restoreSelectedAssessments);
@@ -902,11 +750,11 @@ session_write_close();
             });
 
             function closeDeletedAssessments() {
-                const closeButton = document.querySelector('.assessment-close-button');
-                closeButton.style.backgroundColor = 'transparent'; // Ensure no background color
-                document.getElementById('deleted-assessments-tab').style.display = 'none';
-
-                // Remove all tooltips when closing the deleted assessments tab
+                const tab = document.getElementById('deleted-assessments-tab');
+                if (tab) {
+                    tab.style.display = 'none';
+                }
+                // Remove all tooltips when closing
                 document.querySelectorAll('.tooltip').forEach(tooltip => tooltip.remove());
             }
 
@@ -1164,6 +1012,195 @@ session_write_close();
                 document.removeEventListener('mouseup', stopResize);
             }
     </script>
+</head>
+<body>
+<header>
+        <div class="logo">
+            <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
+        </div>
+        <nav>
+            <div class="nav-container">
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <ul class="nav-list">
+                    <li><a href="#">Assessments</a>
+                        <ul class="dropdown">
+                            <li><a href="create_assessment.php">Create New Assessment</a></li>
+                            <li><a href="manage_assessments.php">Manage Assessments</a></li>
+                            <li><a href="view_assessment_results.php">View Assessment Results</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Users</a>
+                        <ul class="dropdown">
+                            <li><a href="manage_users.php">Manage Users</a></li>
+                            <li><a href="user_feedback.php">User Feedback</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Reports</a>
+                        <ul class="dropdown">
+                            <li><a href="assessment_performance.php">Assessment Performance</a></li>
+                            <li><a href="user_engagement.php">User Engagement Statistics</a></li>
+                            <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Resources</a>
+                        <ul class="dropdown">
+                            <li><a href="useful_links.php">Manage Useful Links</a></li>
+                            <li><a href="faq.php">Manage FAQs</a></li>
+                            <li><a href="sitemap.php">Manage Sitemap</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="about.php">About</a></li>
+                    <li>
+                        <a href="#" id="profile-link">
+                            <div class="profile-info">
+                                <span class="username" id="username">
+                                    <?php
+                                    
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  
+                                    } else {
+                                        echo "Guest";  
+                                    }
+                                    ?>
+                                </span>
+                                <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
+                            </div>
+                        </a>
+                        <ul class="dropdown" id="profile-dropdown">
+                            <li><a href="settings.php">Settings</a>
+                                <ul class="dropdown">
+                                    <li><a href="manage_profile.php">Manage Profile</a></li>
+                                    <li><a href="system_configuration.php">System Configuration Settings</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#" >Logout</a></li>
+                        </ul>
+                    </li>                    
+                </ul>
+            </div>
+        </nav>
+    </header>    
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>
+        <main>
+        <h1>Manage Assessments</h1>
+        <div class="header-controls">
+            <div class="button-group">
+                <button onclick="window.location.href='create_assessment.php'">Create New Assessment</button>
+                <button id="deleteSelected" class="danger">Delete Selected Assessment</button>
+                <button id="viewDeleted">View Deleted Assessments</button>
+            </div>
+            <div class="search-sort-controls">
+                <span>Sort by key:</span>
+                <select id="sortDropdown">
+                    <option value="none">None</option>
+                    <option value="assessment_id_asc">Assessment ID ASC</option>
+                    <option value="assessment_id_desc">Assessment ID DESC</option>
+                    <option value="admin_id_asc">Admin ID ASC</option>
+                    <option value="admin_id_desc">Admin ID DESC</option>
+                </select>
+                <div class="search-container">
+                    <div class="search-field-container">
+                        <input type="text" id="searchInput" placeholder="Search...">
+                        <span id="clearSearch">&#x2715;</span>
+                        <div id="noMatchesPopup">No matches found.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAll"></th>
+                        <th data-column="assessment_id">Assessment ID</th>
+                        <th data-column="admin_id">Admin ID</th>
+                        <th data-column="assessment_name">Assessment Name</th>
+                        <th data-column="description">Description</th>
+                        <th data-column="last_modified">Last Modified</th>
+                        <th data-column="timestamp">Timestamp</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="assessmentsTableBody">
+                    <?php
+                    $servername = "localhost";
+                    $username = "root";
+                    $password = "";
+                    $dbname = "techfit";
+
+                    // Create connection
+                    $conn = new mysqli($servername, $username, $password, $dbname);
+
+                    // Check connection
+                    if ($conn->connect_error) {
+                        die("Connection failed: " . $conn->connect_error);
+                    }
+
+                    $sql = "SELECT assessment_id, admin_id, assessment_name, description, timestamp, last_modified FROM Assessment_Admin WHERE is_active = 1";
+                    $result = $conn->query($sql);
+
+                    if ($result->num_rows > 0) {
+                        while($row = $result->fetch_assoc()) {
+                            echo "<tr>";
+                            echo "<td><input type='checkbox' class='selectAssessment' value='" . htmlspecialchars($row['assessment_id']) . "'></td>";
+                            echo "<td>" . htmlspecialchars($row['assessment_id']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['admin_id']) . "</td>";
+                            echo "<td class='editable' data-id='" . htmlspecialchars($row['assessment_id']) . "' data-column='assessment_name'>" . htmlspecialchars($row['assessment_name']) . "</td>";
+                            echo "<td class='editable' data-id='" . htmlspecialchars($row['assessment_id']) . "' data-column='description'>" . htmlspecialchars($row['description']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['last_modified']) . "</td>";
+                            echo "<td>" . htmlspecialchars($row['timestamp']) . "</td>";
+                            echo "<td><a href='edit_assessment.php?assessment_id=" . htmlspecialchars($row['assessment_id']) . "'>Edit</a> <span class='action-separator'>|</span> <a href='#' class='deleteAssessment' data-id='" . htmlspecialchars($row['assessment_id']) . "'>Delete</a></td>";
+                            echo "</tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='8'>No assessments found</td></tr>";
+                    }
+
+                    $conn->close();
+                    ?>
+                </tbody>
+            </table>
+            <div id="deleted-assessments-tab" style="display:none;">
+                <div class="header-controls">
+                    <h3>Deleted Assessments</h3>
+                </div>
+                <div class="action-controls">
+                    <button type="button" class="success" id="restoreSelectedButton" onclick="restoreSelectedAssessments()">
+                        Restore Selected Assessments
+                    </button>
+                    <div class="deleted-search-container">
+                        <div class="search-field-container">
+                            <input type="text" id="deletedSearchInput" placeholder="Search...">
+                            <span id="deletedClearSearch">&#x2715;</span>
+                            <div id="deletedNoMatchesPopup">No matches found.</div>
+                        </div>
+                    </div>
+                </div>
+                <form id="restore-form">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" id="select-all-deleted"></th>
+                                <th data-column="assessment_id">Assessment ID</th>
+                                <th data-column="assessment_name">Assessment Name</th>
+                                <th data-column="description">Description</th>
+                                <th data-column="last_modified">Last Modified</th>
+                                <th data-column="timestamp">Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deleted-assessments"></tbody>
+                    </table>
+                </form>
+                <button type="button" class="assessment-close-button" onclick="closeDeletedAssessments()">&#x2715;</button>
+            </div>
+        </main>
     <footer>
         <div class="footer-content">
             <div class="footer-left">
