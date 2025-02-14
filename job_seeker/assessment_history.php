@@ -51,16 +51,19 @@ $user_id = $_SESSION['user_id'];
 
 $sql = "
     SELECT 
-        Assessment_Job_Seeker.assessment_id AS 'assessment_id',
+        Assessment_Job_Seeker.result_id AS 'assessment_id', 
         Assessment_Job_Seeker.job_seeker_id AS 'job_id',
         Assessment_Job_Seeker.start_time AS 'start_time',
         Assessment_Job_Seeker.end_time AS 'end_time',
-        Assessment_Job_Seeker.score AS 'score'
+        Assessment_Job_Seeker.score AS 'score',
+        Assessment_Settings.passing_score_percentage
     FROM Assessment_Job_Seeker
     INNER JOIN Job_Seeker 
         ON Assessment_Job_Seeker.job_seeker_id = Job_Seeker.job_seeker_id
     INNER JOIN User
         ON Job_Seeker.user_id = User.user_id
+    INNER JOIN Assessment_Settings
+        ON Assessment_Settings.setting_id = '1'
     WHERE User.user_id = ?";
 
 $stmt = $conn->prepare($sql);
@@ -85,6 +88,145 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assessment History - TechFit</title>
     <link rel="stylesheet" href="styles.css">
+
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --accent-color: #5c7dff; 
+            --danger-color: #e74c3c; 
+            --danger-color-hover: #c0392b;
+            --success-color: #28a745;
+            --success-color-hover: #2ecc71;
+
+            --background-color: #121212;
+            --background-color-medium: #080808;
+            --background-color-medium: #1E1E1E;
+            --background-color-light: #444;
+            --background-color-extra-light: #555;
+            --background-color-hover: #666;
+            
+            --text-color: #fafafa;
+            --text-color-dark: #b0b0b0;
+            --text-color-medium: #e0e0e0;
+            --text-color-light: #f7f7f7;
+            --text-color-extra-light: #ffffff;
+            --text-color-hover: #b0b0b0;
+            
+            --button-color: #007bff;
+            --button-color-hover: #3c87e3;
+            --focus-border-color: #47a3e0;
+            --disabled-color: #7f8c8d;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .actions a {
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            color: var(--text-color);
+            transition: background-color 0.3s ease;
+        }
+
+        .actions a[title="Download"] {
+            background-color: var(--primary-color);
+        }
+
+        .actions a[title="Download"]:hover {
+            background-color: var(--button-color-hover);
+        }
+
+        .actions a[title="Share"] {
+            background-color: var(--success-color);
+        }
+
+        .actions a[title="Share"]:hover {
+            background-color: var(--success-color-hover);
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: var(--background-color-light);
+            margin-bottom: 15px;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .date-time {
+            flex: 2;
+            text-align: left;
+        }
+
+        .date-time p {
+            margin: 0;
+            line-height: 1.5;
+            color: var(--text-color);
+        }
+
+        .score {
+            flex: 1;
+            text-align: center;
+        }
+
+        .score h3 {
+            margin: 0;
+            color: var(--text-color);
+        }
+
+        .score p {
+            font-size: 1.2em;
+            margin: 5px 0 0;
+            color: var(--text-color);
+        }
+
+        #assessment-history {
+            min-height: calc(100vh - 250px); /* Subtract header + footer height */
+            padding: 40px 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 50%;
+            margin: 0 auto;
+            padding: 0 20px;
+            box-sizing: border-box;
+        }
+
+        .history-header {
+            margin-bottom: 30px;
+            text-align: left;
+            color: var(--text-color);
+        }
+
+        .history-header h2 {
+            font-size: 1.8em;
+            margin: 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--background-color-light);
+        }
+
+        .scrollable-container {
+            max-height: calc(100vh - 350px);
+            overflow-y: auto;
+            padding-right: 10px;
+            width: 100%;
+        }
+
+        .score-passed {
+            color: var(--success-color) !important;
+        }
+
+        .score-failed {
+            color: var(--danger-color) !important;
+        }
+    </style>
 
 </head>
 <body>
@@ -152,30 +294,39 @@ $conn->close();
             <div class="history-header">
                 <h2>Assessment History</h2>
             </div>
-
-            <?php if (!empty($assessments)): ?>
-                <?php foreach ($assessments as $assessment): ?>
-                    <div class="history-item">
+            
+            <div class="scrollable-container">
+                <?php if (!empty($assessments)): ?>
+                    <?php foreach ($assessments as $assessment): ?>
+                        <div class="history-item">
                         <div class="date-time">
                             <p>
                                 <strong>Date:</strong> <?php echo htmlspecialchars(date('Y-m-d', strtotime($assessment['start_time']))); ?> 
-                                <br><strong>Avg Time Used (mins):</strong> <?php echo round((strtotime($assessment['end_time']) - strtotime($assessment['start_time'])) / 60, 2); ?>
+                                <br><strong>Time Used:</strong> <?php 
+                                    $duration = strtotime($assessment['end_time']) - strtotime($assessment['start_time']);
+                                    $minutes = floor($duration / 60);
+                                    $seconds = $duration % 60;
+                                    echo $minutes . ' minutes ' . $seconds . ' seconds';
+                                ?>
                             </p>
                         </div>
                         <div class="score">
                             <h3>Score</h3>
-                            <p><?php echo htmlspecialchars($assessment['score']); ?></p>
+                            <p class="<?php echo ($assessment['score'] >= $assessment['passing_score_percentage']) ? 'score-passed' : 'score-failed'; ?>">
+                                <?php echo htmlspecialchars($assessment['score']); ?>
+                            </p>
                         </div>
-                        <div class="actions">
-                            <a href="download_assessment_history_report.php?assessment_id=<?php echo urlencode($assessment['assessment_id']); ?>" title="Download">Download</a>
-                            <a href="share_assessment_history.php?assessment_id=<?= urlencode($assessment['assessment_id']); ?>" title="Share">Share</a>
+                            <div class="actions">
+                                <a href="download_assessment_history_report.php?assessment_id=<?php echo urlencode($assessment['assessment_id']); ?>" title="Download">Download</a>
+                                <a href="share_assessment_history.php?assessment_id=<?= urlencode($assessment['assessment_id']); ?>" title="Share">Share</a>
+                            </div>
                         </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p>No assessment history available.</p>
-<?php endif; ?>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <p>No assessment history available.</p>
+    <?php endif; ?>
         </div>
+    </div>
     </section>
 
     <footer>

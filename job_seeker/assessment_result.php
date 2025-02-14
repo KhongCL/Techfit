@@ -143,10 +143,9 @@ while ($row = $score_result->fetch_assoc()) {
     $total_questions += $row['total'];
 }
 
+$overall_score = ($total_questions > 0) ? ($total_score / $total_questions) * 100 : 0;
 error_log("Final totals: score=$total_score, questions=$total_questions, overall_score=$overall_score%");
 
-// Calculate overall score from all sections
-$overall_score = ($total_questions > 0) ? ($total_score / $total_questions) * 100 : 0;
 $final_score = round($overall_score);
 $passed = $final_score >= $passing_score;
 

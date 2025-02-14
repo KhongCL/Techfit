@@ -49,21 +49,17 @@ if ($conn->connect_error) {
 
 $job_seeker_id = $_SESSION['job_seeker_id'];
 
-
 $sql = "
     SELECT 
-    Assessment_Job_Seeker.end_time AS assessment_date, 
-    Assessment_Job_Seeker.assessment_id AS assessment_id,
-    COUNT(Question.question_id) AS number_of_questions, 
-    SUM(CASE WHEN Answer.is_correct = TRUE THEN 1 ELSE 0 END) AS correct_answers,
-    SUM(CASE WHEN Answer.is_correct = FALSE THEN 1 ELSE 0 END) AS wrong_answers,
-    Assessment_Job_Seeker.score
-    
+        Assessment_Job_Seeker.end_time AS assessment_date,
+        Assessment_Job_Seeker.start_time,
+        Assessment_Job_Seeker.result_id AS assessment_id,
+        Assessment_Job_Seeker.score,
+        Assessment_Settings.passing_score_percentage,
+        TIMESTAMPDIFF(SECOND, Assessment_Job_Seeker.start_time, Assessment_Job_Seeker.end_time) as duration
     FROM Assessment_Job_Seeker
-    JOIN Question ON Question.assessment_id = Assessment_Job_Seeker.assessment_id
-    LEFT JOIN Answer ON Answer.job_seeker_id = Assessment_Job_Seeker.job_seeker_id AND Answer.question_id = Question.question_id
+    JOIN Assessment_Settings ON Assessment_Settings.setting_id = '1'
     WHERE Assessment_Job_Seeker.job_seeker_id = ?
-    GROUP BY Assessment_Job_Seeker.assessment_id
     ORDER BY Assessment_Job_Seeker.end_time DESC";
 
 $stmt = $conn->prepare($sql);
@@ -79,6 +75,85 @@ $result = $stmt->get_result();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Assessment History - TechFit</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --accent-color: #5c7dff; 
+            --danger-color: #e74c3c; 
+            --danger-color-hover: #c0392b;
+            --success-color: #28a745;
+            --success-color-hover: #2ecc71;
+            --background-color: #121212;
+            --background-color-medium: #1E1E1E;
+            --background-color-light: #444;
+            --text-color: #fafafa;
+            --text-color-dark: #b0b0b0;
+        }
+
+        .summary_header {
+            padding: 20px;
+            border-bottom: 2px solid var(--background-color-light);
+            text-align: left; /* Change from center to left */
+        }
+
+        .summary-item {
+            background-color: var(--background-color-light);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex; /* Add display flex */
+            justify-content: space-between; /* Space between summary details and button */
+            align-items: flex-start; /* Align items to top */
+        }
+
+        .view-answers-button {
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            color: var(--text-color);
+            background-color: var(--primary-color);
+            transition: background-color 0.3s ease;
+            align-self: flex-start; /* Align button to top */
+            margin-left: 20px; /* Add spacing between content and button */
+        }
+
+        .view-answers-button:hover {
+            background-color: var(--button-color-hover);
+        }
+
+        .status {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .status.passed {
+            color: var(--success-color);
+        }
+
+        .status.failed {
+            color: var(--danger-color);
+        }
+
+        .summary-details {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            text-align: left; /* Ensure text alignment is left */
+            flex-grow: 1; /* Allow details section to grow */
+        }
+
+        .summary-details h3 {
+            margin-bottom: 10px;
+            color: var(--text-color);
+            text-align: left; /* Ensure heading is left aligned */
+        }
+
+        .summary-details p {
+            margin: 0;
+            color: var(--text-color-dark);
+            text-align: left; /* Ensure paragraphs are left aligned */
+        }
+    </style>
 
 </head>
 <body>
@@ -148,13 +223,15 @@ $result = $stmt->get_result();
                 <?php if ($result->num_rows > 0): ?>
                     <?php while ($row = $result->fetch_assoc()): ?>
                         <div class="summary-item">
-                            <div class="summary-details">
-                                <h3>Assessment <?= $row['assessment_id']; ?></h3>
-                                <p>Date: <?= date('d/m/Y', strtotime($row['assessment_date'])); ?></p>
-                                <p>Score: <?= $row['score']; ?></p>
-                                <p>Correct answers: <?= $row['correct_answers']; ?></p>
-                                <p>Wrong answers: <?= $row['wrong_answers']; ?></p>
-                            </div>
+                        <div class="summary-details">
+                            <h3>Assessment <?= $row['assessment_id']; ?></h3>
+                            <p>Date: <?= date('Y-m-d', strtotime($row['assessment_date'])); ?></p>
+                            <p>Time Spent: <?= floor($row['duration']/60) ?> minutes <?= $row['duration']%60 ?> seconds</p>
+                            <p>Score: <?= $row['score']; ?>%</p>
+                            <p class="status <?= ($row['score'] >= $row['passing_score_percentage']) ? 'passed' : 'failed' ?>">
+                                Status: <?= ($row['score'] >= $row['passing_score_percentage']) ? 'PASSED' : 'FAILED' ?>
+                            </p>
+                        </div>
                             <a href="view_answers.php?assessment_id=<?= urlencode($row['assessment_id']); ?>" class="view-answers-button">View answers</a>
                         </div>
                     <?php endwhile; ?>
