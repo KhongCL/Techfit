@@ -1060,7 +1060,6 @@ session_start();
                         </tr>
                     </thead>
                     <tbody id="deletedQuestionsTableBody">
-                        <!-- Deleted questions will be populated here -->
                     </tbody>
                 </table>
             </form>

@@ -593,7 +593,6 @@ $sections['AS81'] = 'Work-Style and Personality';
             </nav>
         </header>
 
-        <!-- Logout Popup -->
         <div id="logout-popup" class="popup">
             <h2>Are you sure you want to Log Out?</h2>
             <button class="close-button" onclick="logoutUser()">Yes</button>

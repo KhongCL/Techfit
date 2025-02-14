@@ -575,7 +575,6 @@ $sections['AS81'] = 'Work-Style and Personality';
                             <p class="question-text"><?= htmlspecialchars($detail['question_text']); ?></p>
                             <div class="answer-pair">
                                 <?php if ($detail['answer_type'] === 'code'): ?>
-                                    <!-- Code question display -->
                                     <?php if (!empty($detail['programming_language'])): ?>
                                         <div class="language-indicator">
                                             Language: <?= ucfirst($detail['programming_language']); ?>
@@ -623,7 +622,6 @@ $sections['AS81'] = 'Work-Style and Personality';
                                         <?php endif; ?>
                                     </div>
                                 <?php else: ?>
-                                    <!-- Multiple choice question display -->
                                     <div class="your-answer">Your Answer: <?= htmlspecialchars($detail['display_answer']); ?></div>
                                     <?php if (!in_array($detail['assessment_id'], ['AS75', 'AS81'])): ?>
                                         <div class="correct-answer">

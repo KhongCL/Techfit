@@ -187,7 +187,7 @@ $conn->close();
         }
 
         #assessment-history {
-            min-height: calc(100vh - 250px); /* Subtract header + footer height */
+            min-height: calc(100vh - 250px);
             padding: 40px 0;
         }
 

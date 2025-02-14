@@ -334,7 +334,7 @@ $conn->close();
         <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
     </div>
     <div class="container">
-        <h2 style="margin-top: -25px;">Register</h2> <!-- Move title up by 25px -->
+        <h2 style="margin-top: -25px;">Register</h2>
         <div id="error-message" class="error-message">
             <?php
                 if (isset($_SESSION['error_message'])) {
