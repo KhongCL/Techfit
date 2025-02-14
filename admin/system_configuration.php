@@ -159,6 +159,25 @@ $conn->close();
         .form-section button:hover {
             background-color: var(--button-hover-color);
         }
+
+        .notification-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 5px 0;
+            flex-wrap: nowrap;
+        }
+        .notification-option label {
+            flex-grow: 1;
+            white-space: nowrap;
+        }
+        .notification-option input {
+            margin-left: 10px;
+            flex-shrink: 0;
+            transform: translateX(-670px) translateY(6px);
+        }
+
     </style>
 </head>
 <body>
@@ -279,12 +298,16 @@ $conn->close();
                                 break;
                             }
                         }
-                        echo '<input type="checkbox" name="notification_events[]" value="' . $event . '" ' . ($is_enabled ? 'checked' : '') . '> ' . $event . '<br>';
+                        echo '<div class="notification-option">
+                                <label>' . $event . '</label>
+                                <input type="checkbox" name="notification_events[]" value="' . $event . '" ' . ($is_enabled ? 'checked' : '') . '>
+                            </div>';
                         echo '<label for="email-template-' . $event . '">Email Template for ' . $event . ':</label>';
                         echo '<textarea id="email-template-' . $event . '" name="email_template[' . $event . ']" rows="5">' . htmlspecialchars($template) . '</textarea>';
                     }
                     ?>
                 </div>
+
 
                 <button type="submit">Save Notification Settings</button>
             </form>
