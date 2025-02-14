@@ -115,8 +115,10 @@ CREATE TABLE Feedback (
     user_id VARCHAR(5) NOT NULL,
     text TEXT NOT NULL,
     timestamp DATETIME NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
+
 
 CREATE TABLE Profile_Setting (
     user_id VARCHAR(5) PRIMARY KEY,

@@ -19,7 +19,6 @@ if ($_SESSION['role'] !== 'Admin') {
 session_write_close();
 ?>
 
-
 <?php
 $host = 'localhost';
 $username = 'root';
@@ -28,11 +27,35 @@ $database = 'techfit';
 
 $conn = new mysqli($host, $username, $password, $database);
 
-$sql = "SELECT f.feedback_id, f.text, f.timestamp, fm.action_type, fm.response_text, a.admin_id
+$sql = "SELECT f.feedback_id, f.text, f.timestamp
         FROM Feedback f
-        LEFT JOIN feedback_management fm ON f.feedback_id = fm.feedback_id
-        LEFT JOIN Admin a ON fm.admin_id = a.admin_id";
+        WHERE f.is_active = 1";
 $result = $conn->query($sql);
+
+$sql_deleted = "SELECT f.feedback_id, f.text, f.timestamp
+                FROM Feedback f
+                WHERE f.is_active = 0";
+$result_deleted = $conn->query($sql_deleted);
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    if (isset($_POST['delete'])) {
+        $feedbackIds = $_POST['feedback_ids'];
+        foreach ($feedbackIds as $feedbackId) {
+            $updateQuery = "UPDATE Feedback SET is_active = 0 WHERE feedback_id = '$feedbackId'";
+            $conn->query($updateQuery);
+        }
+        header('Location: user_feedback.php');
+        exit();
+    } elseif (isset($_POST['restore'])) {
+        $feedbackIds = $_POST['restore_feedback_ids'];
+        foreach ($feedbackIds as $feedbackId) {
+            $updateQuery = "UPDATE Feedback SET is_active = 1 WHERE feedback_id = '$feedbackId'";
+            $conn->query($updateQuery);
+        }
+        header('Location: user_feedback.php');
+        exit();
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -42,72 +65,119 @@ $result = $conn->query($sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - TechFit</title>
     <link rel="stylesheet" href="styles.css">   
-        <style>
-            .feedback-container {
-                display: flex;
-                justify-content: center;
-            }
-            .main-content {
-                flex-grow: 1;
-                padding: 70px;
-                background: #f4f4f4;
-                position: relative;
-            }
-            nav {
-                display: flex;
-                gap: 20px;
-            }
-            nav a {
-                text-decoration: none;
-                color: #007bff;
-            }
-            nav .active {
-                font-weight: bold;
-                text-decoration: underline;
-            }
-            h2 {
-                margin-top: -40px;
-            }
-            .delete-btn {
-                position: absolute;
-                right: 20px;
-                top: 20px;
-                background: red;
-                color: white;
-                border: none;
-                padding: 5px 10px;
-                cursor: pointer;
-                height: 40px;
-                display: flex;
-                align-items: center;
-                border-radius: 3px;
-            }
-            .feedback-list {
-                margin-top: 10px;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }   
-            .feedback-item {
-                display: flex;
-                align-items: flex-start; 
-                justify-content: flex-start; 
-                background: white;
-                padding: 40px;
-                margin: 5px 0;
-                border-radius: 5px;
-                width: 60%;
-                height: 40px;
-            }
+    <style>
+        .feedback-container {
+            display: flex;
+            justify-content: center;
+        }
+        .main-content {
+            flex-grow: 1;
+            padding: 70px;
+            background: #f4f4f4;
+            position: relative;
+        }
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+        nav a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        nav .active {
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        h2 {
+            margin-top: -40px;
+        }
 
-            .feedback-checkbox {
-                margin-top: -9px;
-                width: 20px;
-                height: 20px;
-                cursor: pointer;
-            }
-        </style>
+        .restore-btn {
+            position: absolute;
+            right: 100px; 
+            top: 20px;
+            background: green;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            border-radius: 3px;
+        }
+        .delete-btn {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            border-radius: 3px;
+        }
 
+        .feedback-list {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }   
+        .feedback-item {
+            display: flex;
+            align-items: center; 
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 5px;
+            width: 55%;
+            min-height: 80px; 
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .feedback-checkbox {
+            position: absolute;
+            left: 5%;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .feedback-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            flex: 1;
+            margin-left: 80px;
+            box-sizing: border-box;
+        }
+
+        .feedback-content p {
+            margin: 5px 0; 
+        }
+
+        .popup {
+            width: 300px; 
+            padding: 20px;
+            background: #222; /* Changed to solid color */
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center; 
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .popup h2 {
+            font-size: 18px; 
+            margin-bottom: 20px;
+        }
+        .popup .close-button, .popup .cancel-button {
+            margin-top: 10px;
+        }
+    </style>
 </head>
 
 <body>
@@ -156,7 +226,6 @@ $result = $conn->query($sql);
                             <div class="profile-info">
                                 <span class="username" id="username">
                                     <?php
-                                    
                                     if (isset($_SESSION['username'])) {
                                         echo $_SESSION['username'];  
                                     } else {
@@ -188,33 +257,55 @@ $result = $conn->query($sql);
         <button class="cancel-button" id="logout-cancel-button">No</button>
     </div>
 
-    <section class="feedback-container">
-        <div class="main-content">
-            <h2>FEEDBACK</h2>
-            <button class="delete-btn">Delete</button>
-            <div class="feedback-list">
+    <div id="deleted-feedback-popup" class="popup">
+        <h2>Deleted Feedback</h2>
+        <form method="POST" action="user_feedback.php">
+            <div class="deleted-feedback-list">
                 <?php
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        echo '<div class="feedback-item">';
-                        echo '<input type="checkbox" class="feedback-checkbox">';
-                        echo '<div class="feedback-content">';
+                if ($result_deleted->num_rows > 0) {
+                    while ($row = $result_deleted->fetch_assoc()) {
+                        echo '<div class="deleted-feedback-item">';
+                        echo '<input type="checkbox" name="restore_feedback_ids[]" value="' . $row['feedback_id'] . '" class="feedback-checkbox">';
                         echo '<p><strong>Feedback ID:</strong> ' . $row['feedback_id'] . '</p>';
                         echo '<p><strong>Text:</strong> ' . $row['text'] . '</p>';
                         echo '<p><strong>Timestamp:</strong> ' . $row['timestamp'] . '</p>';
-                        if ($row['action_type']) {
-                            echo '<p><strong>Action:</strong> ' . $row['action_type'] . '</p>';
-                            echo '<p><strong>Response:</strong> ' . $row['response_text'] . '</p>';
-                            echo '<p><strong>Admin ID:</strong> ' . $row['admin_id'] . '</p>';
-                        }
-                        echo '</div>';
                         echo '</div>';
                     }
                 } else {
-                    echo '<p>No feedback available.</p>';
+                    echo '<p>No deleted feedback available.</p>';
                 }
                 ?>
             </div>
+            <button type="submit" name="restore" class="close-button">Restore Selected</button>
+            <button type="button" class="cancel-button" id="close-deleted-feedback-popup">Close</button>
+        </form>
+    </div>
+
+    <section class="feedback-container">
+        <div class="main-content">
+            <h2>FEEDBACK</h2>
+            <button class="restore-btn" id="restore-feedback-btn">Restore Feedback</button>
+            <form method="POST" action="user_feedback.php">
+                <button type="submit" name="delete" class="delete-btn">Delete</button>
+                <div class="feedback-list">
+                    <?php
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            echo '<div class="feedback-item">';
+                            echo '<input type="checkbox" name="feedback_ids[]" value="' . $row['feedback_id'] . '" class="feedback-checkbox">';
+                            echo '<div class="feedback-content">';
+                            echo '<p><strong>Feedback ID:</strong> ' . $row['feedback_id'] . '</p>';
+                            echo '<p><strong>Text:</strong> ' . $row['text'] . '</p>';
+                            echo '<p><strong>Timestamp:</strong> ' . $row['timestamp'] . '</p>';
+                            echo '</div>';
+                            echo '</div>';
+                        }
+                    } else {
+                        echo '<p>No feedback available.</p>';
+                    }
+                    ?>
+                </div>
+            </form>
         </div>
     </section>
 
@@ -283,5 +374,14 @@ $result = $conn->query($sql);
         </div>
     </footer>
     <script src="scripts.js"></script>
+    <script>
+        document.getElementById('restore-feedback-btn').addEventListener('click', function() {
+            document.getElementById('deleted-feedback-popup').style.display = 'block';
+        });
+
+        document.getElementById('close-deleted-feedback-popup').addEventListener('click', function() {
+            document.getElementById('deleted-feedback-popup').style.display = 'none';
+        });
+    </script>
 </body>
 </html>
