@@ -29,27 +29,6 @@ if ($row['completed'] > 0) {
     exit();
 }
 
-$check_answers_sql = "SELECT COUNT(*) as has_answers 
-                     FROM Answer
-                     WHERE job_seeker_id = ?";
-
-$stmt = $conn->prepare($check_answers_sql);
-$stmt->bind_param("s", $_SESSION['job_seeker_id']);
-$stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_assoc();
-
-if ($row['has_answers'] > 0) {
-    echo '<script>
-        if (confirm("You have already started/completed an assessment. Would you like to view your assessment history?")) {
-            window.location.href = "assessment_history.php";
-        } else {
-            window.location.href = "index.php";
-        }
-    </script>';
-    exit();
-}
-
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {

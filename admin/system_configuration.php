@@ -46,8 +46,6 @@ if (!$assessment_settings) {
     }
 }
 
-$notification_settings = $conn->query("SELECT * FROM Notification_Settings")->fetch_all(MYSQLI_ASSOC);
-
 $conn->close();
 ?>
 
@@ -57,7 +55,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>System Configuration Settings - TechFit</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css"> 
     <style>
         :root {
             --primary-color: #007bff;
@@ -84,25 +82,6 @@ $conn->close();
 
         header, footer {
             background-color: var(--secondary-color);
-        }
-
-        .sidebar {
-            width: 20%;
-            float: left;
-            background-color: var(--secondary-color);
-            padding: 20px;
-        }
-
-        .sidebar a {
-            display: block;
-            color: var(--text-color);
-            padding: 10px;
-            text-decoration: none;
-        }
-
-        .sidebar a:hover {
-            background-color: var(--hover-background-color);
-            color: var(--hover-text-color);
         }
 
         .content {
@@ -202,6 +181,74 @@ $conn->close();
         .popup .cancel-button:hover {
             background-color: var(--button-hover-color);
         }
+
+        main {
+            display: flex;
+            padding: 40px;
+            min-height: calc(100vh - 60px - 200px); /* Adjust for header and footer */
+            background-color: var(--background-color);
+        }
+
+        .content {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: var(--background-color-medium);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .content h1 {
+            font-size: 2.4rem;
+            color: var(--text-color);
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        /* Form section styling */
+        .form-section {
+            background-color: var(--background-color);
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+        }
+
+        .form-section h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        /* Form elements */
+        .form-section label {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: var(--text-color);
+        }
+
+        .form-section select {
+            height: 45px;
+            margin-bottom: 25px;
+            font-size: 1rem;
+        }
+
+        .form-section button {
+            width: 300px;
+            height: 45px;
+            margin-top: 20px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
     </style>
 </head>
 <body>
@@ -275,10 +322,6 @@ $conn->close();
     </form>
 </div>
 <main>
-    <div class="sidebar">
-        <a href="#assessment-settings">Assessment Settings</a>
-        <a href="#notification-settings">Notification Settings</a>
-    </div>
     <div class="content">
         <h1>System Configuration Settings</h1>
 
@@ -305,37 +348,6 @@ $conn->close();
                 </select>
 
                 <button type="submit">Save Assessment Settings</button>
-            </form>
-        </div>
-
-        <div id="notification-settings" class="form-section">
-            <h2>Notification Settings</h2>
-            <form method="POST" action="save_notification_settings.php">
-                <label for="notification-events">Enable Notifications for Events:</label>
-                <div id="notification-events">
-                    <?php
-                    $events = ['Assessment Results', 'System Issues', 'User Feedback'];
-                    foreach ($events as $event) {
-                        $is_enabled = false;
-                        $template = '';
-                        foreach ($notification_settings as $setting) {
-                            if ($setting['event_name'] == $event) {
-                                $is_enabled = $setting['is_enabled'];
-                                $template = $setting['email_template'];
-                                break;
-                            }
-                        }
-                        echo '<div class="notification-option">
-                                <label>' . $event . '</label>
-                                <input type="checkbox" name="notification_events[]" value="' . $event . '" ' . ($is_enabled ? 'checked' : '') . '>
-                            </div>';
-                        echo '<label for="email-template-' . $event . '">Email Template for ' . $event . ':</label>';
-                        echo '<textarea id="email-template-' . $event . '" name="email_template[' . $event . ']" rows="5">' . htmlspecialchars($template) . '</textarea>';
-                    }
-                    ?>
-                </div>
-
-                <button type="submit">Save Notification Settings</button>
             </form>
         </div>
     </div>

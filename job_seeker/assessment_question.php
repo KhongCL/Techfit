@@ -34,6 +34,17 @@ if (!isset($_SESSION['job_seeker_id'])) {
     die("ERROR: No job seeker ID in session");
 }
 
+if (!isset($_SESSION['last_login']) || $_SESSION['last_login'] !== $_SESSION['user_id']) {
+    // Clear session storage
+    echo "<script>
+        sessionStorage.clear();
+        localStorage.clear();
+    </script>";
+    
+    // Record current login
+    $_SESSION['last_login'] = $_SESSION['user_id'];
+}
+
 $db_host = 'localhost';
 $db_user = 'root';
 $db_pass = '';
@@ -58,27 +69,6 @@ if ($row['completed'] > 0) {
     echo '<script>
         if (confirm("You have already completed an assessment. Would you like to view your assessment history?")) {
             window.location.href = "assessment_history.php";
-        } else {
-            window.location.href = "index.php";
-        }
-    </script>';
-    exit();
-}
-
-$check_answers_sql = "SELECT COUNT(*) as has_answers 
-                     FROM Answer
-                     WHERE job_seeker_id = ?";
-
-$stmt = $conn->prepare($check_answers_sql);
-$stmt->bind_param("s", $_SESSION['job_seeker_id']);
-$stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_assoc();
-
-if ($row['has_answers'] > 0) {
-    echo '<script>
-        if (confirm("You have already started/completed an assessment. Would you like to view your assessment history?")) {
-            window.location.href = "assessment_history.php";  
         } else {
             window.location.href = "index.php";
         }
@@ -549,12 +539,13 @@ $conn->close();
         let startTime = <?php echo time(); ?>;
         let totalTime = <?php echo $countdownTime; ?>;
         let sectionLastQuestions = {
-            '1': 4,  // Last question index in section 1
-            '2': 4,  // Last question index in section 2
-            '3': 4,  // Last question index in section 3
-            '4': 4   // Last question index in section 4
+            '1': 4,
+            '2': 4,
+            '3': 4,
+            '4': 4
         };
         const ANSWER_DELIMITER = '<<ANSWER_BREAK>>';
+        let isSubmitting = false;
 
         function displayQuestion() {
             if (!questions || !questions.length) {
@@ -1092,22 +1083,19 @@ $conn->close();
             }
         }
 
-        // Add to window.onload
         window.onload = function() {
             const savedState = sessionStorage.getItem('assessmentState');
             if (savedState) {
                 const state = JSON.parse(savedState);
-                // Just restore state without calling loadProgress() and loadState()
                 currentSection = state.currentSection;
                 currentQuestionIndex = state.currentQuestionIndex;
                 savedAnswers = state.savedAnswers;
                 startTime = state.startTime;
                 totalTime = state.totalTime;
                 
-                // Load questions for current section
                 loadSectionQuestions(currentSection.toString());
             } else {
-                // Initialize fresh assessment
+
                 currentSection = 1;
                 loadSectionQuestions('1');
             }
@@ -1365,8 +1353,20 @@ $conn->close();
         }
 
         window.addEventListener('beforeunload', function(e) {
-            saveAllAnswers();
-            saveTimerState();
+            if (isSubmitting) {
+                return;
+            }
+
+            try {
+                const message = 'Are you sure you want to leave? Your changes may not be saved.';
+                e.preventDefault();
+                e.returnValue = message;
+                saveAllAnswers();
+                saveTimerState();
+                return message;
+            } catch (error) {
+                console.error('Error in beforeunload:', error);
+            }
         });
 
         function toggleQuestionList() {
@@ -1459,7 +1459,7 @@ $conn->close();
         }
 
         function submitAssessment(isTimeUp = false) {
-            // Prevent multiple submissions
+            isSubmitting = true;
             if (document.querySelectorAll('button, input, textarea')[0].disabled) {
                 return;
             }
@@ -1511,6 +1511,7 @@ $conn->close();
                     return cleanupAndRedirect(); // Wait for cleanup to complete
                 })
                 .catch(error => {
+                    isSubmitting = false;
                     log('Error during submission:', error);
                     // Re-enable inputs if there was an error
                     document.querySelectorAll('button, input, textarea').forEach(el => el.disabled = false);
@@ -1728,32 +1729,38 @@ $conn->close();
         }
 
         function saveState() {
+            const userId = '<?php echo $_SESSION["job_seeker_id"]; ?>';
             const state = {
                 currentSection: currentSection,
                 currentQuestionIndex: currentQuestionIndex,
                 savedAnswers: savedAnswers,
                 startTime: startTime,
-                totalTime: totalTime
+                totalTime: totalTime,
+                userId: userId
             };
-            sessionStorage.setItem('assessmentState', JSON.stringify(state));
+            sessionStorage.setItem(`assessment_state_${userId}`, JSON.stringify(state));
         }
 
         function loadState() {
-            const state = JSON.parse(sessionStorage.getItem('assessmentState'));
-            if (state) {
+            const userId = '<?php echo $_SESSION["job_seeker_id"]; ?>';
+            const state = JSON.parse(sessionStorage.getItem(`assessment_state_${userId}`));
+            
+            if (state && state.userId === userId) {
                 currentSection = state.currentSection;
                 currentQuestionIndex = state.currentQuestionIndex;
                 savedAnswers = state.savedAnswers;
                 startTime = state.startTime;
                 totalTime = state.totalTime;
-                
-                // Don't call switchSection here as it will cause recursion
-                loadSectionQuestions(currentSection.toString());
             } else {
-                // Initialize with section 1
+
                 currentSection = 1;
-                loadSectionQuestions('1');
+                savedAnswers = {};
+                startTime = <?php echo time(); ?>;
+                totalTime = <?php echo $countdownTime; ?>;
+                sessionStorage.removeItem('allAnswers');
             }
+            
+            loadSectionQuestions(currentSection.toString());
         }
 
         function checkAndUnlockSection3() {
