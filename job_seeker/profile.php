@@ -162,14 +162,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_linkedin'])) {
     $new_linkedin = $_POST['new_linkedin'];
 
+    // Regular expression to validate LinkedIn URLs
+    $linkedin_pattern = '/^https?:\/\/(?:www\.)?linkedin\.com\/(?:in|profile)\/[A-Za-z0-9\-]+\/?$/';
     
-    if (filter_var($new_linkedin, FILTER_VALIDATE_URL)) {
+    if (filter_var($new_linkedin, FILTER_VALIDATE_URL) && preg_match($linkedin_pattern, $new_linkedin)) {
         $conn = new mysqli("localhost", "root", "", "techfit");
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        
         $stmt = $conn->prepare("UPDATE Job_Seeker SET linkedin_link=? WHERE user_id=?");
         $stmt->bind_param("ss", $new_linkedin, $user_id); 
         if ($stmt->execute()) {
@@ -181,7 +182,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_linkedin'])) {
         $stmt->close();
         $conn->close();
     } else {
-        $error_message = "Invalid LinkedIn URL.";
+        $error_message = "Invalid LinkedIn URL. Please enter a valid LinkedIn profile URL (e.g., https://www.linkedin.com/in/username)";
     }
 }
 
@@ -239,7 +240,31 @@ $resume = $row['resume'];
 $stmt->close();
 $conn->close();
 
+$conn = new mysqli("localhost", "root", "", "techfit");
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+$stmt = $conn->prepare("SELECT education_level FROM Job_Seeker WHERE user_id=?");
+$stmt->bind_param("s", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$education_level = $row['education_level'];
+$stmt->close();
+$conn->close();
 
+$conn = new mysqli("localhost", "root", "", "techfit");
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+$stmt = $conn->prepare("SELECT year_of_experience FROM Job_Seeker WHERE user_id=?");
+$stmt->bind_param("s", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+$year_of_experience = $row['year_of_experience'];
+$stmt->close();
+$conn->close();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
     $resume_file = $_FILES['resume_file'];
@@ -284,6 +309,95 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
     }
 }
 
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_education'])) {
+    $new_education = $_POST['new_education'];
+    
+    $allowed_education_levels = [
+        'No Formal Education',
+        'Primary School',
+        'High School',
+        'Diploma / Foundation',
+        'Bachelor\'s Degree',
+        'Master\'s Degree',
+        'Doctorate (Ph.D.)'
+    ];
+
+    if (in_array($new_education, $allowed_education_levels)) {
+        $conn = new mysqli("localhost", "root", "", "techfit");
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+
+        $stmt = $conn->prepare("UPDATE Job_Seeker SET education_level=? WHERE user_id=?");
+        $stmt->bind_param("ss", $new_education, $user_id);
+        
+        $response = [];
+        if ($stmt->execute()) {
+            $response['success'] = true;
+            $response['message'] = "Education level updated successfully.";
+            if (!headers_sent()) {
+                header('Content-Type: application/json');
+                echo json_encode($response);
+                exit;
+            }
+        } else {
+            $response['success'] = false;
+            $response['message'] = "Failed to update education level: " . $stmt->error;
+            if (!headers_sent()) {
+                header('Content-Type: application/json');
+                echo json_encode($response);
+                exit;
+            }
+        }
+
+        $stmt->close();
+        $conn->close();
+    }
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
+    $new_experience = $_POST['new_experience'];
+    
+    if (is_numeric($new_experience) && $new_experience >= 0 && floor($new_experience) == $new_experience) {
+        $conn = new mysqli("localhost", "root", "", "techfit");
+        if ($conn->connect_error) {
+            die("Connection failed: " . $conn->connect_error);
+        }
+
+        $stmt = $conn->prepare("UPDATE Job_Seeker SET year_of_experience=? WHERE user_id=?");
+        $stmt->bind_param("is", $new_experience, $user_id);
+        
+        $response = [];
+        if ($stmt->execute()) {
+            $response['success'] = true;
+            $response['message'] = "Years of experience updated successfully.";
+            if (!headers_sent()) {
+                header('Content-Type: application/json');
+                echo json_encode($response);
+                exit;
+            }
+        } else {
+            $response['success'] = false;
+            $response['message'] = "Failed to update years of experience: " . $stmt->error;
+            if (!headers_sent()) {
+                header('Content-Type: application/json');
+                echo json_encode($response);
+                exit;
+            }
+        }
+
+        $stmt->close();
+        $conn->close();
+    } else {
+        $response['success'] = false;
+        $response['message'] = "Invalid input. Please enter a non-negative whole number.";
+        if (!headers_sent()) {
+            header('Content-Type: application/json');
+            echo json_encode($response);
+            exit;
+        }
+    }
+}
 
 ?>
 
@@ -304,22 +418,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
 
     #profile {
         display: flex;
-        align-items: flex-start;
-        justify-content: flex-start;
+        justify-content: flex-start; /* Changed from center */
         margin-top: 80px;
         margin-bottom: 80px;
-    }
-    .profile-image {
-        margin-right: 50px;
-        margin-left: 50px;
-        width: auto;
-        height: auto;
-        border-radius: 0;
+        padding-left: 100px; /* Add left padding */
     }
     .profile-details {
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start; /* Changed from center */
+        max-width: 800px; /* Optional: Add max-width to prevent content from stretching too wide */
     }
     .profile-details h2 {
         margin: 0;
@@ -341,7 +449,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
         color: #e0e0e0;
     }
     .profile-details .edit-button {
-        margin-left: 100px;
+        margin-left: 50px;
         padding: 5px 10px;
         font-size: 14px;
         background-color: #007bff;
@@ -426,16 +534,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
     .popup .cancel-button:hover {
         background-color: #0056b3;
     }
-    .bottom-edit-button {
-        display: flex;
-        justify-content: left;
-        margin-bottom: 50px;
-        margin-left: 290px;
-        margin-top: -50px;
-    }
-    .bottom-edit-button:hover {
-        background-color: #0056b3;
-    }
    
     .profile-info .profile-image {
         margin-left: 10px;
@@ -457,6 +555,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
         margin: 0;
         padding: 0;
     }
+    .education-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+    }
+    .education-option {
+        padding: 10px;
+        border: 1px solid #444;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background-color: #333;
+        color: #fff;
+    }
+
+    .education-option:hover {
+        background-color: #444;
+    }
+
+    .education-option.selected {
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    .experience-input {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 20px 0;
+    }
+
+    .experience-input input[type="number"] {
+        width: 80px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        background-color: #333;
+        color: #fff;
+    }
+
 </style>
 </head>
 <body>
@@ -514,7 +652,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
 
     <main>
         <section id="profile">
-            <img src="images/testprofile.png" alt="Your Profile" class="profile-image" />
             <div class="profile-details">
                 <h2>Edit Profile</h2>
                 <?php if (isset($success_message)) { echo '<p class="success-message">' . $success_message . '</p>'; } ?>
@@ -533,6 +670,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
                     <i class="fas fa-lock"></i>
                     <span>Password</span>
                     <button class="edit-button" onclick="openPopup('password-popup')"><i class="fas fa-edit"></i> Edit Password</button>
+                </div>
+                <div class="detail-line">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span><?php echo $education_level ? htmlspecialchars($education_level) : 'Education Level'; ?></span>
+                    <button class="edit-button" onclick="openPopup('education-popup')"><i class="fas fa-edit"></i> Edit Education Level</button>
+                </div>
+                <div class="detail-line">
+                    <i class="fas fa-briefcase"></i>
+                    <span><?php 
+                        if ($year_of_experience !== null) {
+                            echo htmlspecialchars($year_of_experience) . ' Years of Experience';
+                        } else {
+                            echo 'Years of Working Experience';
+                        }
+                    ?></span>
+                    <button class="edit-button" onclick="openPopup('experience-popup')">
+                        <i class="fas fa-edit"></i> Edit Years of Experience
+                    </button>
                 </div>
                 <div class="detail-line">
                     <img src="images/linkedin.png" alt="LinkedIn" style="width: 20px; height: 20px; margin-right: 10px;">
@@ -559,9 +714,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
         </section>
     </main>
 
-    <div class="bottom-edit-button">
-        <button class="edit-button" onclick="openPopup('edit-profile-popup')"><i class="fas fa-edit"></i> Edit Profile</button>
-    </div>
 
     <div id="username-popup" class="popup">
         <form action="profile.php" method="post">
@@ -614,6 +766,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
             <input type="hidden" name="logout" value="1">
             <button type="submit" class="close-button">Yes</button>
             <button type="button" class="cancel-button" onclick="closePopup('logout-popup')">No</button>
+        </form>
+    </div>
+
+    <div id="education-popup" class="popup">
+        <form action="profile.php" method="post">
+            <h2>Select Education Level</h2>
+            <div class="education-options">
+                <?php
+                $education_levels = [
+                    'No Formal Education',
+                    'Primary School',
+                    'High School',
+                    'Diploma / Foundation',
+                    'Bachelor\'s Degree',
+                    'Master\'s Degree',
+                    'Doctorate (Ph.D.)'
+                ];
+                foreach ($education_levels as $level) {
+                    $selected = ($education_level === $level) ? 'selected' : '';
+                    echo "<div class='education-option $selected' onclick='selectEducation(this)' data-value='" . htmlspecialchars($level) . "'>" . htmlspecialchars($level) . "</div>";
+                }
+                ?>
+            </div>
+            <input type="hidden" name="new_education" id="selected_education">
+            <input type="submit" value="Update">
+            <button type="button" class="close-button" onclick="closePopup('education-popup')">Cancel</button>
+        </form>
+    </div>
+    <div id="experience-popup" class="popup">
+        <form action="profile.php" method="post" id="experience-form">
+            <h2>Edit Years of Experience</h2>
+            <div class="experience-input">
+                <input type="number" name="new_experience" id="new_experience" min="0" step="1" required> Years
+            </div>
+            <input type="submit" value="Update">
+            <button type="button" class="close-button" onclick="closePopup('experience-popup')">Cancel</button>
         </form>
     </div>
 
@@ -690,6 +878,88 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['resume_file'])) {
             const resumeLinkContainer = document.getElementById('resume-link-container');
             resumeLinkContainer.innerHTML = `<a href="job_seeker/resumes/${fileName}" target="_blank" style="color: #007bff;">View Resume</a>`;
         }
+        function updateEducationLevel(newLevel) {
+            const educationSpan = document.querySelector('.detail-line i.fa-graduation-cap').nextElementSibling;
+            educationSpan.textContent = newLevel || 'Education Level';
+        }
+
+        function selectEducation(element) {
+            // Remove selected class from all options
+            document.querySelectorAll('.education-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            element.classList.add('selected');
+            
+            // Update hidden input value
+            document.getElementById('selected_education').value = element.dataset.value;
+        }
+
+        // Modify your existing education popup form submission to use AJAX:
+        document.querySelector('#education-popup form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newEducation = document.getElementById('selected_education').value;
+            
+            fetch('profile.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'new_education=' + encodeURIComponent(newEducation)
+            })
+            .then(response => response.text())
+            .then(data => {
+                updateEducationLevel(newEducation);
+                closePopup('education-popup');
+                // Optional: Show success message
+                const successMessage = document.createElement('p');
+                successMessage.className = 'success-message';
+                successMessage.textContent = 'Education level updated successfully.';
+                document.querySelector('.profile-details').insertBefore(successMessage, document.querySelector('.detail-line'));
+                setTimeout(() => successMessage.remove(), 3000);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+        // Add to your existing script section
+        function updateExperience(years) {
+            const experienceSpan = document.querySelector('.detail-line i.fa-briefcase').nextElementSibling;
+            experienceSpan.textContent = years ? `${years} Years of Experience` : 'Years of Working Experience';
+        }
+
+        // Add this to handle the form submission
+        document.querySelector('#experience-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newExperience = document.getElementById('new_experience').value;
+            
+            fetch('profile.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'new_experience=' + encodeURIComponent(newExperience)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateExperience(newExperience);
+                    closePopup('experience-popup');
+                    // Show success message
+                    const successMessage = document.createElement('p');
+                    successMessage.className = 'success-message';
+                    successMessage.textContent = data.message;
+                    document.querySelector('.profile-details').insertBefore(successMessage, document.querySelector('.detail-line'));
+                    setTimeout(() => successMessage.remove(), 3000);
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
     </script>
 </body>
 </html>
