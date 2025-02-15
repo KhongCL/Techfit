@@ -65,27 +65,6 @@ if ($row['completed'] > 0) {
     exit();
 }
 
-$check_answers_sql = "SELECT COUNT(*) as has_answers 
-                     FROM Answer
-                     WHERE job_seeker_id = ?";
-
-$stmt = $conn->prepare($check_answers_sql);
-$stmt->bind_param("s", $_SESSION['job_seeker_id']);
-$stmt->execute();
-$result = $stmt->get_result();
-$row = $result->fetch_assoc();
-
-if ($row['has_answers'] > 0) {
-    echo '<script>
-        if (confirm("You have already started/completed an assessment. Would you like to view your assessment history?")) {
-            window.location.href = "assessment_history.php";  
-        } else {
-            window.location.href = "index.php";
-        }
-    </script>';
-    exit();
-}
-
 function fetchSectionQuestions($conn, $assessment_id) {
     $questions = [];
     $sql = "SELECT q.*, c.choice_id, c.choice_text 
@@ -549,12 +528,13 @@ $conn->close();
         let startTime = <?php echo time(); ?>;
         let totalTime = <?php echo $countdownTime; ?>;
         let sectionLastQuestions = {
-            '1': 4,  // Last question index in section 1
-            '2': 4,  // Last question index in section 2
-            '3': 4,  // Last question index in section 3
-            '4': 4   // Last question index in section 4
+            '1': 4,
+            '2': 4,
+            '3': 4,
+            '4': 4
         };
         const ANSWER_DELIMITER = '<<ANSWER_BREAK>>';
+        let isSubmitting = false;
 
         function displayQuestion() {
             if (!questions || !questions.length) {
@@ -1365,8 +1345,20 @@ $conn->close();
         }
 
         window.addEventListener('beforeunload', function(e) {
-            saveAllAnswers();
-            saveTimerState();
+            if (isSubmitting) {
+                return;
+            }
+
+            try {
+                const message = 'Are you sure you want to leave? Your changes may not be saved.';
+                e.preventDefault();
+                e.returnValue = message;
+                saveAllAnswers();
+                saveTimerState();
+                return message;
+            } catch (error) {
+                console.error('Error in beforeunload:', error);
+            }
         });
 
         function toggleQuestionList() {
@@ -1459,7 +1451,7 @@ $conn->close();
         }
 
         function submitAssessment(isTimeUp = false) {
-            // Prevent multiple submissions
+            isSubmitting = true;
             if (document.querySelectorAll('button, input, textarea')[0].disabled) {
                 return;
             }
@@ -1511,6 +1503,7 @@ $conn->close();
                     return cleanupAndRedirect(); // Wait for cleanup to complete
                 })
                 .catch(error => {
+                    isSubmitting = false;
                     log('Error during submission:', error);
                     // Re-enable inputs if there was an error
                     document.querySelectorAll('button, input, textarea').forEach(el => el.disabled = false);
