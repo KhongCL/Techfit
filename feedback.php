@@ -17,9 +17,9 @@ if ($mysqli->connect_error) {
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to provide feedback. Go to Login Page? Click cancel to go to home page.")) {
-            window.location.href = "../login.php";
+            window.location.href = "./login.php";
         } else {
-            window.location.href = "../index.php";
+            window.location.href = "./index.php";
         }
     </script>';
     exit();
