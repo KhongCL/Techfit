@@ -38,23 +38,43 @@ if ($_SESSION['role'] !== 'Employer') {
             min-width: 100%;
         }
 
+        .code-container {
+            overflow-x: auto;
+            min-width: 100%;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--background-color);
+        }
+
         .job-seeker-answer pre,
         .correct-answer pre,
         .code-template {
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
-            word-break: break-all;
+            white-space: pre; /* Change from pre-wrap to pre */
+            word-break: normal; /* Change from break-all */
+            overflow-x: auto; /* Ensure horizontal scroll */
             display: block;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            font-family: monospace;
+            font-family: 'Consolas', 'Monaco', monospace; /* Specify monospace fonts */
             font-size: 0.9em;
+            tab-size: 4; /* Add tab size */
+            -moz-tab-size: 4; /* Firefox support */
+            text-align: left; /* Add this */
+            line-height: 1.5; /* Add this for better readability */
         }
 
         .code-template {
             background-color: var(--background-color-extra-light);
             color: var(--text-color);
+        }
+
+        .score-passed {
+            color: var(--success-color) !important;
+        }
+
+        .score-failed {
+            color: var(--danger-color) !important;
         }
 
         .language-indicator {
@@ -80,16 +100,21 @@ if ($_SESSION['role'] !== 'Employer') {
         .question-text {
             font-weight: bold;
             margin-bottom: 10px;
+            text-align: left; /* Add this */
         }
 
-        .job-seeker-answer, .correct-answer {
+        .job-seeker-answer,
+        .correct-answer {
             margin-top: 10px;
+            text-align: left; /* Add this */
         }
 
-        .job-seeker-answer strong, .correct-answer strong {
+        .job-seeker-answer strong, 
+        .correct-answer strong {
             font-weight: bold;
             display: block;
             margin-bottom: 5px;
+            text-align: left; /* Add this */
         }
 
         .section-navigator {
@@ -136,16 +161,17 @@ if ($_SESSION['role'] !== 'Employer') {
         }
 
         .page-wrapper {
-            width: 75%;
+            width: 95%;
             margin: 0 auto;
-            min-width: 900px;
+            min-width: auto;
+            max-width: 1200px;
         }
 
         .assessment-container {
             display: flex;
             flex-direction: column;
             gap: 20px;
-            padding: 20px;
+            padding: 10px;
             width: 100%;
             margin: 0 auto;
         }
@@ -189,11 +215,118 @@ if ($_SESSION['role'] !== 'Employer') {
 
         .candidate-info {
             width: 100%;
-            max-width: 1200px;
+            max-width: 100%;
+            padding: 10px;
+            margin: 0 auto 20px;
+            text-align: center;
+        }
+
+        .profile-section {
             margin-bottom: 20px;
         }
 
-        @media (max-width: 768px) {
+        .profile-section img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .name {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .details-container {
+            background-color: var(--background-color-light);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .details {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            padding: 8px 16px;
+            background-color: var(--background-color);
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .score-time {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--background-color);
+        }
+
+        @media screen and (max-width: 1024px) {
+            .details {
+                gap: 10px;
+            }
+
+            .detail-item {
+                font-size: 0.9em;
+                padding: 6px 12px;
+            }
+
+            .section-nav-list {
+                gap: 5px;
+            }
+
+            .section-nav-item {
+                padding: 6px 12px;
+                font-size: 0.9em;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .page-wrapper {
+                width: 100%;
+                padding: 10px;
+            }
+
+            .assessment-container {
+                padding: 5px;
+            }
+
+            .summary_header {
+                padding: 10px;
+            }
+
+            .details {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .detail-item {
+                width: 100%;
+                text-align: center;
+            }
+
+            .questions-section {
+                padding: 10px;
+            }
+
+            /* Make code sections responsive */
+            .code-container, 
+            .job-seeker-answer pre,
+            .correct-answer pre {
+                font-size: 0.8em;
+                max-width: 100%;
+                overflow-x: auto;
+            }
+
             .section-nav-list {
                 flex-direction: column;
                 align-items: stretch;
@@ -201,6 +334,7 @@ if ($_SESSION['role'] !== 'Employer') {
             
             .section-nav-item {
                 text-align: center;
+                width: 100%;
             }
 
             .details, .score-time {
@@ -210,6 +344,40 @@ if ($_SESSION['role'] !== 'Employer') {
             
             .divider {
                 display: none;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .profile-section img {
+                width: 80px;
+                height: 80px;
+            }
+
+            .name {
+                font-size: 1.2em;
+            }
+
+            .assessment-title {
+                font-size: 1.2em;
+            }
+
+            .question-text {
+                font-size: 0.9em;
+            }
+
+            /* Adjust footer for mobile */
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .footer-right {
+                margin-top: 20px;
+            }
+
+            .footer-column {
+                width: 100%;
+                margin-bottom: 20px;
             }
         }
     </style>
@@ -302,24 +470,66 @@ if ($_SESSION['role'] !== 'Employer') {
 
             if ($result_candidate->num_rows > 0) {
                 $row_candidate = $result_candidate->fetch_assoc();
+                
+                // Get score and time info
+                $score = "N/A";
+                $time_used = "N/A";
+            
+                $sql_score_time = "SELECT ajs.score, TIMEDIFF(ajs.end_time, ajs.start_time) AS time_used,
+                                            ast.passing_score_percentage
+                                    FROM Assessment_Job_Seeker ajs
+                                    CROSS JOIN Assessment_Settings ast
+                                    WHERE ajs.job_seeker_id = ? 
+                                    AND ast.setting_id = '1'";
+                        
+                $stmt = $conn->prepare($sql_score_time);
+                $stmt->bind_param("s", $job_seeker_id);
+                $stmt->execute();
+                $result_score_time = $stmt->get_result();
+            
+                if ($result_score_time->num_rows > 0) {
+                    $row_score_time = $result_score_time->fetch_assoc();
+                    $score = !is_null($row_score_time['score']) ? $row_score_time['score'] : 'N/A';
+                    $time_used_value = $row_score_time['time_used'];
+                    $time_used = !empty($time_used_value) ? $time_used_value : 'N/A';
+                    $passing_score = $row_score_time['passing_score_percentage'];
+                    
+                    // Create score display with color coding
+                    $score_class = ($score !== 'N/A' && $score >= $passing_score) ? 'score-passed' : 'score-failed';
+                    echo "<div class='detail-item'>Score: <span class='" . $score_class . "'>" . $score . "/100</span></div>";
+                } else {
+                    echo "<div class='detail-item'>Score: N/A</div>";
+                }
+            
+                // Display candidate info
                 echo "<div class='candidate-info'>";
+                echo "<div class='profile-section'>";
                 echo "<img src='images/usericon.png' alt='User Icon'>";
                 echo "<div class='name'>" . htmlspecialchars($row_candidate['first_name']) . " " . htmlspecialchars($row_candidate['last_name']) . "</div>";
+                echo "</div>";
+                
+                echo "<div class='details-container'>";
                 echo "<div class='details'>";
-
+                
                 if (!empty($row_candidate['linkedin_link'])) {
-                    echo "<a href='" . htmlspecialchars($row_candidate['linkedin_link']) . "' target='_blank'>LinkedIn Profile</a><br>";
+                    echo "<div class='detail-item'><a href='" . htmlspecialchars($row_candidate['linkedin_link']) . "' target='_blank'>LinkedIn Profile</a></div>";
                 } else {
-                    echo "LinkedIn Profile: N/A<br>";
+                    echo "<div class='detail-item'>LinkedIn Profile: N/A</div>";
                 }
-
+                
                 $education_level = !empty($row_candidate['education_level']) ? htmlspecialchars($row_candidate['education_level']) : 'N/A';
-                echo "<div class='education'>Education Level: " . $education_level . "</div>";
-
+                echo "<div class='detail-item'>Education Level: " . $education_level . "</div>";
+                
                 $experience = (!empty($row_candidate['year_of_experience']) || $row_candidate['year_of_experience'] === '0') ? htmlspecialchars($row_candidate['year_of_experience']) . " Years" : 'N/A';
-                echo "<div class='experience'>Years of Experience: " . $experience . "</div>";
+                echo "<div class='detail-item'>Years of Experience: " . $experience . "</div>";
+                
+
+                echo "<div class='detail-item'>Time Used: " . $time_used . "</div>";
+                
                 echo "</div>";
-                echo "</div>";
+                
+                echo "</div>"; // Close details-container
+                echo "</div>"; // Close candidate-info
             } else {
                 echo "<h1>Candidate not found</h1>";
             }
@@ -343,13 +553,6 @@ if ($_SESSION['role'] !== 'Employer') {
                 $time_used_value = $row_score_time['time_used'];
                 $time_used = !empty($time_used_value) ? $time_used_value : 'N/A';
             }
-
-            echo "<div class='score-time'>";
-            echo "<div class='score'>Score: " . $score . "/100</div>";
-            echo "<div class='divider'></div>";
-            echo "<div class='time-used'>Time Used: " . $time_used . "</div>";
-            echo "<div class='divider'></div>";
-            echo "</div>";
             ?>
         </div>
 
