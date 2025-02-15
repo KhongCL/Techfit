@@ -14,31 +14,27 @@ if ($conn->connect_error) {
 function displayLoginMessage() {
     echo '<script>
         alert("You need to log in to access this page.");
+        window.location.href = "login.php";
     </script>';
     exit();
 }
 
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage(); 
+    displayLoginMessage();
 }
-
 
 if ($_SESSION['role'] !== 'Admin') {
-    displayLoginMessage(); 
+    displayLoginMessage();
 }
 
-// Fetch the first row to get the passing_score_percentage
 $sql = "
     SELECT 
-        assessment_settings.passing_score_percentage
-    FROM assessment_job_seeker
-    JOIN assessment_settings ON assessment_settings.setting_id = '1'
-    WHERE assessment_job_seeker.job_seeker_id = ?
-    ORDER BY assessment_job_seeker.end_time DESC
+        passing_score_percentage
+    FROM assessment_settings
+    WHERE setting_id = '1'
     LIMIT 1";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $job_seeker_id);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -52,21 +48,21 @@ if ($passing_score_percentage === null) {
     exit();
 }
 
-// Fetch all rows to process the scores
 $sql = "
     SELECT 
-        assessment_job_seeker.score
-    FROM assessment_job_seeker
-    WHERE assessment_job_seeker.job_seeker_id = ?
-    ORDER BY assessment_job_seeker.end_time DESC";
+        score
+    FROM assessment_job_seeker";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $job_seeker_id);
+
 $stmt->execute();
 $result = $stmt->get_result();
 
 $pass = 0;
 $fail = 0;
+$total_assessments = 0;
+$total_score = 0;
+$average_score=0;
 
 while ($row = $result->fetch_assoc()) {
     $score = $row['score'] ?? null;
@@ -74,6 +70,8 @@ while ($row = $result->fetch_assoc()) {
     echo "<script>console.log('Score: " . $score . ", Passing Score: " . $passing_score_percentage . "');</script>";
 
     if ($score !== null) {
+        $total_assessments++;
+        $total_score += $score;
         if ($score >= $passing_score_percentage) {
             $pass++;
         } else {
@@ -83,6 +81,9 @@ while ($row = $result->fetch_assoc()) {
         echo "<script>console.error('Error: Score is null');</script>";
     }
 }
+
+$average_score = $total_assessments > 0 ? $total_score / $total_assessments : 0;
+$average_score = number_format($average_score, 2);
 
 session_write_close();
 ?>
@@ -104,6 +105,10 @@ session_write_close();
 
         h2{
             color: white;
+        }
+
+        h5{
+            text-align: center;
         }
 
     </style>
@@ -199,7 +204,7 @@ session_write_close();
 
             console.log("Pass Count: ", passCount); // Debugging
             console.log("Fail Count: ", failCount); // Debugging
-
+            
             const ctx = document.getElementById('assessmentChart').getContext('2d');
             new Chart(ctx, {
                 type: 'pie',
@@ -234,6 +239,9 @@ session_write_close();
     </script>
 
     <h2><br</h2>
+    <h5>Total Assessment: <?php echo $total_assessments; ?></h5>
+    <h5>Average Scores across Assessment: <?php echo $average_score; ?>%</h5>
+
     <footer>
         <div class="footer-content">
             <div class="footer-left">
