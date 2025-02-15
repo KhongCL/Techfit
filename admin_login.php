@@ -140,6 +140,12 @@ $conn->close();
 
         
         }
+
+        label {
+        display: block;
+        text-align: left;
+        margin-bottom: 5px;
+    }
     </style>
 
 </head>

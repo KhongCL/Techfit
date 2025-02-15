@@ -237,6 +237,135 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
         li {
             color: white;
         }
+
+        #formContainer {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        #faqForm {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--background-color-medium);
+            border-radius: 8px;
+        }
+
+        #faqForm label {
+            color: var(--text-color);
+            font-size: 16px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        #faqForm select,
+        #faqForm input[type="file"],
+        #faqForm textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            background-color: var(--background-color-light);
+            border: 1px solid var(--background-color-extra-light);
+            border-radius: 4px;
+            color: var(--text-color);
+        }
+
+        .sitemap-category {
+            background-color: var(--background-color-medium);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .sitemap-item {
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: var(--background-color-light) !important;
+        }
+
+        .sitemap-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .edit-button,
+        .delete-button {
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+            border: none;
+        }
+
+        #manage_sitemap_button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        #manage_sitemap_button:hover {
+            background-color: var(--primary-color-hover);
+        }
+
+        @media (max-width: 768px) {
+            #formContainer {
+                padding: 10px;
+            }
+
+            #faqForm {
+                padding: 15px;
+            }
+
+            .sitemap-category {
+                padding: 15px;
+            }
+
+            .sitemap-item {
+                padding: 15px;
+            }
+
+            .sitemap-image {
+                max-width: 100% !important;
+            }
+
+            .edit-button,
+            .delete-button {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            .button-container {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #faqForm label,
+            #faqForm select,
+            #faqForm input[type="file"],
+            #faqForm textarea {
+                font-size: 14px;
+            }
+
+            .sitemap-category h2 {
+                font-size: 20px !important;
+            }
+
+            .sitemap-item p {
+                font-size: 12px !important;
+            }
+        }
     </style>
 <header>
         <div class="logo">
