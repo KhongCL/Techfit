@@ -942,7 +942,8 @@ session_start();
                 margin-bottom: 20px;
             }
 
-            #deleted-questions-popup {
+            @media (max-width: 768px) {
+                #deleted-questions-popup {
                 width: 95%;
                 height: 90vh;
                 padding: 15px;
@@ -1001,6 +1002,21 @@ session_start();
                 margin-top: 15px;
             }
 
+            #deleted-questions-popup {
+                width: 98%;
+                padding: 10px;
+            }
+
+            #deleted-questions-popup h3 {
+                font-size: 18px;
+            }
+
+            #deleted-questions-popup th,
+            #deleted-questions-popup td {
+                font-size: 12px;
+                padding: 6px;
+            }
+
             .deleted-search-container {
                 justify-content: center;
                 align-items: center;
@@ -1014,23 +1030,7 @@ session_start();
             .action-controls .success{
                 width: 100%;
             }
-
-            @media (max-width: 480px) {
-                #deleted-questions-popup {
-                    width: 98%;
-                    padding: 10px;
-                }
-
-                #deleted-questions-popup h3 {
-                    font-size: 18px;
-                }
-
-                #deleted-questions-popup th,
-                #deleted-questions-popup td {
-                    font-size: 12px;
-                    padding: 6px;
-                }
-            }
+        }
         </style>
 </head>
 <body>
