@@ -536,6 +536,7 @@ session_write_close();
                 flex-direction: column;
                 align-items: flex-start;
                 font-size: xx-small;
+                gap: 15px;
             }
 
             table {
@@ -548,66 +549,72 @@ session_write_close();
             }
 
             th {
-                font-size: smaller;
+                font-size: 14px;
             }
 
             .button-group {
                 flex-direction: column;
                 width: 100%;
+                gap: 10px;
             }
 
-            .search-sort-controls {
-                flex-direction: column;
+            .button-group button {
                 width: 100%;
             }
 
+            .search-sort-controls {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                gap: 10px;
+                width: 100%;
+                margin-top: 10px;
+            }
+
             .search-sort-controls span{
-                align-self: flex-start;;
+                font-size: 14px;
+                white-space: nowrap;
+                margin-right: 10px;
+                display: flex;
+                align-items: center;
+                height: 100%;
             }
 
             .search-sort-controls select {
                 align-self: flex-start;
             }
 
+            #sortDropdown {
+                min-width: 120px;
+                flex-shrink: 0;
+                margin-right: 10px;
+                height: 40px;
+            }
 
             .search-field-container{
                 align-self: flex-start;
+                width: 100%;
             }
 
             .search-container {
                 align-self: right;
                 width: 100%;
-            }
-
-            .nav-list {
-                flex-direction: column;
-                align-items: flex-start;
-                display: none;
-                font-size: smaller;
-            }
-
-            .nav-list li {
-                margin-right: 0;
-                width: 100%;
-            }
-
-            .nav-list a {
-                padding: 10px;
-                width: 100%;
-                display: block;
-            }
-
-            .hamburger {
+                flex-grow: 1;
+                min-width: 0;
                 display: flex;
+                align-items: center;
             }
 
-            .nav-list.show {
-                display: flex;
+            #searchInput {
+                width: 100%;
+                margin-left: 0;
+                height: 40px;
             }
 
             tbody {
-                font-size: smaller;
+                font-size: 14px;
             }
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
