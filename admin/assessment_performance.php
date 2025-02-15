@@ -14,24 +14,18 @@ if ($conn->connect_error) {
 function displayLoginMessage() {
     echo '<script>
         alert("You need to log in to access this page.");
-        window.location.href = "login.php";
     </script>';
     exit();
 }
 
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage();
+    displayLoginMessage(); 
 }
+
 
 if ($_SESSION['role'] !== 'Admin') {
-    displayLoginMessage();
+    displayLoginMessage(); 
 }
-
-if (!isset($_SESSION['job_seeker_id'])) {
-    displayLoginMessage();
-}
-
-$job_seeker_id = $_SESSION['job_seeker_id'];
 
 // Fetch the first row to get the passing_score_percentage
 $sql = "

@@ -13,6 +13,21 @@ if ($mysqli->connect_error) {
     die(json_encode(['status' => 'error', 'message' => 'Database connection failed']));
 }
 
+function displayLoginMessage() {
+    echo '<script>
+        alert("You need to log in to access this page.");
+    </script>';
+    exit();
+}
+
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage();
+}
+
+if ($_SESSION['role'] !== 'Admin') {
+    displayLoginMessage();
+}
+
 if (!isset($_SESSION['user_id'])) {
     die(json_encode(['status' => 'error', 'message' => 'User not logged in']));
 }

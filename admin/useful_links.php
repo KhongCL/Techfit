@@ -14,6 +14,21 @@ if ($mysqli->connect_error) {
     die("Database connection failed: " . $mysqli->connect_error);
 }
 
+function displayLoginMessage() {
+    echo '<script>
+        alert("You need to log in to access this page.");
+    </script>';
+    exit();
+}
+
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage();
+}
+
+if ($_SESSION['role'] !== 'Admin') {
+    displayLoginMessage();
+}
+
 function generateResourceId($mysqli) {
     $result = $mysqli->query("SELECT resource_id FROM resource ORDER BY resource_id DESC LIMIT 1");
     $lastId = $result->fetch_assoc()['resource_id'];

@@ -19,7 +19,6 @@ if ($_SESSION['role'] !== 'Admin') {
     displayLoginMessage(); 
 }
 
-
 session_write_close();
 ?>
 
