@@ -614,6 +614,76 @@ session_write_close();
             tbody {
                 font-size: 14px;
             }
+
+            #deleted-assessments-tab {
+                width: 95%;
+                height: 90vh;
+                padding: 15px;
+                overflow-y: auto;
+            }
+
+            #deleted-assessments-tab .header-controls {
+                margin-bottom: 20px;
+            }
+
+            #deleted-assessments-tab .action-controls {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            #deleted-assessments-tab .deleted-search-container {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            #restoreSelectedButton {
+                width: 100%;
+                margin: 0;
+            }
+
+            #deleted-assessments-tab table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+
+            #deleted-assessments-tab th,
+            #deleted-assessments-tab td {
+                font-size: 14px;
+                padding: 8px;
+            }
+
+            #deleted-assessments-tab .assessment-close-button {
+                top: 5px;
+                right: 5px;
+                font-size: 20px;
+            }
+
+            #deletedSearchInput {
+                width: 100%;
+                margin: 0;
+            }
+
+            #deleted-assessments-tab form {
+                margin-top: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #deleted-assessments-tab {
+                width: 98%;
+                padding: 10px;
+            }
+
+            #deleted-assessments-tab h3 {
+                font-size: 18px;
+            }
+
+            #deleted-assessments-tab th,
+            #deleted-assessments-tab td {
+                font-size: 12px;
+                padding: 6px;
+            }
         }
     </style>
     <script>
