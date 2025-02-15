@@ -225,6 +225,90 @@ session_write_close();
         .button-group button {
             margin: 0;
         }
+        @media (max-width: 768px) {
+            /* Main container adjustments */
+            main {
+                padding: 10px;
+                overflow-x: hidden; /* Prevent body scroll */
+            }
+
+            /* Wrap tables in scrollable containers */
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+                max-width: 100%;
+                margin: 10px 0;
+            }
+
+            /* Maintain minimum column widths */
+            th, td {
+                min-width: 100px; /* Base minimum width */
+                padding: 8px;
+            }
+
+            /* Specific column width adjustments */
+            th:first-child, td:first-child {
+                min-width: 40px; /* Checkbox column */
+                position: sticky;
+                left: 0;
+                background-color: var(--background-color);
+            }
+
+            th[data-column="username"], td[data-column="username"],
+            th[data-column="email"], td[data-column="email"] {
+                min-width: 150px;
+            }
+
+            th[data-column="actions"], td[data-column="actions"] {
+                min-width: 200px;
+            }
+
+            /* Rest of your existing mobile styles... */
+            .header-controls {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+                padding: 0 15px;
+            }
+
+            .header-controls h2 {
+                text-align: center;
+            }
+
+            .button-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .button-group button {
+                width: 100%;
+                margin: 5px 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            /* Adjust minimum widths for even smaller screens */
+            th, td {
+                min-width: 80px;
+                font-size: 13px;
+                padding: 6px;
+            }
+
+            th:first-child, td:first-child {
+                min-width: 30px;
+            }
+
+            th[data-column="username"], td[data-column="username"],
+            th[data-column="email"], td[data-column="email"] {
+                min-width: 120px;
+            }
+
+            th[data-column="actions"], td[data-column="actions"] {
+                min-width: 160px;
+            }
+        }
     </style>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
