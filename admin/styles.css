@@ -1699,6 +1699,12 @@ form#faqForm button:hover {
     margin-bottom: 10px;
   }
 
+  #questions {
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
   .question-list {
     text-align: left;
   }

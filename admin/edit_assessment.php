@@ -941,6 +941,87 @@ session_start();
             .form-group {
                 margin-bottom: 20px;
             }
+
+            #deleted-questions-popup {
+                width: 95%;
+                height: 90vh;
+                padding: 15px;
+                overflow-y: auto;
+                display: flex; /* Enable flexbox for vertical layout */
+                flex-direction: column; /* Stack elements vertically */
+            }
+
+            #deleted-questions-popup .header-controls {
+                margin-bottom: 20px;
+            }
+
+            #deleted-questions-popup .action-controls {
+                display: flex; /* Needed for flex-direction to work */
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            #deleted-questions-popup .deleted-search-container {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            #restoreSelectedButton {
+                width: 100%;
+                margin: 0;
+            }
+
+            #deleted-questions-popup table {
+                width: 100%; /* Ensure table takes full width */
+                display: block; /* Important for overflow to work */
+                overflow-x: auto; /* Allow horizontal scrolling if content overflows */
+                white-space: nowrap; /* Prevent table cells from wrapping */
+            }
+
+            #deleted-questions-popup th,
+            #deleted-questions-popup td {
+                font-size: 14px;
+                padding: 8px;
+                text-align: left; /* Align text to the left within cells */
+                vertical-align: top; /* Align content to the top of cells */
+            }
+
+            #deleted-questions-popup .assessment-close-button {
+                top: 5px;
+                right: 5px;
+                font-size: 20px;
+            }
+
+            #deletedSearchInput {
+                width: 100%;
+                margin: 0;
+            }
+
+            #deleted-questions-popup form {
+                margin-top: 15px;
+            }
+
+            @media (max-width: 480px) {
+                #deleted-questions-popup {
+                    width: 98%;
+                    padding: 10px;
+                }
+
+                #deleted-questions-popup h3 {
+                    font-size: 18px;
+                }
+
+                #deleted-questions-popup th,
+                #deleted-questions-popup td {
+                    font-size: 12px;
+                    padding: 6px;
+                }
+            }
+
+            .searchDeletedQuestions {
+                justify-content: center;
+                align-items: center;
+            }
         </style>
 </head>
 <body>
