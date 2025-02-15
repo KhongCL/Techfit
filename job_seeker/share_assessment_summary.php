@@ -216,10 +216,10 @@ $conn->close();
 </head>
 <body>
     <div class="report-card">
-        <h2>Assessment History Report</h2>
+        <h2>Assessment Summary Report</h2>
         
-        <div class="status <?= $assessment['score'] >= 90 ? 'passed' : 'failed' ?>">
-            <?= $assessment['score'] >= 90 ? 'PASSED' : 'FAILED' ?>
+        <div class="status <?= $assessment['score'] >= $assessment['passing_score_percentage'] ? 'passed' : 'failed' ?>">
+            <?= $assessment['score'] >= $assessment['passing_score_percentage'] ? 'PASSED' : 'FAILED' ?>
         </div>
 
         <div class="report-row">
