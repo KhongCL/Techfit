@@ -205,6 +205,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>FAQ Management - TechFit</title>
     <link rel="stylesheet" href="styles.css"> 
 </head>
+    <style>
+        li {
+            color: white;
+        }
+    </style>
 <header>
         <div class="logo">
             <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
@@ -243,7 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
-                            <li><a href="profile.php">Settings</a></li>
+                        <li><a>Settings</a></li>
                             <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li>
                         </ul>
                     </li>
@@ -361,8 +366,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <h3>Reports</h3>
                     <ul>
                         <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                        <li><a href="user_engagement.php">User Engagement Statistics</a></li>
-                        <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
+                        
                     </ul>
                 </div>
                 <div class="footer-column">

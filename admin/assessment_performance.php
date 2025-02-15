@@ -112,8 +112,12 @@ session_write_close();
             text-align: center;
             color: white;
             margin-bottom: 0px;
+            font-weight: normal;
         }
 
+        li {
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -145,8 +149,7 @@ session_write_close();
                     <li><a href="#">Reports</a>
                         <ul class="dropdown">
                             <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                            <li><a href="user_engagement.php">User Engagement Statistics</a></li>
-                            <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
+                            
                         </ul>
                     </li>
                     <li><a href="#">Resources</a>
@@ -173,7 +176,7 @@ session_write_close();
                             </div>
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
-                            <li><a href="settings.php">Settings</a>
+                            <li><a>Settings</a>
                                 <ul class="dropdown">
                                     <li><a href="manage_profile.php">Manage Profile</a></li>
                                     <li><a href="system_configuration.php">System Configuration Settings</a></li>
@@ -194,7 +197,7 @@ session_write_close();
     </div>
         
     <h2 style="text-align: center;" ><br>Assessment Performance</h2>
-
+         <h6></h6>                           
     <div class="chart-container">
         <canvas id="assessmentChart">
         </canvas>
