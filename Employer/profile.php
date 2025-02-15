@@ -396,6 +396,7 @@ $conn->close();
     }
 
     @media (max-width: 768px) {
+        /* Profile section styles */
         #profile {
             margin: 20px 0;
             padding: 10px;
@@ -416,18 +417,27 @@ $conn->close();
             flex-wrap: wrap;
             gap: 10px;
             justify-content: flex-start;
+            width: 100%;
+            margin-bottom: 15px;
         }
 
         .detail-line span, 
         .detail-line a {
             font-size: 16px;
             width: 100%;
+            order: 2;
+        }
+
+        .detail-line i,
+        .detail-line img {
+            order: 1;
         }
 
         .edit-button {
             margin-left: 0 !important;
             width: 100% !important;
             margin-top: 5px;
+            order: 3;
         }
 
         .logout-button {
@@ -435,6 +445,7 @@ $conn->close();
             margin-top: 30px;
         }
 
+        /* Popup styles */
         .popup {
             width: 90%;
             max-width: 350px;
@@ -463,26 +474,52 @@ $conn->close();
         }
 
         .nav-list {
-            display: none;
-            position: absolute;
-            top: 60px;
-            right: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: fixed;
+            top: 0;
+            right: -100%;
+            height: 100%;
             background-color: var(--background-color-medium);
-            width: 250px;
-            padding: 20px;
-            box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.2);
+            width: 350px;
+            z-index: 1000;
+            padding: 60px 20px;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+            justify-content: flex-start;
+            transition: right 0.3s ease;
+            margin-top: 0;
         }
 
         .nav-list.active {
-            display: block;
+            right: 0;
         }
 
         .nav-list li {
-            margin: 10px 0;
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .nav-list .dropdown {
+            position: static;
+            background-color: var(--background-color);
+            margin-top: 5px;
+            border-radius: 0;
+            box-shadow: none;
+            width: 100%;
+            display: none;
+        }
+
+        .nav-list li.active > .dropdown {
+            display: block;
         }
 
         .hamburger {
             display: flex;
+            position: fixed;
+            top: 25px;
+            right: 20px;
+            z-index: 1002;
             flex-direction: column;
             gap: 5px;
             cursor: pointer;
@@ -506,6 +543,14 @@ $conn->close();
 
         .hamburger.active span:nth-child(3) {
             transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        /* Additional responsive fixes */
+        .bottom-edit-button {
+            margin-left: 0;
+            margin-top: 10px;
+            width: 100%;
+            justify-content: center;
         }
     }
 
