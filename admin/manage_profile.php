@@ -192,6 +192,92 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
             color: white;
         }
 
+        main {
+            position: relative;
+            min-height: 70vh;
+            padding: 0;
+        }
+
+        #home {
+            position: relative;
+            width: 100%;
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0;
+            overflow: hidden;
+            background-image: url('images/office_background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        #home::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('images/office_background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(4px);
+            z-index: 1;
+        }
+
+        #home-content {
+            position: relative;
+            z-index: 3;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.4);
+            width: 100%;
+            height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #home h2 {
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            margin-bottom: 1rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        #home p {
+            font-size: 1.3rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+            margin-bottom: 2rem;
+            letter-spacing: 0.5px;
+        }
+
+        #home button {
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        #home button:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+        }
+
     body {
         font-family: Arial, sans-serif;
         color: #e0e0e0;
@@ -345,6 +431,110 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
     .button-container {
         display: flex;
         gap: 15px; /* 10px gap between buttons */
+    }
+
+    @media (max-width: 768px) {
+        #profile {
+            margin: 20px 0;
+            padding: 10px;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .profile-details {
+            padding-left: 20px !important;
+            width: 100%;
+        }
+
+        .profile-details h2 {
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .detail-line {
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-start;
+            width: 100%;
+        }
+
+        .detail-line span, 
+        .detail-line a {
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .edit-button {
+            margin-left: 0 !important;
+            width: 100% !important;
+            margin-top: 5px;
+        }
+
+        .button-container {
+            flex-direction: column;
+            width: 100%;
+            gap: 10px;
+        }
+
+        .logout-button,
+        .config-button {
+            width: 100% !important;
+            margin: 5px 0;
+        }
+
+        .popup {
+            width: 90%;
+            max-width: 350px;
+        }
+
+        .popup input[type="text"],
+        .popup input[type="password"] {
+            width: 100%;
+        }
+
+        .popup form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .popup input[type="submit"],
+        .popup .close-button,
+        .popup .cancel-button {
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .popup h2 {
+            font-size: 20px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-details {
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+        }
+
+        .detail-line i {
+            margin-right: 5px;
+        }
+
+        .popup {
+            padding: 15px;
+            width: 95%;
+        }
+
+        .popup h2 {
+            font-size: 18px;
+        }
+
+        .success-message,
+        .error-message {
+            font-size: 14px;
+            margin: 10px 0;
+            text-align: center;
+        }
     }
     </style>
 </head>
@@ -545,6 +735,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
+    <script src="scripts.js"></script>
 
 <script>
     function openPopup(popupId) {

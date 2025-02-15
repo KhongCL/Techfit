@@ -91,6 +91,127 @@ if ($_SESSION['role'] !== 'Employer') {
             display: block;
             margin-bottom: 5px;
         }
+
+        .section-navigator {
+            padding: 20px;
+            background-color: var(--background-color-medium);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .section-nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .section-nav-item {
+            padding: 8px 16px;
+            background-color: var(--background-color-light);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            color: var(--text-color);
+        }
+
+        .section-nav-item:hover,
+        .section-nav-item.active {
+            background-color: var(--primary-color);
+        }
+
+        .section-questions {
+            margin-bottom: 40px;
+            scroll-margin-top: 100px;
+        }
+
+        .section-questions h2 {
+            color: var(--text-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--background-color-light);
+        }
+
+        .page-wrapper {
+            width: 75%;
+            margin: 0 auto;
+            min-width: 900px;
+        }
+
+        .assessment-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .questions-section {
+            flex: 2;
+            min-width: 0;
+            background-color: var(--background-color-medium);
+            color: var(--text-color);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 140px);
+        }
+
+        .question {
+            background-color: var(--background-color);
+            border-color: var(--background-color-light);
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid var(--background-color-light);
+            border-radius: 4px;
+            max-width: 100%;
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .summary_header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .candidate-info {
+            width: 100%;
+            max-width: 1200px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .section-nav-list {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .section-nav-item {
+                text-align: center;
+            }
+
+            .details, .score-time {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .divider {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -150,43 +271,40 @@ if ($_SESSION['role'] !== 'Employer') {
     <button class="cancel-button" onclick="closePopup('logout-popup')">No</button>
 </div>
 
-<div class="container">
-    <div class="main-content middle-section">
-        <a href="search_candidate.php" class="back-arrow">
-            &#8592;
-        </a>
-
-        <div class="row-1 assessment-area" style="color:white; font-size: 1.2em;">
+<div class="page-wrapper">
+    <div class="assessment-container">
+        <div class="summary_header">
             <div class="assessment-title">Candidate Profile & Answers</div>
-        </div>
-
-        <div class="row-2 candidate-score-row">
             <?php
-
+            // Database connection
             $servername = "localhost";
-            $username = "root";
+            $username = "root"; 
             $password = "";
             $dbname = "techfit";
 
             $conn = new mysqli($servername, $username, $password, $dbname);
-
             if ($conn->connect_error) {
                 die("Connection failed: " . $conn->connect_error);
             }
 
             $job_seeker_id = $_GET['job_seeker_id'];
 
+            // Get candidate info
             $sql_candidate = "SELECT u.first_name, u.last_name, js.education_level, js.year_of_experience, js.linkedin_link
-                                     FROM User u
-                                     JOIN Job_Seeker js ON u.user_id = js.user_id
-                                     WHERE js.job_seeker_id = '$job_seeker_id'";
-            $result_candidate = $conn->query($sql_candidate);
+                            FROM User u
+                            JOIN Job_Seeker js ON u.user_id = js.user_id
+                            WHERE js.job_seeker_id = ?";
+            
+            $stmt = $conn->prepare($sql_candidate);
+            $stmt->bind_param("s", $job_seeker_id);
+            $stmt->execute();
+            $result_candidate = $stmt->get_result();
 
             if ($result_candidate->num_rows > 0) {
                 $row_candidate = $result_candidate->fetch_assoc();
                 echo "<div class='candidate-info'>";
                 echo "<img src='images/usericon.png' alt='User Icon'>";
-                echo "<div class='name'>" . $row_candidate['first_name'] . " " . $row_candidate['last_name'] . "</div>";
+                echo "<div class='name'>" . htmlspecialchars($row_candidate['first_name']) . " " . htmlspecialchars($row_candidate['last_name']) . "</div>";
                 echo "<div class='details'>";
 
                 if (!empty($row_candidate['linkedin_link'])) {
@@ -206,13 +324,18 @@ if ($_SESSION['role'] !== 'Employer') {
                 echo "<h1>Candidate not found</h1>";
             }
 
+            // Get score and time info
             $score = "N/A";
             $time_used = "N/A";
 
             $sql_score_time = "SELECT score, TIMEDIFF(end_time, start_time) AS time_used
-                                     FROM Assessment_Job_Seeker
-                                     WHERE job_seeker_id = '$job_seeker_id'";
-            $result_score_time = $conn->query($sql_score_time);
+                              FROM Assessment_Job_Seeker 
+                              WHERE job_seeker_id = ?";
+            
+            $stmt = $conn->prepare($sql_score_time);
+            $stmt->bind_param("s", $job_seeker_id);
+            $stmt->execute();
+            $result_score_time = $stmt->get_result();
 
             if ($result_score_time->num_rows > 0) {
                 $row_score_time = $result_score_time->fetch_assoc();
@@ -227,88 +350,138 @@ if ($_SESSION['role'] !== 'Employer') {
             echo "<div class='time-used'>Time Used: " . $time_used . "</div>";
             echo "<div class='divider'></div>";
             echo "</div>";
+            ?>
+        </div>
 
+        <div class="section-navigator">
+            <ul class="section-nav-list">
+                <?php
+                $sections = [
+                    'general' => 'General Questions',
+                    'scenario' => 'Scenario-Based Questions', 
+                    'programming' => 'Programming Questions',
+                    'personality' => 'Work-Style and Personality'
+                ];
 
+                foreach ($sections as $id => $name): ?>
+                    <li class="section-nav-item" onclick="scrollToSection('<?php echo $id; ?>')"><?php echo $name; ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </div>
+
+        <div class="questions-section">
+            <?php
+            // Get questions and answers
             $sql_questions = "SELECT q.question_id, q.question_text, q.correct_answer, q.answer_type,
                                     q.programming_language, q.code_template,
                                     a.answer_text, a.is_correct,
-                                    c.choice_text AS job_seeker_choice_text
-                             FROM question q
-                             INNER JOIN answer a ON q.question_id = a.question_id
-                             LEFT JOIN choices c ON a.answer_text = c.choice_id
-                             WHERE a.job_seeker_id = '$job_seeker_id'";
+                                    c.choice_text AS job_seeker_choice_text,
+                                    q.assessment_id
+                            FROM question q
+                            INNER JOIN answer a ON q.question_id = a.question_id
+                            LEFT JOIN choices c ON a.answer_text = c.choice_id
+                            WHERE a.job_seeker_id = ?
+                            ORDER BY q.assessment_id, q.question_id";
+            
+            $stmt = $conn->prepare($sql_questions);
+            $stmt->bind_param("s", $job_seeker_id);
+            $stmt->execute();
+            $result_questions = $stmt->get_result();
 
-            $result_questions = $conn->query($sql_questions);
-
-            if ($result_questions) {
-                if ($result_questions->num_rows > 0) {
+            if ($result_questions && $result_questions->num_rows > 0) {
+                foreach ($sections as $id => $name) {
+                    echo "<div id='$id' class='section-questions'>";
+                    echo "<h2>$name</h2>";
+                    
+                    // Map sections to assessment IDs
+                    $section_mapping = [
+                        'general' => 'AS75',
+                        'scenario' => 'AS76',
+                        'programming' => ['AS77', 'AS78', 'AS79', 'AS80'],
+                        'personality' => 'AS81'
+                    ];
+                    
+                    // Reset result pointer and counters
+                    $result_questions->data_seek(0);
                     $question_counter = 1;
+                    
                     while ($row_question = $result_questions->fetch_assoc()) {
-                        echo "<div class='question'>";
-                        echo "<div class='question-text'><strong>Question " . $question_counter . ":</strong> " . htmlspecialchars($row_question['question_text']) . "</div>";
+                        $current_section = $row_question['assessment_id'];
+                        
+                        // Check if question belongs to current section
+                        $show_question = false;
+                        if (is_array($section_mapping[$id])) {
+                            $show_question = in_array($current_section, $section_mapping[$id]);
+                        } else {
+                            $show_question = ($current_section === $section_mapping[$id]);
+                        }
+                        
+                        if ($show_question) {
+                            echo "<div class='question'>";
+                            echo "<div class='question-text'><strong>Question " . $question_counter . ":</strong> " . 
+                                 htmlspecialchars($row_question['question_text']) . "</div>";
 
-                        if ($row_question['answer_type'] === 'code') {
-                            if (!empty($row_question['programming_language'])) {
-                                echo "<div class='language-indicator'>";
+                            if ($row_question['answer_type'] === 'code') {
+                                if (!empty($row_question['programming_language'])) {
+                                    echo "<div class='language-indicator'>";
                                     echo "Language: " . ucfirst(htmlspecialchars($row_question['programming_language']));
-                                echo "</div>";
-                            }
-                            if (!empty($row_question['code_template'])) {
-                                echo "<div class='code-container'>";
-                                    echo "<pre class='code-template'>" . htmlspecialchars($row_question['code_template']) . "</pre>";
-                                echo "</div>";
-                            }
-                        }
-
-
-                        echo "<div class='job-seeker-answer'>";
-                        echo "<strong>Job Seeker's Answer:</strong> <pre>";
-                        if ($row_question['answer_text']!== null) {
-                            $answer_to_display = '';
-
-                            if ($row_question['answer_type'] === 'multiple choice') {
-
-                                $answer_to_display = $row_question['job_seeker_choice_text'];
-                                if (empty($answer_to_display)) {
-                                    $answer_to_display = "Choice ID: " . htmlspecialchars($row_question['answer_text']) . " (Choice Text Not Found)";
+                                    echo "</div>";
                                 }
-                            } else {
-                                $answer_to_display = $row_question['answer_text'];
+                                if (!empty($row_question['code_template'])) {
+                                    echo "<div class='code-container'>";
+                                    echo "<pre class='code-template'>" . htmlspecialchars($row_question['code_template']) . "</pre>";
+                                    echo "</div>";
+                                }
                             }
-                            $answer_text_with_breaks = str_replace("<<ANSWER_BREAK>>", "\n", $answer_to_display);
-                            echo htmlspecialchars($answer_text_with_breaks);
-                        } else {
-                            echo "No answer provided.";
-                        }
-                        echo "</pre>";
-                        echo "</div>";
 
-                        echo "<div class='correct-answer'>";
-                        echo "<strong>Correct Answer:</strong> <pre>";
-                        if ($row_question['correct_answer']!== null) {
-                            $correct_answer_with_breaks = str_replace("<<ANSWER_BREAK>>", "\n", $row_question['correct_answer']);
-                            echo htmlspecialchars($correct_answer_with_breaks);
-                        } else {
-                            echo "No correct answer provided.";
-                        }
-                        echo "</pre>";
-                        echo "</div>";
+                            echo "<div class='job-seeker-answer'>";
+                            echo "<strong>Job Seeker's Answer:</strong> <pre>";
+                            if ($row_question['answer_text'] !== null) {
+                                $answer_to_display = '';
+                                if ($row_question['answer_type'] === 'multiple choice') {
+                                    $answer_to_display = $row_question['job_seeker_choice_text'];
+                                    if (empty($answer_to_display)) {
+                                        $answer_to_display = "Choice ID: " . htmlspecialchars($row_question['answer_text']) . 
+                                                           " (Choice Text Not Found)";
+                                    }
+                                } else {
+                                    $answer_to_display = $row_question['answer_text'];
+                                }
+                                $answer_text_with_breaks = str_replace("<<ANSWER_BREAK>>", "\n", $answer_to_display);
+                                echo htmlspecialchars($answer_text_with_breaks);
+                            } else {
+                                echo "No answer provided.";
+                            }
+                            echo "</pre></div>";
 
-                        echo "</div>";
-                        $question_counter++;
+                            if (!in_array($current_section, ['AS75', 'AS81'])) {
+                                echo "<div class='correct-answer'>";
+                                echo "<strong>Correct Answer:</strong> <pre>";
+                                if ($row_question['correct_answer'] !== null) {
+                                    $correct_answer_with_breaks = str_replace("<<ANSWER_BREAK>>", "\n", $row_question['correct_answer']);
+                                    echo htmlspecialchars($correct_answer_with_breaks);
+                                } else {
+                                    echo "No correct answer provided.";
+                                }
+                                echo "</pre></div>";
+                            }
+
+                            echo "</div>";
+                            $question_counter++;
+                        }
                     }
-                } else {
-                    echo "<div>No questions found or no answers provided by the job seeker.</div>";
+                    echo "</div>";
                 }
             } else {
-                echo "<div>Error executing query: " . $conn->error . "</div>";
+                echo "<div>No questions found or no answers provided by the job seeker.</div>";
             }
 
+            $stmt->close();
             $conn->close();
             ?>
         </div>
     </div>
-    </div>
+</div>
 
     <footer>
         <div class="footer-content">
@@ -371,6 +544,42 @@ if ($_SESSION['role'] !== 'Employer') {
             urlParams.set('assessment_id', selectedAssessmentId);
             window.location.search = urlParams.toString();
         }
+
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // Update active state
+                document.querySelectorAll('.section-nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                const activeItem = document.querySelector(`[onclick="scrollToSection('${sectionId}')"]`);
+                if (activeItem) {
+                    activeItem.classList.add('active');
+                }
+            }
+        }
+
+        // Track scroll position to update active section
+        document.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('.section-questions');
+            let currentSection = '';
+            
+            sections.forEach(section => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= 100) {
+                    currentSection = section.id;
+                }
+            });
+            
+            if (currentSection) {
+                document.querySelectorAll('.section-nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector(`[onclick="scrollToSection('${currentSection}')"]`)?.classList.add('active');
+            }
+        });
     </script>
     <script src="scripts.js"></script>
 </body>
