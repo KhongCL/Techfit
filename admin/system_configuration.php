@@ -75,15 +75,6 @@ $conn->close();
             --success-hover-color: #218838;
         }
 
-        body {
-            background-color: var(--background-color);
-            color: var(--text-color);
-        }
-
-        header, footer {
-            background-color: var(--secondary-color);
-        }
-
         .content {
             width: 75%;
             float: right;
@@ -206,7 +197,6 @@ $conn->close();
             text-align: center;
         }
 
-        /* Form section styling */
         .form-section {
             background-color: var(--background-color);
             padding: 30px;
@@ -249,6 +239,40 @@ $conn->close();
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
+        @media (max-width: 768px) {
+            main {
+                padding: 20px;
+            }
+
+            .content {
+                width: 100%;
+                padding: 20px;
+                margin-top: 60px;
+            }
+
+            .form-section {
+                padding: 15px;
+            }
+
+            .form-section button {
+                width: 100%;
+            }
+
+            .content h1 {
+                font-size: 1.8rem;
+            }
+
+            .form-section h2 {
+                font-size: 1.4rem;
+            }
+
+            .form-section select {
+                height: 40px;
+                font-size: 0.9rem;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -416,6 +440,7 @@ $conn->close();
         <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
     </div>
 </footer>
+<script src="scripts.js"></script>
 
 <script>
     function openPopup(popupId) {
