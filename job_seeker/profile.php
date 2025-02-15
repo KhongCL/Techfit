@@ -595,6 +595,76 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
         color: #fff;
     }
     @media (max-width: 768px) {
+            #profile {
+            margin: 20px 0;
+            padding: 10px;
+            flex-direction: column;
+        }
+
+        .profile-details {
+            padding-left: 20px !important;
+            width: 100%;
+        }
+
+        .profile-details h2 {
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .detail-line {
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-start;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .detail-line span, 
+        .detail-line a {
+            font-size: 16px;
+            width: 100%;
+            order: 2;
+        }
+
+        .detail-line i,
+        .detail-line img {
+            order: 1;
+        }
+
+        .edit-button {
+            margin-left: 0 !important;
+            width: 100% !important;
+            margin-top: 5px;
+            order: 3;
+        }
+
+        .logout-button {
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .popup {
+            width: 90%;
+            max-width: 350px;
+        }
+
+        .popup input[type="text"],
+        .popup input[type="password"],
+        .popup input[type="file"] {
+            width: 100%;
+        }
+
+        .popup form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .popup input[type="submit"],
+        .popup .close-button,
+        .popup .cancel-button {
+            width: 100%;
+        }
         .hamburger {
             display: flex;
             position: fixed;
@@ -632,6 +702,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
 
         .nav-container {
             padding-right: 0;
+        }
+    }
+    @media (max-width: 480px) {
+        .profile-details {
+            padding-left: 10px !important;
+        }
+
+        .detail-line i {
+            margin-right: 5px;
+        }
+
+        .popup {
+            padding: 15px;
+        }
+
+        .popup h2 {
+            font-size: 18px;
         }
     }
 
