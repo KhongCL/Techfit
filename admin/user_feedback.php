@@ -277,9 +277,9 @@ ob_end_flush();
                                     <textarea name="response_text" rows="3" placeholder="Type your response here (for 'Respond')..."></textarea>
                                     <div style="display:none;" id="selected_feedback_ids_container">
                                         </div>
-                                <button type="submit" name="respond" class="action-button respond-button">Respond to Selected</button>
-                                <button type="submit" name="resolve" class="action-button resolve-button">Resolve Selected</button>
-                                </div>
+                                            <button type="submit" name="respond" class="action-button respond-button">Respond to Selected</button>
+                                            <button type="submit" name="resolve" class="action-button resolve-button">Resolve Selected</button>
+                                        </div>
                                 
                     </div>
                 </form>
