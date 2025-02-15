@@ -118,13 +118,6 @@ CREATE TABLE Feedback (
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
-
-CREATE TABLE Profile_Setting (
-    user_id VARCHAR(5) PRIMARY KEY,
-    editable_fields TEXT,
-    FOREIGN KEY (user_id) REFERENCES User(user_id)
-);
-
 CREATE TABLE Report (
     report_id VARCHAR(5) PRIMARY KEY,
     admin_id VARCHAR(5),
@@ -188,12 +181,5 @@ CREATE TABLE Assessment_Settings (
     setting_id VARCHAR(5) PRIMARY KEY,
     default_time_limit INT NOT NULL,
     passing_score_percentage INT NOT NULL
-);
-
-CREATE TABLE Notification_Settings (
-    setting_id VARCHAR(5) PRIMARY KEY,
-    event_name VARCHAR(100) NOT NULL,
-    is_enabled BOOLEAN NOT NULL,
-    email_template TEXT NOT NULL
 );
 
