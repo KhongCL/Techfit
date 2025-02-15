@@ -370,8 +370,7 @@ ob_end_flush();
                     <h3>Reports</h3>
                     <ul>
                         <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                        <li><a href="user_engagement.php">User Engagement Statistics</a></li>
-                        <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
+                      
                     </ul>
                 </div>
                 <div class="footer-column">

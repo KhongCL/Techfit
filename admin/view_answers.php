@@ -519,8 +519,7 @@ $sections['AS81'] = 'Work-Style and Personality';
                     <li><a href="#">Reports</a>
                         <ul class="dropdown">
                             <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                            <li><a href="user_engagement.php">User Engagement Statistics</a></li>
-                            <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
+                           
                         </ul>
                     </li>
                     <li><a href="#">Resources</a>
@@ -548,7 +547,7 @@ $sections['AS81'] = 'Work-Style and Personality';
                             </div>
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
-                            <li><a href="settings.php">Settings</a>
+                            <li><a>Settings</a>
                                 <ul class="dropdown">
                                     <li><a href="manage_profile.php">Manage Profile</a></li>
                                     <li><a href="system_configuration.php">System Configuration Settings</a></li>
@@ -732,35 +731,45 @@ $sections['AS81'] = 'Work-Style and Personality';
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p><a href="mailto:/a></p>techfit@gmail.com">techfit@gmail.com</a></p>
+                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
                 <div class="footer-column">
-                    <h3>Candidate</h3>
+                    <h3>Assessments</h3>
                     <ul>
-                        <li><a href="search_candidate.php">Search Candidates</a></li>
+                        <li><a href="create_assessment.php">Create New Assessment</a></li>
+                        <li><a href="manage_assessments.php">Manage Assessments</a></li>
+                        <li><a href="view_assessment_results.php">View Assessment Results</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Users</h3>
+                    <ul>
+                        <li><a href="manage_users.php">Manage Users</a></li>
+                        <li><a href="user_feedback.php">User Feedback</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Reports</h3>
+                    <ul>
+                        <li><a href="assessment_performance.php">Assessment Performance</a></li>
+                      
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
-                        <li><a href="useful_links.php">Useful Links</a></li>
-                        <li><a href="faq.php">FAQ</a></li>
-                        <li><a href="sitemap.php">Sitemap</a></li>
+                        <li><a href="useful_links.php">Manage Useful Links</a></li>
+                        <li><a href="faq.php">Manage FAQs</a></li>
+                        <li><a href="sitemap.php">Manage Sitemap</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>About</h3>
+                    <ul>
                         <li><a href="about.php">About</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Contact</h3>
-                    <ul>
                         <li><a href="contact.php">Contact Us</a></li>
-                        <li><a href="feedback.php">Feedback</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Legal</h3>
-                    <ul>
                         <li><a href="terms.php">Terms of Service</a></li>
                         <li><a href="privacy.php">Privacy Policy</a></li>
                     </ul>
