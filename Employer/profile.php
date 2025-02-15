@@ -394,6 +394,138 @@ $conn->close();
     .bottom-edit-button:hover {
         background-color: #0056b3;
     }
+
+    @media (max-width: 768px) {
+        #profile {
+            margin: 20px 0;
+            padding: 10px;
+            flex-direction: column;
+        }
+
+        .profile-details {
+            padding-left: 20px !important;
+            width: 100%;
+        }
+
+        .profile-details h2 {
+            font-size: 24px;
+            text-align: center;
+        }
+
+        .detail-line {
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-start;
+        }
+
+        .detail-line span, 
+        .detail-line a {
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .edit-button {
+            margin-left: 0 !important;
+            width: 100% !important;
+            margin-top: 5px;
+        }
+
+        .logout-button {
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        .popup {
+            width: 90%;
+            max-width: 350px;
+        }
+
+        .popup input[type="text"],
+        .popup input[type="password"] {
+            width: 100%;
+        }
+
+        .popup form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .popup input[type="submit"],
+        .popup .close-button,
+        .popup .cancel-button {
+            width: 100%;
+        }
+
+        /* Navigation styles */
+        .nav-container {
+            position: relative;
+        }
+
+        .nav-list {
+            display: none;
+            position: absolute;
+            top: 60px;
+            right: 0;
+            background-color: var(--background-color-medium);
+            width: 250px;
+            padding: 20px;
+            box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-list.active {
+            display: block;
+        }
+
+        .nav-list li {
+            margin: 10px 0;
+        }
+
+        .hamburger {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            display: block;
+            width: 25px;
+            height: 3px;
+            background-color: var(--text-color);
+            transition: 0.3s;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+    }
+
+    @media (max-width: 480px) {
+        .profile-details {
+            padding-left: 10px !important;
+        }
+
+        .detail-line i {
+            margin-right: 5px;
+        }
+
+        .popup {
+            padding: 15px;
+        }
+
+        .popup h2 {
+            font-size: 18px;
+        }
+    }
     </style>
 </head>
 <body>
@@ -609,6 +741,7 @@ $conn->close();
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer> 
+    <script src="scripts.js"></script>
 
 <script>
     function openPopup(popupId) {

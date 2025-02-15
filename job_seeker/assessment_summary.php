@@ -227,6 +227,129 @@ $conn->close();
         .score-failed {
             color: var(--danger-color) !important;
         }
+
+        @media (max-width: 1024px) {
+            .container {
+                width: 70%;
+            }
+
+            .history-item {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .date-time {
+                flex: 100%;
+                order: 1;
+            }
+
+            .score {
+                flex: 1;
+                order: 2;
+            }
+
+            .actions {
+                flex: 1;
+                order: 3;
+                justify-content: flex-end;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+                padding: 0 15px;
+            }
+
+            .history-header h2 {
+                font-size: 1.5em;
+            }
+
+            .history-item {
+                padding: 15px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .date-time, .score, .actions {
+                width: 100%;
+                text-align: left;
+                margin-bottom: 10px;
+            }
+
+            .actions {
+                justify-content: flex-start;
+            }
+
+            .actions a {
+                padding: 6px 12px;
+                font-size: 0.9em;
+            }
+
+            .score {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .score h3 {
+                margin-right: 10px;
+            }
+
+            .scrollable-container {
+                max-height: calc(100vh - 300px);
+            }
+
+            #assessment-history {
+                padding: 20px 0;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-list {
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            }
+
+            .nav-list.active {
+                transform: translateX(0);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 95%;
+                padding: 0 10px;
+            }
+
+            .history-item {
+                padding: 12px;
+            }
+
+            .date-time p {
+                font-size: 0.9em;
+            }
+
+            .score h3 {
+                font-size: 1em;
+            }
+
+            .score p {
+                font-size: 1em;
+            }
+
+            .actions {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .actions a {
+                width: 100%;
+                text-align: center;
+            }
+        }
     </style>
 
 </head>
