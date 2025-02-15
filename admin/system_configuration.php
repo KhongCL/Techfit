@@ -184,7 +184,7 @@ $conn->close();
         main {
             display: flex;
             padding: 40px;
-            min-height: calc(100vh - 60px - 200px); /* Adjust for header and footer */
+            min-height: calc(100vh - 60px - 200px); 
             background-color: var(--background-color);
         }
 
@@ -220,7 +220,6 @@ $conn->close();
             border-bottom: 2px solid var(--border-color);
         }
 
-        /* Form elements */
         .form-section label {
             font-size: 1.1rem;
             margin-bottom: 12px;
@@ -285,65 +284,74 @@ $conn->close();
 </head>
 <body>
 <header>
-    <div class="logo">
-        <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
-    </div>
-    <nav>
-        <div class="nav-container">
-            <ul class="nav-list">
-                <li><a href="#">Assessments</a>
-                    <ul class="dropdown">
-                        <li><a href="create_assessment.php">Create New Assessment</a></li>
-                        <li><a href="manage_assessments.php">Manage Assessments</a></li>
-                        <li><a href="view_assessment_results.php">View Assessment Results</a></li>
-                    </ul>
-                </li>
-                <li><a href="#">Users</a>
-                    <ul class="dropdown">
-                        <li><a href="manage_users.php">Manage Users</a></li>
-                        <li><a href="user_feedback.php">User Feedback</a></li>
-                    </ul>
-                </li>
-                <li><a href="#">Reports</a>
-                    <ul class="dropdown">
-                        <li><a href="assessment_performance.php">Assessment Performance</a></li>
-              
-                    </ul>
-                </li>
-                <li><a href="#">Resources</a>
-                    <ul class="dropdown">
-                        <li><a href="useful_links.php">Manage Useful Links</a></li>
-                        <li><a href="faq.php">Manage FAQs</a></li>
-                        <li><a href="sitemap.php">Manage Sitemap</a></li>
-                    </ul>
-                </li>
-                <li><a href="about.php">About</a></li>
-                <li>
-                    <a href="#" id="profile-link">
-                        <div class="profile-info">
-                            <span class="username" id="username">Admin</span>
-                            <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
-                        </div>
-                    </a>
-                    <ul class="dropdown" id="profile-dropdown">
-                    <li><a>Settings</a>
-                            <ul class="dropdown">
-                                <li><a href="manage_profile.php">Manage Profile</a></li>
-                                <li><a href="system_configuration.php">System Configuration Settings</a></li>
-                            </ul>
-                        </li>
-                        <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li>
-                    </ul>
-                </li>
-            </ul>
-            <div class="hamburger" id="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+        <div class="logo">
+            <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
-    </nav>
-</header>
+        <nav>
+            <div class="nav-container">
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <ul class="nav-list">
+                    <li><a href="#">Assessments</a>
+                        <ul class="dropdown">
+                            <li><a href="create_assessment.php">Create New Assessment</a></li>
+                            <li><a href="manage_assessments.php">Manage Assessments</a></li>
+                            <li><a href="view_assessment_results.php">View Assessment Results</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Users</a>
+                        <ul class="dropdown">
+                            <li><a href="manage_users.php">Manage Users</a></li>
+                            <li><a href="user_feedback.php">User Feedback</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Reports</a>
+                        <ul class="dropdown">
+                            <li><a href="assessment_performance.php">Assessment Performance</a></li>
+                     
+                        </ul>
+                    </li>
+                    <li><a href="#">Resources</a>
+                        <ul class="dropdown">
+                            <li><a href="useful_links.php">Manage Useful Links</a></li>
+                            <li><a href="faq.php">Manage FAQs</a></li>
+                            <li><a href="sitemap.php">Manage Sitemap</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="about.php">About</a></li>
+                    <li>
+                        <a href="#" id="profile-link">
+                            <div class="profile-info">
+                                <span class="username" id="username">
+                                    <?php
+                                    
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  
+                                    } else {
+                                        echo "Guest";  
+                                    }
+                                    ?>
+                                </span>
+                                <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
+                            </div>
+                        </a>
+                        <ul class="dropdown" id="profile-dropdown">
+                        <li><a>Settings</a>
+                                <ul class="dropdown">
+                                    <li><a href="manage_profile.php">Manage Profile</a></li>
+                                    <li><a href="system_configuration.php">System Configuration Settings</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#" >Logout</a></li>
+                        </ul>
+                    </li>                    
+                </ul>
+            </div>
+        </nav>
+    </header>
 <div id="logout-popup" class="popup">
     <h2>Are you sure you want to Log Out?</h2>
     <form id="logout-form" action="manage_profile.php" method="post">

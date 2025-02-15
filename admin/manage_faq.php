@@ -210,25 +210,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: white;
         }
     </style>
-<header>
+    <header>
         <div class="logo">
             <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
         <nav>
             <div class="nav-container">
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
                 <ul class="nav-list">
-                    <li><a href="#">Assessment</a>
+                    <li><a href="#">Assessments</a>
                         <ul class="dropdown">
-                            <li><a href="start_assessment.php">Start Assessment</a></li>
-                            <li><a href="assessment_history.php">Assessment History</a></li>
-                            <li><a href="assessment_summary.php">Assessment Summary</a></li>
+                            <li><a href="create_assessment.php">Create New Assessment</a></li>
+                            <li><a href="manage_assessments.php">Manage Assessments</a></li>
+                            <li><a href="view_assessment_results.php">View Assessment Results</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Users</a>
+                        <ul class="dropdown">
+                            <li><a href="manage_users.php">Manage Users</a></li>
+                            <li><a href="user_feedback.php">User Feedback</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Reports</a>
+                        <ul class="dropdown">
+                            <li><a href="assessment_performance.php">Assessment Performance</a></li>
+                     
                         </ul>
                     </li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
-                            <li><a href="useful_links.php">Useful Links</a></li>
-                            <li><a href="faq.php">FAQ</a></li>
-                            <li><a href="sitemap.php">Sitemap</a></li>
+                            <li><a href="useful_links.php">Manage Useful Links</a></li>
+                            <li><a href="faq.php">Manage FAQs</a></li>
+                            <li><a href="sitemap.php">Manage Sitemap</a></li>
                         </ul>
                     </li>
                     <li><a href="about.php">About</a></li>
@@ -237,10 +254,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="profile-info">
                                 <span class="username" id="username">
                                     <?php
+                                    
                                     if (isset($_SESSION['username'])) {
-                                        echo $_SESSION['username'];
+                                        echo $_SESSION['username'];  
                                     } else {
-                                        echo "Guest";
+                                        echo "Guest";  
                                     }
                                     ?>
                                 </span>
@@ -248,16 +266,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
-                        <li><a>Settings</a></li>
-                            <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li>
+                        <li><a>Settings</a>
+                                <ul class="dropdown">
+                                    <li><a href="manage_profile.php">Manage Profile</a></li>
+                                    <li><a href="system_configuration.php">System Configuration Settings</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#" >Logout</a></li>
                         </ul>
-                    </li>
+                    </li>                    
                 </ul>
-                <div class="hamburger" id="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
             </div>
         </nav>
     </header>
