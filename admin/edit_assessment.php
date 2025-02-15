@@ -1018,7 +1018,7 @@ session_start();
                 }
             }
 
-            .searchDeletedQuestions {
+            .deleted-search-container {
                 justify-content: center;
                 align-items: center;
             }
