@@ -277,7 +277,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </ul>
             </div>
         </nav>
-    </header>  
+    </header> 
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div> 
 <body>
 <div id="formContainer">
     <h1 style='text-align:center'>Manage Useful Links</h1>
