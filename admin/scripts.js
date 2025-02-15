@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
 
-    const navItems = document.querySelectorAll('.nav-list > li > a');
+    const navItems = document.querySelectorAll('.nav-list li a'); 
     const dropdowns = document.querySelectorAll('.dropdown');
     const hamburger = document.getElementById('hamburger');
     const navList = document.querySelector('.nav-list');
@@ -12,9 +12,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (dropdown) {
                 event.preventDefault();
-                parent.classList.toggle('active');
-                dropdown.classList.toggle('active');
-                closeAllDropdowns(parent);
+
+                
+                const isNestedDropdownToggle = parent.parentElement.classList.contains('dropdown');
+
+
+                if (!isNestedDropdownToggle) { 
+                    parent.classList.toggle('active');
+                    dropdown.classList.toggle('active');
+                    closeAllTopLevelDropdowns(parent);
+                } else { 
+                   parent.classList.toggle('active');
+                   dropdown.classList.toggle('active');
+                }
             }
         });
 
@@ -24,10 +34,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    const closeAllDropdowns = (exceptParent = null) => {
+    const closeAllTopLevelDropdowns = (exceptParent = null) => { 
         dropdowns.forEach(dropdown => {
             const parent = dropdown.parentElement;
-            if (parent !== exceptParent) {
+            if (parent !== exceptParent && !parent.classList.contains('dropdown')) { 
                 dropdown.classList.remove('active');
                 parent.classList.remove('active');
             }

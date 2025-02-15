@@ -311,6 +311,10 @@ header {
         transition: background-color 0.3s ease;
         transition: padding-left 0.6s ease;
     }
+
+    .nav-list .dropdown .dropdown a { 
+        border-bottom: 1px solid blue;
+    }
     
     .nav-list .dropdown a:hover {
         background-color: var(--background-color-light);

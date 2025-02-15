@@ -88,6 +88,9 @@ $conn->close();
 
         .form-section {
             margin-bottom: 20px;
+            max-width: 100%;
+            box-sizing: border-box;
+            overflow-x: hidden;
         }
 
         .form-section h2 {
@@ -353,7 +356,7 @@ $conn->close();
     <div class="content">
         <h1>System Configuration Settings</h1>
 
-        <div id="assessment-settings" class="form-section">
+        <div class="form-section">
             <h2>Assessment Settings</h2>
             <form method="POST" action="save_assessment_settings.php">
                 <label for="default-time-limit">Default Time Limit (minutes):</label>
