@@ -1,5 +1,27 @@
 <?php
 session_start();
+
+function displayLoginMessage() {
+    echo '<script>
+        if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
+            window.location.href = "../login.php";
+        } else {
+            window.location.href = "../index.php";
+        }
+    </script>';
+    exit();
+}
+
+
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage();
+}
+
+
+if ($_SESSION['role'] !== 'Employer') {
+    displayLoginMessage();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -174,10 +196,14 @@ session_start();
             exit;
         }
 
-        $sql_questions = "SELECT q.question_text, q.correct_answer, a.answer_text, a.is_correct
-                            FROM question q
-                            INNER JOIN answer a ON q.question_id = a.question_id
-                            WHERE a.job_seeker_id = '$job_seeker_id'";
+        $sql_questions = "SELECT q.question_id, q.question_text, q.correct_answer, q.answer_type,
+                           a.answer_text, a.is_correct,
+                           c.choice_text AS job_seeker_choice_text
+                    FROM question q
+                    INNER JOIN answer a ON q.question_id = a.question_id
+                    LEFT JOIN choices c ON a.answer_text = c.choice_id
+                    WHERE a.job_seeker_id = '$job_seeker_id'";
+
         $result_questions = $conn->query($sql_questions);
 
         if ($result_questions) {
@@ -188,27 +214,37 @@ session_start();
                     echo "<div class='question-text'><strong>Question $question_counter:</strong> ". htmlspecialchars($row_question['question_text']). "</div>";
 
                     echo "<div class='job-seeker-answer'>";
-                    echo "<strong>Job Seeker's Answer:</strong> <pre>"; 
+                    echo "<strong>Job Seeker's Answer:</strong> <pre>";
                     if ($row_question['answer_text']!== null) {
+                        $answer_to_display = '';
                         
-                        $answer_text_with_breaks = str_replace("<<ANSWER_BREAK>>", "\n", $row_question['answer_text']);
-                        echo htmlspecialchars($answer_text_with_breaks); 
+                        if ($row_question['answer_type'] === 'multiple choice') {
+                            
+                            $answer_to_display = $row_question['job_seeker_choice_text'];
+                            if (empty($answer_to_display)) { 
+                                $answer_to_display = "Choice ID: " . htmlspecialchars($row_question['answer_text']) . " (Choice Text Not Found)";
+                            }
+                        } else {
+                            
+                            $answer_to_display = $row_question['answer_text'];
+                        }
+                        $answer_text_with_breaks = str_replace("<<ANSWER_BREAK>>", "\n", $answer_to_display);
+                        echo htmlspecialchars($answer_text_with_breaks);
                     } else {
                         echo "No answer provided.";
                     }
-                    echo "</pre>"; 
+                    echo "</pre>";
                     echo "</div>";
 
                     echo "<div class='correct-answer'>";
-                    echo "<strong>Correct Answer:</strong> <pre>"; 
+                    echo "<strong>Correct Answer:</strong> <pre>";
                     if ($row_question['correct_answer']!== null) {
-                        
                         $correct_answer_with_breaks = str_replace("<<ANSWER_BREAK>>", "\n", $row_question['correct_answer']);
-                        echo htmlspecialchars($correct_answer_with_breaks); 
+                        echo htmlspecialchars($correct_answer_with_breaks);
                     } else {
                         echo "No correct answer provided.";
                     }
-                    echo "</pre>"; 
+                    echo "</pre>";
                     echo "</div>";
 
                     echo "</div>";
@@ -277,7 +313,7 @@ session_start();
         <div class="footer-bottom">
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
-    </footer>  
+    </footer>    
 <script>
     function updateAssessment() {
         const assessmentSelect = document.getElementById('assessment-select');

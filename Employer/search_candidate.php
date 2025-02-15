@@ -1,5 +1,27 @@
 <?php
 session_start();
+
+function displayLoginMessage() {
+    echo '<script>
+        if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
+            window.location.href = "../login.php";
+        } else {
+            window.location.href = "../index.php";
+        }
+    </script>';
+    exit();
+}
+
+
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage();
+}
+
+
+if ($_SESSION['role'] !== 'Employer') {
+    displayLoginMessage();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -376,7 +398,7 @@ session_start();
         <div class="footer-bottom">
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
-    </footer> 
+    </footer>  
     <script src="scripts.js"></script>  
     <script>
     function updateInterest(jobSeekerId, interestStatus) {
@@ -567,19 +589,19 @@ session_start();
                     const bText = b.querySelector(`td:nth-child(${columnIndex})`).textContent.trim();
 
                     if (aText === 'N/A' && bText !== 'N/A') {
-                        return 1; // 'N/A' comes after non-'N/A'
+                        return 1; 
                     }
                     if (aText !== 'N/A' && bText === 'N/A') {
-                        return -1; // non-'N/A' comes before 'N/A'
+                        return -1; 
                     }
                     if (aText === 'N/A' && bText === 'N/A') {
-                        return 0; // 'N/A' vs 'N/A' - no change in order
+                        return 0; 
                     }
 
 
-                    if (columnIndex === 3 || columnIndex === 4) { // Years of Experience or Assessment Scores
-                        const aValue = (aText === 'N/A') ? -Infinity : parseFloat(aText); // Treat N/A as smallest for numerical sort
-                        const bValue = (bText === 'N/A') ? -Infinity : parseFloat(bText); // Treat N/A as smallest for numerical sort
+                    if (columnIndex === 3 || columnIndex === 4) { 
+                        const aValue = (aText === 'N/A') ? -Infinity : parseFloat(aText); 
+                        const bValue = (bText === 'N/A') ? -Infinity : parseFloat(bText); 
                         return (aValue - bValue) * order;
                     } else {
                         return aText.localeCompare(bText, undefined, { numeric: true }) * order;
