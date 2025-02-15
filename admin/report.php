@@ -213,6 +213,14 @@ session_write_close();
                         <li><a href="assessment_summary.php">Assessment Summary</a></li>
                     </ul>
                 </div>
+
+                <div class="footer-column">
+                    <h3>Reports</h3>
+                    <ul>
+                        <li><a href="assessment_performance.php">Assessment Performance</a></li>
+                        
+                    </ul>
+                </div>
                 <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
