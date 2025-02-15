@@ -530,6 +530,84 @@ session_write_close();
             transform: scale(1.1);
             background: none;
         }
+
+        @media (max-width: 768px) {
+            .header-controls {
+                flex-direction: column;
+                align-items: flex-start;
+                font-size: xx-small;
+            }
+
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
+                max-width: 100%;
+                margin: 10px 0;
+            }
+
+            th {
+                font-size: smaller;
+            }
+
+            .button-group {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .search-sort-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .search-sort-controls span{
+                align-self: flex-start;;
+            }
+
+            .search-sort-controls select {
+                align-self: flex-start;
+            }
+
+
+            .search-field-container{
+                align-self: flex-start;
+            }
+
+            .search-container {
+                align-self: right;
+                width: 100%;
+            }
+
+            .nav-list {
+                flex-direction: column;
+                align-items: flex-start;
+                display: none;
+                font-size: smaller;
+            }
+
+            .nav-list li {
+                margin-right: 0;
+                width: 100%;
+            }
+
+            .nav-list a {
+                padding: 10px;
+                width: 100%;
+                display: block;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .nav-list.show {
+                display: flex;
+            }
+
+            tbody {
+                font-size: smaller;
+            }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
