@@ -50,6 +50,11 @@ try {
     <title>FAQ - TechFit</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+<style>
+    li {
+        color: white;
+    }
+</style>
 <body>
     <header>
         <div class="logo">
@@ -79,8 +84,7 @@ try {
                     <li><a href="#">Reports</a>
                         <ul class="dropdown">
                             <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                            <li><a href="user_engagement.php">User Engagement Statistics</a></li>
-                            <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
+                            
                         </ul>
                     </li>
                     <li><a href="#">Resources</a>
@@ -108,7 +112,7 @@ try {
                             </div>
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
-                            <li><a href="settings.php">Settings</a>
+                        <li><a>Settings</a>
                                 <ul class="dropdown">
                                     <li><a href="manage_profile.php">Manage Profile</a></li>
                                     <li><a href="system_configuration.php">System Configuration Settings</a></li>

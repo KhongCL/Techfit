@@ -57,6 +57,11 @@ $conn->close();
     <title>System Configuration Settings - TechFit</title>
     <link rel="stylesheet" href="styles.css"> 
     <style>
+        li {
+                color: white;
+            }
+    
+
         :root {
             --primary-color: #007bff;
             --secondary-color: #1e1e1e;
@@ -73,15 +78,6 @@ $conn->close();
             --danger-hover-color: #c82333;
             --success-color: #28a745;
             --success-hover-color: #218838;
-        }
-
-        body {
-            background-color: var(--background-color);
-            color: var(--text-color);
-        }
-
-        header, footer {
-            background-color: var(--secondary-color);
         }
 
         .content {
@@ -206,7 +202,6 @@ $conn->close();
             text-align: center;
         }
 
-        /* Form section styling */
         .form-section {
             background-color: var(--background-color);
             padding: 30px;
@@ -249,6 +244,40 @@ $conn->close();
             overflow: hidden;
             text-overflow: ellipsis;
         }
+
+        @media (max-width: 768px) {
+            main {
+                padding: 20px;
+            }
+
+            .content {
+                width: 100%;
+                padding: 20px;
+                margin-top: 60px;
+            }
+
+            .form-section {
+                padding: 15px;
+            }
+
+            .form-section button {
+                width: 100%;
+            }
+
+            .content h1 {
+                font-size: 1.8rem;
+            }
+
+            .form-section h2 {
+                font-size: 1.4rem;
+            }
+
+            .form-section select {
+                height: 40px;
+                font-size: 0.9rem;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -275,8 +304,7 @@ $conn->close();
                 <li><a href="#">Reports</a>
                     <ul class="dropdown">
                         <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                        <li><a href="user_engagement.php">User Engagement Statistics</a></li>
-                        <li><a href="feedback_analysis.php">Feedback Analysis</a></li>
+              
                     </ul>
                 </li>
                 <li><a href="#">Resources</a>
@@ -295,7 +323,7 @@ $conn->close();
                         </div>
                     </a>
                     <ul class="dropdown" id="profile-dropdown">
-                        <li><a href="settings.php">Settings</a>
+                    <li><a>Settings</a>
                             <ul class="dropdown">
                                 <li><a href="manage_profile.php">Manage Profile</a></li>
                                 <li><a href="system_configuration.php">System Configuration Settings</a></li>
@@ -416,6 +444,7 @@ $conn->close();
         <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
     </div>
 </footer>
+<script src="scripts.js"></script>
 
 <script>
     function openPopup(popupId) {
