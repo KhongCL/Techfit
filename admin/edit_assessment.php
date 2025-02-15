@@ -1102,6 +1102,13 @@ session_start();
                     </ul>
                 </div>
                 <div class="footer-column">
+                    <h3>Reports</h3>
+                    <ul>
+                        <li><a href="assessment_performance.php">Assessment Performance</a></li>
+                        
+                    </ul>
+                </div>
+                <div class="footer-column">
                     <h3>Resources</h3>
                     <ul>
                         <li><a href="useful_links.php">Useful Links</a></li>
