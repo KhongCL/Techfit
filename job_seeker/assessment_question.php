@@ -34,6 +34,17 @@ if (!isset($_SESSION['job_seeker_id'])) {
     die("ERROR: No job seeker ID in session");
 }
 
+if (!isset($_SESSION['last_login']) || $_SESSION['last_login'] !== $_SESSION['user_id']) {
+    // Clear session storage
+    echo "<script>
+        sessionStorage.clear();
+        localStorage.clear();
+    </script>";
+    
+    // Record current login
+    $_SESSION['last_login'] = $_SESSION['user_id'];
+}
+
 $db_host = 'localhost';
 $db_user = 'root';
 $db_pass = '';
@@ -1072,22 +1083,19 @@ $conn->close();
             }
         }
 
-        // Add to window.onload
         window.onload = function() {
             const savedState = sessionStorage.getItem('assessmentState');
             if (savedState) {
                 const state = JSON.parse(savedState);
-                // Just restore state without calling loadProgress() and loadState()
                 currentSection = state.currentSection;
                 currentQuestionIndex = state.currentQuestionIndex;
                 savedAnswers = state.savedAnswers;
                 startTime = state.startTime;
                 totalTime = state.totalTime;
                 
-                // Load questions for current section
                 loadSectionQuestions(currentSection.toString());
             } else {
-                // Initialize fresh assessment
+
                 currentSection = 1;
                 loadSectionQuestions('1');
             }
@@ -1721,32 +1729,38 @@ $conn->close();
         }
 
         function saveState() {
+            const userId = '<?php echo $_SESSION["job_seeker_id"]; ?>';
             const state = {
                 currentSection: currentSection,
                 currentQuestionIndex: currentQuestionIndex,
                 savedAnswers: savedAnswers,
                 startTime: startTime,
-                totalTime: totalTime
+                totalTime: totalTime,
+                userId: userId
             };
-            sessionStorage.setItem('assessmentState', JSON.stringify(state));
+            sessionStorage.setItem(`assessment_state_${userId}`, JSON.stringify(state));
         }
 
         function loadState() {
-            const state = JSON.parse(sessionStorage.getItem('assessmentState'));
-            if (state) {
+            const userId = '<?php echo $_SESSION["job_seeker_id"]; ?>';
+            const state = JSON.parse(sessionStorage.getItem(`assessment_state_${userId}`));
+            
+            if (state && state.userId === userId) {
                 currentSection = state.currentSection;
                 currentQuestionIndex = state.currentQuestionIndex;
                 savedAnswers = state.savedAnswers;
                 startTime = state.startTime;
                 totalTime = state.totalTime;
-                
-                // Don't call switchSection here as it will cause recursion
-                loadSectionQuestions(currentSection.toString());
             } else {
-                // Initialize with section 1
+
                 currentSection = 1;
-                loadSectionQuestions('1');
+                savedAnswers = {};
+                startTime = <?php echo time(); ?>;
+                totalTime = <?php echo $countdownTime; ?>;
+                sessionStorage.removeItem('allAnswers');
             }
+            
+            loadSectionQuestions(currentSection.toString());
         }
 
         function checkAndUnlockSection3() {
