@@ -38,6 +38,93 @@ session_write_close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TechFit Job Seeker - Home</title>
     <link rel="stylesheet" href="styles.css?v=2.0">
+    <style>
+        main {
+            position: relative;
+            min-height: 70vh;
+            padding: 0;
+        }
+
+        #home {
+            position: relative;
+            width: 100%;
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 0;
+            overflow: hidden;
+            background-image: url('images/office_background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        #home::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('images/office_background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(4px);
+            z-index: 1;
+        }
+
+        #home-content {
+            position: relative;
+            z-index: 3;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.4);
+            width: 100%;
+            height: 40vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #home h2 {
+            font-size: 3rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            margin-bottom: 1rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        #home p {
+            font-size: 1.3rem;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+            margin-bottom: 2rem;
+            letter-spacing: 0.5px;
+        }
+
+        #home button {
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        #home button:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -93,11 +180,15 @@ session_write_close();
         </nav>
     </header>
 
-    <section id="home">
-        <h2>Welcome to TechFit</h2>
-        <p>Bridging the Gap Between IT Talent and Top Employers.</p>
-        <button onclick="location.href='login.php'">Get Started</button>
-    </section>
+    <main>
+        <section id="home">
+            <div id="home-content">
+                <h2>Welcome to TechFit</h2>
+                <p>Bridging the Gap Between IT Talent and Top Employers.</p>
+                <button onclick="location.href='start_assessment.php'">Start Assessment</button>
+            </div>
+        </section>
+    </main>
 
     <footer>
         <div class="footer-content">
