@@ -34,11 +34,20 @@ session_start();
                 <li><a href="about.php">About</a></li>
                 <li>
                     <a href="#" id="profile-link">
-                        <div class="profile-info">
-                            <span class="username" id="username">Employer</span>
-                            <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
-                        </div>
-                    </a>
+                            <div class="profile-info">
+                                <span class="username" id="username">
+                                    <?php
+
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];
+                                    } else {
+                                        echo "Guest";
+                                    }
+                                    ?>
+                                </span>
+                                <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
+                            </div>
+                        </a>
                     <ul class="dropdown" id="profile-dropdown">
                         <li><a href="profile.php">Settings</a></li>
                         <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li>
@@ -66,58 +75,8 @@ session_start();
             &#8592;
         </a>
 
-        <div class="row-1 assessment-area">
-            <div class="assessment-title">Assessment :</div>
-            <div class="assessment-dropdown">
-                <select id="assessment-select" onchange="updateAssessment()">
-                    <?php
-                    
-                    $servername = "localhost";
-                    $username = "root";
-                    $password = "";
-                    $dbname = "techfit";
-
-                    $conn = new mysqli($servername, $username, $password, $dbname);
-
-                    if ($conn->connect_error) {
-                        die("Connection failed: " . $conn->connect_error);
-                    }
-
-                    if (!isset($_SESSION['employer_id'])) {
-                        die("Employer not logged in.");
-                    }
-
-                    $job_seeker_id = $_GET['job_seeker_id'];
-                    $assessment_id = isset($_GET['assessment_id']) ? $_GET['assessment_id'] : null;
-
-                    $sql = "SELECT aj.assessment_id, aa.assessment_name
-                                FROM Assessment_Job_Seeker aj
-                                JOIN Assessment_Admin aa ON aj.assessment_id = aa.assessment_id
-                                WHERE aj.job_seeker_id = '$job_seeker_id'";
-                    $result = $conn->query($sql);
-
-                    $first_assessment_id = null;
-                    if ($result->num_rows > 0) {
-                        while ($row = $result->fetch_assoc()) {
-                            if ($first_assessment_id === null) {
-                                $first_assessment_id = $row['assessment_id'];
-                            }
-                            $selected = ($row['assessment_id'] == $assessment_id) ? 'selected' : '';
-                            echo "<option value='" . $row['assessment_id'] . "' $selected>" . $row['assessment_name'] . "</option>";
-                        }
-                        
-                        if ($assessment_id === null && $first_assessment_id !== null) {
-                            $assessment_id = $first_assessment_id;
-                            echo "<script>window.location.href = '?job_seeker_id=$job_seeker_id&assessment_id=$assessment_id';</script>";
-                        }
-                    } else {
-                        echo "<option>No assessments found</option>";
-                    }
-
-                    $conn->close();
-                    ?>
-                </select>
-            </div>
+        <div class="row-1 assessment-area" style="color:white; font-size: 1.2em;">
+            <div class="assessment-title">Candidate Profile</div>
         </div>
 
         <div class="row-2 candidate-score-row">
@@ -135,7 +94,6 @@ session_start();
             }
 
             $job_seeker_id = $_GET['job_seeker_id'];
-            $assessment_id = isset($_GET['assessment_id']) ? $_GET['assessment_id'] : null;
 
             $sql_candidate = "SELECT u.first_name, u.last_name, js.education_level, js.year_of_experience, js.linkedin_link
                                          FROM User u
@@ -168,22 +126,21 @@ session_start();
             }
 
 
-            
             $score = "N/A";
             $time_used = "N/A";
-            if ($assessment_id) {
-                $sql_score_time = "SELECT score, TIMEDIFF(end_time, start_time) AS time_used
-                                             FROM Assessment_Job_Seeker
-                                             WHERE job_seeker_id = '$job_seeker_id' AND assessment_id = '$assessment_id'";
-                $result_score_time = $conn->query($sql_score_time);
 
-                if ($result_score_time->num_rows > 0) {
-                    $row_score_time = $result_score_time->fetch_assoc();
-                    $score = !is_null($row_score_time['score']) ? $row_score_time['score'] : 'N/A'; 
-                    $time_used_value = $row_score_time['time_used'];
-                    $time_used = !empty($time_used_value) ? $time_used_value : 'N/A'; 
-                }
+            $sql_score_time = "SELECT score, TIMEDIFF(end_time, start_time) AS time_used
+                                            FROM Assessment_Job_Seeker
+                                            WHERE job_seeker_id = '$job_seeker_id'";
+            $result_score_time = $conn->query($sql_score_time);
+
+            if ($result_score_time->num_rows > 0) {
+                $row_score_time = $result_score_time->fetch_assoc();
+                $score = !is_null($row_score_time['score']) ? $row_score_time['score'] : 'N/A'; 
+                $time_used_value = $row_score_time['time_used'];
+                $time_used = !empty($time_used_value) ? $time_used_value : 'N/A'; 
             }
+        
 
 
             echo "<div class='score-time'>";
@@ -198,53 +155,73 @@ session_start();
             ?>
         </div>
 
-        <div class="row-3 questions-section">
-            <div class="questions-title">Questions</div>
-            <div class="questions-container">
-                <?php
-                
-                $servername = "localhost";
-                $username = "root";
-                $password = "";
-                $dbname = "techfit";
+        <?php
+        $servername = "localhost";
+        $username = "root";
+        $password = "";
+        $dbname = "techfit";
 
-                $conn = new mysqli($servername, $username, $password, $dbname);
+        $conn = new mysqli($servername, $username, $password, $dbname);
 
-                if ($conn->connect_error) {
-                    die("Connection failed: " . $conn->connect_error);
-                }
+        if ($conn->connect_error) {
+            die("Connection failed: ". $conn->connect_error);
+        }
 
-                $assessment_id = isset($_GET['assessment_id']) ? $_GET['assessment_id'] : null;
+        $job_seeker_id = isset($_GET['job_seeker_id'])? $_GET['job_seeker_id']: null;
 
-                if ($assessment_id) {
-                    
-                    $sql_questions = "SELECT q.question_text, q.correct_answer
-                                                 FROM question q
-                                                 WHERE q.assessment_id = '$assessment_id'";
-                    $result_questions = $conn->query($sql_questions);
+        if ($job_seeker_id === null) {
+            echo "<div>Job Seeker ID is missing.</div>";
+            exit;
+        }
 
-                    if ($result_questions->num_rows > 0) {
-                        $question_counter = 1; 
-                        while ($row_question = $result_questions->fetch_assoc()) {
-                            echo "<div class='question'>";
-                            echo "<div class='question-text'><strong>Question $question_counter:</strong> " . htmlspecialchars($row_question['question_text']) . "</div>";
-                            echo "<div class='job-seeker-answer'><strong>Job Seeker's Answer:</strong> </div>"; 
-                            echo "<div class='correct-answer'><strong>Correct Answer:</strong> " . htmlspecialchars($row_question['correct_answer']) . "</div>";
-                            echo "</div>";
-                            $question_counter++; 
-                        }
+        $sql_questions = "SELECT q.question_text, q.correct_answer, a.answer_text, a.is_correct
+                            FROM question q
+                            INNER JOIN answer a ON q.question_id = a.question_id
+                            WHERE a.job_seeker_id = '$job_seeker_id'";
+        $result_questions = $conn->query($sql_questions);
+
+        if ($result_questions) {
+            if ($result_questions->num_rows > 0) {
+                $question_counter = 1;
+                while ($row_question = $result_questions->fetch_assoc()) {
+                    echo "<div class='question'>";
+                    echo "<div class='question-text'><strong>Question $question_counter:</strong> ". htmlspecialchars($row_question['question_text']). "</div>";
+
+                    echo "<div class='job-seeker-answer'>";
+                    echo "<strong>Job Seeker's Answer:</strong> <pre>"; 
+                    if ($row_question['answer_text']!== null) {
+                        
+                        $answer_text_with_breaks = str_replace("<<ANSWER_BREAK>>", "\n", $row_question['answer_text']);
+                        echo htmlspecialchars($answer_text_with_breaks); 
                     } else {
-                        echo "<div>No questions found for this assessment.</div>";
+                        echo "No answer provided.";
                     }
-                } else {
-                    echo "<div>Please select an assessment to view questions.</div>";
+                    echo "</pre>"; 
+                    echo "</div>";
+
+                    echo "<div class='correct-answer'>";
+                    echo "<strong>Correct Answer:</strong> <pre>"; 
+                    if ($row_question['correct_answer']!== null) {
+                        
+                        $correct_answer_with_breaks = str_replace("<<ANSWER_BREAK>>", "\n", $row_question['correct_answer']);
+                        echo htmlspecialchars($correct_answer_with_breaks); 
+                    } else {
+                        echo "No correct answer provided.";
+                    }
+                    echo "</pre>"; 
+                    echo "</div>";
+
+                    echo "</div>";
+                    $question_counter++;
                 }
+            } else {
+                echo "<div>No questions found or no answers provided by the job seeker.</div>";
+            }
+        } else {
+            echo "<div>Error executing query: ". $conn->error. "</div>";
+        }
 
-                $conn->close();
-                ?>
-            </div>
-        </div>
-
+        $conn->close();?>
     </div>
 </div>
 
@@ -262,16 +239,14 @@ session_start();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
+                    <p><a href="mailto:/a></p>techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
                 <div class="footer-column">
-                    <h3>Assessment</h3>
+                    <h3>Candidate</h3>
                     <ul>
-                        <li><a href="start_assessment.php">Start Assessment</a></li>
-                        <li><a href="assessment_history.php">Assessment History</a></li>
-                        <li><a href="assessment_summary.php">Assessment Summary</a></li>
+                        <li><a href="search_candidate.php">Search Candidates</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -302,7 +277,7 @@ session_start();
         <div class="footer-bottom">
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
-    </footer>
+    </footer>  
 <script>
     function updateAssessment() {
         const assessmentSelect = document.getElementById('assessment-select');

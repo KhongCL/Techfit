@@ -131,28 +131,28 @@ session_start();
                     $employer_id = $_SESSION['employer_id'];
 
                     $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
-                                GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
-                                AVG(ajs.score) AS avg_score
-                            FROM Job_Seeker js
-                            JOIN User u ON js.user_id = u.user_id
-                            LEFT JOIN  Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
-                            LEFT JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id AND ei.employer_id = '$employer_id'
-                            WHERE ei.employer_id IS NULL AND ajs.result_id IS NOT NULL
-                            GROUP BY js.job_seeker_id";
+                                    GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
+                                    AVG(ajs.score) AS avg_score
+                                FROM Job_Seeker js
+                                JOIN User u ON js.user_id = u.user_id
+                                LEFT JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
+                                LEFT JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id AND ei.employer_id = '$employer_id'
+                                WHERE ei.employer_id IS NULL AND ajs.result_id IS NOT NULL
+                                GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
-
+    
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
                             echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
                             echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
                             
-                                $education_level = !empty($row['education_level']) ? htmlspecialchars($row['education_level']) : 'null';
+                            $education_level = (isset($row['education_level']) && $row['education_level'] !== null && $row['education_level'] !== '') ? htmlspecialchars($row['education_level']) : 'N/A';
                             echo "<td>" . $education_level . "</td>";
                             
-                                $experience = (!empty($row['year_of_experience']) || $row['year_of_experience'] === '0') ? htmlspecialchars($row['year_of_experience']) : 'null';
+                            $experience = (isset($row['year_of_experience']) && $row['year_of_experience'] !== null) ? htmlspecialchars($row['year_of_experience']) : 'N/A';
                             echo "<td>" . $experience . "</td>";
                             
-                                $scores_display = !empty($row['scores']) ? htmlspecialchars($row['scores']) : 'null';
+                            $scores_display = !empty($row['scores']) ? htmlspecialchars($row['scores']) : 'N/A';
                             echo "<td>" . $scores_display . "</td>";
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
@@ -196,13 +196,13 @@ session_start();
                             echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
                             echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
                             
-                                $education_level = !empty($row['education_level']) ? htmlspecialchars($row['education_level']) : 'null';
+                                $education_level = !empty($row['education_level']) ? htmlspecialchars($row['education_level']) : 'N/A';
                             echo "<td>" . $education_level . "</td>";
                             
-                                $experience = (!empty($row['year_of_experience']) || $row['year_of_experience'] === '0') ? htmlspecialchars($row['year_of_experience']) : 'null';
+                                $experience = (!empty($row['year_of_experience']) || $row['year_of_experience'] === '0') ? htmlspecialchars($row['year_of_experience']) : 'N/A';
                             echo "<td>" . $experience . "</td>";
                             
-                                $scores_display = !empty($row['scores']) ? htmlspecialchars($row['scores']) : 'null';
+                                $scores_display = !empty($row['scores']) ? htmlspecialchars($row['scores']) : 'N/A';
                             echo "<td>" . $scores_display . "</td>";
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
@@ -245,13 +245,13 @@ session_start();
                             echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
                             echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
                             
-                                $education_level = !empty($row['education_level']) ? htmlspecialchars($row['education_level']) : 'null';
+                                $education_level = !empty($row['education_level']) ? htmlspecialchars($row['education_level']) : 'N/A';
                             echo "<td>" . $education_level . "</td>";
                             
-                                $experience = (!empty($row['year_of_experience']) || $row['year_of_experience'] === '0') ? htmlspecialchars($row['year_of_experience']) : 'null';
+                                $experience = (!empty($row['year_of_experience']) || $row['year_of_experience'] === '0') ? htmlspecialchars($row['year_of_experience']) : 'N/A';
                             echo "<td>" . $experience . "</td>";
                             
-                                $scores_display = !empty($row['scores']) ? htmlspecialchars($row['scores']) : 'null';
+                                $scores_display = !empty($row['scores']) ? htmlspecialchars($row['scores']) : 'N/A';
                             echo "<td>" . $scores_display . "</td>";
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
@@ -294,11 +294,11 @@ session_start();
                             echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
                             
                             
-                            $education_level = !empty($row['education_level']) ? htmlspecialchars($row['education_level']) : 'null';
+                            $education_level = !empty($row['education_level']) ? htmlspecialchars($row['education_level']) : 'N/A';
                             echo "<td>" . $education_level . "</td>";
                             
                             
-                            $experience = (!empty($row['year_of_experience']) || $row['year_of_experience'] === '0') ? htmlspecialchars($row['year_of_experience']) : 'null';
+                            $experience = (!empty($row['year_of_experience']) || $row['year_of_experience'] === '0') ? htmlspecialchars($row['year_of_experience']) : 'N/A';
                             echo "<td>" . $experience . "</td>";
                             
                             
@@ -470,26 +470,42 @@ session_start();
         xhr.open('GET', 'fetch_deleted_candidates.php', true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
-                const deletedCandidates = JSON.parse(xhr.responseText);
+                const response = JSON.parse(xhr.responseText);
                 const tbody = document.getElementById('view-deleted-candidates-tab');
                 tbody.innerHTML = '';
 
-                deletedCandidates.forEach(candidate => {
-                    const row = document.createElement('tr');
-                    row.id = 'row-' + candidate.job_seeker_id;
-                    row.innerHTML = `
-                        <td>${candidate.name}</td>
-                        <td>${candidate.education_level}</td>
-                        <td>${candidate.years_of_experience}</td>
-                        <td>${candidate.assessment_scores}</td>
-                        <td class="actions">
-                            <button class="accept" onclick="updateInterest('${candidate.job_seeker_id}', 'interested')">✔</button>
-                            <button class="reject" onclick="updateInterest('${candidate.job_seeker_id}', 'uninterested')">✖</button>
-                            <a href="candidate_answer.php?job_seeker_id=${candidate.job_seeker_id}" class="view">View</a>
-                        </td>
-                    `;
-                    tbody.appendChild(row);
-                });
+                if (response.noCandidates === true) {
+                    let noCandidatesRow = document.getElementById('no-candidates-view-deleted-candidates');
+                    if (!noCandidatesRow) { 
+                        tbody.innerHTML = `<tr id='no-candidates-view-deleted-candidates'><td colspan='6'class='no-candidates-message'>No candidates found</td></tr>`;
+                    }
+                } else {
+                    const deletedCandidates = response; 
+                    if (deletedCandidates.length > 0) { 
+                        deletedCandidates.forEach(candidate => {
+                            const row = document.createElement('tr');
+                            row.id = 'row-' + candidate.job_seeker_id;
+                            row.innerHTML = `
+                                <td>${candidate.name}</td>
+                                <td>${candidate.education_level}</td>
+                                <td>${candidate.years_of_experience}</td>
+                                <td>${candidate.assessment_scores}</td>
+                                <td class="actions">
+                                    <button class="accept" onclick="updateInterest('${candidate.job_seeker_id}', 'interested')">✔</button>
+                                    <button class="reject" onclick="updateInterest('${candidate.job_seeker_id}', 'uninterested')">✖</button>
+                                    <a href="candidate_answer.php?job_seeker_id=${candidate.job_seeker_id}" class='view'>View</a>
+                                </td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                        removeNoCandidatesMessage('view-deleted-candidates-tab');
+                    } else {
+                        let noCandidatesRow = document.getElementById('no-candidates-view-deleted-candidates');
+                        if (!noCandidatesRow) { 
+                            tbody.innerHTML = `<tr id='no-candidates-view-deleted-candidates'><td colspan='6'class='no-candidates-message'>No candidates found</td></tr>`;
+                        }
+                    }
+                }
             }
         };
         xhr.send();
@@ -509,35 +525,35 @@ session_start();
 
             switch (value) {
                 case 'name_asc':
-                    columnIndex = 2;
+                    columnIndex = 1;
                     order = 1;
                     break;
                 case 'name_desc':
-                    columnIndex = 2;
+                    columnIndex = 1;
                     order = -1;
                     break;
                 case 'education_level_asc':
-                    columnIndex = 3;
+                    columnIndex = 2;
                     order = 1;
                     break;
                 case 'education_level_desc':
-                    columnIndex = 3;
+                    columnIndex = 2;
                     order = -1;
                     break;
                 case 'years_of_experience_asc':
-                    columnIndex = 4;
+                    columnIndex = 3;
                     order = 1;
                     break;
                 case 'years_of_experience_desc':
-                    columnIndex = 4;
+                    columnIndex = 3;
                     order = -1;
                     break;
                 case 'assessment_scores_asc':
-                    columnIndex = 5;
+                    columnIndex = 4;
                     order = 1;
                     break;
                 case 'assessment_scores_desc':
-                    columnIndex = 5;
+                    columnIndex = 4;
                     order = -1;
                     break;
                 default:
@@ -549,43 +565,61 @@ session_start();
                 rows.sort((a, b) => {
                     const aText = a.querySelector(`td:nth-child(${columnIndex})`).textContent.trim();
                     const bText = b.querySelector(`td:nth-child(${columnIndex})`).textContent.trim();
-                    if (columnIndex === 4 || columnIndex === 5) { 
-                        const aValue = columnIndex === 5 ? calculateAverage(aText) : parseFloat(aText);
-                        const bValue = columnIndex === 5 ? calculateAverage(bText) : parseFloat(bText);
-                        return (aValue - bValue) * order;
+
+                    if (aText === 'N/A' && bText !== 'N/A') {
+                        return 1; // 'N/A' comes after non-'N/A'
                     }
-                    return aText.localeCompare(bText, undefined, {numeric: true}) * order;
+                    if (aText !== 'N/A' && bText === 'N/A') {
+                        return -1; // non-'N/A' comes before 'N/A'
+                    }
+                    if (aText === 'N/A' && bText === 'N/A') {
+                        return 0; // 'N/A' vs 'N/A' - no change in order
+                    }
+
+
+                    if (columnIndex === 3 || columnIndex === 4) { // Years of Experience or Assessment Scores
+                        const aValue = (aText === 'N/A') ? -Infinity : parseFloat(aText); // Treat N/A as smallest for numerical sort
+                        const bValue = (bText === 'N/A') ? -Infinity : parseFloat(bText); // Treat N/A as smallest for numerical sort
+                        return (aValue - bValue) * order;
+                    } else {
+                        return aText.localeCompare(bText, undefined, { numeric: true }) * order;
+                    }
                 });
                 rows.forEach(row => tab.appendChild(row));
             });
         });
-
-        function calculateAverage(scoresText) {
-            const scores = scoresText.split(', ').map(Number);
-            return scores.reduce((sum, score) => sum + score, 0) / scores.length;
-        }
 
         
         document.querySelectorAll('th[data-column]').forEach(th => {
             th.addEventListener('click', function() {
                 const column = this.getAttribute('data-column');
                 const currentOrder = this.dataset.order || -1;
-                const order = this.dataset.order = currentOrder * -1; 
-                console.log(`Sorting table column: ${column}, Order: ${order}`); 
+                const order = this.dataset.order = currentOrder * -1;
+                console.log(`Sorting table column: ${column}, Order: ${order}`);
                 const rows = Array.from(document.querySelectorAll('#active-tab tr, #interested-tab tr, #uninterested-tab tr, #view-deleted-candidates-tab tr'));
                 rows.sort((a, b) => {
                     const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
                     const bText = b.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
-                    if (column === 'years_of_experience' || column === 'assessment_scores') { 
-                        const aValue = column === 'assessment_scores' ? calculateAverage(aText) : parseFloat(aText);
-                        const bValue = column === 'assessment_scores' ? calculateAverage(bText) : parseFloat(bText);
+
+                    if (aText === 'N/A' && bText !== 'N/A') {
+                        return 1; 
+                    }
+                    if (aText !== 'N/A' && bText === 'N/A') {
+                        return -1;
+                    }
+                    if (aText === 'N/A' && bText === 'N/A') {
+                        return 0; 
+                    }
+
+                    if (column === 'years_of_experience' || column === 'assessment_scores') {
+                        const aValue = (aText === 'N/A') ? -Infinity : parseFloat(aText); 
+                        const bValue = (bText === 'N/A') ? -Infinity : parseFloat(bText); 
                         return (aValue - bValue) * order;
                     }
-                    return aText.localeCompare(bText, undefined, {numeric: true}) * order;
+                    return aText.localeCompare(bText, undefined, { numeric: true }) * order;
                 });
                 rows.forEach(row => row.parentNode.appendChild(row));
 
-                
                 document.querySelectorAll('th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
                 this.classList.add(order === 1 ? 'asc' : 'desc');
             });

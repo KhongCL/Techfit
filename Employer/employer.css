@@ -1,31 +1,3 @@
-:root {
-  --primary-color: #007bff;
-  --accent-color: #5c7dff;
-  --danger-color: #e74c3c;
-  --danger-color-hover: #c0392b;
-  --success-color: #28a745;
-  --success-color-hover: #2ecc71;
-
-  --background-color: #121212;
-  --background-color-dark: #080808;
-  --background-color-medium: #1E1E1E;
-  --background-color-light: #444;
-  --background-color-extra-light: #555;
-  --background-color-hover: #666;
-
-  --text-color: #fafafa;
-  --text-color-dark: #b0b0b0;
-  --text-color-medium: #e0e0e0;
-  --text-color-light: #f7f7f7;
-  --text-color-extra-light: #ffffff;
-  --text-color-hover: #b0b0b0;
-
-  --button-color: #007bff;
-  --button-color-hover: #3c87e3;
-  --focus-border-color: #47a3e0;
-  --disabled-color: #7f8c8d;
-}
-
 .container {
   width: 100%;
   max-width: 1200px;
@@ -471,9 +443,9 @@ table td {
 
 .question {
   padding: 15px;
-  border: 1px solid var(--background-color);
+  border: 5px solid var(--background-color);
   border-radius: 5px;
-  background-color: var(--background-color-medium);
+  background-color: var(--background-color-light);
 }
 
 .question-text {
@@ -504,26 +476,49 @@ table td {
   transition: color 0.3s ease;
 }
 
+.question-text,
+.job-seeker-answer,
+.correct-answer {
+    word-break: break-word;   
+    overflow-wrap: break-word;  
+    white-space: normal;      
+}
+
 
 @media (max-width: 768px) {
+  table th {
+      text-transform: none;
+  }
+
   .container {
       flex-direction: column;
       align-items: stretch;
-      background-color: var(--background-color);
+      background-color: var(--background-color-medium);
       padding: 15px;
-      border-radius: 0;
+      border-radius: 5px;
   }
 
   .sort-controls span {
-      transform: translateY(-35px);
-      position: absolute;
-      left: 25px;
+     
+      position: static;
+      left: auto;     
+      transform: none; 
+      color: var(--text-color-medium);
   }
 
   .sort-controls-wrapper {
       flex-direction: column;
       align-items: stretch;
       gap: 10px;
+      padding-top: 40px;
+  }
+
+  .sort-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      top: -35px;     
   }
 
   .search-container {
@@ -532,6 +527,8 @@ table td {
 
   #searchInput {
       width: 100%;
+      background-color: var(--background-color-light);
+      color: var(--text-color);
   }
 
   .tabs {
@@ -543,6 +540,20 @@ table td {
   .tabs button {
       width: 100%;
       text-align: center;
+      background-color: var(--background-color-light);
+      color: var(--text-color);
+      border: 1px solid var(--background-color-medium);
+  }
+
+  .tabs button.active {
+      background-color: var(--primary-color);
+      color: var(--text-color-light);
+      border-color: var(--primary-color);
+  }
+
+  .tabs button:hover {
+      background-color: var(--button-color-hover);
+      color: var(--text-color-medium);
   }
 
 
@@ -557,6 +568,7 @@ table td {
       width: 100%;
       padding: 20px;
       margin-right: 0;
+      background-color: var(--background-color-light);
   }
 
   .assessment-area,
@@ -580,6 +592,8 @@ table td {
       position: static;
       right: auto;
       top: auto;
+      background-color: var(--background-color-light);
+      color: var(--text-color);
   }
 
   .questions-title {
@@ -590,18 +604,20 @@ table td {
   .questions-container {
       margin-left: 0;
       padding: 15px;
+      background-color: var(--background-color-light);
   }
 
   .back-arrow {
       margin-top: 10px;
       margin-left: 0;
+      color: var(--primary-color);
   }
 
   table th,
   table td {
-    padding: 8px 10px;
-    font-size: 0.85rem;
-    min-width: 60px;
+      padding: 8px 10px;
+      font-size: 0.85rem;
+      min-width: 60px;
   }
 
   .candidate-info img {
@@ -637,5 +653,120 @@ table td {
   .no-candidates-message {
       font-size: 1.0rem;
       text-align: center;
+  }
+
+  table thead th[data-column="name"]::before {
+      content: "Name";
+      color: var(--text-color-light);
+  }
+
+  table thead th[data-column="education_level"]::before {
+      content: "Edu";
+      color: var(--text-color-light);
+  }
+
+  table thead th[data-column="years_of_experience"]::before {
+      content: "YoE";
+      color: var(--text-color-light);
+  }
+
+  table thead th[data-column="assessment_scores"]::before {
+      content: "Score";
+      color: var(--text-color-light);
+  }
+
+
+  table thead th[data-column="name"],
+  table thead th[data-column="education_level"],
+  table thead th[data-column="years_of_experience"],
+  table thead th[data-column="assessment_scores"] {
+      font-size: 0;
+      line-height: 0;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      position: relative;
+      padding-left: 5px;
+      padding-right: 5px;
+      background-color: var(--background-color-dark);
+  }
+
+
+  table thead th[data-column="name"]::before,
+  table thead th[data-column="education_level"]::before,
+  table thead th[data-column="years_of_experience"]::before,
+  table thead th[data-column="assessment_scores"]::before {
+      font-size: 14px;
+      line-height: normal;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+  }
+
+
+  table thead th:nth-child(5)::before {
+      content: "Interest?";
+      color: var(--text-color-light);
+  }
+
+  table thead th:nth-child(5) {
+      font-size: 0;
+      line-height: 0;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      position: relative;
+      padding-left: 5px;
+      padding-right: 5px;
+       background-color: var(--background-color-dark);
+  }
+
+  table thead th:nth-child(5)::before {
+      font-size: 14px;
+      line-height: normal;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+  }
+
+
+  table {
+      border-collapse: separate;
+  }
+
+  table td,
+  table th {
+      border-right: 1.5px solid var(--background-color-medium);
+      border-bottom: 1.5px solid var(--background-color-medium);
+  }
+
+  table th:last-child,
+  table td:last-child {
+      border-right: none;
+  }
+
+  table tbody tr:last-child td {
+      border-bottom: none;
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 0px;
+    justify-content: center;
+  }
+
+  .actions .view {
+    text-align: center;
+  }
+
+  pre {
+    overflow-x: auto;
+    white-space: pre-wrap;
+    padding: 10px;
+    border: 1px solid var(--text-color);
+    border-radius: 5px;
   }
 }
