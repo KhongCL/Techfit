@@ -17,6 +17,21 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error); 
 }
 
+function displayLoginMessage() {
+    echo '<script>
+        alert("You need to log in to access this page.");
+    </script>';
+    exit();
+}
+
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage();
+}
+
+if ($_SESSION['role'] !== 'Admin') {
+    displayLoginMessage();
+}
+
 $user_id = $_SESSION['user_id'];
 $admin_query = "SELECT admin_id FROM Admin WHERE user_id = ?";
 $stmt = $conn->prepare($admin_query);

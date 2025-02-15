@@ -9,7 +9,7 @@ function displayLoginMessage() {
 }
 
 if (!isset($_SESSION['user_id'])) {
-    displayLoginMessage();s
+    displayLoginMessage();
 }
 
 if ($_SESSION['role'] !== 'Admin') {

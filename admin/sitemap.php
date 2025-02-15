@@ -8,6 +8,21 @@ $username = "root";
 $password = "";
 $dbname = "techfit";
 
+function displayLoginMessage() {
+    echo '<script>
+        alert("You need to log in to access this page.");
+    </script>';
+    exit();
+}
+
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage();
+}
+
+if ($_SESSION['role'] !== 'Admin') {
+    displayLoginMessage();
+}
+
 try {
     $conn = new PDO("mysql:host=$servername;dbname=$dbname", $username, $password);
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

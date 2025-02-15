@@ -4,18 +4,17 @@ session_start();
 
 function displayLoginMessage() {
     echo '<script>
-        if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
-            window.location.href = "../admin_login.php?key=techfit";
-        } else {
-            window.location.href = "../index.php";
-        }
+        alert("You need to log in to access this page.");
     </script>';
     exit();
 }
 
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage();
+}
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'Admin') {
-    displayLoginMessage(); 
+if ($_SESSION['role'] !== 'Admin') {
+    displayLoginMessage();
 }
 
 $email = isset($_SESSION['email']) ? $_SESSION['email'] : ''; 

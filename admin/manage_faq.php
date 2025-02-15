@@ -18,6 +18,20 @@ if (!isset($_SESSION['user_id'])) {
 }
 $user_id = $_SESSION['user_id'];
 
+function displayLoginMessage() {
+    echo '<script>
+        alert("You need to log in to access this page.");
+    </script>';
+    exit();
+}
+
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage();
+}
+
+if ($_SESSION['role'] !== 'Admin') {
+    displayLoginMessage();
+}
 
 $admin_id_query = $mysqli->prepare("SELECT admin_id FROM admin WHERE user_id = ?");
 $admin_id_query->bind_param("s", $user_id);
