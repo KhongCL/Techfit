@@ -67,8 +67,7 @@ session_write_close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FAQ - TechFit</title>
-    <link rel="stylesheet" href="styles.css">
-
+    <link rel="stylesheet" href="styles.css?v=2.0">
 </head>
 <body>
     <header>
@@ -78,11 +77,9 @@ session_write_close();
         <nav>
             <div class="nav-container">
                 <ul class="nav-list">
-                    <li><a href="#">Assessment</a>
+                    <li><a href="#">Candidates</a>
                         <ul class="dropdown">
-                            <li><a href="start_assessment.php">Start Assessment</a></li>
-                            <li><a href="assessment_history.php">Assessment History</a></li>
-                            <li><a href="assessment_summary.php">Assessment Summary</a></li>
+                            <li><a href="search_candidate.php">Search Candidates</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Resources</a>
@@ -94,7 +91,7 @@ session_write_close();
                     </li>
                     <li><a href="about.php">About</a></li>
                     <li>
-                        <a href="#" id="profile-link">
+                    <a href="#" id="profile-link">
                             <div class="profile-info">
                                 <span class="username" id="username">
                                     <?php
@@ -111,9 +108,9 @@ session_write_close();
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
                             <li><a href="profile.php">Settings</a></li>
-                            <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li>
+                            <li><a href="#" >Logout</a></li>
                         </ul>
-                    </li>
+                    </li> 
                 </ul>
                 <div class="hamburger" id="hamburger">
                     <span></span>
@@ -124,13 +121,12 @@ session_write_close();
         </nav>
     </header>
 
-    
     <div id="logout-popup" class="popup">
         <h2>Are you sure you want to Log Out?</h2>
-        <button class="close-button" onclick="logoutUser()">Yes</button>
-        <button class="cancel-button" onclick="closePopup('logout-popup')">No</button>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
     </div>
-
+    
     <section id="faq">
         <h2>Frequently Asked Questions</h2>
 
@@ -197,16 +193,14 @@ session_write_close();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
+                    <p><a href="mailto:/a></p>techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">
                 <div class="footer-column">
-                    <h3>Assessment</h3>
+                    <h3>Candidate</h3>
                     <ul>
-                        <li><a href="start_assessment.php">Start Assessment</a></li>
-                        <li><a href="assessment_history.php">Assessment History</a></li>
-                        <li><a href="assessment_summary.php">Assessment Summary</a></li>
+                        <li><a href="search_candidate.php">Search Candidates</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -238,7 +232,7 @@ session_write_close();
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
-
-    <script src="scripts.js?v=1.0"></script>
+    
+    <script src="scripts.js?v=2.0"></script>
 </body>
 </html>
