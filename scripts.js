@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const logoutCancelButton = document.getElementById('logout-cancel-button');
     const profileDropdown = document.getElementById('profile-dropdown');
 
-    // Only run navigation related code if elements exist
+    
     if (navItems.length && dropdowns.length) {
         navItems.forEach(item => {
             item.addEventListener('click', function (event) {
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Only add hamburger events if element exists
+    
     if (hamburger && navList) {
         hamburger.addEventListener('click', function () {
             hamburger.classList.toggle('active');
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Only add profile/logout events if elements exist
+    
     if (profileLink && profileDropdown) {
         profileLink.addEventListener('click', function(event) {
             event.preventDefault();

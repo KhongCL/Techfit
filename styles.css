@@ -302,9 +302,10 @@ header {
     }
 
     .nav-list .dropdown a {
-        padding: 10px 15px;
+        padding: 10px 20px;
         display: block;
         color: var(--text-color);
+        border-bottom: 1px solid var(--primary-color);
         text-decoration: none;
         white-space: nowrap;
         transition: background-color 0.3s ease;
@@ -1231,9 +1232,18 @@ footer {
     margin-top: 20px;
 }
 
+#formContainer {
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+
 #formContainer h1 {
+    padding: 50px;
     color: var(--text-color);
     text-align: center;
+    width: 100%;
 }
 
 
@@ -1262,7 +1272,7 @@ form#faqForm textarea,
 form#faqForm select {
     width: 100%;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--text-color);
     border-radius: 4px;
     font-size: 14px;
 }

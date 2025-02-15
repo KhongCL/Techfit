@@ -18,7 +18,6 @@ if (!isset($_SESSION['employer_id'])) {
 $employer_id = $_SESSION['employer_id'];
 $job_seeker_id = $_POST['job_seeker_id'];
 
-// Update the is_active status to 0
 $sql = "UPDATE Employer_Interest SET is_active = 0 WHERE employer_id = '$employer_id' AND job_seeker_id = '$job_seeker_id'";
 
 if ($conn->query($sql) === TRUE) {

@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
+
     const navItems = document.querySelectorAll('.nav-list > li > a');
     const dropdowns = document.querySelectorAll('.dropdown');
     const hamburger = document.getElementById('hamburger');
@@ -11,12 +12,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (dropdown) {
                 event.preventDefault();
-                const isActive = dropdown.classList.contains('active');
-                closeAllDropdowns();
-                if (!isActive) {
-                    dropdown.classList.add('active');
-                    parent.classList.add('active');
-                }
+                parent.classList.toggle('active');
+                dropdown.classList.toggle('active');
+                closeAllDropdowns(parent);
             }
         });
 
@@ -26,9 +24,14 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    const closeAllDropdowns = () => {
-        dropdowns.forEach(dd => dd.classList.remove('active'));
-        navItems.forEach(item => item.parentElement.classList.remove('active'));
+    const closeAllDropdowns = (exceptParent = null) => {
+        dropdowns.forEach(dropdown => {
+            const parent = dropdown.parentElement;
+            if (parent !== exceptParent) {
+                dropdown.classList.remove('active');
+                parent.classList.remove('active');
+            }
+        });
     };
 
     document.addEventListener('click', function (event) {
@@ -40,6 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
     hamburger.addEventListener('click', function () {
         hamburger.classList.toggle('active');
         navList.classList.toggle('active');
+        closeAllDropdowns();
     });
 
     window.addEventListener('resize', function () {
@@ -54,77 +58,76 @@ document.addEventListener('DOMContentLoaded', function () {
     const logoutCancelButton = document.getElementById('logout-cancel-button');
     const profileDropdown = document.getElementById('profile-dropdown');
 
-    profileLink.addEventListener('click', function(event) {
+    profileLink.addEventListener('click', function (event) {
         event.preventDefault();
         profileDropdown.classList.toggle('active');
     });
 
     const logoutDropdownLink = profileDropdown.querySelector('li a[href="#"]');
 
-    if(logoutDropdownLink) {
-        logoutDropdownLink.addEventListener('click', function(event) {
+    if (logoutDropdownLink) {
+        logoutDropdownLink.addEventListener('click', function (event) {
             event.preventDefault();
             openPopup('logout-popup');
             profileDropdown.classList.remove('active');
         });
     }
 
-    logoutConfirmButton.addEventListener('click', function() {
+    logoutConfirmButton.addEventListener('click', function () {
         logoutUser();
     });
 
-    logoutCancelButton.addEventListener('click', function() {
+    logoutCancelButton.addEventListener('click', function () {
         closePopup('logout-popup');
     });
-});
 
+    document.querySelectorAll('.faq-question').forEach(item => {
+        item.addEventListener('click', function () {
+            const faqItem = item.closest('.faq-item');
+            const arrow = faqItem.querySelector('.dropdown-arrow');
 
-document.querySelectorAll('.faq-question').forEach(item => {
-    item.addEventListener('click', () => {
-        const faqItem = item.closest('.faq-item');
-        const arrow = faqItem.querySelector('.dropdown-arrow');
+            faqItem.classList.toggle('open');
 
-        faqItem.classList.toggle('open');
-
-        if (faqItem.classList.contains('open')) {
-            arrow.style.transform = 'rotate(180deg)';
-        } else {
-            arrow.style.transform = 'rotate(0deg)';
-        }
+            if (faqItem.classList.contains('open')) {
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        });
     });
+
+    function createFaqElement(faq) {
+        const faqItem = document.createElement('div');
+        faqItem.classList.add('faq-item');
+        faqItem.innerHTML = `
+            <button class="faq-question" aria-expanded="false">
+                <span>${faq.question}</span>
+                <span class="dropdown-arrow">&#9660;</span>
+            </button>
+            <div class="faq-answer" aria-hidden="true">
+                <p>${faq.answer}</p>
+            </div>
+        `;
+        return faqItem;
+    }
+
+    function createLinkElement(link) {
+        const linkElement = document.createElement('a');
+        linkElement.href = link.link;
+        linkElement.textContent = link.title || link.link;
+        linkElement.target = "_blank";
+        return linkElement;
+    }
+
+    function openPopup(popupId) {
+        document.getElementById(popupId).style.display = 'block';
+    }
+
+    function closePopup(popupId) {
+        document.getElementById(popupId).style.display = 'none';
+    }
+
+    function logoutUser() {
+        window.location.href = '/Techfit';
+    }
 });
-
-function createFaqElement(faq) {
-    const faqItem = document.createElement('div');
-    faqItem.classList.add('faq-item');
-    faqItem.innerHTML = `
-        <button class="faq-question" aria-expanded="false">
-            <span>${faq.question}</span>
-            <span class="dropdown-arrow">&#9660;</span>
-        </button>
-        <div class="faq-answer" aria-hidden="true">
-            <p>${faq.answer}</p>
-        </div>
-    `;
-    return faqItem;
-}
-
-function createLinkElement(link) {
-    const linkElement = document.createElement('a');
-    linkElement.href = link.link;
-    linkElement.textContent = link.title || link.link;
-    linkElement.target = "_blank";
-    return linkElement;
-}
-
-function openPopup(popupId) {
-    document.getElementById(popupId).style.display = 'block';
-}
-
-function closePopup(popupId) {
-    document.getElementById(popupId).style.display = 'none';
-}
-
-function logoutUser() {
-    window.location.href = '/Techfit';
-}
