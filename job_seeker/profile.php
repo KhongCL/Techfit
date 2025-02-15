@@ -594,6 +594,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
         background-color: #333;
         color: #fff;
     }
+    @media (max-width: 768px) {
+        .hamburger {
+            display: flex;
+            position: fixed;
+            top: 25px;
+            right: 20px;
+            z-index: 1002; /* Ensure it's above the nav-list */
+        }
+
+        .nav-list {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: fixed;
+            top: 0;
+            right: -100%;
+            height: 100%;
+            background-color: var(--background-color);
+            width: 350px;
+            z-index: 1000;
+            padding: 60px 20px;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
+            justify-content: flex-start;
+            transition: right 0.3s ease;
+            margin-top: 0; /* Reset any margin */
+        }
+
+        .nav-list.active {
+            right: 0;
+        }
+
+        .nav-list li {
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .nav-container {
+            padding-right: 0;
+        }
+    }
 
 </style>
 </head>
@@ -958,6 +998,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
             })
             .catch(error => {
                 console.error('Error:', error);
+            });
+        });
+        // Add hamburger menu functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.getElementById('hamburger');
+            const navList = document.querySelector('.nav-list');
+            
+            hamburger.addEventListener('click', function() {
+                hamburger.classList.toggle('active');
+                navList.classList.toggle('active');
+            });
+
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!hamburger.contains(e.target) && !navList.contains(e.target)) {
+                    hamburger.classList.remove('active');
+                    navList.classList.remove('active');
+                }
+            });
+
+            // Handle dropdown menus in mobile view
+            const dropdownParents = document.querySelectorAll('.nav-list li:has(.dropdown)');
+            dropdownParents.forEach(parent => {
+                parent.addEventListener('click', function(e) {
+                    if (window.innerWidth <= 768) {
+                        const dropdown = this.querySelector('.dropdown');
+                        const allDropdowns = document.querySelectorAll('.nav-list .dropdown');
+                        
+                        allDropdowns.forEach(d => {
+                            if (d !== dropdown) {
+                                d.parentElement.classList.remove('active');
+                            }
+                        });
+                        
+                        this.classList.toggle('active');
+                        e.stopPropagation();
+                    }
+                });
             });
         });
     </script>
