@@ -57,6 +57,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
+
 }
 
 .feedback-item {
@@ -66,7 +68,7 @@
     padding: 20px;
     margin: 10px 0;
     border-radius: 5px;
-    width: 55%;
+    width: 85%;
     min-height: 80px;
     box-sizing: border-box;
     position: relative;
@@ -167,6 +169,7 @@ h2, h3 {
     padding: 20px;
     background-color: var(--background-color-medium);
     border-radius: 5px;
+    width: 100%;
 }
 
 .feedback-category h3 {
@@ -201,6 +204,8 @@ h2, h3 {
     margin-left: 10px;
     transition: background-color 0.3s ease;
     display: inline-block;
+    justify-content: center;
+    margin-bottom: 10px;
 }
 
 
@@ -292,3 +297,65 @@ textarea[name="response_text"]:focus {
     padding: 10px 0;
 }
 
+
+@media (max-width: 768px) {
+    .feedback-container {
+        padding: 20px;
+    }
+
+    .main-content {
+        padding: 30px;
+    }
+
+    .restore-btn,
+    .delete-btn {
+        right: 10px;
+        top: 10px;
+    }
+
+    .restore-btn {
+        right: 60px;
+    }
+
+    .feedback-list {
+        margin-bottom: 20px;
+    }
+
+    .feedback-item {
+        width: 95%;
+        padding: 15px;
+        padding-bottom: 25px;
+    }
+
+    .feedback-content {
+        margin-left: 20px;
+    }
+
+    h2 {
+        font-size: 1.8rem;
+        margin-bottom: 20px;
+    }
+
+    h3 {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+    }
+
+    .feedback-category {
+        padding: 15px;
+        margin-bottom: 30px;
+    }
+
+    .feedback-action-bar {
+        justify-content: space-around;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        text-align: center;
+      }
+
+    .feedback-action-bar button.action-button {
+        margin-left: 0;
+        justify-content: right;
+    }
+}
