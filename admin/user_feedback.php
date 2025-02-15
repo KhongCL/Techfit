@@ -2,11 +2,6 @@
 session_start();
 ob_start();
 
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'Admin') {
-    echo '<script>alert("You need to log in as an Admin to access this page."); window.location.href = "login.php";</script>';
-    exit();
-}
-
 $host = 'localhost';
 $username = 'root';
 $password = '';

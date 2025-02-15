@@ -37,6 +37,51 @@ if ($conn->connect_error) {
     die('Connection failed: ' . $conn->connect_error);
 }
 
+$check_completion_sql = "SELECT COUNT(*) as completed 
+                        FROM Assessment_Job_Seeker 
+                        WHERE job_seeker_id = ? AND end_time IS NOT NULL";
+
+$stmt = $conn->prepare($check_completion_sql);
+$stmt->bind_param("s", $_SESSION['job_seeker_id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+
+if ($row['completed'] == 0) {
+    // No completed assessment found
+    echo '<script>
+        if (confirm("You have not completed any assessment yet. Would you like to start an assessment?")) {
+            window.location.href = "start_assessment.php";
+        } else {
+            window.location.href = "index.php";
+        }
+    </script>';
+    exit();
+}
+
+// Check if user has any answers
+$check_answers_sql = "SELECT COUNT(*) as has_answers 
+                     FROM Answer
+                     WHERE job_seeker_id = ?";
+
+$stmt = $conn->prepare($check_answers_sql);
+$stmt->bind_param("s", $_SESSION['job_seeker_id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+
+if ($row['has_answers'] == 0) {
+    // No answers found
+    echo '<script>
+        if (confirm("No answers found for your assessment. Would you like to start a new assessment?")) {
+            window.location.href = "start_assessment.php";
+        } else {
+            window.location.href = "index.php";
+        }
+    </script>';
+    exit();
+}
+
 $job_seeker_id = $_SESSION['job_seeker_id'];
 
 function calculateScore($conn, $job_seeker_id) {

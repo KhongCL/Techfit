@@ -51,8 +51,8 @@ $job_seeker_id = $_SESSION['job_seeker_id'];
 
 $sql = "
     SELECT 
-        Assessment_Job_Seeker.end_time AS assessment_date,
         Assessment_Job_Seeker.start_time,
+        Assessment_Job_Seeker.end_time,
         Assessment_Job_Seeker.result_id AS assessment_id,
         Assessment_Job_Seeker.score,
         Assessment_Settings.passing_score_percentage,
@@ -60,6 +60,7 @@ $sql = "
     FROM Assessment_Job_Seeker
     JOIN Assessment_Settings ON Assessment_Settings.setting_id = '1'
     WHERE Assessment_Job_Seeker.job_seeker_id = ?
+    AND Assessment_Job_Seeker.end_time IS NOT NULL
     ORDER BY Assessment_Job_Seeker.end_time DESC";
 
 $stmt = $conn->prepare($sql);
@@ -223,15 +224,17 @@ $result = $stmt->get_result();
                 <?php if ($result->num_rows > 0): ?>
                     <?php while ($row = $result->fetch_assoc()): ?>
                         <div class="summary-item">
-                        <div class="summary-details">
-                            <h3>Assessment <?= $row['assessment_id']; ?></h3>
-                            <p>Date: <?= date('Y-m-d', strtotime($row['assessment_date'])); ?></p>
-                            <p>Time Spent: <?= floor($row['duration']/60) ?> minutes <?= $row['duration']%60 ?> seconds</p>
-                            <p>Score: <?= $row['score']; ?>%</p>
-                            <p class="status <?= ($row['score'] >= $row['passing_score_percentage']) ? 'passed' : 'failed' ?>">
-                                Status: <?= ($row['score'] >= $row['passing_score_percentage']) ? 'PASSED' : 'FAILED' ?>
-                            </p>
-                        </div>
+                            <div class="summary-details">
+                                <h3>Assessment <?= $row['assessment_id']; ?></h3>
+                                <p>Date: <?= date('Y-m-d', strtotime($row['start_time'])); ?></p>
+                                <p>Time Spent: <?= max(0, floor($row['duration']/60)) ?> minutes <?= max(0, $row['duration']%60) ?> seconds</p>
+                                <p>Score: <?= $row['score'] ?? 'Not completed'; ?>%</p>
+                                <?php if(isset($row['score'])): ?>
+                                    <p class="status <?= ($row['score'] >= $row['passing_score_percentage']) ? 'passed' : 'failed' ?>">
+                                        Status: <?= ($row['score'] >= $row['passing_score_percentage']) ? 'PASSED' : 'FAILED' ?>
+                                    </p>
+                                <?php endif; ?>
+                            </div>
                             <a href="view_answers.php?assessment_id=<?= urlencode($row['assessment_id']); ?>" class="view-answers-button">View answers</a>
                         </div>
                     <?php endwhile; ?>

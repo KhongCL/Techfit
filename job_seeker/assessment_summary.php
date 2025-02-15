@@ -64,7 +64,8 @@ $sql = "
         ON Job_Seeker.user_id = User.user_id
     INNER JOIN Assessment_Settings
         ON Assessment_Settings.setting_id = '1'
-    WHERE User.user_id = ?";
+    WHERE User.user_id = ?
+    AND Assessment_Job_Seeker.end_time IS NOT NULL";
 
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $user_id);
@@ -299,31 +300,37 @@ $conn->close();
                 <?php if (!empty($assessments)): ?>
                     <?php foreach ($assessments as $assessment): ?>
                         <div class="history-item">
-                        <div class="date-time">
-                            <p>
-                                <strong>Date:</strong> <?php echo htmlspecialchars(date('Y-m-d', strtotime($assessment['start_time']))); ?> 
-                                <br><strong>Time Used:</strong> <?php 
-                                    $duration = strtotime($assessment['end_time']) - strtotime($assessment['start_time']);
-                                    $minutes = floor($duration / 60);
-                                    $seconds = $duration % 60;
-                                    echo $minutes . ' minutes ' . $seconds . ' seconds';
-                                ?>
-                            </p>
-                        </div>
-                        <div class="score">
-                            <h3>Score</h3>
-                            <p class="<?php echo ($assessment['score'] >= $assessment['passing_score_percentage']) ? 'score-passed' : 'score-failed'; ?>">
-                                <?php echo htmlspecialchars($assessment['score']); ?>
-                            </p>
-                        </div>
+                            <div class="date-time">
+                                <p>
+                                    <strong>Date:</strong> <?php echo htmlspecialchars(date('Y-m-d', strtotime($assessment['start_time']))); ?> 
+                                    <br><strong>Time Used:</strong> <?php 
+                                        if ($assessment['end_time']) {
+                                            $duration = strtotime($assessment['end_time']) - strtotime($assessment['start_time']);
+                                            $minutes = max(0, floor($duration / 60));
+                                            $seconds = max(0, $duration % 60);
+                                            echo $minutes . ' minutes ' . $seconds . ' seconds';
+                                        } else {
+                                            echo 'Assessment not completed';
+                                        }
+                                    ?>
+                                </p>
+                            </div>
+                            <div class="score">
+                                <h3>Score</h3>
+                                <p class="<?php echo ($assessment['score'] >= $assessment['passing_score_percentage']) ? 'score-passed' : 'score-failed'; ?>">
+                                    <?php echo $assessment['score'] ?? 'Not completed'; ?>
+                                </p>
+                            </div>
                             <div class="actions">
-                                <a href="download_assessment_history_report.php?assessment_id=<?php echo urlencode($assessment['assessment_id']); ?>" title="Download">Download</a>
-                                <a href="share_assessment_summary.php?assessment_id=<?= urlencode($assessment['assessment_id']); ?>" title="Share">Share</a>
+                                <?php if($assessment['end_time']): ?>
+                                    <a href="download_assessment_history_report.php?assessment_id=<?php echo urlencode($assessment['assessment_id']); ?>" title="Download">Download</a>
+                                    <a href="share_assessment_summary.php?assessment_id=<?= urlencode($assessment['assessment_id']); ?>" title="Share">Share</a>
+                                <?php endif; ?>
                             </div>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <p>No assessment history available.</p>
+                    <p>No assessment summary available.</p>
     <?php endif; ?>
         </div>
     </div>

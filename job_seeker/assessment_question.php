@@ -65,6 +65,27 @@ if ($row['completed'] > 0) {
     exit();
 }
 
+$check_answers_sql = "SELECT COUNT(*) as has_answers 
+                     FROM Answer
+                     WHERE job_seeker_id = ?";
+
+$stmt = $conn->prepare($check_answers_sql);
+$stmt->bind_param("s", $_SESSION['job_seeker_id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$row = $result->fetch_assoc();
+
+if ($row['has_answers'] > 0) {
+    echo '<script>
+        if (confirm("You have already started/completed an assessment. Would you like to view your assessment history?")) {
+            window.location.href = "assessment_history.php";  
+        } else {
+            window.location.href = "index.php";
+        }
+    </script>';
+    exit();
+}
+
 function fetchSectionQuestions($conn, $assessment_id) {
     $questions = [];
     $sql = "SELECT q.*, c.choice_id, c.choice_text 
@@ -111,7 +132,7 @@ $assessment_settings = $settings_result->fetch_assoc();
 
 // Set time limit from settings (convert minutes to seconds)
 $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
-
+$conn->close(); 
 ?>
 
 <!DOCTYPE html>
