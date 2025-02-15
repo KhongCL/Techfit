@@ -108,7 +108,10 @@ session_write_close();
         }
 
         h5{
+            font-size: 20px;
             text-align: center;
+            color: white;
+            margin-bottom: 0px;
         }
 
     </style>
@@ -204,7 +207,7 @@ session_write_close();
 
             console.log("Pass Count: ", passCount); // Debugging
             console.log("Fail Count: ", failCount); // Debugging
-            
+
             const ctx = document.getElementById('assessmentChart').getContext('2d');
             new Chart(ctx, {
                 type: 'pie',
@@ -226,6 +229,16 @@ session_write_close();
                                 align: 'center', // Ensures labels are centered
                                 boxWidth: 40, // Adjusts size of legend color box
                             }
+                        },
+                        datalabels: {
+                            color: 'white',
+                            font: {
+                                weight: 'bold',
+                                size: 16
+                            },
+                            formatter: (value, ctx) => {
+                                return value;
+                            }
                         }
                     },
                     layout: {
@@ -238,10 +251,11 @@ session_write_close();
         });
     </script>
 
-    <h2><br</h2>
+    
     <h5>Total Assessment: <?php echo $total_assessments; ?></h5>
     <h5>Average Scores across Assessment: <?php echo $average_score; ?>%</h5>
-
+        <h6></h6>
+    
     <footer>
         <div class="footer-content">
             <div class="footer-left">

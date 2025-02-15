@@ -114,6 +114,7 @@ session_write_close();
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            margin-bottom: 40px; /* Add bottom margin to tables */
             table-layout: fixed;
         }
 
@@ -199,6 +200,27 @@ session_write_close();
         td a.deleteUser:hover {
             color: var(--danger-hover-color);
         }
+        .header-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            margin-top: 40px; /* Add top margin to headers */
+        }
+
+        .header-controls h2 {
+            margin: 0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .button-group button {
+            margin: 0;
+        }
     </style>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -246,9 +268,9 @@ session_write_close();
             }
         });
 
-        document.getElementById('restoreAllUsers').addEventListener('click', function() {
-            if (confirm('Are you sure you want to restore all users?')) {
-                fetch('restore_all_users.php', {
+        document.getElementById('restoreAllJobSeekers').addEventListener('click', function() {
+            if (confirm('Are you sure you want to restore all deleted job seekers?')) {
+                fetch('restore_all_job_seekers.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -257,15 +279,38 @@ session_write_close();
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('All users have been restored.');
+                        alert(data.message);
                         location.reload();
                     } else {
-                        alert('Failed to restore users.');
+                        alert(data.message);
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('An error occurred while restoring the users.');
+                    alert('An error occurred while restoring the job seekers.');
+                });
+            }
+        });
+        document.getElementById('restoreAllEmployers').addEventListener('click', function() {
+            if (confirm('Are you sure you want to restore all deleted employers?')) {
+                fetch('restore_all_employers.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while restoring the employers.');
                 });
             }
         });
@@ -473,6 +518,11 @@ session_write_close();
             </div>
         </nav>
     </header>
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>
     <main>
         <h1>Manage Users</h1>
         <div class="header-controls">
@@ -574,7 +624,11 @@ session_write_close();
         </table>
         <div class="header-controls">
             <h2>Deleted Users</h2>
-            <button id="restoreSelectedUsers" class="primary">Restore Selected Users</button>
+            <div class="button-group">
+                <button id="restoreAllEmployers" class="success">Restore All Employers</button>
+                <button id="restoreAllJobSeekers" class="success">Restore All Job Seekers</button>
+                <button id="restoreSelectedUsers" class="primary">Restore Selected Users</button>
+            </div>
         </div>
         <table>
             <thead>
@@ -626,7 +680,6 @@ session_write_close();
                 ?>
             </tbody>
         </table>
-        <button id="restoreAllUsers" class="success">Restore All Users</button>
     </main>
     <footer>
         <div class="footer-content">

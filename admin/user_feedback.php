@@ -240,6 +240,12 @@ ob_end_flush();
         </nav>
     </header>
 
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>
+
     <section class="feedback-container">
         <div class="main-content">
             <h2 style="text-align: center;">Manage Feedback</h2>
