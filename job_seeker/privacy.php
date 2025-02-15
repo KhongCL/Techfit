@@ -74,7 +74,7 @@ session_write_close();
                         </a>
                         <ul class="dropdown" id="profile-dropdown">
                             <li><a href="profile.php">Settings</a></li>
-                            <li><a href="logout.php">Logout</a></li>
+                            <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -245,6 +245,14 @@ session_write_close();
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
+    <div id="logout-popup" class="popup">
+        <h2>Are you sure you want to Log Out?</h2>
+        <form id="logout-form" action="profile.php" method="post">
+            <input type="hidden" name="logout" value="1">
+            <button type="submit" class="close-button">Yes</button>
+            <button type="button" class="cancel-button" onclick="closePopup('logout-popup')">No</button>
+        </form>
+    </div>
 
     <script src="scripts.js"></script>
 </body>

@@ -23,9 +23,13 @@ if (!isset($_GET['key']) || $_GET['key'] !== $admin_key) {
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
+    
+    $_SESSION['entered_username'] = $username;
 
-    $sql = "SELECT * FROM User WHERE username='$username' AND role='Admin'";
-    $result = $conn->query($sql);
+    $stmt = $conn->prepare("SELECT * FROM User WHERE username=? AND role='Admin'");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
@@ -59,6 +63,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - TechFit</title>
+    <script src="scripts.js?v=1.0"></script>
     <style>
         body {
             background-color: #121212;
@@ -156,15 +161,16 @@ $conn->close();
         ?>
         
         <img src="images/usericon.png" alt="User Icon">
-            <form action="admin_login.php?key=techfit" method="post">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required><br>
+        <form action="admin_login.php?key=techfit" method="post">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username"
+                value="<?php echo isset($_SESSION['entered_username']) ? htmlspecialchars($_SESSION['entered_username']) : ''; ?>" required><br>
 
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required><br>
 
-                <input type="submit" value="Login">
-            </form>
+            <input type="submit" value="Login">
+        </form>
             <p>Don't have an account? <a href="admin_register.php?key=techfit">Sign up here</a></p>
         </div>
     </main>

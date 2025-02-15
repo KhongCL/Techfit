@@ -14,17 +14,11 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-if ($_SERVER["REQUEST_METHOD"] != "POST") {
-    unset($_SESSION['entered_username']);
-    unset($_SESSION['entered_password']);
-}
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
     $_SESSION['entered_username'] = $username; // Store username
-    $_SESSION['entered_password'] = $password; // Store password (optional)
 
     $stmt = $conn->prepare("SELECT * FROM User WHERE username=?");
     $stmt->bind_param("s", $username);
@@ -34,7 +28,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         if (password_verify($password, $row['password'])) {
-            // Check if the user is an admin
+
+            unset($_SESSION['entered_username']);
+            unset($_SESSION['entered_password']);
+            unset($_SESSION['error_message']);
+
             if ($row['role'] == 'Admin') {
                 $_SESSION['error_message'] = "No Job Seeker or Employer found with that username.";
                 header("Location: login.php");
@@ -91,6 +89,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - TechFit</title>
+    <script src="scripts.js?v=1.0"></script>
     <style>
         body {
             background-color: #121212;
@@ -194,8 +193,7 @@ $conn->close();
                 value="<?php echo isset($_SESSION['entered_username']) ? htmlspecialchars($_SESSION['entered_username']) : ''; ?>" required><br>
 
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password"
-                value="<?php echo isset($_SESSION['entered_password']) ? htmlspecialchars($_SESSION['entered_password']) : ''; ?>" required><br>
+            <input type="password" id="password" name="password" required><br>
 
             <input type="submit" value="Login">
         </form>

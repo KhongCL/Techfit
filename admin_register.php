@@ -33,14 +33,22 @@ function generateNextId($conn, $table, $column, $prefix) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $user_id = generateNextId($conn, 'User', 'user_id', 'U');
     $username = $_POST['username'];
     $first_name = $_POST['first_name'];
     $last_name = $_POST['last_name'];
     $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $birthday = $_POST['birthday'];
     $gender = $_POST['gender'];
+    
+    $_SESSION['entered_username'] = $username;
+    $_SESSION['entered_first_name'] = $first_name;
+    $_SESSION['entered_last_name'] = $last_name;
+    $_SESSION['entered_email'] = $email;
+    $_SESSION['entered_birthday'] = $birthday;
+    $_SESSION['entered_gender'] = $gender;
+
+    $user_id = generateNextId($conn, 'User', 'user_id', 'U');
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $role = 'Admin'; 
 
     
@@ -61,6 +69,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 VALUES ('$admin_id', '$user_id')";
 
         if ($conn->query($sql) === TRUE) {
+            unset($_SESSION['entered_password']);
+            unset($_SESSION['entered_confirm_password']);
+            session_unset();
             header("Location: admin_login.php?key=$admin_key");
             exit();
         } else {
@@ -84,6 +95,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Register - TechFit</title>
+    <script src="scripts.js?v=1.0"></script>
     <style>
         body {
             background-color: #121212;
@@ -228,8 +240,8 @@ $conn->close();
                 top: 0;
                 left: 0;
                 margin-bottom: 20px;
-                align-items: left;
-                justify-content: left;
+                display: flex;
+                justify-content: flex-start;
                 z-index: 2;
             }
 
@@ -313,33 +325,41 @@ $conn->close();
         ?>
         </div>
         <form action="admin_register.php?key=techfit" method="post" onsubmit="return validateForm()">
-            <div class="form-row">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-                <label for="email">Email:</label>
-                <input type="email" id="email" name="email" required>
-            </div>
-            <div class="form-row">
-                <label for="first_name">First Name:</label>
-                <input type="text" id="first_name" name="first_name" required>
-                <label for="last_name">Last Name:</label>
-                <input type="text" id="last_name" name="last_name" required>
-            </div>
-            <div class="form-row">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-                <label for="confirm_password">Confirm Password:</label>
-                <input type="password" id="confirm_password" name="confirm_password" required>
-            </div>
-            <div class="form-row">
-                <label for="birthday">Birthday:</label>
-                <input type="date" id="birthday" name="birthday" required>
-                <label for="gender">Gender:</label>
-                <select id="gender" name="gender">
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                </select>
-            </div>
+        <div class="form-row">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" 
+                value="<?php echo isset($_SESSION['entered_username']) ? htmlspecialchars($_SESSION['entered_username']) : ''; ?>" required>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email"
+                value="<?php echo isset($_SESSION['entered_email']) ? htmlspecialchars($_SESSION['entered_email']) : ''; ?>" required>
+        </div>
+        <div class="form-row">
+            <label for="first_name">First Name:</label>
+            <input type="text" id="first_name" name="first_name"
+                value="<?php echo isset($_SESSION['entered_first_name']) ? htmlspecialchars($_SESSION['entered_first_name']) : ''; ?>" required>
+            <label for="last_name">Last Name:</label>
+            <input type="text" id="last_name" name="last_name"
+                value="<?php echo isset($_SESSION['entered_last_name']) ? htmlspecialchars($_SESSION['entered_last_name']) : ''; ?>" required>
+        </div>
+        
+        <div class="form-row">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="confirm_password">Confirm Password:</label>
+            <input type="password" id="confirm_password" name="confirm_password" required>
+        </div>
+
+        <div class="form-row">
+            <label for="birthday">Birthday:</label>
+            <input type="date" id="birthday" name="birthday"
+                value="<?php echo isset($_SESSION['entered_birthday']) ? htmlspecialchars($_SESSION['entered_birthday']) : ''; ?>" required>
+            <label for="gender">Gender:</label>
+            <select id="gender" name="gender">
+                <option value="Male" <?php echo (isset($_SESSION['entered_gender']) && $_SESSION['entered_gender'] == 'Male') ? 'selected' : ''; ?>>Male</option>
+                <option value="Female" <?php echo (isset($_SESSION['entered_gender']) && $_SESSION['entered_gender'] == 'Female') ? 'selected' : ''; ?>>Female</option>
+            </select>
+        </div>
             
             <div class="form-row checkbox-row">
                 <input type="checkbox" id="terms" name="terms" required>

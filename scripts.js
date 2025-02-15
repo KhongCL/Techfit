@@ -3,79 +3,93 @@ document.addEventListener('DOMContentLoaded', function () {
     const dropdowns = document.querySelectorAll('.dropdown');
     const hamburger = document.getElementById('hamburger');
     const navList = document.querySelector('.nav-list');
-
-    navItems.forEach(item => {
-        item.addEventListener('click', function (event) {
-            const parent = item.parentElement;
-            const dropdown = parent.querySelector('.dropdown');
-
-            if (dropdown) {
-                event.preventDefault();
-                const isActive = dropdown.classList.contains('active');
-                closeAllDropdowns();
-                if (!isActive) {
-                    dropdown.classList.add('active');
-                    parent.classList.add('active');
-                }
-            }
-        });
-
-        item.addEventListener('touchstart', function (event) {
-            event.preventDefault();
-            item.click();
-        });
-    });
-
-    const closeAllDropdowns = () => {
-        dropdowns.forEach(dd => dd.classList.remove('active'));
-        navItems.forEach(item => item.parentElement.classList.remove('active'));
-    };
-
-    document.addEventListener('click', function (event) {
-        if (!event.target.closest('.nav-list')) {
-            closeAllDropdowns();
-        }
-    });
-
-    hamburger.addEventListener('click', function () {
-        hamburger.classList.toggle('active');
-        navList.classList.toggle('active');
-    });
-
-    window.addEventListener('resize', function () {
-        closeAllDropdowns();
-        hamburger.classList.remove('active');
-        navList.classList.remove('active');
-    });
-
     const profileLink = document.getElementById('profile-link');
     const logoutPopup = document.getElementById('logout-popup');
     const logoutConfirmButton = document.getElementById('logout-confirm-button');
     const logoutCancelButton = document.getElementById('logout-cancel-button');
     const profileDropdown = document.getElementById('profile-dropdown');
 
-    profileLink.addEventListener('click', function(event) {
-        event.preventDefault();
-        profileDropdown.classList.toggle('active');
-    });
+    // Only run navigation related code if elements exist
+    if (navItems.length && dropdowns.length) {
+        navItems.forEach(item => {
+            item.addEventListener('click', function (event) {
+                const parent = item.parentElement;
+                const dropdown = parent.querySelector('.dropdown');
 
-    const logoutDropdownLink = profileDropdown.querySelector('li a[href="#"]');
+                if (dropdown) {
+                    event.preventDefault();
+                    const isActive = dropdown.classList.contains('active');
+                    closeAllDropdowns();
+                    if (!isActive) {
+                        dropdown.classList.add('active');
+                        parent.classList.add('active');
+                    }
+                }
+            });
 
-    if(logoutDropdownLink) {
-        logoutDropdownLink.addEventListener('click', function(event) {
-            event.preventDefault();
-            openPopup('logout-popup');
-            profileDropdown.classList.remove('active');
+            item.addEventListener('touchstart', function (event) {
+                event.preventDefault();
+                item.click();
+            });
+        });
+
+        const closeAllDropdowns = () => {
+            dropdowns.forEach(dd => dd.classList.remove('active'));
+            navItems.forEach(item => item.parentElement.classList.remove('active'));
+        };
+
+        document.addEventListener('click', function (event) {
+            if (!event.target.closest('.nav-list')) {
+                closeAllDropdowns();
+            }
         });
     }
 
-    logoutConfirmButton.addEventListener('click', function() {
-        logoutUser();
-    });
+    // Only add hamburger events if element exists
+    if (hamburger && navList) {
+        hamburger.addEventListener('click', function () {
+            hamburger.classList.toggle('active');
+            navList.classList.toggle('active');
+        });
 
-    logoutCancelButton.addEventListener('click', function() {
-        closePopup('logout-popup');
-    });
+        window.addEventListener('resize', function () {
+            if (typeof closeAllDropdowns === 'function') {
+                closeAllDropdowns();
+            }
+            hamburger.classList.remove('active');
+            navList.classList.remove('active');
+        });
+    }
+
+    // Only add profile/logout events if elements exist
+    if (profileLink && profileDropdown) {
+        profileLink.addEventListener('click', function(event) {
+            event.preventDefault();
+            profileDropdown.classList.toggle('active');
+        });
+
+        const logoutDropdownLink = profileDropdown.querySelector('li a[href="#"]');
+
+        if(logoutDropdownLink) {
+            logoutDropdownLink.addEventListener('click', function(event) {
+                event.preventDefault();
+                openPopup('logout-popup');
+                profileDropdown.classList.remove('active');
+            });
+        }
+    }
+
+    if (logoutConfirmButton) {
+        logoutConfirmButton.addEventListener('click', function() {
+            logoutUser();
+        });
+    }
+
+    if (logoutCancelButton) {
+        logoutCancelButton.addEventListener('click', function() {
+            closePopup('logout-popup');
+        });
+    }
 });
 
 

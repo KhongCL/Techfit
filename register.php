@@ -16,18 +16,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-if ($_SERVER["REQUEST_METHOD"] != "POST") {
-    unset($_SESSION['entered_username']);
-    unset($_SESSION['entered_first_name']); 
-    unset($_SESSION['entered_last_name']);
-    unset($_SESSION['entered_email']);
-    unset($_SESSION['entered_birthday']);
-    unset($_SESSION['entered_gender']);
-    unset($_SESSION['entered_role']);
-    unset($_SESSION['entered_job_position']);
-    unset($_SESSION['entered_confirm_password']);
-}
-
 // Function to generate the next ID with a given prefix
 function generateNextId($conn, $table, $column, $prefix) {
     $sql = "SELECT MAX(CAST(SUBSTRING($column, LENGTH('$prefix') + 1) AS UNSIGNED)) AS max_id FROM $table WHERE $column LIKE '$prefix%'";
@@ -48,7 +36,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['entered_gender'] = $_POST['gender'];
     $_SESSION['entered_role'] = $_POST['role'];
     $_SESSION['entered_job_position'] = isset($_POST['job_position_interested']) ? $_POST['job_position_interested'] : '';
-    $_SESSION['entered_confirm_password'] = $_POST['confirm_password']; // Store confirm password
     
     // Hash password but don't store it in session for security reasons
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
@@ -79,7 +66,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         if ($conn->query($sql) === TRUE) {
-            // Clear session values on successful registration
+            unset($_SESSION['entered_password']);
+            unset($_SESSION['entered_confirm_password']);
             session_unset();
             header("Location: login.php");
             exit();
@@ -105,6 +93,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - TechFit</title>
+    <script src="scripts.js?v=1.0"></script>
     <style>
         body {
             background-color: #121212;
@@ -381,8 +370,7 @@ $conn->close();
             <input type="password" id="password" name="password" required>
 
             <label for="confirm_password">Confirm Password:</label>
-            <input type="password" id="confirm_password" name="confirm_password"
-                value="<?php echo isset($_SESSION['entered_confirm_password']) ? htmlspecialchars($_SESSION['entered_confirm_password']) : ''; ?>" required>
+            <input type="password" id="confirm_password" name="confirm_password" required>
         </div>
 
         <div class="form-row">
