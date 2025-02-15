@@ -1001,6 +1001,20 @@ session_start();
                 margin-top: 15px;
             }
 
+            .deleted-search-container {
+                justify-content: center;
+                align-items: center;
+            }
+
+            .search-field-container {
+                width: 100%;
+                position: relative;
+            }
+
+            .action-controls .success{
+                width: 100%;
+            }
+
             @media (max-width: 480px) {
                 #deleted-questions-popup {
                     width: 98%;
@@ -1016,11 +1030,6 @@ session_start();
                     font-size: 12px;
                     padding: 6px;
                 }
-            }
-
-            .deleted-search-container {
-                justify-content: center;
-                align-items: center;
             }
         </style>
 </head>
