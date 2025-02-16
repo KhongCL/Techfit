@@ -21,6 +21,41 @@ if (!isset($_GET['assessment_id']) || empty($_GET['assessment_id'])) {
     die("Invalid assessment ID.");
 }
 
+function displayLoginMessage() {
+    echo '<script>
+        if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
+            window.location.href = "../login.php";
+        } else {
+            window.location.href = "../index.php";
+        }
+    </script>';
+    exit();
+}
+
+
+if (!isset($_SESSION['user_id'])) {
+    displayLoginMessage(); 
+}
+
+
+if ($_SESSION['role'] !== 'Job Seeker') {
+    displayLoginMessage(); 
+}
+
+
+if (!isset($_SESSION['job_seeker_id'])) {
+    displayLoginMessage(); 
+}
+
+if (!isset($_GET['assessment_id']) || trim($_GET['assessment_id']) === '') {
+    displayLoginMessage();
+}
+
+$referer = $_SERVER['HTTP_REFERER'] ?? '';
+if (strpos($referer, 'assessment_summary.php') === false) {
+    displayLoginMessage();
+}
+
 $assessment_id = $_GET['assessment_id'];
 
 

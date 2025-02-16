@@ -28,6 +28,15 @@ if (!isset($_SESSION['job_seeker_id'])) {
     displayLoginMessage(); 
 }
 
+if (!isset($_GET['assessment_id']) || trim($_GET['assessment_id']) === '') {
+    displayLoginMessage();
+}
+
+$referer = $_SERVER['HTTP_REFERER'] ?? '';
+if (strpos($referer, 'assessment_history.php') === false) {
+    displayLoginMessage();
+}
+
 
 session_write_close();
 
