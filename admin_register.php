@@ -103,9 +103,12 @@ $conn->close();
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             height: 100vh;
             margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow: auto;
         }
 
         .logo {
@@ -113,6 +116,7 @@ $conn->close();
             top: 10px;
             left: 20px;
         }
+
         .logo img {
             height: 50px;
         }
@@ -123,37 +127,50 @@ $conn->close();
 
         .container {
             background-color: #1e1e1e;
-            padding: 50px;
+            padding: 60px;
+            margin-top: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            width: 900px;
+            width: 100%;
+            max-width: 900px;
             text-align: center;
+            box-sizing: border-box;
+            overflow: auto;
         }
+
         .form-row {
             display: flex;
             justify-content: space-between;
             margin-bottom: 35px;
+            flex-wrap: wrap;
         }
+
         .form-row label {
             flex: 1;
             margin-right: 10px;
         }
-        .form-row input, .form-row select {
+
+        .form-row input,
+        .form-row select {
             flex: 1;
             padding: 15px;
             border: none;
             border-radius: 10px;
             background-color: #333;
             color: #fff;
+            margin-bottom: 10px;
         }
-        .form-row.full-width input, .form-row.full-width select {
+
+        .form-row.full-width input,
+        .form-row.full-width select {
             width: calc(100% - 30px);
         }
+
         .form-row input[type="checkbox"] {
             flex: 0;
             margin-right: 20px;
         }
-        
+
         input[type="submit"] {
             width: 100%;
             padding: 15px;
@@ -173,6 +190,7 @@ $conn->close();
             color: #007bff;
             text-decoration: none;
         }
+
         a:hover {
             text-decoration: underline;
         }
@@ -180,13 +198,17 @@ $conn->close();
         .form-row.full-width {
             flex-direction: column;
         }
-        .form-row.full-width input, .form-row.full-width select {
+
+        .form-row.full-width input,
+        .form-row.full-width select {
             width: calc(100% - 30px);
         }
+
         .form-row.checkbox-row {
             align-items: center;
             justify-content: center;
         }
+
         .form-row.checkbox-row label {
             flex: none;
             margin-right: 10px;
@@ -210,6 +232,7 @@ $conn->close();
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             z-index: 1000;
         }
+
         .popup button {
             margin-top: 20px;
             padding: 10px 20px;
@@ -219,58 +242,95 @@ $conn->close();
             color: #fff;
             cursor: pointer;
         }
+
         .popup button:hover {
             background-color: #0056b3;
         }
+
         .popup ul {
             list-style-type: none;
             padding: 0;
         }
+
         .popup ul li {
             margin: 10px 0;
             cursor: pointer;
         }
+
         .popup ul li:hover {
             text-decoration: underline;
         }
 
-        @media (max-width: 600px) {
-            .logo {
-                position: relative;
-                top: 0;
-                left: 0;
-                margin-bottom: 20px;
-                display: flex;
-                justify-content: flex-start;
-                z-index: 2;
+        @media (max-width: 850px) {
+            h2 {
+                padding-top:35px;
+            }   
+
+            .container {
+                margin-top: 30px;
+                padding: 20px;
+                overflow: auto;
             }
 
-            h2 {
-                margin-top: 0;
+            .form-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .form-row label,
+            .form-row input,
+            .form-row select {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+
+            .form-row input,
+            .form-row select {
+                padding: 10px;
+                width: calc(100% - 20px);
+            }
+
+            #gender,
+            #role {
+                width: 100%;
+            }
+
+            .form-row input[type="checkbox"] {
+                margin-right: 10px;
+            }
+
+            input[type="submit"] {
+                width: 100%;
+                padding: 15px;
+                margin: 20px 0;
             }
         }
-        
+
+        body {
+            padding-top: 50px;
+        }
     </style>
+        
     <script>
         function validateForm() {
             let isValid = true;
             let errorMessage = "";
 
-            // Username validation (5-20 chars, letters, numbers, underscore)
+            
             const username = document.getElementById("username")?.value;
             if (username && !/^[a-zA-Z0-9_]{5,20}$/.test(username)) {
                 errorMessage += "Username must be 5-20 characters and contain only letters, numbers, and underscores.<br>";
                 isValid = false;
             }
 
-            // Email validation using comprehensive regex
+            
             const email = document.getElementById("email")?.value;
             if (email && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
                 errorMessage += "Please enter a valid email address.<br>";
                 isValid = false;
             }
 
-            // Password validation with all requirements combined
+            
             const password = document.getElementById("password")?.value;
             const confirmPassword = document.getElementById("confirm_password")?.value;
             if (password) {
@@ -289,7 +349,7 @@ $conn->close();
                 }
             }
 
-            // Name validation (letters and hyphens only)
+            
             const nameRegex = /^[a-zA-Z-]+$/;
             const firstName = document.getElementById("first_name")?.value;
             const lastName = document.getElementById("last_name")?.value;
@@ -303,19 +363,19 @@ $conn->close();
                 isValid = false;
             }
 
-            // Birthday validation with proper age calculation
+            
             const birthday = document.getElementById("birthday")?.value;
             if (birthday) {
                 const birthDate = new Date(birthday);
                 const today = new Date();
                 
-                // Check if date is in the future
+                
                 if (birthDate >= today) {
                     errorMessage += "Birthday cannot be in the future.<br>";
                     isValid = false;
                 }
 
-                // Calculate age considering month and day
+                
                 let age = today.getFullYear() - birthDate.getFullYear();
                 const monthDiff = today.getMonth() - birthDate.getMonth();
                 if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
@@ -328,18 +388,18 @@ $conn->close();
                 }
             }
 
-            // Terms checkbox validation
+            
             const terms = document.getElementById("terms")?.checked;
             if (!terms) {
                 errorMessage += "You must agree to the Terms of Service and Privacy Policy.<br>";
                 isValid = false;
             }
 
-            // Display error message
+            
             const errorDiv = document.getElementById("error-message");
             if (!isValid && errorDiv) {
                 errorDiv.innerHTML = errorMessage;
-                // Scroll to error message
+                
                 errorDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 

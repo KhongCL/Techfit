@@ -8,15 +8,12 @@ $username = "root";
 $password = "";
 $dbname = "techfit";
 
-// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Function to generate the next ID with a given prefix
 function generateNextId($conn, $table, $column, $prefix) {
     $sql = "SELECT MAX(CAST(SUBSTRING($column, LENGTH('$prefix') + 1) AS UNSIGNED)) AS max_id FROM $table WHERE $column LIKE '$prefix%'";
     $result = $conn->query($sql);
@@ -27,7 +24,6 @@ function generateNextId($conn, $table, $column, $prefix) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Store input values in session
     $_SESSION['entered_username'] = $_POST['username'];
     $_SESSION['entered_first_name'] = $_POST['first_name'];
     $_SESSION['entered_last_name'] = $_POST['last_name'];
@@ -37,10 +33,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION['entered_role'] = $_POST['role'];
     $_SESSION['entered_job_position'] = isset($_POST['job_position_interested']) ? $_POST['job_position_interested'] : '';
     
-    // Hash password but don't store it in session for security reasons
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-    // Check for duplicate username or email
     $check_sql = "SELECT * FROM User WHERE username='{$_POST['username']}' OR email='{$_POST['email']}'";
     $check_result = $conn->query($check_sql);
     if ($check_result->num_rows > 0) {
@@ -49,7 +43,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    // Insert user data into the database
     $user_id = generateNextId($conn, 'User', 'user_id', 'U');
     $sql = "INSERT INTO User (user_id, username, first_name, last_name, email, password, birthday, gender, role, is_active)
             VALUES ('$user_id', '{$_POST['username']}', '{$_POST['first_name']}', '{$_POST['last_name']}', '{$_POST['email']}', '$password', '{$_POST['birthday']}', '{$_POST['gender']}', '{$_POST['role']}', TRUE)";
@@ -101,12 +94,12 @@ $conn->close();
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Align items from the top */
+            align-items: flex-start; 
             height: 100vh;
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
-            overflow: auto; /* Enable scrolling */
+            overflow: auto; 
         }
 
         .logo {
@@ -119,41 +112,42 @@ $conn->close();
         }
 
         h2 {
-            margin-top: -25px; /* Move title up by 25px */
+            margin-top: -25px;
         }
 
         .container {
             background-color: #1e1e1e;
-            padding: 50px;
+            padding: 60px;
+            margin-top: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             width: 100%;
-            max-width: 900px; /* Set max width */
+            max-width: 900px;
             text-align: center;
             box-sizing: border-box;
-            overflow: auto; /* Enable scrolling */
+            overflow: auto;
         }
         .form-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 35px; /* Increased spacing */
-            flex-wrap: wrap; /* Allow wrapping */
+            margin-bottom: 35px; 
+            flex-wrap: wrap; 
         }
         .form-row label {
             flex: 1;
-            margin-right: 10px; /* Increased spacing */
+            margin-right: 10px; 
         }
         .form-row input, .form-row select {
             flex: 1;
-            padding: 15px; /* Increased padding */
+            padding: 15px; 
             border: none;
             border-radius: 10px;
             background-color: #333;
             color: #fff;
-            margin-bottom: 10px; /* Add margin for spacing */
+            margin-bottom: 10px;
         }
         .form-row.full-width input, .form-row.full-width select {
-            width: calc(100% - 30px); /* Adjusted width */
+            width: calc(100% - 30px); 
         }
         .form-row input[type="checkbox"] {
             flex: 0;
@@ -161,8 +155,8 @@ $conn->close();
         }
         input[type="submit"] {
             width: 100%;
-            padding: 15px; /* Increased padding */
-            margin: 20px 0; /* Increased spacing */
+            padding: 15px;
+            margin: 20px 0; 
             border: none;
             border-radius: 5px;
             background-color: #007bff;
@@ -183,11 +177,11 @@ $conn->close();
             flex-direction: column;
         }
         .form-row.full-width input, .form-row.full-width select {
-            width: calc(100% - 30px); /* Adjusted width */
+            width: calc(100% - 30px);
         }
         .form-row.checkbox-row {
             align-items: center;
-            justify-content: center; /* Center align the checkbox row */
+            justify-content: center;
         }
         .form-row.checkbox-row label {
             flex: none;
@@ -236,46 +230,63 @@ $conn->close();
         }
 
         @media (max-width: 850px) {
-            .container {
-                padding: 20px;
-                overflow: auto; /* Enable scrolling */
+            h2 {
+            margin-top: 10px;
             }
+
+            .container {
+            margin-top : 30px;
+            padding: 20px;
+            overflow: auto; 
+            }
+
             .form-row {
-                flex-direction: column;
-                align-items: flex-start;
+            flex-direction: column;
+            align-items: flex-start;
             }
             .form-row label, .form-row input, .form-row select {
-                width: 100%;
-                margin-bottom: 10px;
+            width: 100%;
+            margin-bottom: 10px;
             }
             .form-row input, .form-row select {
-                padding: 10px; /* Reduce padding */
+            padding: 10px;
+            width: calc(100% - 20px);
+            }
+            #gender, #role {
+                width: 100%;    
             }
             .form-row input[type="checkbox"] {
-                margin-right: 10px;
+            margin-right: 10px;
+            }
+            input[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0; 
             }
         }
+
+        body {
+            padding-top: 50px;
+        }
+
     </style>
     <script>
         function validateForm() {
             let isValid = true;
             let errorMessage = "";
 
-            // Username validation (5-20 chars, letters, numbers, underscore)
             const username = document.getElementById("username")?.value;
             if (username && !/^[a-zA-Z0-9_]{5,20}$/.test(username)) {
                 errorMessage += "Username must be 5-20 characters and contain only letters, numbers, and underscores.<br>";
                 isValid = false;
             }
 
-            // Email validation using comprehensive regex
             const email = document.getElementById("email")?.value;
             if (email && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
                 errorMessage += "Please enter a valid email address.<br>";
                 isValid = false;
             }
 
-            // Password validation with all requirements combined
             const password = document.getElementById("password")?.value;
             const confirmPassword = document.getElementById("confirm_password")?.value;
             if (password) {
@@ -294,7 +305,6 @@ $conn->close();
                 }
             }
 
-            // Name validation (letters and hyphens only)
             const nameRegex = /^[a-zA-Z-]+$/;
             const firstName = document.getElementById("first_name")?.value;
             const lastName = document.getElementById("last_name")?.value;
@@ -308,19 +318,16 @@ $conn->close();
                 isValid = false;
             }
 
-            // Birthday validation with proper age calculation
             const birthday = document.getElementById("birthday")?.value;
             if (birthday) {
                 const birthDate = new Date(birthday);
                 const today = new Date();
                 
-                // Check if date is in the future
                 if (birthDate >= today) {
                     errorMessage += "Birthday cannot be in the future.<br>";
                     isValid = false;
                 }
 
-                // Calculate age considering month and day
                 let age = today.getFullYear() - birthDate.getFullYear();
                 const monthDiff = today.getMonth() - birthDate.getMonth();
                 if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
@@ -333,7 +340,6 @@ $conn->close();
                 }
             }
 
-            // Job Position validation (required if role is selected)
             const role = document.getElementById("role")?.value;
             const jobPosition = document.getElementById("job_position_interested")?.value;
             if (role && (jobPosition === 'Select' || !jobPosition)) {
@@ -341,18 +347,15 @@ $conn->close();
                 isValid = false;
             }
 
-            // Terms checkbox validation
             const terms = document.getElementById("terms")?.checked;
             if (!terms) {
                 errorMessage += "You must agree to the Terms of Service and Privacy Policy.<br>";
                 isValid = false;
             }
 
-            // Display error message
             const errorDiv = document.getElementById("error-message");
             if (!isValid && errorDiv) {
                 errorDiv.innerHTML = errorMessage;
-                // Scroll to error message
                 errorDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
@@ -382,7 +385,7 @@ $conn->close();
         <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
     </div>
     <div class="container">
-        <h2 style="margin-top: -25px;">Register</h2> <!-- Move title up by 25px -->
+        <h2>Register</h2>
         <div id="error-message" class="error-message">
             <?php
                 if (isset($_SESSION['error_message'])) {
