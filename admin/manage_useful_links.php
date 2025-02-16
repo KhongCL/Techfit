@@ -208,6 +208,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         li {
                 color: white;
             }
+            .wrapped-link {
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+                word-break: break-all;
+                white-space: normal;
+                display: inline-block;
+                width: 100%;
+            }
     </style>
 <header>
         <div class="logo">
@@ -366,7 +374,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             return;
         }
         const title = usefulLinkItem.querySelector('strong:nth-of-type(1)').nextSibling.textContent.trim();
-        const link = usefulLinkItem.querySelector('strong:nth-of-type(2)').nextSibling.textContent.trim();
+        const link = usefulLinkItem.querySelector('a').getAttribute('href').trim();
         const category = usefulLinkItem.closest('.faq-category').querySelector('h3').textContent.toLowerCase().includes('job') ? 'jobSeeker' : 'employer';
         const description = usefulLinkItem.querySelector('p').textContent.replace('Description:', '').trim();
 
@@ -465,7 +473,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <div class="faq-item" data-id="<?= $usefulLink['resource_id'] ?>">
                             <div style="color:white;">
                                 <strong>Title: </strong><?= htmlspecialchars($usefulLink['title'])?><br><br>
-                                <strong>Link: </strong> <a href="<?= htmlspecialchars($usefulLink['link']) ?>" target="_blank"><?= htmlspecialchars($usefulLink['link']) ?></a><br><br>
+                                <strong>Link: </strong> 
+                                <a href="<?= htmlspecialchars($usefulLink['link']) ?>" target="_blank" class="wrapped-link">
+                                    <?= htmlspecialchars($usefulLink['link']) ?>
+                                </a>
                             </div>
                             <p>
                             <strong>Description: </strong> <?= htmlspecialchars($usefulLinkDescriptions[$usefulLink['resource_id']] ?? 'No description available', ENT_QUOTES, 'UTF-8') ?>
