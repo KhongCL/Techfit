@@ -470,23 +470,61 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
             max-width: 350px;
         }
 
-        .popup input[type="text"],
-        .popup input[type="password"],
-        .popup input[type="email"] {
-            width: 100%;
+        #logout-popup {
+            width: 70%;
+            max-width: 250px;
+            padding: 20px;
+            text-align: left;
+            border-radius: 10px;
+            background-color: var(--background-color-light);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
-        .popup form {
+        #logout-popup h2 {
+            margin-bottom: 20px;
+            font-size: 22px;
+            color: var(--text-color);
+            font-weight: bold;
+            text-align: left;
+        }
+
+        #logout-popup .button-container {
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
+            justify-content: flex-start;
             gap: 10px;
+            margin-top: 20px;
         }
 
-        .popup input[type="submit"],
-        .popup .close-button,
-        .popup .cancel-button {
-            width: 100%;
+        #logout-popup .close-button,
+        #logout-popup .cancel-button {
+            display: inline-block;
+            width: calc(45% - 10px);
+            margin: 0px;
+            padding: 8px 0;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
         }
+
+            .popup input[type="text"],
+            .popup input[type="password"],
+            .popup input[type="email"] {
+                width: 100%;
+            }
+
+            .popup form {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .popup input[type="submit"],
+            .popup .close-button,
+            .popup .cancel-button {
+                width: 100%;
+            }
     }
 
     @media (max-width: 480px) {
@@ -644,8 +682,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
 
 <div id="logout-popup" class="popup">
     <h2>Are you sure you want to Log Out?</h2>
-    <button class="close-button" id="logout-confirm-button">Yes</button>
-    <button class="cancel-button" id="logout-cancel-button">No</button>
+    <div class="button-container">
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>
 </div>
 
 <footer>
