@@ -261,52 +261,99 @@ $conn->close();
             let isValid = true;
             let errorMessage = "";
 
-            // Password validation
-            const password = document.getElementById("password").value;
-            const confirmPassword = document.getElementById("confirm_password").value;
-            if (password.length < 8) {
-                errorMessage += "Password must be at least 8 characters long.<br>";
-                isValid = false;
-            }
-            if (!/[0-9]/.test(password)) {
-                errorMessage += "Password must contain at least one number.<br>";
-                isValid = false;
-            }
-            if (!/[a-zA-Z]/.test(password)) {
-                errorMessage += "Password must contain at least one letter.<br>";
-                isValid = false;
-            }
-            if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-                errorMessage += "Password must contain at least one symbol.<br>";
-                isValid = false;
-            }
-            if (password !== confirmPassword) {
-                errorMessage += "Passwords do not match.<br>";
+            // Username validation (5-20 chars, letters, numbers, underscore)
+            const username = document.getElementById("username")?.value;
+            if (username && !/^[a-zA-Z0-9_]{5,20}$/.test(username)) {
+                errorMessage += "Username must be 5-20 characters and contain only letters, numbers, and underscores.<br>";
                 isValid = false;
             }
 
-            // Birthday validation
-            const birthday = document.getElementById("birthday").value;
-            if (!birthday) {
-                errorMessage += "Please enter your birthday.<br>";
+            // Email validation using comprehensive regex
+            const email = document.getElementById("email")?.value;
+            if (email && !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+                errorMessage += "Please enter a valid email address.<br>";
                 isValid = false;
             }
 
-            // First name and last name validation
-            const firstName = document.getElementById("first_name").value;
-            const lastName = document.getElementById("last_name").value;
-            if (!/^[a-zA-Z-]+$/.test(firstName)) {
+            // Password validation with all requirements combined
+            const password = document.getElementById("password")?.value;
+            const confirmPassword = document.getElementById("confirm_password")?.value;
+            if (password) {
+                const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+                if (!passwordRegex.test(password)) {
+                    errorMessage += "Password must:<br>" +
+                        "- Be at least 8 characters long<br>" +
+                        "- Contain at least one letter<br>" +
+                        "- Contain at least one number<br>" +
+                        "- Contain at least one special character (@$!%*?&)<br>";
+                    isValid = false;
+                }
+                if (confirmPassword && password !== confirmPassword) {
+                    errorMessage += "Passwords do not match.<br>";
+                    isValid = false;
+                }
+            }
+
+            // Name validation (letters and hyphens only)
+            const nameRegex = /^[a-zA-Z-]+$/;
+            const firstName = document.getElementById("first_name")?.value;
+            const lastName = document.getElementById("last_name")?.value;
+            
+            if (firstName && !nameRegex.test(firstName)) {
                 errorMessage += "First name can only contain letters and hyphens.<br>";
                 isValid = false;
             }
-            if (!/^[a-zA-Z-]+$/.test(lastName)) {
+            if (lastName && !nameRegex.test(lastName)) {
                 errorMessage += "Last name can only contain letters and hyphens.<br>";
                 isValid = false;
             }
 
+            // Birthday validation with proper age calculation
+            const birthday = document.getElementById("birthday")?.value;
+            if (birthday) {
+                const birthDate = new Date(birthday);
+                const today = new Date();
+                
+                // Check if date is in the future
+                if (birthDate >= today) {
+                    errorMessage += "Birthday cannot be in the future.<br>";
+                    isValid = false;
+                }
+
+                // Calculate age considering month and day
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+
+                if (age < 16) {
+                    errorMessage += "Must be at least 16 years old.<br>";
+                    isValid = false;
+                }
+            }
+
+            // Job Position validation (required if role is selected)
+            const role = document.getElementById("role")?.value;
+            const jobPosition = document.getElementById("job_position_interested")?.value;
+            if (role && (jobPosition === 'Select' || !jobPosition)) {
+                errorMessage += "Please select at least one job position.<br>";
+                isValid = false;
+            }
+
+            // Terms checkbox validation
+            const terms = document.getElementById("terms")?.checked;
+            if (!terms) {
+                errorMessage += "You must agree to the Terms of Service and Privacy Policy.<br>";
+                isValid = false;
+            }
+
             // Display error message
-            if (!isValid) {
-                document.getElementById("error-message").innerHTML = errorMessage;
+            const errorDiv = document.getElementById("error-message");
+            if (!isValid && errorDiv) {
+                errorDiv.innerHTML = errorMessage;
+                // Scroll to error message
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
             return isValid;
