@@ -12,14 +12,17 @@ function displayLoginMessage() {
     exit();
 }
 
+
 if (!isset($_SESSION['user_id'])) {
     displayLoginMessage();
 }
+
 
 if ($_SESSION['role'] !== 'Employer') {
     displayLoginMessage();
 }
 
+session_write_close();
 ?>
 
 <!DOCTYPE html>
@@ -222,6 +225,7 @@ if ($_SESSION['role'] !== 'Employer') {
         }
 
         .profile-section {
+            margin-top: 40px;
             margin-bottom: 20px;
         }
 
@@ -258,6 +262,7 @@ if ($_SESSION['role'] !== 'Employer') {
             background-color: var(--background-color);
             border-radius: 4px;
             white-space: nowrap;
+            justify-content: center;
         }
 
         .score-time {
@@ -269,6 +274,11 @@ if ($_SESSION['role'] !== 'Employer') {
             padding-top: 15px;
             border-top: 1px solid var(--background-color);
         }
+
+        .assessment-title {
+                padding: 50px;
+                padding-bottom: 20px;
+            }
 
         @media screen and (max-width: 1024px) {
             .details {
@@ -318,7 +328,6 @@ if ($_SESSION['role'] !== 'Employer') {
                 padding: 10px;
             }
 
-            /* Make code sections responsive */
             .code-container, 
             .job-seeker-answer pre,
             .correct-answer pre {
@@ -359,25 +368,12 @@ if ($_SESSION['role'] !== 'Employer') {
 
             .assessment-title {
                 font-size: 1.2em;
+                padding: 50px;
+                padding-bottom: 20px;
             }
 
             .question-text {
                 font-size: 0.9em;
-            }
-
-            /* Adjust footer for mobile */
-            .footer-content {
-                flex-direction: column;
-                text-align: center;
-            }
-
-            .footer-right {
-                margin-top: 20px;
-            }
-
-            .footer-column {
-                width: 100%;
-                margin-bottom: 20px;
             }
         }
     </style>
@@ -444,7 +440,6 @@ if ($_SESSION['role'] !== 'Employer') {
         <div class="summary_header">
             <div class="assessment-title">Candidate Profile & Answers</div>
             <?php
-            // Database connection
             $servername = "localhost";
             $username = "root"; 
             $password = "";
@@ -457,7 +452,6 @@ if ($_SESSION['role'] !== 'Employer') {
 
             $job_seeker_id = $_GET['job_seeker_id'];
 
-            // Get candidate info
             $sql_candidate = "SELECT u.first_name, u.last_name, js.education_level, js.year_of_experience, js.linkedin_link
                             FROM User u
                             JOIN Job_Seeker js ON u.user_id = js.user_id
@@ -471,7 +465,6 @@ if ($_SESSION['role'] !== 'Employer') {
             if ($result_candidate->num_rows > 0) {
                 $row_candidate = $result_candidate->fetch_assoc();
                 
-                // Get score and time info
                 $score = "N/A";
                 $time_used = "N/A";
             
@@ -494,14 +487,12 @@ if ($_SESSION['role'] !== 'Employer') {
                     $time_used = !empty($time_used_value) ? $time_used_value : 'N/A';
                     $passing_score = $row_score_time['passing_score_percentage'];
                     
-                    // Create score display with color coding
                     $score_class = ($score !== 'N/A' && $score >= $passing_score) ? 'score-passed' : 'score-failed';
                     echo "<div class='detail-item'>Score: <span class='" . $score_class . "'>" . $score . "/100</span></div>";
                 } else {
                     echo "<div class='detail-item'>Score: N/A</div>";
                 }
             
-                // Display candidate info
                 echo "<div class='candidate-info'>";
                 echo "<div class='profile-section'>";
                 echo "<img src='images/usericon.png' alt='User Icon'>";
@@ -528,13 +519,12 @@ if ($_SESSION['role'] !== 'Employer') {
                 
                 echo "</div>";
                 
-                echo "</div>"; // Close details-container
-                echo "</div>"; // Close candidate-info
+                echo "</div>"; 
+                echo "</div>"; 
             } else {
                 echo "<h1>Candidate not found</h1>";
             }
 
-            // Get score and time info
             $score = "N/A";
             $time_used = "N/A";
 
@@ -574,7 +564,6 @@ if ($_SESSION['role'] !== 'Employer') {
 
         <div class="questions-section">
             <?php
-            // Get questions and answers
             $sql_questions = "SELECT q.question_id, q.question_text, q.correct_answer, q.answer_type,
                                     q.programming_language, q.code_template,
                                     a.answer_text, a.is_correct,
@@ -596,7 +585,6 @@ if ($_SESSION['role'] !== 'Employer') {
                     echo "<div id='$id' class='section-questions'>";
                     echo "<h2>$name</h2>";
                     
-                    // Map sections to assessment IDs
                     $section_mapping = [
                         'general' => 'AS75',
                         'scenario' => 'AS76',
@@ -604,14 +592,12 @@ if ($_SESSION['role'] !== 'Employer') {
                         'personality' => 'AS81'
                     ];
                     
-                    // Reset result pointer and counters
                     $result_questions->data_seek(0);
                     $question_counter = 1;
                     
                     while ($row_question = $result_questions->fetch_assoc()) {
                         $current_section = $row_question['assessment_id'];
                         
-                        // Check if question belongs to current section
                         $show_question = false;
                         if (is_array($section_mapping[$id])) {
                             $show_question = in_array($current_section, $section_mapping[$id]);
@@ -753,7 +739,6 @@ if ($_SESSION['role'] !== 'Employer') {
             if (section) {
                 section.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 
-                // Update active state
                 document.querySelectorAll('.section-nav-item').forEach(item => {
                     item.classList.remove('active');
                 });
@@ -764,7 +749,6 @@ if ($_SESSION['role'] !== 'Employer') {
             }
         }
 
-        // Track scroll position to update active section
         document.addEventListener('scroll', () => {
             const sections = document.querySelectorAll('.section-questions');
             let currentSection = '';
@@ -783,6 +767,18 @@ if ($_SESSION['role'] !== 'Employer') {
                 document.querySelector(`[onclick="scrollToSection('${currentSection}')"]`)?.classList.add('active');
             }
         });
+
+        function openPopup(popupId) {
+        document.getElementById(popupId).style.display = 'block';
+        }
+
+        function closePopup(popupId) {
+            document.getElementById(popupId).style.display = 'none';
+        }
+
+        function logoutUser() {
+            window.location.href = '/Techfit';
+        }
     </script>
     <script src="scripts.js"></script>
 </body>

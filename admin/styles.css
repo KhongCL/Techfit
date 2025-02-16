@@ -109,7 +109,6 @@ header {
 .nav-list .dropdown {
     display: none;
     position: absolute;
-    top: 100%;
     left: 0;
     background-color: var(--background-color-light);
     list-style: none;

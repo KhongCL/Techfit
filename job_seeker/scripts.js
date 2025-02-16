@@ -58,10 +58,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const logoutCancelButton = document.getElementById('logout-cancel-button');
     const profileDropdown = document.getElementById('profile-dropdown');
 
-    profileLink.addEventListener('click', function (event) {
-        event.preventDefault();
-        profileDropdown.classList.toggle('active');
-    });
 
     const logoutDropdownLink = profileDropdown.querySelector('li a[href="#"]');
 

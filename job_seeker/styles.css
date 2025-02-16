@@ -114,7 +114,6 @@ header {
 .nav-list .dropdown {
     display: none;
     position: absolute;
-    top: 100%;
     left: 0;
     background-color: var(--background-color-light);
     list-style: none;
@@ -129,8 +128,8 @@ header {
     display: block;
 }
 
-.nav-list li.active > .dropdown { /* Corrected selector */
-    display: block; /* Show dropdown when parent <li> is active */
+.nav-list li.active > .dropdown { 
+    display: block;
 }
 
 #profile-link:hover > .dropdown {
