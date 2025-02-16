@@ -1,5 +1,5 @@
 <?php
-session_start(); 
+session_start();
 
 
 function displayLoginMessage() {
@@ -17,7 +17,31 @@ if ($_SESSION['role'] !== 'Admin') {
     displayLoginMessage();
 }
 
-$email = isset($_SESSION['email']) ? $_SESSION['email'] : ''; 
+$email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
+
+
+if (empty($email)) {
+    $conn = new mysqli("localhost", "root", "", "techfit");
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    $stmt = $conn->prepare("SELECT email FROM User WHERE user_id=?");
+    $stmt->bind_param("s", $_SESSION['user_id']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $email = $row['email'];
+        $_SESSION['email'] = $email;
+    }
+
+    $stmt->close();
+    $conn->close();
+}
+
+$username = $_SESSION['username'];
+$email = isset($_SESSION['email']) ? $_SESSION['email'] : '';
+$user_id = $_SESSION['user_id'];
 
 
 if (empty($email)) {
@@ -39,35 +63,11 @@ if (empty($email)) {
     $conn->close();
 }
 
-$username = $_SESSION['username'];
-$email = isset($_SESSION['email']) ? $_SESSION['email'] : ''; 
-$user_id = $_SESSION['user_id'];
-
-
-if (empty($email)) {
-    $conn = new mysqli("localhost", "root", "", "techfit");
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    $stmt = $conn->prepare("SELECT email FROM User WHERE user_id=?");
-    $stmt->bind_param("s", $user_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    if ($row = $result->fetch_assoc()) {
-        $email = $row['email'];
-        $_SESSION['email'] = $email; 
-    }
-
-    $stmt->close();
-    $conn->close();
-}
-
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])) {
     session_unset();
     session_destroy();
-    header('Location: /Techfit'); 
+    header('Location: /Techfit');
     exit();
 }
 
@@ -75,14 +75,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_username'])) {
     $new_username = $_POST['new_username'];
 
-    
+
     if (preg_match('/^[a-zA-Z0-9_]{5,20}$/', $new_username)) {
         $conn = new mysqli("localhost", "root", "", "techfit");
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        
+
         $stmt = $conn->prepare("SELECT * FROM User WHERE username=?");
         $stmt->bind_param("s", $new_username);
         $stmt->execute();
@@ -91,9 +91,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_username'])) {
         if ($result->num_rows > 0) {
             $error_message = "Username already exists. Please choose a different username.";
         } else {
-            
+
             $stmt = $conn->prepare("UPDATE User SET username=? WHERE user_id=?");
-            $stmt->bind_param("ss", $new_username, $user_id); 
+            $stmt->bind_param("ss", $new_username, $user_id);
             if ($stmt->execute()) {
                 $_SESSION['username'] = $new_username;
                 $username = $new_username;
@@ -114,14 +114,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_username'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_email'])) {
     $new_email = $_POST['new_email'];
 
-    
+
     if (filter_var($new_email, FILTER_VALIDATE_EMAIL)) {
         $conn = new mysqli("localhost", "root", "", "techfit");
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        
+
         $stmt = $conn->prepare("SELECT * FROM User WHERE email=?");
         $stmt->bind_param("s", $new_email);
         $stmt->execute();
@@ -130,9 +130,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_email'])) {
         if ($result->num_rows > 0) {
             $error_message = "Email already exists. Please choose a different email.";
         } else {
-            
+
             $stmt = $conn->prepare("UPDATE User SET email=? WHERE user_id=?");
-            $stmt->bind_param("ss", $new_email, $user_id); 
+            $stmt->bind_param("ss", $new_email, $user_id);
             if ($stmt->execute()) {
                 $_SESSION['email'] = $new_email;
                 $email = $new_email;
@@ -153,17 +153,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_email'])) {
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
     $new_password = $_POST['new_password'];
 
-    
+
     if (preg_match('/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $new_password)) {
         $conn = new mysqli("localhost", "root", "", "techfit");
         if ($conn->connect_error) {
             die("Connection failed: " . $conn->connect_error);
         }
 
-        
+
         $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
         $stmt = $conn->prepare("UPDATE User SET password=? WHERE user_id=?");
-        $stmt->bind_param("ss", $hashed_password, $user_id); 
+        $stmt->bind_param("ss", $hashed_password, $user_id);
         if ($stmt->execute()) {
             $success_message = "Password updated successfully.";
         } else {
@@ -187,136 +187,46 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-
-        li {
-            color: white;
-        }
-
-        main {
-            position: relative;
-            min-height: 70vh;
-            padding: 0;
-        }
-
-        #home {
-            position: relative;
-            width: 100%;
-            min-height: 70vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            color: white;
-            padding: 0;
-            overflow: hidden;
-            background-image: url('images/office_background.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        #home::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url('images/office_background.jpg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            filter: blur(4px);
-            z-index: 1;
-        }
-
-        #home-content {
-            position: relative;
-            z-index: 3;
-            padding: 2rem;
-            background: rgba(0, 0, 0, 0.4);
-            width: 100%;
-            height: 40vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        #home h2 {
-            font-size: 3rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
-            margin-bottom: 1rem;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        #home p {
-            font-size: 1.3rem;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
-            margin-bottom: 2rem;
-            letter-spacing: 0.5px;
-        }
-
-        #home button {
-            padding: 1rem 2.5rem;
-            font-size: 1.2rem;
-            border: none;
-            border-radius: 5px;
-            background-color: var(--primary-color);
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        #home button:hover {
-            background-color: var(--accent-color);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
-        }
-
-    body {
-        font-family: Arial, sans-serif;
-        color: #e0e0e0;
-        background-color: #121212;
-    }
-
     #profile {
         display: flex;
-        align-items: flex-start;
         justify-content: flex-start;
         margin-top: 80px;
         margin-bottom: 80px;
+        padding-left: 100px;
     }
+
     .profile-details {
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
+        max-width: 800px;
     }
+
     .profile-details h2 {
         margin: 0;
         margin-bottom: 30px;
         font-size: 35px;
         color: #e0e0e0;
     }
+
     .profile-details .detail-line {
         display: flex;
         align-items: center;
         margin-bottom: 20px;
     }
+
     .profile-details .detail-line i {
         margin-right: 10px;
     }
+
     .profile-details .detail-line span,
     .profile-details .detail-line a {
         font-size: 20px;
         color: #e0e0e0;
     }
+
     .profile-details .edit-button {
-        margin-left: 100px;
+        margin-left: 50px;
         padding: 5px 10px;
         font-size: 14px;
         background-color: #007bff;
@@ -326,9 +236,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
         cursor: pointer;
         width: fit-content;
     }
+
     .profile-details .edit-button:hover {
         background-color: #0056b3;
     }
+
     .logout-button {
         margin-top: 20px;
         padding: 10px 20px;
@@ -340,9 +252,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
         cursor: pointer;
         width: fit-content;
     }
+
+    .separate-config-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 14px;
+        background-color: var(--primary-color);
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        width: fit-content;
+    }
+
     .logout-button:hover {
         background-color: #c82333;
     }
+
     .popup {
         display: none;
         position: fixed;
@@ -355,11 +281,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         z-index: 1000;
     }
+
     .popup h2 {
         color: #fff;
     }
+
     .popup input[type="text"],
-    .popup input[type="password"] {
+    .popup input[type="password"],
+    .popup input[type="email"] {
         width: calc(100% - 20px);
         padding: 10px;
         margin: 10px 0;
@@ -368,6 +297,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
         background-color: #333;
         color: #fff;
     }
+
     .popup input[type="submit"] {
         padding: 10px 20px;
         border: none;
@@ -376,9 +306,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
         color: #fff;
         cursor: pointer;
     }
+
     .popup input[type="submit"]:hover {
         background-color: #0056b3;
     }
+
     .popup .close-button {
         background-color: #dc3545;
         color: #fff;
@@ -387,9 +319,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
         padding: 10px 20px;
         cursor: pointer;
     }
+
     .popup .close-button:hover {
         background-color: #c82333;
     }
+
     .popup .cancel-button {
         background-color: #007bff;
         color: #fff;
@@ -398,47 +332,87 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
         padding: 10px 20px;
         cursor: pointer;
     }
+
     .popup .cancel-button:hover {
         background-color: #0056b3;
     }
-    .bottom-edit-button {
-        display: flex;
-        justify-content: left;
-        margin-bottom: 50px;
-        margin-left: 290px;
-        margin-top: -50px;
-    }
-    .bottom-edit-button:hover {
-        background-color: #0056b3;
-    }
-    .separate-config-button {
-        padding: 4px 16px; /* Adjust the padding to reduce the distance */
-        font-size: 14px;
-        margin: 10px 0;
-        background-color: #007bff; /* Blue color */
-        color: #fff;
-        border: none;
-        border-radius: 5px; /* Match the border-radius of the logout button */
-        cursor: pointer;
-        width: fit-content;
-        margin-top: 10px; /* Move the button down by 3px */
+
+    .profile-info .profile-image {
+        margin-left: 10px;
+        width: 30px;
+        height: 30px;
+        border-radius: 20%;
     }
 
-    .separate-config-button:hover {
-        background-color: #0056b3; /* Same hover color as the Edit Username button */
+
+    .success-message,
+    .error-message {
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        width: 100%;
+    }
+
+    .success-message {
+        background-color: rgba(40, 167, 69, 0.2);
+        color: #28a745;
+        border: 1px solid #28a745;
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        width: 100%;
+    }
+
+    .error-message {
+        background-color: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+        border: 1px solid #dc3545;
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        width: 100%;
+    }
+
+    .popup .success-message,
+    .popup .error-message {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        width: 100%;
+    }
+
+    .popup .success-message {
+        background-color: rgba(40, 167, 69, 0.2);
+        color: #28a745;
+        border: 1px solid #28a745;
+    }
+
+    .popup .error-message {
+        background-color: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+        border: 1px solid #dc3545;
     }
 
     .button-container {
         display: flex;
-        gap: 15px; /* 10px gap between buttons */
+        gap: 15px;
     }
+
+    .separate-config-button {
+        padding: 10px 20px;
+    }
+
 
     @media (max-width: 768px) {
         #profile {
             margin: 20px 0;
             padding: 10px;
             flex-direction: column;
-            width: 100%;
+            padding-left: 0;
         }
 
         .profile-details {
@@ -456,31 +430,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
             gap: 10px;
             justify-content: flex-start;
             width: 100%;
+            margin-bottom: 15px;
         }
 
-        .detail-line span, 
+        .detail-line span,
         .detail-line a {
             font-size: 16px;
             width: 100%;
+            order: 2;
+        }
+
+        .detail-line i,
+        .detail-line img {
+            order: 1;
         }
 
         .edit-button {
             margin-left: 0 !important;
             width: 100% !important;
             margin-top: 5px;
+            order: 3;
+        }
+
+        .logout-button,
+        .separate-config-button {
+            width: 100%;
+            margin-top: 10px;
         }
 
         .button-container {
             flex-direction: column;
-            width: 100%;
             gap: 10px;
         }
 
-        .logout-button,
-        .config-button {
-            width: 100% !important;
-            margin: 5px 0;
-        }
 
         .popup {
             width: 90%;
@@ -488,7 +470,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
         }
 
         .popup input[type="text"],
-        .popup input[type="password"] {
+        .popup input[type="password"],
+        .popup input[type="email"] {
             width: 100%;
         }
 
@@ -502,18 +485,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
         .popup .close-button,
         .popup .cancel-button {
             width: 100%;
-            margin: 5px 0;
-        }
-
-        .popup h2 {
-            font-size: 20px;
         }
     }
 
     @media (max-width: 480px) {
         .profile-details {
             padding-left: 10px !important;
-            padding-right: 10px !important;
         }
 
         .detail-line i {
@@ -522,21 +499,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
 
         .popup {
             padding: 15px;
-            width: 95%;
         }
 
         .popup h2 {
             font-size: 18px;
         }
-
-        .success-message,
-        .error-message {
-            font-size: 14px;
-            margin: 10px 0;
-            text-align: center;
-        }
     }
-    </style>
+</style>
 </head>
 <body>
 <header>
@@ -562,7 +531,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
                 <li><a href="#">Reports</a>
                     <ul class="dropdown">
                         <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                     
+
                     </ul>
                 </li>
                 <li><a href="#">Resources</a>
@@ -579,9 +548,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
                             <span class="username" id="username">
                                 <?php
                                 if (isset($_SESSION['username'])) {
-                                    echo $_SESSION['username'];  
+                                    echo $_SESSION['username'];
                                 } else {
-                                    echo "Guest";  
+                                    echo "Guest";
                                 }
                                 ?>
                             </span>
@@ -589,7 +558,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
                         </div>
                     </a>
                     <ul class="dropdown" id="profile-dropdown">
-                    <li><a>Settings</a>
+                        <li><a>Settings</a>
                             <ul class="dropdown">
                                 <li><a href="manage_profile.php">Manage Profile</a></li>
                                 <li><a href="system_configuration.php">System Configuration Settings</a></li>
@@ -609,10 +578,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
 </header>
 <main>
     <section id="profile">
-            <div class="profile-details" style="padding-left: 50px;">
+        <div class="profile-details">
             <h2>Edit Profile</h2>
-            <?php if (isset($success_message)) { echo '<p class="success-message">' . $success_message . '</p>'; } ?>
-            <?php if (isset($error_message)) { echo '<p class="error-message">' . $error_message . '</p>'; } ?>
+            <div id="profile-message-container">
+                <?php if (isset($success_message)): ?>
+                    <p class="success-message"><?php echo htmlspecialchars($success_message); ?></p>
+                <?php endif; ?>
+                <?php if (isset($error_message)): ?>
+                    <p class="error-message"><?php echo htmlspecialchars($error_message); ?></p>
+                <?php endif; ?>
+            </div>
             <div class="detail-line">
                 <i class="fas fa-user"></i>
                 <span id="username-display"><?php echo htmlspecialchars($username); ?></span>
@@ -637,8 +612,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
 </main>
 
 <div id="username-popup" class="popup">
-    <form action="manage_profile.php" method="post">
+    <form id="username-form" action="manage_profile.php" method="post">
         <h2>Edit Username</h2>
+        <div id="username-message" class="message-container"></div>
         <input type="text" name="new_username" placeholder="New Username" required>
         <input type="submit" value="Update">
         <button type="button" class="close-button" onclick="closePopup('username-popup')">Cancel</button>
@@ -646,17 +622,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
 </div>
 
 <div id="email-popup" class="popup">
-    <form action="manage_profile.php" method="post">
+    <form id="email-form" action="manage_profile.php" method="post">
         <h2>Edit Email</h2>
-        <input type="text" name="new_email" placeholder="New Email" required>
+        <div id="email-message" class="message-container"></div>
+        <input type="email" name="new_email" placeholder="New Email" required>
         <input type="submit" value="Update">
         <button type="button" class="close-button" onclick="closePopup('email-popup')">Cancel</button>
     </form>
 </div>
 
 <div id="password-popup" class="popup">
-    <form action="manage_profile.php" method="post">
+    <form id="password-form" action="manage_profile.php" method="post">
         <h2>Edit Password</h2>
+        <div id="password-message" class="message-container"></div>
         <input type="password" name="new_password" placeholder="New Password" required>
         <input type="submit" value="Update">
         <button type="button" class="close-button" onclick="closePopup('password-popup')">Cancel</button>
@@ -709,7 +687,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
                     <h3>Reports</h3>
                     <ul>
                         <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                       
+                        
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -735,7 +713,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
-    <script src="scripts.js"></script>
+<script src="scripts.js"></script>
 
 <script>
     function openPopup(popupId) {
@@ -744,9 +722,130 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
 
     function closePopup(popupId) {
         document.getElementById(popupId).style.display = 'none';
+        removeMessages(popupId); 
     }
 
     function logoutUser() {
         document.getElementById('logout-form').submit();
     }
+
+    function showPageMessage(message, type) {
+        const messageDiv = document.createElement('p');
+        messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+        messageDiv.innerHTML = message;
+
+        const profileDetails = document.querySelector('.profile-details');
+        const firstDetailLine = profileDetails.querySelector('.detail-line');
+
+        
+        profileDetails.insertBefore(messageDiv, firstDetailLine);
+        messageDiv.offsetHeight; 
+
+        
+        if (type === 'success') {
+            
+            if (window.messageTimeout) {
+                clearTimeout(window.messageTimeout);
+            }
+
+            
+            window.messageTimeout = setTimeout(() => {
+                if (messageDiv && messageDiv.parentNode) {
+                    messageDiv.remove();
+                }
+            }, 3000); 
+        }
+
+        
+        return messageDiv;
+    }
+
+    function validateProfileUpdate(type, value) {
+        let errorMessage = "";
+        let isValid = true;
+
+        const popupTypeMap = {
+            'username-popup': 'username',
+            'email-popup': 'email',
+            'password-popup': 'password'
+        };
+
+        
+        const validationType = popupTypeMap[type] || type;
+
+        switch(validationType) {
+            case 'username':
+                
+                if (!/^[a-zA-Z0-9_]{5,20}$/.test(value)) {
+                    errorMessage = "Username requirements:<br>" +
+                        "- Length: 5-20 characters<br>" +
+                        "- Allowed characters: letters (case-sensitive), numbers, underscore<br>" +
+                        "- No spaces or special characters allowed";
+                    isValid = false;
+                }
+                break;
+
+            case 'email':
+                if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) {
+                    errorMessage = "Invalid email format. Please enter a valid email address:<br>" +
+                        "- Must contain @ symbol<br>" +
+                        "- Must have valid domain (e.g., example.com)<br>" +
+                        "- No spaces allowed";
+                    isValid = false;
+                }
+                break;
+
+            case 'password':
+                const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+                if (!passwordRegex.test(value)) {
+                    errorMessage = "Password requirements:<br>" +
+                        "- Minimum 8 characters long<br>" +
+                        "- At least 1 letter (a-z, A-Z)<br>" +
+                        "- At least 1 number<br>" +
+                        "- At least 1 special character (@$!%*?&)<br>" +
+                        "- No spaces allowed";
+                    isValid = false;
+                }
+                break;
+        }
+
+        return { isValid, errorMessage };
+    }
+
+    function showError(message, popupId) {
+        removeMessages(popupId); 
+        const messageContainer = document.querySelector(`#${popupId} .message-container`);
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.innerHTML = message;
+        messageContainer.appendChild(errorDiv);
+    }
+
+    function removeMessages(popupId) {
+        const messageContainer = document.querySelector(`#${popupId} .message-container`);
+        messageContainer.innerHTML = ''; 
+    }
+
+    
+    document.querySelectorAll('.popup form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const popupId = this.closest('.popup').id;
+            let input = this.querySelector('input[type="text"], input[type="password"], input[type="email"]');
+            if (!input) return;
+
+            let inputType = input.name.replace('new_', '');
+            let validation = validateProfileUpdate(popupId, input.value);
+
+            if (!validation.isValid) {
+                showError(validation.errorMessage, popupId);
+                return;
+            }
+
+            
+            this.submit(); 
+        });
+    });
 </script>
+</body>
+</html>
