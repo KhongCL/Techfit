@@ -244,6 +244,31 @@ $conn->close();
             padding-bottom: 5px;
             border-bottom: 1px solid var(--background-color-light);
         }
+
+        .back-arrow {
+            display: block; 
+            padding: 0;
+            background-color: transparent;
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 0;
+            margin-bottom: 15px;
+            transition: none;
+            font-size: 3em;
+            line-height: 2;
+        }
+
+        .back-arrow:hover {
+            color: var(--primary-color-hover);
+            background-color: transparent;
+            color: darkblue;
+        }
+
+        .summary_header {
+            width: 100%;      
+            display: block;  
+            overflow: hidden;
+        }
     </style>
     <script>
         function copyToClipboard() {
@@ -258,6 +283,7 @@ $conn->close();
     </script>
 </head>
 <body>
+    <a href="./assessment_summary.php" class="back-arrow">&#8592;</a>
     <div class="report-card">
         <h2>Assessment Summary Report</h2>
         
@@ -270,7 +296,7 @@ $conn->close();
             <span><?= htmlspecialchars($assessment['assessment_id']) ?></span>
         </div>
         <div class="report-row">
-            <span class="report-label">Job Seeker ID:</span>
+            <spna class="report-label">Job Seeker ID:</spna>
             <span><?= htmlspecialchars($assessment['job_seeker_id']) ?></span>
         </div>
         <div class="report-row">

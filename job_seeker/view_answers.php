@@ -443,6 +443,27 @@ $sections['AS81'] = 'Work-Style and Personality';
             font-size: 0.85em;
         }
 
+        .back-arrow {
+            display: block; 
+            padding: 0;
+            background-color: transparent;
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 0;
+            margin-bottom: 15px;
+            transition: none;
+            font-size: 3em;
+            line-height: 1;
+            float: left; 
+        }
+
+        .back-arrow:hover {
+            color: var(--primary-color-hover);
+            background-color: transparent;
+        }
+
+
+
         @media screen and (max-width: 1024px) {
             .page-wrapper {
                 width: 90%;
@@ -539,6 +560,9 @@ $sections['AS81'] = 'Work-Style and Personality';
 
     <div class="page-wrapper">
         <div class="assessment-container">
+            <a href="assessment_history.php" class="back-arrow">
+                &#8592;
+            </a>
             <div class="summary_header">
                 <h2>View Answers</h2>
                 <?php if (!empty($assessment_details)): ?>

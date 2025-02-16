@@ -216,6 +216,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 display: inline-block;
                 width: 100%;
             }
+
+            #formContainer textarea,
+            #formContainer input[type="url"],
+            #formContainer select {
+                background-color: var(--background-color);
+                color: var(--text-color);
+                border: 1px solid var(--background-color-light);
+                padding: 8px;
+                border-radius: 4px;
+                width: calc(100% - 12px); /* Account for margin-left */
+                font-size: 14px;
+            }
+
+            #formContainer textarea:focus,
+            #formContainer input[type="url"]:focus,
+            #formContainer select:focus {
+                outline: none;
+                border-color: var(--primary-color);
+                box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+            }
+
+            #formContainer select option {
+                background-color: var(--background-color);
+                color: var(--text-color);
+            }
+
+            #formContainer label {
+                color: var(--text-color);
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            /* Button styling */
+            #formContainer button {
+                background-color: var(--primary-color);
+                color: var(--text-color);
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+            #formContainer button:disabled {
+                background-color: var(--background-color-light);
+                cursor: not-allowed;
+            }
+
+            #formContainer button:hover:not(:disabled) {
+                background-color: var(--accent-color);
+            }
+
+            .cancel-button {
+                background-color: var(--danger-color) !important;
+                margin-left: 10px;
+            }
+
+            .cancel-button:hover {
+                background-color: var(--danger-color-hover) !important;
+            }
     </style>
 <header>
         <div class="logo">

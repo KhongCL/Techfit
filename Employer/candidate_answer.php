@@ -90,14 +90,14 @@ session_write_close();
         }
 
         .question {
-            margin-bottom: 20px; 
-            padding: 15px;   
-            border: 1px solid #ddd; 
-            border-radius: 8px;  
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
 
-            width: 100%; 
-            display: block;  
-            box-sizing: border-box; 
+            width: 100%;
+            display: block;
+            box-sizing: border-box;
         }
 
         .question-text {
@@ -112,7 +112,7 @@ session_write_close();
             text-align: left; /* Add this */
         }
 
-        .job-seeker-answer strong, 
+        .job-seeker-answer strong,
         .correct-answer strong {
             font-weight: bold;
             display: block;
@@ -328,7 +328,7 @@ session_write_close();
                 padding: 10px;
             }
 
-            .code-container, 
+            .code-container,
             .job-seeker-answer pre,
             .correct-answer pre {
                 font-size: 0.8em;
@@ -340,7 +340,7 @@ session_write_close();
                 flex-direction: column;
                 align-items: stretch;
             }
-            
+
             .section-nav-item {
                 text-align: center;
                 width: 100%;
@@ -350,7 +350,7 @@ session_write_close();
                 flex-direction: column;
                 gap: 10px;
             }
-            
+
             .divider {
                 display: none;
             }
@@ -375,6 +375,31 @@ session_write_close();
             .question-text {
                 font-size: 0.9em;
             }
+        }
+
+        .back-arrow {
+            display: block; 
+            padding: 0;
+            background-color: transparent;
+            color: var(--primary-color);
+            text-decoration: none;
+            border-radius: 0;
+            margin-bottom: 15px;
+            transition: none;
+            font-size: 1.5em;
+            line-height: 1;
+            float: left; 
+        }
+
+        .back-arrow:hover {
+            color: var(--primary-color-hover);
+            background-color: transparent;
+        }
+
+        .summary_header {
+            width: 100%;      
+            display: block;  
+            overflow: hidden;
         }
     </style>
 </head>
@@ -438,10 +463,13 @@ session_write_close();
 <div class="page-wrapper">
     <div class="assessment-container">
         <div class="summary_header">
+            <a href="search_candidate.php" class="back-arrow">
+                &#8592;
+            </a>
             <div class="assessment-title">Candidate Profile & Answers</div>
             <?php
             $servername = "localhost";
-            $username = "root"; 
+            $username = "root";
             $password = "";
             $dbname = "techfit";
 
@@ -453,10 +481,10 @@ session_write_close();
             $job_seeker_id = $_GET['job_seeker_id'];
 
             $sql_candidate = "SELECT u.first_name, u.last_name, js.education_level, js.year_of_experience, js.linkedin_link
-                            FROM User u
-                            JOIN Job_Seeker js ON u.user_id = js.user_id
-                            WHERE js.job_seeker_id = ?";
-            
+                                         FROM User u
+                                         JOIN Job_Seeker js ON u.user_id = js.user_id
+                                         WHERE js.job_seeker_id = ?";
+
             $stmt = $conn->prepare($sql_candidate);
             $stmt->bind_param("s", $job_seeker_id);
             $stmt->execute();
@@ -464,63 +492,63 @@ session_write_close();
 
             if ($result_candidate->num_rows > 0) {
                 $row_candidate = $result_candidate->fetch_assoc();
-                
+
                 $score = "N/A";
                 $time_used = "N/A";
-            
+
                 $sql_score_time = "SELECT ajs.score, TIMEDIFF(ajs.end_time, ajs.start_time) AS time_used,
-                                            ast.passing_score_percentage
-                                    FROM Assessment_Job_Seeker ajs
-                                    CROSS JOIN Assessment_Settings ast
-                                    WHERE ajs.job_seeker_id = ? 
-                                    AND ast.setting_id = '1'";
-                        
+                                                                    ast.passing_score_percentage
+                                                                     FROM Assessment_Job_Seeker ajs
+                                                                     CROSS JOIN Assessment_Settings ast
+                                                                     WHERE ajs.job_seeker_id = ?
+                                                                     AND ast.setting_id = '1'";
+
                 $stmt = $conn->prepare($sql_score_time);
                 $stmt->bind_param("s", $job_seeker_id);
                 $stmt->execute();
                 $result_score_time = $stmt->get_result();
-            
+
                 if ($result_score_time->num_rows > 0) {
                     $row_score_time = $result_score_time->fetch_assoc();
                     $score = !is_null($row_score_time['score']) ? $row_score_time['score'] : 'N/A';
                     $time_used_value = $row_score_time['time_used'];
                     $time_used = !empty($time_used_value) ? $time_used_value : 'N/A';
                     $passing_score = $row_score_time['passing_score_percentage'];
-                    
+
                     $score_class = ($score !== 'N/A' && $score >= $passing_score) ? 'score-passed' : 'score-failed';
                     echo "<div class='detail-item'>Score: <span class='" . $score_class . "'>" . $score . "/100</span></div>";
                 } else {
                     echo "<div class='detail-item'>Score: N/A</div>";
                 }
-            
+
                 echo "<div class='candidate-info'>";
                 echo "<div class='profile-section'>";
                 echo "<img src='images/usericon.png' alt='User Icon'>";
                 echo "<div class='name'>" . htmlspecialchars($row_candidate['first_name']) . " " . htmlspecialchars($row_candidate['last_name']) . "</div>";
                 echo "</div>";
-                
+
                 echo "<div class='details-container'>";
                 echo "<div class='details'>";
-                
+
                 if (!empty($row_candidate['linkedin_link'])) {
                     echo "<div class='detail-item'><a href='" . htmlspecialchars($row_candidate['linkedin_link']) . "' target='_blank'>LinkedIn Profile</a></div>";
                 } else {
                     echo "<div class='detail-item'>LinkedIn Profile: N/A</div>";
                 }
-                
+
                 $education_level = !empty($row_candidate['education_level']) ? htmlspecialchars($row_candidate['education_level']) : 'N/A';
                 echo "<div class='detail-item'>Education Level: " . $education_level . "</div>";
-                
+
                 $experience = (!empty($row_candidate['year_of_experience']) || $row_candidate['year_of_experience'] === '0') ? htmlspecialchars($row_candidate['year_of_experience']) . " Years" : 'N/A';
                 echo "<div class='detail-item'>Years of Experience: " . $experience . "</div>";
-                
+
 
                 echo "<div class='detail-item'>Time Used: " . $time_used . "</div>";
-                
+
                 echo "</div>";
-                
-                echo "</div>"; 
-                echo "</div>"; 
+
+                echo "</div>";
+                echo "</div>";
             } else {
                 echo "<h1>Candidate not found</h1>";
             }
@@ -529,9 +557,9 @@ session_write_close();
             $time_used = "N/A";
 
             $sql_score_time = "SELECT score, TIMEDIFF(end_time, start_time) AS time_used
-                              FROM Assessment_Job_Seeker 
-                              WHERE job_seeker_id = ?";
-            
+                                         FROM Assessment_Job_Seeker
+                                         WHERE job_seeker_id = ?";
+
             $stmt = $conn->prepare($sql_score_time);
             $stmt->bind_param("s", $job_seeker_id);
             $stmt->execute();
@@ -551,7 +579,7 @@ session_write_close();
                 <?php
                 $sections = [
                     'general' => 'General Questions',
-                    'scenario' => 'Scenario-Based Questions', 
+                    'scenario' => 'Scenario-Based Questions',
                     'programming' => 'Programming Questions',
                     'personality' => 'Work-Style and Personality'
                 ];
@@ -565,16 +593,16 @@ session_write_close();
         <div class="questions-section">
             <?php
             $sql_questions = "SELECT q.question_id, q.question_text, q.correct_answer, q.answer_type,
-                                    q.programming_language, q.code_template,
-                                    a.answer_text, a.is_correct,
-                                    c.choice_text AS job_seeker_choice_text,
-                                    q.assessment_id
-                            FROM question q
-                            INNER JOIN answer a ON q.question_id = a.question_id
-                            LEFT JOIN choices c ON a.answer_text = c.choice_id
-                            WHERE a.job_seeker_id = ?
-                            ORDER BY q.assessment_id, q.question_id";
-            
+                                                            q.programming_language, q.code_template,
+                                                            a.answer_text, a.is_correct,
+                                                            c.choice_text AS job_seeker_choice_text,
+                                                            q.assessment_id
+                                                     FROM question q
+                                                     INNER JOIN answer a ON q.question_id = a.question_id
+                                                     LEFT JOIN choices c ON a.answer_text = c.choice_id
+                                                     WHERE a.job_seeker_id = ?
+                                                     ORDER BY q.assessment_id, q.question_id";
+
             $stmt = $conn->prepare($sql_questions);
             $stmt->bind_param("s", $job_seeker_id);
             $stmt->execute();
@@ -584,31 +612,31 @@ session_write_close();
                 foreach ($sections as $id => $name) {
                     echo "<div id='$id' class='section-questions'>";
                     echo "<h2>$name</h2>";
-                    
+
                     $section_mapping = [
                         'general' => 'AS75',
                         'scenario' => 'AS76',
                         'programming' => ['AS77', 'AS78', 'AS79', 'AS80'],
                         'personality' => 'AS81'
                     ];
-                    
+
                     $result_questions->data_seek(0);
                     $question_counter = 1;
-                    
+
                     while ($row_question = $result_questions->fetch_assoc()) {
                         $current_section = $row_question['assessment_id'];
-                        
+
                         $show_question = false;
                         if (is_array($section_mapping[$id])) {
                             $show_question = in_array($current_section, $section_mapping[$id]);
                         } else {
                             $show_question = ($current_section === $section_mapping[$id]);
                         }
-                        
+
                         if ($show_question) {
                             echo "<div class='question'>";
-                            echo "<div class='question-text'><strong>Question " . $question_counter . ":</strong> " . 
-                                 htmlspecialchars($row_question['question_text']) . "</div>";
+                            echo "<div class='question-text'><strong>Question " . $question_counter . ":</strong> " .
+                               htmlspecialchars($row_question['question_text']) . "</div>";
 
                             if ($row_question['answer_type'] === 'code') {
                                 if (!empty($row_question['programming_language'])) {
@@ -630,8 +658,8 @@ session_write_close();
                                 if ($row_question['answer_type'] === 'multiple choice') {
                                     $answer_to_display = $row_question['job_seeker_choice_text'];
                                     if (empty($answer_to_display)) {
-                                        $answer_to_display = "Choice ID: " . htmlspecialchars($row_question['answer_text']) . 
-                                                           " (Choice Text Not Found)";
+                                        $answer_to_display = "Choice ID: " . htmlspecialchars($row_question['answer_text']) .
+                                                                                                   " (Choice Text Not Found)";
                                     }
                                 } else {
                                     $answer_to_display = $row_question['answer_text'];
@@ -738,7 +766,7 @@ session_write_close();
             const section = document.getElementById(sectionId);
             if (section) {
                 section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                
+
                 document.querySelectorAll('.section-nav-item').forEach(item => {
                     item.classList.remove('active');
                 });
@@ -752,14 +780,14 @@ session_write_close();
         document.addEventListener('scroll', () => {
             const sections = document.querySelectorAll('.section-questions');
             let currentSection = '';
-            
+
             sections.forEach(section => {
                 const rect = section.getBoundingClientRect();
                 if (rect.top <= 100) {
                     currentSection = section.id;
                 }
             });
-            
+
             if (currentSection) {
                 document.querySelectorAll('.section-nav-item').forEach(item => {
                     item.classList.remove('active');
