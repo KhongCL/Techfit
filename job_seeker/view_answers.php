@@ -98,18 +98,15 @@ $result = $stmt->get_result();
 
 $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
 
-$programming_sql = "SELECT DISTINCT q.assessment_id 
+$programming_sql = "SELECT DISTINCT q.assessment_id, q.programming_language 
 FROM Question q
+JOIN Answer a ON a.question_id = q.question_id
 WHERE q.assessment_id IN ('AS77', 'AS78', 'AS79', 'AS80')
-AND q.question_id IN (
-    SELECT a.question_id 
-    FROM Answer a 
-    WHERE a.job_seeker_id = ? 
-    AND job_seeker_id IN (
-        SELECT job_seeker_id 
-        FROM Assessment_Job_Seeker 
-        WHERE result_id = ?
-    )
+AND a.job_seeker_id = ? 
+AND job_seeker_id IN (
+    SELECT job_seeker_id 
+    FROM Assessment_Job_Seeker 
+    WHERE result_id = ?
 )";
 
 $stmt = $conn->prepare($programming_sql);
@@ -117,7 +114,13 @@ $stmt->bind_param("ss", $_SESSION['job_seeker_id'], $assessment_id);
 $stmt->execute();
 $prog_result = $stmt->get_result();
 $row = $prog_result->fetch_assoc();
-$programming_section = $row ? $row['assessment_id'] : null;
+
+$programming_section = null;
+$programming_language = null;
+if ($row) {
+    $programming_section = $row['assessment_id'];
+    $programming_language = $row['programming_language'];
+}
 
 
 $sections = [
@@ -577,17 +580,29 @@ $sections['AS81'] = 'Work-Style and Personality';
                     ];
 
                     foreach ($assessment_details as $detail):
-                        if (in_array($detail['assessment_id'], ['AS77', 'AS78', 'AS79']) && 
-                            $detail['programming_language'] !== 'cpp') {
+                        // Only show questions for the correct programming language section
+                        if ($detail['assessment_id'] === $programming_section && 
+                            $detail['programming_language'] !== $programming_language) {
                             continue;
                         }
-
+                    
                         if ($detail['assessment_id'] !== $current_section) {
                             if ($current_section !== '') {
                                 echo "</div>";
                             }
                             $current_section = $detail['assessment_id'];
-                            echo "<h2 class='section-header'>{$sections[$current_section]}</h2>";
+                            $section_name = $sections[$current_section];
+                            
+                            // Add programming language to section name if applicable
+                            if (in_array($current_section, ['AS77', 'AS78', 'AS79', 'AS80'])) {
+                                $section_name = str_replace(
+                                    ['Python', 'Java', 'JavaScript', 'C++'],
+                                    ucfirst($programming_language),
+                                    $section_name
+                                );
+                            }
+                            
+                            echo "<h2 class='section-header'>{$section_name}</h2>";
                             echo "<div id='{$current_section}' class='section-questions'>";
                         }
                     ?>
