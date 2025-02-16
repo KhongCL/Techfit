@@ -31,6 +31,25 @@ session_write_close();
     <title>Manage Assessments - TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <style>
+
+        :root {
+                --primary-color: #007bff;
+                --secondary-color: #1e1e1e;
+                --accent-color: #0056b3;
+                --text-color: #e0e0e0;
+                --background-color: #121212;
+                --border-color: #333;
+                --hover-background-color: #333;
+                --hover-text-color: #fff;
+                --button-hover-color: #80bdff;
+                --popup-background-color: #1a1a1a;
+                --popup-border-color: #444;
+                --danger-color: #dc3545;
+                --danger-hover-color: #c82333;
+                --success-color: #28a745;
+                --success-hover-color: #218838;
+            }
+
        li {
             color: white;
         }
