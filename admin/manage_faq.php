@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         $stmt->close();
 
-        echo json_encode(['status' => 'success', 'message' => 'Sitemap deleted successfully']);
+        echo json_encode(['status' => 'success', 'message' => 'FAQ deleted successfully']);
         exit;
     } elseif ($action === 'add') {
         
