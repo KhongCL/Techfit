@@ -268,6 +268,6 @@ session_write_close();
         </div>
     </footer>
 
-    <script src="scripts.js?v=1.0"></script>
+    <script src="scripts.js"></script>
 </body>
 </html>

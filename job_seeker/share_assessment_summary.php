@@ -32,6 +32,16 @@ function displayLoginMessage() {
     exit();
 }
 
+function displayErrorMessage() {
+    echo '<script>
+        if (confirm("You need to access this page from assessment summary. Go to Assessment Summary? Click cancel to go to home page.")) {
+            window.location.href = "./assessment_summary.php";
+        } else {
+            window.location.href = "./index.php";
+        }
+    </script>';
+    exit();
+}
 
 if (!isset($_SESSION['user_id'])) {
     displayLoginMessage(); 
@@ -47,14 +57,16 @@ if (!isset($_SESSION['job_seeker_id'])) {
     displayLoginMessage(); 
 }
 
-if (!isset($_GET['assessment_id']) || trim($_GET['assessment_id']) === '') {
-    displayLoginMessage();
+if (!isset($_GET['result_id']) || trim($_GET['result_id']) === '') {
+    displayErrorMessage();
 }
 
 $referer = $_SERVER['HTTP_REFERER'] ?? '';
 if (strpos($referer, 'assessment_summary.php') === false) {
-    displayLoginMessage();
+    displayErrorMessage();
 }
+
+session_write_close();
 
 $assessment_id = $_GET['assessment_id'];
 

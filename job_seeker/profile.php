@@ -53,137 +53,182 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['logout'])) {
     exit();
 }
 
-
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_username'])) {
     $new_username = $_POST['new_username'];
-
+    $response = array();
     
     if (preg_match('/^[a-zA-Z0-9_]{5,20}$/', $new_username)) {
         $conn = new mysqli("localhost", "root", "", "techfit");
         if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
+            $response['success'] = false;
+            $response['message'] = "Connection failed: " . $conn->connect_error;
+            echo json_encode($response);
+            exit;
         }
 
-        
         $stmt = $conn->prepare("SELECT * FROM User WHERE username=?");
         $stmt->bind_param("s", $new_username);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-            $error_message = "Username already exists. Please choose a different username.";
+            $response['success'] = false;
+            $response['message'] = "Username already exists. Please choose a different username.";
         } else {
-            
             $stmt = $conn->prepare("UPDATE User SET username=? WHERE user_id=?");
-            $stmt->bind_param("ss", $new_username, $user_id); 
+            $stmt->bind_param("ss", $new_username, $user_id);
             if ($stmt->execute()) {
                 $_SESSION['username'] = $new_username;
                 $username = $new_username;
-                $success_message = "Username updated successfully.";
+                $response['success'] = true;
+                $response['message'] = "Username updated successfully.";
             } else {
-                $error_message = "Failed to update username: " . $stmt->error;
+                $response['success'] = false;
+                $response['message'] = "Failed to update username: " . $stmt->error;
             }
         }
 
         $stmt->close();
         $conn->close();
     } else {
-        $error_message = "Invalid username. Must be 5-20 characters long and contain only letters, numbers, and underscores.";
+        $response['success'] = false;
+        $response['message'] = "Invalid username format";
     }
+    
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit;
 }
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_email'])) {
     $new_email = $_POST['new_email'];
+    $response = array();
 
-    
     if (filter_var($new_email, FILTER_VALIDATE_EMAIL)) {
         $conn = new mysqli("localhost", "root", "", "techfit");
         if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
+            $response['success'] = false;
+            $response['message'] = "Connection failed: " . $conn->connect_error;
+            echo json_encode($response);
+            exit;
         }
 
-        
         $stmt = $conn->prepare("SELECT * FROM User WHERE email=?");
         $stmt->bind_param("s", $new_email);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-            $error_message = "Email already exists. Please choose a different email.";
+            $response['success'] = false;
+            $response['message'] = "Email already exists. Please choose a different email.";
         } else {
-            
             $stmt = $conn->prepare("UPDATE User SET email=? WHERE user_id=?");
-            $stmt->bind_param("ss", $new_email, $user_id); 
+            $stmt->bind_param("ss", $new_email, $user_id);
             if ($stmt->execute()) {
                 $_SESSION['email'] = $new_email;
                 $email = $new_email;
-                $success_message = "Email updated successfully.";
+                $response['success'] = true;
+                $response['message'] = "Email updated successfully.";
             } else {
-                $error_message = "Failed to update email: " . $stmt->error;
+                $response['success'] = false;
+                $response['message'] = "Failed to update email: " . $stmt->error;
             }
         }
 
         $stmt->close();
         $conn->close();
     } else {
-        $error_message = "Invalid email format.";
+        $response['success'] = false;
+        $response['message'] = "Invalid email format";
     }
+    
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit;
 }
 
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
     $new_password = $_POST['new_password'];
+    $response = array();
 
-    
     if (preg_match('/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $new_password)) {
         $conn = new mysqli("localhost", "root", "", "techfit");
         if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
+            $response['success'] = false;
+            $response['message'] = "Connection failed: " . $conn->connect_error;
+            echo json_encode($response);
+            exit;
         }
 
-        
         $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
         $stmt = $conn->prepare("UPDATE User SET password=? WHERE user_id=?");
-        $stmt->bind_param("ss", $hashed_password, $user_id); 
+        $stmt->bind_param("ss", $hashed_password, $user_id);
+        
         if ($stmt->execute()) {
-            $success_message = "Password updated successfully.";
+            $response['success'] = true;
+            $response['message'] = "Password updated successfully.";
         } else {
-            $error_message = "Failed to update password: " . $stmt->error;
+            $response['success'] = false;
+            $response['message'] = "Failed to update password: " . $stmt->error;
         }
 
         $stmt->close();
         $conn->close();
     } else {
-        $error_message = "Invalid password. Must be at least 8 characters long and contain at least one letter, one number, and one special character.";
+        $response['success'] = false;
+        $response['message'] = "Invalid password format";
     }
+    
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_linkedin'])) {
     $new_linkedin = $_POST['new_linkedin'];
-
-    // Regular expression to validate LinkedIn URLs
     $linkedin_pattern = '/^https?:\/\/(?:www\.)?linkedin\.com\/(?:in|profile)\/[A-Za-z0-9\-]+\/?$/';
+    $response = array();
     
     if (filter_var($new_linkedin, FILTER_VALIDATE_URL) && preg_match($linkedin_pattern, $new_linkedin)) {
         $conn = new mysqli("localhost", "root", "", "techfit");
         if ($conn->connect_error) {
-            die("Connection failed: " . $conn->connect_error);
-        }
-
-        $stmt = $conn->prepare("UPDATE Job_Seeker SET linkedin_link=? WHERE user_id=?");
-        $stmt->bind_param("ss", $new_linkedin, $user_id); 
-        if ($stmt->execute()) {
-            $success_message = "LinkedIn profile updated successfully.";
+            $response['success'] = false;
+            $response['message'] = "Connection failed: " . $conn->connect_error;
         } else {
-            $error_message = "Failed to update LinkedIn profile: " . $stmt->error;
+            // Check for uniqueness first
+            $stmt = $conn->prepare("SELECT user_id FROM " . ($_SESSION['role'] === 'Employer' ? 'Employer' : 'Job_Seeker') . " WHERE linkedin_link = ? AND user_id != ?");
+            $stmt->bind_param("ss", $new_linkedin, $user_id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            
+            if ($result->num_rows > 0) {
+                $response['success'] = false;
+                $response['message'] = "This LinkedIn profile is already linked to another account.";
+            } else {
+                $stmt = $conn->prepare("UPDATE " . ($_SESSION['role'] === 'Employer' ? 'Employer' : 'Job_Seeker') . " SET linkedin_link=? WHERE user_id=?");
+                $stmt->bind_param("ss", $new_linkedin, $user_id);
+                
+                if ($stmt->execute()) {
+                    $response['success'] = true;
+                    $response['message'] = "LinkedIn profile updated successfully.";
+                } else {
+                    $response['success'] = false;
+                    $response['message'] = "Failed to update LinkedIn profile.";
+                }
+            }
+            $stmt->close();
+            $conn->close();
         }
-
-        $stmt->close();
-        $conn->close();
     } else {
-        $error_message = "Invalid LinkedIn URL. Please enter a valid LinkedIn profile URL (e.g., https://www.linkedin.com/in/username)";
+        $response['success'] = false;
+        $response['message'] = "Invalid LinkedIn URL format.";
     }
+    
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit;
 }
 
 
@@ -544,7 +589,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
     .nav-container {
         display: flex;
         justify-content: flex-end;
-        padding-right: -50px;
+        padding-right: 50px;
     }
 
    
@@ -594,6 +639,59 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
         background-color: #333;
         color: #fff;
     }
+
+    .success-message,
+    .error-message {
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        width: 100%;
+    }
+
+    .success-message {
+        background-color: rgba(40, 167, 69, 0.2);
+        color: #28a745;
+        border: 1px solid #28a745;
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        width: 100%;
+    }
+
+    .error-message {
+        background-color: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+        border: 1px solid #dc3545;
+        padding: 10px;
+        margin-bottom: 20px;
+        border-radius: 5px;
+        font-weight: bold;
+        width: 100%;
+    }
+
+    .popup .success-message,
+    .popup .error-message {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 14px;
+        width: 100%;
+    }
+
+    .popup .success-message {
+        background-color: rgba(40, 167, 69, 0.2);
+        color: #28a745;
+        border: 1px solid #28a745;
+    }
+
+    .popup .error-message {
+        background-color: rgba(220, 53, 69, 0.2);
+        color: #dc3545;
+        border: 1px solid #dc3545;
+    }
+
     @media (max-width: 768px) {
             #profile {
             margin: 20px 0;
@@ -889,11 +987,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
 
     <div id="logout-popup" class="popup">
         <h2>Are you sure you want to Log Out?</h2>
-        <form id="logout-form" action="profile.php" method="post">
-            <input type="hidden" name="logout" value="1">
-            <button type="submit" class="close-button">Yes</button>
-            <button type="button" class="cancel-button" onclick="closePopup('logout-popup')">No</button>
-        </form>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
     </div>
 
     <div id="education-popup" class="popup">
@@ -987,6 +1082,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
             <p>&copy; 2024 TechPathway: TechFit. All rights reserved.</p>
         </div>
     </footer>
+    <script src="scripts.js"></script>
 
     <script>
         function openPopup(popupId) {
@@ -994,11 +1090,368 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
         }
 
         function closePopup(popupId) {
-            document.getElementById(popupId).style.display = 'none';
+            const popup = document.getElementById(popupId);
+            popup.style.display = 'none';
+            
+            // Clear any error messages
+            const errorMessage = popup.querySelector('.error-message');
+            if (errorMessage) {
+                errorMessage.remove();
+            }
         }
 
         function logoutUser() {
             document.getElementById('logout-form').submit();
+        }
+
+        function showPageMessage(message, type) {
+            // Remove any existing messages first
+            const existingMessages = document.querySelectorAll('.success-message, .error-message');
+            existingMessages.forEach(msg => msg.remove());
+            
+            const messageDiv = document.createElement('p');
+            messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+            messageDiv.textContent = message;
+            
+            const profileDetails = document.querySelector('.profile-details');
+            const firstDetailLine = profileDetails.querySelector('.detail-line');
+            
+            // Insert message and force layout reflow
+            profileDetails.insertBefore(messageDiv, firstDetailLine);
+            messageDiv.offsetHeight; // Force reflow
+            
+            // Only set timeout for success messages
+            if (type === 'success') {
+                // Remove previous timeout if exists
+                if (window.messageTimeout) {
+                    clearTimeout(window.messageTimeout);
+                }
+                
+                // Set new timeout
+                window.messageTimeout = setTimeout(() => {
+                    if (messageDiv && messageDiv.parentNode) {
+                        messageDiv.remove();
+                    }
+                }, 3000); // Increased to 3 seconds
+            }
+            
+            // Return the message div for reference
+            return messageDiv;
+        }
+
+        function validateProfileUpdate(type, value) {
+                let errorMessage = "";
+                let isValid = true;
+
+                const popupTypeMap = {
+            'username-popup': 'username',
+            'email-popup': 'email',
+            'password-popup': 'password',
+            'linkedin-popup': 'linkedin',
+            'company-name-popup': 'company_name',
+            'company-type-popup': 'company_type'
+        };
+
+        // Get the actual type if it exists in the map
+        const validationType = popupTypeMap[type] || type;
+
+            switch(type) {
+                case 'username':
+                    // Add case-sensitive check
+                    if (!/^[a-zA-Z0-9_]{5,20}$/.test(value)) {
+                        errorMessage = "Username requirements:<br>" +
+                            "- Length: 5-20 characters<br>" +
+                            "- Allowed characters: letters (case-sensitive), numbers, underscore<br>" +
+                            "- No spaces or special characters allowed";
+                        isValid = false;
+                    }
+                    break;
+
+                case 'email':
+                    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) {
+                        errorMessage = "Invalid email format. Please enter a valid email address:<br>" +
+                            "- Must contain @ symbol<br>" +
+                            "- Must have valid domain (e.g., example.com)<br>" +
+                            "- No spaces allowed";
+                        isValid = false;
+                    }
+                    break;
+
+                case 'password':
+                    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+                    if (!passwordRegex.test(value)) {
+                        errorMessage = "Password requirements:<br>" +
+                            "- Minimum 8 characters long<br>" +
+                            "- At least 1 letter (a-z, A-Z)<br>" +
+                            "- At least 1 number<br>" +
+                            "- At least 1 special character (@$!%*?&)<br>" +
+                            "- No spaces allowed";
+                        isValid = false;
+                    }
+                    break;
+
+                case 'linkedin':
+                    const linkedinRegex = /^https?:\/\/(?:www\.)?linkedin\.com\/(?:in|profile)\/[A-Za-z0-9\-]+\/?$/;
+                    if (!linkedinRegex.test(value)) {
+                        errorMessage = "Invalid LinkedIn URL format. Example:<br>" +
+                            "https://www.linkedin.com/in/username<br>" +
+                            "or<br>" +
+                            "https://linkedin.com/in/username";
+                        isValid = false;
+                    }
+                    break;
+            }
+
+            return { isValid, errorMessage };
+        }
+
+        function handleFormSubmission(form, popupId, updateCallback) {
+            const formData = new FormData(form);
+            
+            fetch('profile.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update display if callback exists
+                    if (updateCallback) {
+                        updateCallback(data);
+                    }
+                    
+                    // Remove any existing success messages first
+                    const existingMessages = document.querySelectorAll('.success-message, .error-message');
+                    existingMessages.forEach(msg => msg.remove());
+                    
+                    // Create and show success message on page
+                    const successMessage = document.createElement('p');
+                    successMessage.className = 'success-message';
+                    successMessage.textContent = data.message;
+                    document.querySelector('.profile-details').insertBefore(successMessage, document.querySelector('.detail-line'));
+                    
+                    // Remove success message after 3 seconds instead of 2
+                    setTimeout(() => successMessage.remove(), 3000);
+                    
+                    // Clear form and close popup
+                    form.reset();
+                    closePopup(popupId);
+                    
+                    // Update display immediately
+                    if (data.company_name) {
+                        document.querySelector('.detail-line i.fa-building').nextElementSibling.textContent = data.company_name;
+                    }
+                } else {
+                    showError(data.message, popupId);
+                }
+            })
+            .catch(error => {
+                showError('An error occurred. Please try again.', popupId);
+            });
+        }
+
+        document.querySelectorAll('.popup form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const popupId = this.closest('.popup').id;
+                let input = this.querySelector('input[type="text"], input[type="password"], input[type="email"]');
+                if (!input) return;
+
+                let inputType = input.name.replace('new_', '');
+                let validation = validateProfileUpdate(inputType, input.value);
+
+                if (!validation.isValid) {
+                    showError(validation.errorMessage, popupId);
+                    return;
+                }
+
+                let formData = new FormData(this);
+                
+                fetch('profile.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update the display
+                        if (input.name === 'new_username') {
+                            document.getElementById('username-display').textContent = input.value;
+                            document.querySelector('.username').textContent = input.value;
+                        } else if (input.name === 'new_email') {
+                            document.querySelector('.detail-line .fa-envelope').nextElementSibling.textContent = input.value;
+                        }
+                        
+                        // Show success message on page
+                        showPageMessage(data.message, 'success');
+                        
+                        // Clear form and close popup
+                        this.reset();
+                        closePopup(popupId);
+                        
+                        // Reload page if needed
+                        if (input.name === 'new_linkedin') {
+                            window.location.reload();
+                        }
+                    } else {
+                        showError(data.message, popupId);
+                    }
+                })
+                .catch(error => {
+                    showError('An error occurred. Please try again.', popupId);
+                });
+            });
+        });
+
+        document.querySelector('#password-popup form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const popupId = this.closest('.popup').id;
+            const input = this.querySelector('input[type="password"]');
+            
+            let validation = validateProfileUpdate('password', input.value);
+            if (!validation.isValid) {
+                showError(validation.errorMessage, popupId);
+                return;
+            }
+
+            const formData = new FormData(this);
+            
+            fetch('profile.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message on page
+                    showPageMessage(data.message, 'success');
+                    
+                    // Close popup and reset form
+                    this.reset();
+                    closePopup(popupId);
+                } else {
+                    showError(data.message || 'Failed to update password', popupId);
+                }
+            })
+            .catch(error => {
+                showError('An error occurred. Please try again.', popupId);
+            });
+        });
+
+        document.querySelector('#linkedin-popup form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const input = this.querySelector('input[type="text"]');
+            const form = this;
+            
+            let validation = validateProfileUpdate('linkedin', input.value);
+            if (!validation.isValid) {
+                showError(validation.errorMessage, 'linkedin-popup');
+                return;
+            }
+
+            const formData = new FormData(this);
+            
+            fetch('profile.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update LinkedIn display immediately
+                    const linkedinSpan = document.querySelector('.detail-line a[href^="http"]');
+                    if (linkedinSpan) {
+                        linkedinSpan.href = input.value;
+                        linkedinSpan.textContent = input.value;
+                    } else {
+                        // If no LinkedIn link exists yet, create one
+                        const linkedinContainer = document.createElement('div');
+                        linkedinContainer.className = 'detail-line';
+                        linkedinContainer.innerHTML = `<a href="${input.value}" target="_blank" style="color: #007bff;">${input.value}</a>`;
+                        document.querySelector('.detail-line img[alt="LinkedIn"]').closest('.detail-line').after(linkedinContainer);
+                    }
+                    
+                    // Reset form and close popup
+                    form.reset();
+                    closePopup('linkedin-popup');
+
+                    // Show success message last, after DOM updates
+                    const messageDiv = showPageMessage(data.message, 'success');
+                    
+                    // Delay page reload to ensure message is visible
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 3000);
+                } else {
+                    showError(data.message, 'linkedin-popup');
+                }
+            })
+            .catch(error => {
+                console.error('LinkedIn update error:', error);
+                showError('Failed to update LinkedIn profile. Please try again.', 'linkedin-popup');
+            });
+        });
+
+        document.querySelector('#resume-popup form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const form = this;
+            
+            fetch('profile.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                // Show success message on page
+                showPageMessage("Resume uploaded successfully.", 'success');
+                
+                // Close popup immediately
+                form.reset();
+                closePopup('resume-popup');
+                
+                // Delay page reload
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
+            })
+            .catch(error => {
+                showError('Failed to upload resume. Please try again.', 'resume-popup');
+            });
+        });
+
+        function showSuccess(message, popupId) {
+            // Remove any existing messages
+            removeMessages(popupId);
+            
+            // Create and show success message
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.innerHTML = message;
+            
+            const form = document.querySelector(`#${popupId} form`);
+            form.insertBefore(successDiv, form.firstChild);
+        }
+
+        function showError(message, popupId) {
+            // Remove any existing messages
+            removeMessages(popupId);
+            
+            // Create and show error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = message;
+            
+            const form = document.querySelector(`#${popupId} form`);
+            form.insertBefore(errorDiv, form.firstChild);
+        }
+
+        function removeMessages(popupId) {
+            const popup = document.getElementById(popupId);
+            const messages = popup.querySelectorAll('.error-message, .success-message');
+            messages.forEach(msg => msg.remove());
         }
 
         function updateResumeLink(fileName) {

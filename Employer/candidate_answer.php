@@ -430,10 +430,10 @@ session_write_close();
 </header>
 
 <div id="logout-popup" class="popup">
-    <h2>Are you sure you want to Log Out?</h2>
-    <button class="close-button" onclick="logoutUser()">Yes</button>
-    <button class="cancel-button" onclick="closePopup('logout-popup')">No</button>
-</div>
+        <h2>Are you sure you want to Log Out?</h2>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
+    </div>
 
 <div class="page-wrapper">
     <div class="assessment-container">
@@ -783,4 +783,3 @@ session_write_close();
     <script src="scripts.js"></script>
 </body>
 </html>
-```
