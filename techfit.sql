@@ -118,15 +118,6 @@ CREATE TABLE Feedback (
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
-CREATE TABLE Report (
-    report_id VARCHAR(5) PRIMARY KEY,
-    admin_id VARCHAR(5),
-    report_type ENUM('feedback', 'user') NOT NULL,
-    description TEXT NOT NULL,
-    timestamp DATETIME NOT NULL,
-    FOREIGN KEY (admin_id) REFERENCES Admin(admin_id)
-);
-
 CREATE TABLE Feedback_Management (
     feedback_management_id VARCHAR(5) PRIMARY KEY,
     feedback_id VARCHAR(5),
@@ -135,28 +126,6 @@ CREATE TABLE Feedback_Management (
     timestamp DATETIME NOT NULL,
     response_text TEXT DEFAULT NULL,
     FOREIGN KEY (feedback_id) REFERENCES Feedback(feedback_id),
-    FOREIGN KEY (admin_id) REFERENCES Admin(admin_id)
-);
-
-CREATE TABLE User_Audit_Log (
-    user_log_id VARCHAR(5) PRIMARY KEY,
-    user_id VARCHAR(5),
-    admin_id VARCHAR(5),
-    action_type ENUM('viewed', 'edited', 'deleted') NOT NULL,
-    timestamp DATETIME NOT NULL,
-    details TEXT DEFAULT NULL,
-    FOREIGN KEY (user_id) REFERENCES User(user_id),
-    FOREIGN KEY (admin_id) REFERENCES Admin(admin_id)
-);
-
-CREATE TABLE Assessment_Audit_Log (
-    assessment_log_id VARCHAR(5) PRIMARY KEY,
-    assessment_id VARCHAR(5),
-    admin_id VARCHAR(5),
-    action_type ENUM('created', 'edited', 'deleted') NOT NULL,
-    timestamp DATETIME NOT NULL,
-    details TEXT DEFAULT NULL,
-    FOREIGN KEY (assessment_id) REFERENCES Assessment_Admin(assessment_id),
     FOREIGN KEY (admin_id) REFERENCES Admin(admin_id)
 );
 

@@ -248,12 +248,9 @@ session_write_close();
 
     <div id="logout-popup" class="popup">
         <h2>Are you sure you want to Log Out?</h2>
-        <form id="logout-form" action="profile.php" method="post">
-            <input type="hidden" name="logout" value="1">
-            <button type="submit" class="close-button">Yes</button>
-            <button type="button" class="cancel-button" onclick="closePopup('logout-popup')">No</button>
-        </form>
+        <button class="close-button" id="logout-confirm-button">Yes</button>
+        <button class="cancel-button" id="logout-cancel-button">No</button>
     </div>
-    <script src="scripts.js?v=1.0"></script>
+    <script src="scripts.js"></script>
 </body>
 </html>
