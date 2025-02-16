@@ -699,7 +699,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
     }
 
     @media (max-width: 768px) {
-            #profile {
+        #profile {
             margin: 20px 0;
             padding: 10px;
             flex-direction: column;
@@ -748,29 +748,72 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
         }
 
         .popup {
-            width: 90%;
-            max-width: 350px;
+            width: 70%;
+            max-width: 250px;
+            padding: 20px;
+            text-align: left;
+            border-radius: 10px;
+            background-color: var(--background-color-light); /* Changed to match index.php */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
-        .popup input[type="text"],
-        .popup input[type="password"],
-        .popup input[type="file"] {
-            width: 100%;
+        /* Updated logout popup styles to match index.php */
+        #logout-popup h2 {
+            margin-bottom: 20px;
+            font-size: 22px; /* Increased font size */
+            color: var(--text-color);
+            font-weight: bold;
+            text-align: left;
         }
 
-        .popup form {
+        #logout-popup .button-container {
             display: flex;
-            flex-direction: column;
+            justify-content: flex-start; /* Changed from space-between */
             gap: 10px;
+            margin-top: 20px;
         }
 
-        .popup input[type="submit"],
+        #logout-popup .close-button,
+        #logout-popup .cancel-button {
+            display: inline-block;
+            width: calc(45% - 10px); /* Made buttons smaller */
+            margin: 0px;
+            padding: 8px 0; /* Reduced padding */
+            font-size: 14px; /* Smaller font size */
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Other popup button styles */
         .popup .close-button,
         .popup .cancel-button {
             width: 100%;
+            margin: 5px 0;
+            padding: 10px 0;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            border: none;
         }
 
+        .popup .close-button {
+            background-color: #dc3545;
+            color: #fff;
+        }
 
+        .popup .cancel-button {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .popup .close-button:hover {
+            background-color: #c82333;
+        }
+
+        .popup .cancel-button:hover {
+            background-color: #0056b3;
+        }
     }
     @media (max-width: 480px) {
         .profile-details {

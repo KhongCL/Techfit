@@ -641,6 +641,43 @@ $conn->close();
             width: 100%;
         }
 
+        #logout-popup {
+        width: 70%;
+        max-width: 250px;
+        padding: 20px;
+        text-align: left;
+        border-radius: 10px;
+        background-color: var(--background-color-light);
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    #logout-popup h2 {
+        margin-bottom: 20px;
+        font-size: 22px;
+        color: var(--text-color);
+        font-weight: bold;
+        text-align: left;
+    }
+
+    #logout-popup .button-container {
+        display: flex;
+        justify-content: flex-start;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    #logout-popup .close-button,
+    #logout-popup .cancel-button {
+        display: inline-block;
+        width: calc(45% - 10px);
+        margin: 0px;
+        padding: 8px 0;
+        font-size: 14px;
+        border-radius: 5px;
+        cursor: pointer;
+        border: none;
+    }
+
         /* Navigation styles */
         .nav-container {
             position: relative;
@@ -919,11 +956,13 @@ $conn->close();
     </form>
 </div>
 
-    <div id="logout-popup" class="popup">
-        <h2>Are you sure you want to Log Out?</h2>
+<div id="logout-popup" class="popup">
+    <h2>Are you sure you want to Log Out?</h2>
+    <div class="button-container">
         <button class="close-button" id="logout-confirm-button">Yes</button>
         <button class="cancel-button" id="logout-cancel-button">No</button>
     </div>
+</div>
 
 
 <footer>
