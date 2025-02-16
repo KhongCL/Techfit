@@ -28,10 +28,20 @@ function displayLoginMessage() {
 if (!isset($_SESSION['user_id'])) {
     displayLoginMessage(); 
 }
+
 if ($_SESSION['role'] !== 'Job Seeker') {
     displayLoginMessage(); 
 }
+
 if (!isset($_SESSION['job_seeker_id'])) {
+    displayLoginMessage(); 
+}
+
+if ($_SESSION['role'] !== 'Employer') {
+    displayLoginMessage(); 
+}
+
+if (!isset($_SESSION['employer_id'])) {
     displayLoginMessage(); 
 }
 
