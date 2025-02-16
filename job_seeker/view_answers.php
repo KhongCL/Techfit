@@ -155,20 +155,6 @@ $sections['AS81'] = 'Work-Style and Personality';
     <title>View Answers - TechFit</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        :root {
-            --primary-color: #007bff;
-            --accent-color: #5c7dff; 
-            --danger-color: #e74c3c; 
-            --danger-color-hover: #c0392b;
-            --success-color: #28a745;
-            --success-color-hover: #2ecc71;
-            --background-color: #121212;
-            --background-color-medium: #1E1E1E;
-            --background-color-light: #444;
-            --text-color: #fafafa;
-            --text-color-dark: #b0b0b0;
-        }
-
         #assessment-summary {
             padding: 20px;
             background-color: var(--background-color);
