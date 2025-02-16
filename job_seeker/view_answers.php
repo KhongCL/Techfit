@@ -71,7 +71,7 @@ $sql = "SELECT
     Assessment_Job_Seeker.score,
     Question.assessment_id,
     Question.question_text,
-    Question.answer_type, 
+    Question.answer_type,
     Question.programming_language,
     Question.code_template,
     Answer.answer_text AS user_answer,
@@ -89,25 +89,31 @@ WHERE Assessment_Job_Seeker.result_id = ?
 AND Assessment_Job_Seeker.job_seeker_id = ?
 AND (
     Question.assessment_id IN ('AS75', 'AS76', 'AS81')
-    OR Question.assessment_id = ?
+    OR (Question.assessment_id = ? AND Question.programming_language = ?)
 )
 ORDER BY Question.assessment_id, Question.question_id";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("sss", $assessment_id, $_SESSION['job_seeker_id'], $programming_section);
+$stmt->bind_param("ssss", $assessment_id, $_SESSION['job_seeker_id'], 
+                 $programming_section, $programming_language);
 $stmt->execute();
 $result = $stmt->get_result();
 
 $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
 
-$programming_sql = "SELECT DISTINCT q.assessment_id 
-FROM Answer a 
-JOIN Question q ON a.question_id = q.question_id 
+$programming_sql = "SELECT DISTINCT q.assessment_id, q.programming_language 
+FROM Question q
+JOIN Answer a ON a.question_id = q.question_id 
 WHERE a.job_seeker_id = ? 
-AND q.assessment_id IN ('AS77', 'AS78', 'AS79', 'AS80')";
+AND q.assessment_id IN ('AS77', 'AS78', 'AS79', 'AS80')
+AND a.job_seeker_id IN (
+    SELECT job_seeker_id 
+    FROM Assessment_Job_Seeker 
+    WHERE result_id = ?
+)";
 
 $stmt = $conn->prepare($programming_sql);
-$stmt->bind_param("s", $_SESSION['job_seeker_id']);
+$stmt->bind_param("ss", $_SESSION['job_seeker_id'], $assessment_id);
 $stmt->execute();
 $prog_result = $stmt->get_result();
 $row = $prog_result->fetch_assoc();
