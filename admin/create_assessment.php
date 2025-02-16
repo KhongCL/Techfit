@@ -221,9 +221,14 @@ $conn->close();
             box-sizing: border-box;
         }
 
+        #assessment_name, #description {
+            background-color: var(--background-color);
+            border: 1px solid var(--text-color);
+        }
+
        
         #assessment-name-label, #description-label {
-            color: var(--lighter-text-color);
+            color: var(--text-color);
         }
 
        

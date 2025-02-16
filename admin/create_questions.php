@@ -51,12 +51,12 @@ session_write_close();
             questionDiv.innerHTML = `
                 <p>Question ${questionCount}:</p>
                 <label for="question_text_${questionCount}">Question Text:</label>
-                <textarea id="question_text_${questionCount}" name="question_text[]" required></textarea><br>
+                <textarea id="question_text_${questionCount}" style="border: 1px solid white; background-color: var(--background-color)" name="question_text[]" required></textarea><br>
 
                 <div class="dropdown-container">
                     <div class="dropdown-item">
                         <label for="question_type_${questionCount}">Question Type:</label>
-                        <select id="question_type_${questionCount}" name="question_type[]" required>
+                        <select id="question_type_${questionCount}" style="border: 1px solid white; background-color: var(--background-color)" name="question_type[]" required>
                             <option value="preliminary">Preliminary</option>
                             <option value="experience">Experience</option>
                             <option value="employer_score">Employer Score</option>
@@ -66,7 +66,7 @@ session_write_close();
                     </div>
                     <div class="dropdown-item">
                         <label for="answer_type_${questionCount}">Answer Type:</label>
-                        <select id="answer_type_${questionCount}" name="answer_type[]" onchange="showAnswerOptions(${questionCount})" required>
+                        <select id="answer_type_${questionCount}" style="border: 1px solid white; background-color: var(--background-color); width: 94%;" name="answer_type[]" onchange="showAnswerOptions(${questionCount})" required>
                             <option value="multiple choice">Multiple Choice</option>
                             <option value="true/false">True/False</option>
                             <option value="fill in the blank">Fill in the Blank</option>
@@ -151,7 +151,7 @@ session_write_close();
                     <button type="button" onclick="addChoice(${id})">Add Choice</button>
                 </div>
                 <label for="correct_choice_${id}">Correct Choice:</label>
-                <select id="correct_choice_${id}" name="correct_choice[]" required></select>
+                <select id="correct_choice_${id}" style="border: 1px solid white; background-color: var(--background-color); width: 97%;" name="correct_choice[]" required></select>
             `;
             return choicesHtml;
         }
@@ -159,7 +159,7 @@ session_write_close();
         function getCodeQuestionOptions(id) {
             return `
                 <label for="code_language_${id}">Select Language:</label>
-                <select id="code_language_${id}" name="code_language[]" required>
+                <select id="code_language_${id}" style="border: 1px solid white; background-color: var(--background-color)" name="code_language[]" required>
                     <option value="python">Python</option>
                     <option value="javascript">JavaScript</option>
                     <option value="java">Java</option>
@@ -167,11 +167,11 @@ session_write_close();
                 </select><br>
 
                 <label for="code_${id}">Code Template:</label>
-                <textarea id="code_${id}" name="code_template[]" required 
+                <textarea id="code_${id}" style="border: 1px solid white; background-color: var(--background-color)" name="code_template[]" required 
                     placeholder="Enter code with __BLANK__ placeholders"></textarea><br>
 
                 <label for="correct_code_${id}">Correct Answers:</label>
-                <textarea id="correct_code_${id}" name="correct_choice[]" required 
+                <textarea id="correct_code_${id}" style="border: 1px solid white; background-color: var(--background-color)" name="correct_choice[]" required 
                     placeholder="Enter correct answers separated by <<ANSWER_BREAK>>"
                     title="Enter the answers that should go in each __BLANK__ placeholder, separated by <<ANSWER_BREAK>>"></textarea>
             `;
@@ -467,8 +467,9 @@ session_write_close();
             .choice-container input {
                 flex-grow: 1;
                 box-sizing: border-box;
+                border: 1px solid var(--text-color);
+                background-color: var(--background-color);
             }
-
            
             button.remove-icon[title]:hover::after {
                 content: attr(title);
@@ -572,9 +573,10 @@ session_write_close();
         <button class="close-button" id="logout-confirm-button">Yes</button>
         <button class="cancel-button" id="logout-cancel-button">No</button>
     </div> 
+    <div id="editContainer">
     <main>
         <h1>Create Questions for Assessment</h1>
-        <p>Assessment ID: <strong><?php echo htmlspecialchars($_GET['assessment_id']); ?></strong></p>
+        <p>Assessment ID: <strong><?php echo htmlspecialchars($_GET['assessment_id']); ?></strong></p=>
         <?php
         if (isset($_SESSION['success_message'])) {
             echo '<p class="success-message">' . $_SESSION['success_message'] . '</p>';
@@ -592,6 +594,7 @@ session_write_close();
             <button type="button" class="success" onclick="saveAssessment()">Save Assessment</button>
         </form>
     </main>
+    </div>
     
     <footer>
         <div class="footer-content">
