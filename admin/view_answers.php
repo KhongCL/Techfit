@@ -8,12 +8,36 @@ function displayLoginMessage() {
     exit();
 }
 
+function displayErrorMessage() {
+    echo '<script>
+        if (confirm("You need to access this page from view assessment results. Go to View Assessment Results? Click cancel to go to home page.")) {
+            window.location.href = "./view_assessment_results.php";
+        } else {
+            window.location.href = "./index.php";
+        }
+    </script>';
+    exit();
+}
+
 if (!isset($_SESSION['user_id'])) {
     displayLoginMessage();
 }
 
 if ($_SESSION['role'] !== 'Admin') {
     displayLoginMessage();
+}
+
+if (!isset($_GET['assessment_id']) || trim($_GET['assessment_id']) === '') {
+    displayErrorMessage();
+}
+
+if (!isset($_GET['job_seeker_id']) || trim($_GET['job_seeker_id']) === '') {
+    displayErrorMessage();
+}
+
+$referer = $_SERVER['HTTP_REFERER'] ?? '';
+if (strpos($referer, 'view_assessment_results.php') === false) {
+    displayErrorMessage();
 }
 
 session_write_close();
@@ -149,35 +173,7 @@ $result = $stmt->get_result();
     <title>Admin - View Answers - TechFit</title>
     <link rel="stylesheet" href="../styles.css">
     <style>
-        :root {
-        --primary-color: #007bff;
-        --primary-color-hover: #3c87e3;
-        --accent-color: #5c7dff; 
-        --danger-color: #e74c3c; 
-        --danger-color-hover: #c0392b;
-        --success-color: #28a745;
-        --success-color-hover: #2ecc71;
 
-        --background-color: #121212;
-        --background-color-dark: #080808;
-        --background-color-medium: #1E1E1E;
-        --background-color-light: #444;
-        --background-color-extra-light: #555;
-        --background-color-hover: #666;
-        
-        --text-color: #fafafa;
-        --text-color-dark: #b0b0b0;
-        --text-color-medium: #e0e0e0;
-        --text-color-light: #f7f7f7;
-        --text-color-extra-light: #ffffff;
-        --text-color-hover: #b0b0b0;
-        
-        --button-color: #007bff;
-        --button-color-hover: #3c87e3;
-        --focus-border-color: #47a3e0;
-        --disabled-color: #7f8c8d;
-        --border-color-light: #444;
-    }
 
         #assessment-summary {
             padding: 20px;
