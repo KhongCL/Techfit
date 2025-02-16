@@ -217,6 +217,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
 
     .profile-details .detail-line i {
         margin-right: 10px;
+        color: #e0e0e0;
     }
 
     .profile-details .detail-line span,
@@ -643,11 +644,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_password'])) {
 
 <div id="logout-popup" class="popup">
     <h2>Are you sure you want to Log Out?</h2>
-    <form id="logout-form" action="manage_profile.php" method="post">
-        <input type="hidden" name="logout" value="1">
-        <button type="submit" class="close-button">Yes</button>
-        <button type="button" class="cancel-button" onclick="closePopup('logout-popup')">No</button>
-    </form>
+    <button class="close-button" id="logout-confirm-button">Yes</button>
+    <button class="cancel-button" id="logout-cancel-button">No</button>
 </div>
 
 <footer>
