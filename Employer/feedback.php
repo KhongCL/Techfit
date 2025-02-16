@@ -43,7 +43,11 @@ session_write_close();
         <nav>
             <div class="nav-container">
                 <ul class="nav-list">
-                    <li><a href="#">Candidates</a></li>
+                <li><a href="#">Candidates</a>
+                    <ul class="dropdown">
+                        <li><a href="search_candidate.php">Search Candidates</a></li>
+                    </ul>
+                </li>
                     <li><a href="#">Resources</a>
                         <ul class="dropdown">
                             <li><a href="useful_links.php">Useful Links</a></li>
