@@ -1300,13 +1300,11 @@ $conn->close();
                     form.reset();
                     closePopup('linkedin-popup');
 
-                    // Show success message last, after DOM updates
-                    const messageDiv = showPageMessage(data.message, 'success');
+                    // Show alert message instead of success message
+                    alert(data.message);
                     
-                    // Delay page reload to ensure message is visible
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 3000);
+                    // Reload page
+                    window.location.reload();
                 } else {
                     showError(data.message, 'linkedin-popup');
                 }

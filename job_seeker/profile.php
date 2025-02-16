@@ -455,24 +455,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
     <link rel="stylesheet" href="styles.css?v=2.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-    body {
-        font-family: Arial, sans-serif;
-        color: #e0e0e0;
-        background-color: #121212;
-    }
 
     #profile {
         display: flex;
-        justify-content: flex-start; /* Changed from center */
+        justify-content: flex-start;
         margin-top: 80px;
         margin-bottom: 80px;
-        padding-left: 100px; /* Add left padding */
+        padding-left: 100px;
     }
     .profile-details {
         display: flex;
         flex-direction: column;
-        justify-content: flex-start; /* Changed from center */
-        max-width: 800px; /* Optional: Add max-width to prevent content from stretching too wide */
+        justify-content: flex-start;
+        max-width: 800px;
     }
     .profile-details h2 {
         margin: 0;
@@ -586,26 +581,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
         height: 30px;
         border-radius: 20%;
     }
-    .nav-container {
+
+    .education-options {
         display: flex;
-        justify-content: flex-end;
-        padding-right: 50px;
+        flex-direction: column;
+        gap: 10px;
+        margin: 20px 0;
+        max-height: 250px; /* Set maximum height */
+        overflow-y: auto; /* Enable vertical scrolling */
+        padding-right: 10px; /* Add padding for scrollbar */
     }
 
-   
-    .nav-list {
-        list-style: none;
-        display: flex;
-        justify-content: flex-end;
-        margin: 0;
-        padding: 0;
+    /* Add custom scrollbar styling */
+    .education-options::-webkit-scrollbar {
+        width: 8px;
     }
-    .education-options {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin: 20px 0;
+
+    .education-options::-webkit-scrollbar-track {
+        background: #333;
+        border-radius: 4px;
     }
+
+    .education-options::-webkit-scrollbar-thumb {
+        background: #666;
+        border-radius: 4px;
+    }
+
+    .education-options::-webkit-scrollbar-thumb:hover {
+        background: #888;
+    }
+
     .education-option {
         padding: 10px;
         border: 1px solid #444;
@@ -763,44 +768,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
         .popup .cancel-button {
             width: 100%;
         }
-        .hamburger {
-            display: flex;
-            position: fixed;
-            top: 25px;
-            right: 20px;
-            z-index: 1002; /* Ensure it's above the nav-list */
-        }
 
-        .nav-list {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            position: fixed;
-            top: 0;
-            right: -100%;
-            height: 100%;
-            background-color: var(--background-color);
-            width: 350px;
-            z-index: 1000;
-            padding: 60px 20px;
-            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.5);
-            justify-content: flex-start;
-            transition: right 0.3s ease;
-            margin-top: 0; /* Reset any margin */
-        }
 
-        .nav-list.active {
-            right: 0;
-        }
-
-        .nav-list li {
-            width: 100%;
-            margin: 5px 0;
-        }
-
-        .nav-container {
-            padding-right: 0;
-        }
     }
     @media (max-width: 480px) {
         .profile-details {
@@ -824,56 +793,57 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
 </head>
 <body>
 <header>
-    <div class="logo">
-        <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
-    </div>
-    <nav>
-        <div class="nav-container">
-            <ul class="nav-list">
-                <li><a href="#">Assessment</a>
-                    <ul class="dropdown">
-                        <li><a href="start_assessment.php">Start Assessment</a></li>
-                        <li><a href="assessment_history.php">Assessment History</a></li>
-                        <li><a href="assessment_summary.php">Assessment Summary</a></li>
-                    </ul>
-                </li>
-                <li><a href="#">Resources</a>
-                    <ul class="dropdown">
-                        <li><a href="useful_links.php">Useful Links</a></li>
-                        <li><a href="faq.php">FAQ</a></li>
-                        <li><a href="sitemap.php">Sitemap</a></li>
-                    </ul>
-                </li>
-                <li><a href="about.php">About</a></li>
-                <li>
-                    <a href="#" id="profile-link">
-                        <div class="profile-info">
-                            <span class="username" id="username">
-                                <?php
-                                if (isset($_SESSION['username'])) {
-                                    echo $_SESSION['username'];  
-                                } else {
-                                    echo "Guest";  
-                                }
-                                ?>
-                            </span>
-                            <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
-                        </div>
-                    </a>
-                    <ul class="dropdown" id="profile-dropdown">
-                        <li><a href="profile.php">Settings</a></li>
-                        <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li>
-                    </ul>
-                </li>
-            </ul>
-            <div class="hamburger" id="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+        <div class="logo">
+            <a href="index.php"><img src="images/logo.jpg" alt="TechFit Logo"></a>
         </div>
-    </nav>
-</header>
+        <nav>
+            <div class="nav-container">
+                <ul class="nav-list">
+                    <li><a href="#">Assessment</a>
+                        <ul class="dropdown">
+                            <li><a href="start_assessment.php">Start Assessment</a></li>
+                            <li><a href="assessment_history.php">Assessment History</a></li>
+                            <li><a href="assessment_summary.php">Assessment Summary</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Resources</a>
+                        <ul class="dropdown">
+                            <li><a href="useful_links.php">Useful Links</a></li>
+                            <li><a href="faq.php">FAQ</a></li>
+                            <li><a href="sitemap.php">Sitemap</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="about.php">About</a></li>
+                    <li>
+                        <a href="#" id="profile-link">
+                            <div class="profile-info">
+                                <span class="username" id="username">
+                                    <?php
+                                    
+                                    if (isset($_SESSION['username'])) {
+                                        echo $_SESSION['username'];  
+                                    } else {
+                                        echo "Guest";  
+                                    }
+                                    ?>
+                                </span>
+                                <img src="images/usericon.png" alt="Profile" class="profile-image" id="profile-image">
+                            </div>
+                        </a>
+                        <ul class="dropdown" id="profile-dropdown">
+                            <li><a href="profile.php">Settings</a></li>
+                            <li><a href="#" onclick="openPopup('logout-popup')">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
 
     <main>
         <section id="profile">
@@ -1378,13 +1348,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
                     form.reset();
                     closePopup('linkedin-popup');
 
-                    // Show success message last, after DOM updates
-                    const messageDiv = showPageMessage(data.message, 'success');
+                    // Show alert message instead of success message
+                    alert(data.message);
                     
-                    // Delay page reload to ensure message is visible
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 3000);
+                    // Reload page
+                    window.location.reload();
                 } else {
                     showError(data.message, 'linkedin-popup');
                 }
@@ -1538,44 +1506,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
             })
             .catch(error => {
                 console.error('Error:', error);
-            });
-        });
-        // Add hamburger menu functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const hamburger = document.getElementById('hamburger');
-            const navList = document.querySelector('.nav-list');
-            
-            hamburger.addEventListener('click', function() {
-                hamburger.classList.toggle('active');
-                navList.classList.toggle('active');
-            });
-
-            // Close menu when clicking outside
-            document.addEventListener('click', function(e) {
-                if (!hamburger.contains(e.target) && !navList.contains(e.target)) {
-                    hamburger.classList.remove('active');
-                    navList.classList.remove('active');
-                }
-            });
-
-            // Handle dropdown menus in mobile view
-            const dropdownParents = document.querySelectorAll('.nav-list li:has(.dropdown)');
-            dropdownParents.forEach(parent => {
-                parent.addEventListener('click', function(e) {
-                    if (window.innerWidth <= 768) {
-                        const dropdown = this.querySelector('.dropdown');
-                        const allDropdowns = document.querySelectorAll('.nav-list .dropdown');
-                        
-                        allDropdowns.forEach(d => {
-                            if (d !== dropdown) {
-                                d.parentElement.classList.remove('active');
-                            }
-                        });
-                        
-                        this.classList.toggle('active');
-                        e.stopPropagation();
-                    }
-                });
             });
         });
     </script>

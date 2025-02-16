@@ -21,8 +21,8 @@ CREATE TABLE Job_Seeker (
     resume BLOB,
     linkedin_link VARCHAR(255),
     job_position_interested VARCHAR(255),
-    education_level VARCHAR(100), -- Added column
-    year_of_experience INT, -- Added column
+    education_level VARCHAR(100),
+    year_of_experience INT,
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
@@ -32,7 +32,7 @@ CREATE TABLE Employer (
     company_name VARCHAR(100) NOT NULL,
     linkedin_link VARCHAR(255),
     job_position_interested VARCHAR(255),
-    company_type VARCHAR(100), -- Added column
+    company_type VARCHAR(100),
     FOREIGN KEY (user_id) REFERENCES User(user_id)
 );
 
@@ -46,7 +46,7 @@ CREATE TABLE Assessment_Admin (
     assessment_id VARCHAR(5) PRIMARY KEY,
     admin_id VARCHAR(5) NOT NULL,
     assessment_name VARCHAR(100) NOT NULL,
-    description TEXT, -- Added description column
+    description TEXT,
     last_modified DATETIME,
     timestamp DATETIME NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
@@ -145,7 +145,6 @@ CREATE TABLE Employer_Interest (
     FOREIGN KEY (job_seeker_id) REFERENCES Job_Seeker(job_seeker_id)
 );
 
--- New Tables for System Configuration Settings
 CREATE TABLE Assessment_Settings (
     setting_id VARCHAR(5) PRIMARY KEY,
     default_time_limit INT NOT NULL,
