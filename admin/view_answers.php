@@ -3,11 +3,7 @@ session_start();
 
 function displayLoginMessage() {
     echo '<script>
-        if (confirm("You need to log in as an Admin to access this page. Go to Login Page? Click cancel to go to home page.")) {
-            window.location.href = "../login.php";
-        } else {
-            window.location.href = "../index.php";
-        }
+        alert("You need to log in to access this page.");
     </script>';
     exit();
 }
@@ -37,11 +33,11 @@ $job_seeker_id_url = $_GET['job_seeker_id'];
 
 
 $sql = "
-    SELECT
+SELECT
     Assessment_Job_Seeker.end_time AS assessment_date,
     Assessment_Job_Seeker.score,
     Question.assessment_id,
-    Question.question_text,
+    Question.question_text, 
     Question.answer_type,
     Question.programming_language,
     Question.code_template,
@@ -52,42 +48,51 @@ $sql = "
         WHEN Question.answer_type = 'multiple choice' THEN c.choice_text
         ELSE Answer.answer_text
     END as display_answer,
-    User.username AS job_seeker_username -- Get username from User table
-    FROM Assessment_Job_Seeker
-    JOIN Question ON Question.assessment_id IN ('AS75', 'AS76', 'AS77', 'AS78', 'AS79', 'AS80', 'AS81')
-    LEFT JOIN Answer ON Answer.job_seeker_id = Assessment_Job_Seeker.job_seeker_id
-        AND Answer.question_id = Question.question_id
-    LEFT JOIN Choices c ON (Question.answer_type = 'multiple choice' AND Answer.answer_text = c.choice_id)
-    JOIN Job_Seeker ON Assessment_Job_Seeker.job_seeker_id = Job_Seeker.job_seeker_id -- Join Job_Seeker table
-    JOIN User ON Job_Seeker.user_id = User.user_id -- Join User table
-    WHERE Assessment_Job_Seeker.result_id = ?
-    ORDER BY Question.assessment_id, Question.question_id";
+    User.username AS job_seeker_username,
+    Assessment_Settings.passing_score_percentage
+FROM Assessment_Job_Seeker
+JOIN Assessment_Settings ON Assessment_Settings.setting_id = '1'
+JOIN Question ON Question.assessment_id IN ('AS75', 'AS76', 'AS77', 'AS78', 'AS79', 'AS80', 'AS81')
+LEFT JOIN Answer ON Answer.job_seeker_id = Assessment_Job_Seeker.job_seeker_id
+    AND Answer.question_id = Question.question_id
+LEFT JOIN Choices c ON (Question.answer_type = 'multiple choice' AND Answer.answer_text = c.choice_id)
+JOIN Job_Seeker ON Assessment_Job_Seeker.job_seeker_id = Job_Seeker.job_seeker_id
+JOIN User ON Job_Seeker.user_id = User.user_id
+WHERE Assessment_Job_Seeker.result_id = ?
+AND (
+    Question.assessment_id IN ('AS75', 'AS76', 'AS81')
+    OR (Question.assessment_id = ? AND Question.programming_language = ?)
+)
+ORDER BY Question.assessment_id, Question.question_id";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $assessment_id); 
+$stmt->bind_param("sss", $assessment_id, $programming_section, $programming_language);
 $stmt->execute();
 $result = $stmt->get_result();
 $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
 
-$programming_sql = "SELECT DISTINCT q.assessment_id
+$programming_sql = "SELECT DISTINCT q.assessment_id, q.programming_language 
 FROM Question q
+JOIN Answer a ON a.question_id = q.question_id 
 WHERE q.assessment_id IN ('AS77', 'AS78', 'AS79', 'AS80')
-AND q.question_id IN (
-    SELECT a.question_id
-    FROM Answer a
-    WHERE a.job_seeker_id IN (
-        SELECT job_seeker_id
-        FROM Assessment_Job_Seeker
-        WHERE result_id = ?
-    )
+AND a.job_seeker_id IN (
+    SELECT job_seeker_id 
+    FROM Assessment_Job_Seeker 
+    WHERE result_id = ?
 )";
 
 $stmt = $conn->prepare($programming_sql);
-$stmt->bind_param("s", $assessment_id); 
+$stmt->bind_param("s", $assessment_id);
 $stmt->execute();
 $prog_result = $stmt->get_result();
 $row = $prog_result->fetch_assoc();
 $programming_section = $row ? $row['assessment_id'] : null;
+
+$programming_language = null;
+if ($row) {
+    $programming_section = $row['assessment_id'];
+    $programming_language = $row['programming_language'];
+}
 
 $sections = [
     'AS75' => 'General Questions',
@@ -106,6 +111,34 @@ if ($programming_section) {
 }
 
 $sections['AS81'] = 'Work-Style and Personality';
+
+$sections_sql = "SELECT 
+q.assessment_id,
+q.question_text,
+q.answer_type,
+q.correct_answer,
+q.programming_language,
+q.code_template,
+a.answer_text,
+a.is_correct,
+CASE 
+    WHEN q.answer_type = 'multiple choice' THEN c.choice_text
+    ELSE a.answer_text 
+END as display_answer
+FROM Answer a
+JOIN Question q ON a.question_id = q.question_id
+LEFT JOIN Choices c ON (q.answer_type = 'multiple choice' AND a.answer_text = c.choice_id)
+WHERE a.job_seeker_id IN (
+    SELECT job_seeker_id 
+    FROM Assessment_Job_Seeker 
+    WHERE result_id = ?
+)
+ORDER BY q.assessment_id, q.question_id";
+
+$stmt = $conn->prepare($sections_sql);
+$stmt->bind_param("s", $assessment_id);
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -419,8 +452,15 @@ $sections['AS81'] = 'Work-Style and Personality';
         }
 
         .detail_value.score {
-            color: var(--success-color);
             font-size: 0.85em;
+        }
+
+        .detail_value.score.score-passed {
+            color: var(--success-color);
+        }
+
+        .detail_value.score.score-failed {
+            color: var(--danger-color);
         }
 
        
@@ -604,7 +644,9 @@ $sections['AS81'] = 'Work-Style and Personality';
                     </div>
                     <div class="detail_item">
                         <span class="detail_label">Score:</span>
-                        <span class="detail_value score"><?= $assessment_details[0]['score']; ?>%</span>
+                        <span class="detail_value score <?php echo ($assessment_details[0]['score'] >= $assessment_details[0]['passing_score_percentage']) ? 'score-passed' : 'score-failed'; ?>">
+                            <?= $assessment_details[0]['score']; ?>%
+                        </span>
                     </div>
                 </div>
             <?php endif; ?>
@@ -620,52 +662,56 @@ $sections['AS81'] = 'Work-Style and Personality';
             <?php if (!empty($assessment_details)): ?>
                 <?php
                 $current_section = '';
-                $sections = [
-                    'AS75' => 'General Questions',
-                    'AS76' => 'Scenario-Based Questions',
-                    'AS77' => 'Python Programming',
-                    'AS78' => 'Java Programming',
-                    'AS79' => 'JavaScript Programming',
-                    'AS80' => 'C++ Programming',
-                    'AS81' => 'Work-Style and Personality'
-                ];
 
-                foreach ($assessment_details as $detail):
-                    if (in_array($detail['assessment_id'], ['AS77', 'AS78', 'AS79']) &&
-                        $detail['programming_language'] !== 'cpp') {
+                while ($row = $result->fetch_assoc()):
+                    // Skip questions that don't match programming section
+                    if (in_array($row['assessment_id'], ['AS77', 'AS78', 'AS79', 'AS80']) &&
+                        ($row['assessment_id'] !== $programming_section || 
+                        $row['programming_language'] !== $programming_language)) {
                         continue;
                     }
-
-                    if ($detail['assessment_id'] !== $current_section) {
+                    
+                    if ($current_section !== $row['assessment_id']) {
                         if ($current_section !== '') {
                             echo "</div>";
                         }
-                        $current_section = $detail['assessment_id'];
-                        echo "<h2 class='section-header'>{$sections[$current_section]}</h2>";
+                        $current_section = $row['assessment_id'];
+                        $section_name = $sections[$current_section];
+                        
+                        // Update section name for programming section 
+                        if ($row['assessment_id'] === $programming_section) {
+                            $section_name = str_replace(
+                                ['Python', 'Java', 'JavaScript', 'C++'],
+                                ucfirst($programming_language),
+                                $section_name
+                            );
+                        }
+                        
+                        echo "<h2 class='section-header'>{$section_name}</h2>";
                         echo "<div id='{$current_section}' class='section-questions'>";
                     }
-                    ?>
+                ?>
                     <div class="question-item">
-                        <p class="question-text"><?= htmlspecialchars($detail['question_text']); ?></p>
+                        <p class="question-text"><?= htmlspecialchars($row['question_text']); ?></p>
                         <div class="answer-pair">
-                            <?php if ($detail['answer_type'] === 'code'): ?>
-                                <?php if (!empty($detail['programming_language'])): ?>
+                            <?php if ($row['answer_type'] === 'code'): ?>
+                                <?php if (!empty($row['programming_language'])): ?>
                                     <div class="language-indicator">
-                                        Language: <?= ucfirst($detail['programming_language']); ?>
+                                        Language: <?= ucfirst($row['programming_language']); ?>
                                     </div>
                                 <?php endif; ?>
 
-                                <?php if (!empty($detail['code_template'])): ?>
+                                <?php if (!empty($row['code_template'])): ?>
                                     <div class="code-container">
-                                        <pre class="code-template"><?= htmlspecialchars($detail['code_template']); ?></pre>
+                                        <pre class="code-template"><?= htmlspecialchars($row['code_template']); ?></pre>
                                     </div>
                                 <?php endif; ?>
 
                                 <div class="answers-section">
                                     <h4>Your Answers:</h4>
                                     <?php
-                                    $user_answers = explode('<<ANSWER_BREAK>>', $detail['user_answer']);
-                                    $correct_answers = explode('<<ANSWER_BREAK>>', $detail['correct_answer']);
+                                    $user_answers = explode('<<ANSWER_BREAK>>', $row['answer_text']);
+                                    $correct_answers = explode('<<ANSWER_BREAK>>', $row['correct_answer']);
                                     ?>
                                     <ol class="answer-list">
                                         <?php foreach ($user_answers as $index => $answer): ?>
@@ -676,7 +722,7 @@ $sections['AS81'] = 'Work-Style and Personality';
                                             ?>
                                             <li>
                                                 <?= htmlspecialchars($answer); ?>
-                                                <?php if (!in_array($detail['assessment_id'], ['AS75', 'AS81'])): ?>
+                                                <?php if (!in_array($row['assessment_id'], ['AS75', 'AS81'])): ?>
                                                     <span class="status-indicator <?= $is_correct ? 'status-correct' : 'status-incorrect' ?>">
                                                         <?= $is_correct ? '✓' : '✗' ?>
                                                     </span>
@@ -686,7 +732,7 @@ $sections['AS81'] = 'Work-Style and Personality';
                                         <?php endforeach; ?>
                                     </ol>
 
-                                    <?php if (!in_array($detail['assessment_id'], ['AS75', 'AS81'])): ?>
+                                    <?php if (!in_array($row['assessment_id'], ['AS75', 'AS81'])): ?>
                                         <h4>Correct Answers:</h4>
                                         <ol class="answer-list">
                                             <?php foreach ($correct_answers as $answer): ?>
@@ -696,22 +742,27 @@ $sections['AS81'] = 'Work-Style and Personality';
                                     <?php endif; ?>
                                 </div>
                             <?php else: ?>
-                                <div class="your-answer">Your Answer: <?= htmlspecialchars($detail['display_answer']); ?></div>
-                                <?php if (!in_array($detail['assessment_id'], ['AS75', 'AS81'])): ?>
+                                <div class="your-answer">Your Answer: <?= htmlspecialchars($row['display_answer']); ?></div>
+                                <?php if (!in_array($row['assessment_id'], ['AS75', 'AS81'])): ?>
                                     <div class="correct-answer">
-                                        Correct Answer: <?= htmlspecialchars($detail['correct_answer']); ?>
-                                        <span class="status-indicator <?= $detail['is_correct'] ? 'status-correct' : 'status-incorrect' ?>">
-                                            <?= $detail['is_correct'] ? '✓' : '✗' ?>
+                                        Correct Answer: <?= htmlspecialchars($row['correct_answer']); ?>
+                                        <span class="status-indicator <?= $row['is_correct'] ? 'status-correct' : 'status-incorrect' ?>">
+                                            <?= $row['is_correct'] ? '✓' : '✗' ?>
                                         </span>
                                     </div>
                                 <?php endif; ?>
                             <?php endif; ?>
                         </div>
                     </div>
-                <?php endforeach; ?>
-                <?php if ($current_section !== '') echo "</div>"; ?>
+                <?php 
+                endwhile;
+                if ($current_section !== '') echo "</div>";
+                ?>
             <?php else: ?>
-                <p>No answers found for this assessment.</p>
+                <div class="no-answers-message">
+                    <h3>No Answers Found</h3>
+                    <p>No answers were found for this assessment.</p>
+                </div>
             <?php endif; ?>
         </div>
     </div>
