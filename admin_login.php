@@ -142,7 +142,7 @@ $conn->close();
     text-align: left;
     margin-bottom: 5px;
     }
-    <style>
+
     body {
         background-color: #121212;
         color: #ffffff;
