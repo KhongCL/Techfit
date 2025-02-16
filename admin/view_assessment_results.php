@@ -3,11 +3,7 @@ session_start();
 
 function displayLoginMessage() {
     echo '<script>
-        if (confirm("You need to log in as an Admin to access this page. Go to Login Page? Click cancel to go to home page.")) {
-            window.location.href = "../login.php";
-        } else {
-            window.location.href = "../index.php";
-        }
+        alert("You need to log in to access this page.");
     </script>';
     exit();
 }
@@ -63,20 +59,6 @@ $result = $conn->query($sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin - View Assessment Results - TechFit</title> <link rel="stylesheet" href="styles.css">
     <style>
-        :root {
-            --primary-color: #007bff;
-            --accent-color: #5c7dff;
-            --danger-color: #e74c3c;
-            --danger-color-hover: #c0392b;
-            --success-color: #28a745;
-            --success-color-hover: #2ecc71;
-            --background-color: #121212;
-            --background-color-medium: #1E1E1E;
-            --background-color-light: #444;
-            --text-color: #fafafa;
-            --text-color-dark: #b0b0b0;
-        }
-
         .summary_header {
             padding: 20px;
             border-bottom: 2px solid var(--background-color-light);

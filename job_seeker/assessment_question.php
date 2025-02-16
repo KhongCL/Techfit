@@ -715,34 +715,6 @@ $conn->close();
             }
         }
 
-        function runCode(code, language) {
-            const outputTerminal = document.querySelector('.output-terminal');
-            outputTerminal.textContent = 'Running...';
-
-            const formData = new FormData();
-            formData.append('code', code);
-            formData.append('language', language);
-            
-            return fetch('run_code.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Display output in terminal instead of alert
-                if (data.success) {
-                    outputTerminal.textContent = data.output;
-                } else {
-                    outputTerminal.textContent = `Error:\n${data.error}`;
-                }
-                return data;
-            })
-            .catch(error => {
-                outputTerminal.textContent = `Error running code: ${error.message}`;
-                console.error('Error:', error);
-            });
-        }
-
         function getProgrammingAssessmentId() {
             // Log the saved answer for debugging
             log('Q209 answer:', savedAnswers['Q209']);

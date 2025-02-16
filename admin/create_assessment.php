@@ -97,26 +97,6 @@ $conn->close();
     <link rel="stylesheet" href="styles.css">
         <style>
        
-        :root {
-            --primary-color: #007bff;
-            --secondary-color: #1e1e1e;
-            --accent-color: #0056b3;
-            --text-color: #e0e0e0;
-            --background-color: #121212;
-            --border-color: #333;
-            --hover-background-color: #333;
-            --hover-text-color: #fff;
-            --button-hover-color: #80bdff;
-            --popup-background-color: #1a1a1a;
-            --popup-border-color: #444;
-            --danger-color: #dc3545;
-            --danger-hover-color: #c82333;
-            --success-color: #28a745;
-            --success-hover-color: #218838;
-            --lighter-text-color: #f5f5f5;
-        }
-
-       
         body {
             font-family: Arial, sans-serif;
             color: var(--text-color);
@@ -214,14 +194,6 @@ $conn->close();
         }
 
        
-        #create-assessment-form {
-            background-color: var(--secondary-color);
-            padding: 20px;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-
-       
         #assessment-name-label, #description-label {
             color: var(--lighter-text-color);
         }
@@ -233,6 +205,78 @@ $conn->close();
 
         li {
             color: white;
+        }
+
+        /* Form styling */
+        #create-assessment-form {
+            background-color: var(--background-color);
+            padding: 20px;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        #create-assessment-form textarea,
+        #create-assessment-form input[type="text"],
+        #create-assessment-form select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--text-color);
+            border-radius: 5px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        #create-assessment-form textarea:focus,
+        #create-assessment-form input[type="text"]:focus,
+        #create-assessment-form select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+        }
+
+        #create-assessment-form select option {
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        #create-assessment-form label {
+            color: var(--text-color);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* Button styling */
+        #create-assessment-form button {
+            background-color: var(--primary-color);
+            color: var(--text-color);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #create-assessment-form button:disabled {
+            background-color: var(--background-color-light);
+            cursor: not-allowed;
+        }
+
+        #create-assessment-form button:hover:not(:disabled) {
+            background-color: var(--accent-color);
+        }
+
+        /* Form group spacing */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
         }
     </style>
 </head>

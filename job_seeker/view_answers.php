@@ -66,13 +66,12 @@ if ($conn->connect_error) {
 $assessment_id = $_GET['assessment_id'];
 
 
-$sql = "
-    SELECT 
+$sql = "SELECT 
     Assessment_Job_Seeker.end_time AS assessment_date, 
     Assessment_Job_Seeker.score,
     Question.assessment_id,
     Question.question_text,
-    Question.answer_type,
+    Question.answer_type, 
     Question.programming_language,
     Question.code_template,
     Answer.answer_text AS user_answer,
@@ -82,40 +81,38 @@ $sql = "
         WHEN Question.answer_type = 'multiple choice' THEN c.choice_text 
         ELSE Answer.answer_text 
     END as display_answer
-    FROM Assessment_Job_Seeker
-    JOIN Question ON Question.assessment_id IN ('AS75', 'AS76', 'AS77', 'AS78', 'AS79', 'AS80', 'AS81')
-    LEFT JOIN Answer ON Answer.job_seeker_id = Assessment_Job_Seeker.job_seeker_id 
-        AND Answer.question_id = Question.question_id
-    LEFT JOIN Choices c ON (Question.answer_type = 'multiple choice' AND Answer.answer_text = c.choice_id)
-    WHERE Assessment_Job_Seeker.result_id = ? 
-    AND Assessment_Job_Seeker.job_seeker_id = ?
-    ORDER BY Question.assessment_id, Question.question_id";
+FROM Assessment_Job_Seeker
+JOIN Answer ON Answer.job_seeker_id = Assessment_Job_Seeker.job_seeker_id
+JOIN Question ON Answer.question_id = Question.question_id 
+LEFT JOIN Choices c ON (Question.answer_type = 'multiple choice' AND Answer.answer_text = c.choice_id)
+WHERE Assessment_Job_Seeker.result_id = ? 
+AND Assessment_Job_Seeker.job_seeker_id = ?
+AND (
+    Question.assessment_id IN ('AS75', 'AS76', 'AS81')
+    OR Question.assessment_id = ?
+)
+ORDER BY Question.assessment_id, Question.question_id";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("ss", $assessment_id, $_SESSION['job_seeker_id']);
+$stmt->bind_param("sss", $assessment_id, $_SESSION['job_seeker_id'], $programming_section);
 $stmt->execute();
 $result = $stmt->get_result();
 
 $assessment_details = $result->fetch_all(MYSQLI_ASSOC);
 
-$programming_sql = "SELECT DISTINCT q.assessment_id, q.programming_language 
-FROM Question q
-JOIN Answer a ON a.question_id = q.question_id
-WHERE q.assessment_id IN ('AS77', 'AS78', 'AS79', 'AS80')
-AND a.job_seeker_id = ? 
-AND job_seeker_id IN (
-    SELECT job_seeker_id 
-    FROM Assessment_Job_Seeker 
-    WHERE result_id = ?
-)";
+$programming_sql = "SELECT DISTINCT q.assessment_id 
+FROM Answer a 
+JOIN Question q ON a.question_id = q.question_id 
+WHERE a.job_seeker_id = ? 
+AND q.assessment_id IN ('AS77', 'AS78', 'AS79', 'AS80')";
 
 $stmt = $conn->prepare($programming_sql);
-$stmt->bind_param("ss", $_SESSION['job_seeker_id'], $assessment_id);
+$stmt->bind_param("s", $_SESSION['job_seeker_id']);
 $stmt->execute();
 $prog_result = $stmt->get_result();
 $row = $prog_result->fetch_assoc();
+$programming_section = $row ? $row['assessment_id'] : null;
 
-$programming_section = null;
 $programming_language = null;
 if ($row) {
     $programming_section = $row['assessment_id'];
@@ -604,10 +601,11 @@ $sections['AS81'] = 'Work-Style and Personality';
                     ];
 
                     foreach ($assessment_details as $detail):
-                        // Only show questions for the correct programming language section
-                        if ($detail['assessment_id'] === $programming_section && 
-                            $detail['programming_language'] !== $programming_language) {
-                            continue;
+                        // Skip non-programming sections and questions for wrong programming language
+                        if (in_array($detail['assessment_id'], ['AS77', 'AS78', 'AS79', 'AS80']) &&
+                            ($detail['assessment_id'] !== $programming_section || 
+                             $detail['programming_language'] !== $programming_language)) {
+                            continue; 
                         }
                     
                         if ($detail['assessment_id'] !== $current_section) {
@@ -617,13 +615,16 @@ $sections['AS81'] = 'Work-Style and Personality';
                             $current_section = $detail['assessment_id'];
                             $section_name = $sections[$current_section];
                             
-                            // Add programming language to section name if applicable
-                            if (in_array($current_section, ['AS77', 'AS78', 'AS79', 'AS80'])) {
-                                $section_name = str_replace(
-                                    ['Python', 'Java', 'JavaScript', 'C++'],
-                                    ucfirst($programming_language),
-                                    $section_name
-                                );
+                            // Update section name for programming section
+                            if ($detail['assessment_id'] !== $current_section) {
+                                if ($current_section !== '') {
+                                    echo "</div>";
+                                }
+                                $current_section = $detail['assessment_id'];
+                                $section_name = $sections[$current_section];
+                                
+                                echo "<h2 class='section-header'>{$section_name}</h2>";
+                                echo "<div id='{$current_section}' class='section-questions'>";
                             }
                             
                             echo "<h2 class='section-header'>{$section_name}</h2>";
