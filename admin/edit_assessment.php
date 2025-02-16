@@ -54,12 +54,12 @@ session_start();
                 <input type="hidden" id="question_id_${questionCount}" name="question_id[]" value="">
                 <p>Question ID: <strong id="display_question_id_${questionCount}"></strong></p>
                 <label for="question_text_${questionCount}">Question Text:</label>
-                <textarea id="question_text_${questionCount}" name="question_text[]" required></textarea><br>
+                <textarea id="question_text_${questionCount}" style="border: 1px solid white; background-color: var(--background-color)" name="question_text[]" required></textarea><br>
 
                 <div class="dropdown-container">
                     <div class="dropdown-item">
                         <label for="question_type_${questionCount}">Question Type:</label>
-                        <select id="question_type_${questionCount}" name="question_type[]" required>
+                        <select id="question_type_${questionCount}" style="border: 1px solid white; background-color: var(--background-color)" name="question_type[]" required>
                             <option value="preliminary">Preliminary</option>
                             <option value="experience">Experience</option>
                             <option value="employer_score">Employer Score</option>
@@ -69,7 +69,7 @@ session_start();
                     </div>
                     <div class="dropdown-item">
                         <label for="answer_type_${questionCount}">Answer Type:</label>
-                        <select id="answer_type_${questionCount}" name="answer_type[]" onchange="showAnswerOptions(${questionCount})" required>
+                        <select id="answer_type_${questionCount}" style="border: 1px solid white; background-color: var(--background-color); width: 91%;" name="answer_type[]" onchange="showAnswerOptions(${questionCount})" required>
                             <option value="multiple choice">Multiple Choice</option>
                             <option value="true/false">True/False</option>
                             <option value="fill in the blank">Fill in the Blank</option>
@@ -236,7 +236,7 @@ session_start();
             } else if (answerType === 'true/false') {
                 answerOptionsDiv.innerHTML = `
                     <label for="true_false_${id}">Answer:</label>
-                    <select id="true_false_${id}" name="correct_choice[]" required>
+                    <select id="true_false_${id}" style="border: 1px solid white; background-color: var(--background-color)" name="correct_choice[]" required>
                         <option value="true">True</option>
                         <option value="false">False</option>
                     </select>
@@ -244,12 +244,12 @@ session_start();
             } else if (answerType === 'fill in the blank') {
                 answerOptionsDiv.innerHTML = `
                     <label for="blank_${id}">Blank:</label>
-                    <input type="text" id="blank_${id}" name="correct_choice[]" required>
+                    <input type="text" id="blank_${id}" style="border: 1px solid white; background-color: var(--background-color)" name="correct_choice[]" required>
                 `;
             } else if (answerType === 'essay') {
                 answerOptionsDiv.innerHTML = `
                     <label for="essay_${id}">Correct Answer:</label>
-                    <textarea id="essay_${id}" name="correct_choice[]" required></textarea>
+                    <textarea id="essay_${id}" style="border: 1px solid white; background-color: var(--background-color)" name="correct_choice[]" required></textarea>
                 `;
             } else if (answerType === 'code') {
                 answerOptionsDiv.innerHTML = getCodeQuestionOptions(id, includeEmptyChoice);
@@ -270,7 +270,7 @@ session_start();
                     <button type="button" onclick="addChoice(${id})">Add Choice</button>
                 </div>
                 <label for="correct_choice_${id}">Correct Choice:</label>
-                <select id="correct_choice_${id}" name="correct_choice[]" required></select>
+                <select id="correct_choice_${id}" style="border: 1px solid white; background-color: var(--background-color)" name="correct_choice[]" required></select>
             `;
             console.log('getMultipleChoiceOptions:', choicesHtml); 
             return choicesHtml;
@@ -279,7 +279,7 @@ session_start();
         function getCodeQuestionOptions(id) {
             return `
                 <label for="code_language_${id}">Select Language:</label>
-                <select id="code_language_${id}" name="code_language[]" required>
+                <select id="code_language_${id}" style="border: 1px solid white; background-color: var(--background-color)" name="code_language[]" required>
                     <option value="python">Python</option>
                     <option value="javascript">JavaScript</option>
                     <option value="java">Java</option>
@@ -287,11 +287,11 @@ session_start();
                 </select><br>
 
                 <label for="code_${id}">Code Template:</label>
-                <textarea id="code_${id}" name="code_template[]" required 
+                <textarea id="code_${id}" style="border: 1px solid white; background-color: var(--background-color)" name="code_template[]" required 
                     placeholder="Enter code with __BLANK__ placeholders"></textarea><br>
 
                 <label for="correct_code_${id}">Correct Answers:</label>
-                <textarea id="correct_code_${id}" name="correct_choice[]" required 
+                <textarea id="correct_code_${id}" style="border: 1px solid white; background-color: var(--background-color)" name="correct_choice[]" required 
                     placeholder="Enter correct answers separated by <<ANSWER_BREAK>>"
                     title="Enter the answers that should go in each __BLANK__ placeholder, separated by <<ANSWER_BREAK>>"></textarea>
             `;
@@ -401,6 +401,12 @@ session_start();
                 .then(response => response.json())
                 .then(data => {
                     const deletedQuestionsTableBody = document.getElementById('deletedQuestionsTableBody');
+                    const popup = document.getElementById('deleted-questions-popup');
+
+                    
+                    deletedQuestionsTableBody.innerHTML = '';
+
+                    
                     if (data.length > 0) {
                         deletedQuestionsTableBody.innerHTML = data.map(question => `
                             <tr>
@@ -409,24 +415,22 @@ session_start();
                                 <td class="editable">${question.question_text}</td>
                                 <td>${question.question_type || 'N/A'}</td>
                                 <td>${question.answer_type || 'N/A'}</td>
-                                <td>${
-                                    question.answer_type === 'code' 
+                                <td>
+                                    ${question.answer_type === 'code'
                                         ? `Code Template: ${question.code_template}<br>
                                         Language: ${question.programming_language}<br>
                                         Answers: ${question.correct_answer}`
                                         : (question.correct_answer || 'N/A')
-                                }</td>
+                                    }
+                                </td>
                                 <td>
-                                    ${
-                                        question.answer_type === 'multiple choice' 
-                                            ? (question.choices.length > 0 
-                                                ? question.choices.map(choice => `<div>${choice}</div>`).join('') 
-                                                : 'No choices available')
-                                            : question.answer_type === 'code'
-                                                ? `<div>Code Template with ${
-                                                    (question.code_template.match(/__BLANK__/g) || []).length
-                                                } blank(s)</div>`
-                                                : 'N/A'
+                                    ${question.answer_type === 'multiple choice'
+                                        ? (question.choices.length > 0
+                                            ? question.choices.map(choice => `<div>${choice}</div>`).join('')
+                                            : 'No choices available')
+                                        : question.answer_type === 'code'
+                                            ? `<div>Code Template with ${(question.code_template.match(/__BLANK__/g) || []).length} blank(s)</div>`
+                                            : 'N/A'
                                     }
                                 </td>
                             </tr>
@@ -434,130 +438,93 @@ session_start();
                     } else {
                         deletedQuestionsTableBody.innerHTML = '<tr><td colspan="7">No deleted questions found</td></tr>';
                     }
-                    document.getElementById('deleted-questions-popup').style.display = 'block';
 
                     
-                    document.getElementById('select-all-deleted').addEventListener('change', function() {
-                        const checkboxes = document.querySelectorAll('input[name="restore_questions[]"]');
-                        checkboxes.forEach(checkbox => checkbox.checked = this.checked);
-                    });
+                    popup.style.display = 'block';
 
                     
-                    document.getElementById('searchDeletedQuestions').addEventListener('input', function() {
-                        const filter = this.value.toLowerCase();
-                        const rows = document.querySelectorAll('#deletedQuestionsTableBody tr');
-                        let matchFound = false;
-                        rows.forEach(row => {
-                            const cells = row.querySelectorAll('td');
-                            const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(filter));
-                            row.style.display = match ? '' : 'none';
-                            if (match) matchFound = true;
-                        });
-                        const noMatchesPopup = document.getElementById('deletedNoMatchesPopup');
-                        if (!matchFound) {
-                            noMatchesPopup.style.display = 'block';
-                            noMatchesPopup.style.opacity = '1';
-                        } else {
-                            noMatchesPopup.style.display = 'none';
-                        }
-                        document.getElementById('deletedClearSearch').style.display = filter ? 'block' : 'none';
-                    });
-
-                    document.getElementById('deletedClearSearch').addEventListener('click', function() {
-                        document.getElementById('searchDeletedQuestions').value = '';
-                        const rows = document.querySelectorAll('#deletedQuestionsTableBody tr');
-                        rows.forEach(row => {
-                            row.style.display = '';
-                        });
-                        this.style.display = 'none';
-                        document.getElementById('deletedNoMatchesPopup').style.display = 'none';
-                    });
-
-                    document.getElementById('searchDeletedQuestions').addEventListener('focus', function() {
-                        const noMatchesPopup = document.getElementById('deletedNoMatchesPopup');
-                        if (this.value && !Array.from(document.querySelectorAll('#deletedQuestionsTableBody tr')).some(row => row.style.display !== 'none')) {
-                            noMatchesPopup.style.display = 'block';
-                            noMatchesPopup.style.opacity = '1';
-                        }
-                    });
-
-                    document.addEventListener('click', function(event) {
-                        const noMatchesPopup = document.getElementById('deletedNoMatchesPopup');
-                        if (!document.getElementById('searchDeletedQuestions').contains(event.target) && !noMatchesPopup.contains(event.target)) {
-                            noMatchesPopup.style.display = 'none';
+                    popup.addEventListener('change', function (event) {
+                        if (event.target.id === 'select-all-deleted') {
+                            const checkboxes = document.querySelectorAll('input[name="restore_questions[]"]');
+                            checkboxes.forEach(checkbox => checkbox.checked = event.target.checked);
                         }
                     });
 
                     
-                    document.querySelectorAll('#deleted-questions-popup th[data-column]').forEach(th => {
-                        th.addEventListener('mouseenter', function() {
-                            const tooltip = document.createElement('div');
-                            tooltip.className = 'tooltip';
-                            tooltip.textContent = 'Click to sort';
-                            tooltip.style.position = 'absolute';
-                            tooltip.style.background = 'var(--popup-background-color)';
-                            tooltip.style.color = 'var(--text-color)';
-                            tooltip.style.padding = '5px';
-                            tooltip.style.borderRadius = '5px';
-                            tooltip.style.fontSize = '12px';
-                            tooltip.style.top = '100%';
-                            tooltip.style.left = '50%';
-                            tooltip.style.transform = 'translateX(-50%)';
-                            tooltip.style.whiteSpace = 'nowrap';
-                            tooltip.style.zIndex = '1000';
-                            tooltip.style.boxShadow = '0 0 10px rgba(0,0,0,0.1)';
-                            tooltip.style.opacity = '1';
-                            tooltip.style.visibility = 'visible';
-                            tooltip.style.pointerEvents = 'none';
-                            this.appendChild(tooltip);
-                        });
+                    popup.addEventListener('input', function (event) {
+                        if (event.target.id === 'searchDeletedQuestions') {
+                            const filter = event.target.value.toLowerCase();
+                            const rows = document.querySelectorAll('#deletedQuestionsTableBody tr');
+                            let matchFound = false;
 
-                        th.addEventListener('mouseleave', function() {
-                            const tooltip = this.querySelector('.tooltip');
-                            if (tooltip) {
-                                tooltip.remove();
+                            rows.forEach(row => {
+                                const cells = row.querySelectorAll('td');
+                                const match = Array.from(cells).some(cell => cell.textContent.toLowerCase().includes(filter));
+                                row.style.display = match ? '' : 'none';
+                                if (match) matchFound = true;
+                            });
+
+                            const noMatchesPopup = document.getElementById('deletedNoMatchesPopup');
+                            if (!matchFound) {
+                                noMatchesPopup.style.display = 'block';
+                                noMatchesPopup.style.opacity = '1';
+                            } else {
+                                noMatchesPopup.style.display = 'none';
                             }
-                        });
 
-                        th.addEventListener('click', function() {
+                            document.getElementById('deletedClearSearch').style.display = filter ? 'block' : 'none';
+                        }
+                    });
+
+                    
+                    popup.addEventListener('click', function (event) {
+                        if (event.target.id === 'deletedClearSearch') {
+                            document.getElementById('searchDeletedQuestions').value = '';
+                            const rows = document.querySelectorAll('#deletedQuestionsTableBody tr');
+                            rows.forEach(row => row.style.display = '');
+                            event.target.style.display = 'none';
+                            document.getElementById('deletedNoMatchesPopup').style.display = 'none';
+                        }
+                    });
+
+                    
+                    popup.querySelectorAll('th[data-column]').forEach(th => {
+                        th.addEventListener('click', function () {
                             const column = this.getAttribute('data-column');
                             const order = this.dataset.order = -(this.dataset.order || -1);
                             const rows = Array.from(document.querySelectorAll('#deletedQuestionsTableBody tr'));
+
                             rows.sort((a, b) => {
                                 const aText = a.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
                                 const bText = b.querySelector(`td:nth-child(${this.cellIndex + 1})`).textContent.trim();
-                                return aText.localeCompare(bText, undefined, {numeric: true}) * order;
+                                return aText.localeCompare(bText, undefined, { numeric: true }) * order;
                             });
-                            rows.forEach(row => document.querySelector('#deletedQuestionsTableBody').appendChild(row));
+
+                            rows.forEach(row => deletedQuestionsTableBody.appendChild(row));
 
                             
-                            document.querySelectorAll('#deleted-questions-popup th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
+                            popup.querySelectorAll('th[data-column]').forEach(th => th.classList.remove('asc', 'desc'));
                             this.classList.add(order === 1 ? 'asc' : 'desc');
                         });
                     });
 
                     
                     let lastDeletedChecked = null;
-                    document.querySelectorAll('.selectDeletedQuestion').forEach(function(checkbox) {
-                        checkbox.addEventListener('click', function(event) {
-                            if (!lastDeletedChecked) {
-                                lastDeletedChecked = this;
-                                return;
-                            }
-
-                            if (event.shiftKey) {
-                                let checkboxes = Array.from(document.querySelectorAll('.selectDeletedQuestion'));
-                                let start = checkboxes.indexOf(this);
-                                let end = checkboxes.indexOf(lastDeletedChecked);
+                    popup.addEventListener('click', function (event) {
+                        if (event.target.classList.contains('selectDeletedQuestion')) {
+                            if (event.shiftKey && lastDeletedChecked) {
+                                const checkboxes = Array.from(document.querySelectorAll('.selectDeletedQuestion'));
+                                const start = checkboxes.indexOf(event.target);
+                                const end = checkboxes.indexOf(lastDeletedChecked);
 
                                 checkboxes.slice(Math.min(start, end), Math.max(start, end) + 1)
                                     .forEach(checkbox => checkbox.checked = lastDeletedChecked.checked);
                             }
-
-                            lastDeletedChecked = this;
-                        });
+                            lastDeletedChecked = event.target;
+                        }
                     });
-                });
+                })
+                .catch(error => console.error('Error fetching deleted questions:', error));
         }
 
         function closeDeletedQuestions() {
@@ -616,6 +583,7 @@ session_start();
                 justify-content: space-between;
                 align-items: center;
                 margin-bottom: 10px;
+                border-bottom: 1px solid var(--text-color);
             }
 
             .header-controls p {
@@ -898,6 +866,8 @@ session_start();
             .choice-container input {
                 flex-grow: 1;
                 box-sizing: border-box;
+                border: 1px solid var(--text-color);
+                background-color: var(--background-color);
             }
 
            
@@ -929,8 +899,8 @@ session_start();
                 height: 90vh;
                 padding: 15px;
                 overflow-y: auto;
-                display: flex; /* Enable flexbox for vertical layout */
-                flex-direction: column; /* Stack elements vertically */
+                display: none;
+                flex-direction: column;
             }
 
             #deleted-questions-popup .header-controls {
@@ -938,7 +908,7 @@ session_start();
             }
 
             #deleted-questions-popup .action-controls {
-                display: flex; /* Needed for flex-direction to work */
+                display: flex;
                 flex-direction: column;
                 gap: 15px;
             }
@@ -954,18 +924,18 @@ session_start();
             }
 
             #deleted-questions-popup table {
-                width: 100%; /* Ensure table takes full width */
-                display: block; /* Important for overflow to work */
-                overflow-x: auto; /* Allow horizontal scrolling if content overflows */
-                white-space: nowrap; /* Prevent table cells from wrapping */
+                width: 100%;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
             }
 
             #deleted-questions-popup th,
             #deleted-questions-popup td {
                 font-size: 14px;
                 padding: 8px;
-                text-align: left; /* Align text to the left within cells */
-                vertical-align: top; /* Align content to the top of cells */
+                text-align: left;
+                vertical-align: top;
             }
 
             #deleted-questions-popup .assessment-close-button {
@@ -1089,6 +1059,7 @@ session_start();
         <button class="close-button" id="logout-confirm-button">Yes</button>
         <button class="cancel-button" id="logout-cancel-button">No</button>
     </div>
+    <div id="editContainer">
         <main>
         <h1>Edit Questions for Assessment</h1>
         <div class="header-controls">
@@ -1145,6 +1116,7 @@ session_start();
             <button type="button" class="success" onclick="saveAssessment()">Save Assessment</button>
         </form>
     </main>
+    </div>
     
     <footer>
         <div class="footer-content">
@@ -1183,6 +1155,7 @@ session_start();
                     <h3>Reports</h3>
                     <ul>
                         <li><a href="assessment_performance.php">Assessment Performance</a></li>
+                        
                     </ul>
                 </div>
                 <div class="footer-column">

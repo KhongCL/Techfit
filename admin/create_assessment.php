@@ -194,8 +194,21 @@ $conn->close();
         }
 
        
+        #create-assessment-form {
+            background-color: var(--secondary-color);
+            padding: 20px;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        #assessment_name, #description {
+            background-color: var(--background-color);
+            border: 1px solid var(--text-color);
+        }
+
+       
         #assessment-name-label, #description-label {
-            color: var(--lighter-text-color);
+            color: var(--text-color);
         }
 
        

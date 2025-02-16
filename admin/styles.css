@@ -1251,6 +1251,21 @@ footer {
     margin-top: 20px;
 }
 
+#editContainer {
+    max-width: 100%;
+    overflow-x: hidden;
+    background-color: var(--background-color-medium);
+    margin: 70px;
+    border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+    #editContainer {
+        margin: 30px;
+    }
+}
+
+
 #formContainer {
     max-width: 100%;
     box-sizing: border-box;
