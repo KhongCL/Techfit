@@ -30,7 +30,7 @@ function displayLoginMessage() {
 
 function displayErrorMessage() {
     echo '<script>
-        if (confirm("You need to access this page from assessment summay. Go to Assessment Summary? Click cancel to go to home page.")) {
+        if (confirm("You need to access this page from assessment summary. Go to Assessment Summary? Click cancel to go to home page.")) {
             window.location.href = "./assessment_summary.php";
         } else {
             window.location.href = "./index.php";

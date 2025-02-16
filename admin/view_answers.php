@@ -12,12 +12,36 @@ function displayLoginMessage() {
     exit();
 }
 
+function displayErrorMessage() {
+    echo '<script>
+        if (confirm("You need to access this page from view assessment results. Go to View Assessment Results? Click cancel to go to home page.")) {
+            window.location.href = "./view_assessment_results.php";
+        } else {
+            window.location.href = "./index.php";
+        }
+    </script>';
+    exit();
+}
+
 if (!isset($_SESSION['user_id'])) {
     displayLoginMessage();
 }
 
 if ($_SESSION['role'] !== 'Admin') {
     displayLoginMessage();
+}
+
+if (!isset($_GET['assessment_id']) || trim($_GET['assessment_id']) === '') {
+    displayErrorMessage();
+}
+
+if (!isset($_GET['job_seeker_id']) || trim($_GET['job_seeker_id']) === '') {
+    displayErrorMessage();
+}
+
+$referer = $_SERVER['HTTP_REFERER'] ?? '';
+if (strpos($referer, 'view_assessment_results.php') === false) {
+    displayErrorMessage();
 }
 
 session_write_close();
