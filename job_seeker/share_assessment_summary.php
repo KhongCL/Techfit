@@ -17,10 +17,6 @@ if ($conn->connect_error) {
 }
 
 
-if (!isset($_GET['assessment_id']) || empty($_GET['assessment_id'])) {
-    die("Invalid assessment ID.");
-}
-
 function displayLoginMessage() {
     echo '<script>
         if (confirm("You need to log in to access this page. Go to Login Page? Click cancel to go to home page.")) {
@@ -34,7 +30,7 @@ function displayLoginMessage() {
 
 function displayErrorMessage() {
     echo '<script>
-        if (confirm("You need to access this page from assessment summary. Go to Assessment Summary? Click cancel to go to home page.")) {
+        if (confirm("You need to access this page from assessment summay. Go to Assessment Summary? Click cancel to go to home page.")) {
             window.location.href = "./assessment_summary.php";
         } else {
             window.location.href = "./index.php";
@@ -57,7 +53,7 @@ if (!isset($_SESSION['job_seeker_id'])) {
     displayLoginMessage(); 
 }
 
-if (!isset($_GET['result_id']) || trim($_GET['result_id']) === '') {
+if (!isset($_GET['assessment_id']) || trim($_GET['assessment_id']) === '') {
     displayErrorMessage();
 }
 
