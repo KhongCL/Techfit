@@ -482,6 +482,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
     }
     .profile-details .detail-line i {
         margin-right: 10px;
+        color: #e0e0e0;
     }
     .profile-details .detail-line span,
     .profile-details .detail-line a {
