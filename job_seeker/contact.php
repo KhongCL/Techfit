@@ -110,8 +110,8 @@ session_write_close();
                     <div class="contact-box">
                         <h3><i class="fas fa-envelope icon"></i> Email</h3>
                         <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
-                        <p><a href="mailto:techfit@yahoo.com">techfit@yahoo.com</a></p>
-                        <p><a href="mailto:techfit.@mail.apu.edu.my">techfit@mail.apu.edu.my</a></p>
+                        <p><a href="mailto:techfit.business@gmail.com">techfit@yahoo.com</a></p>
+                        <p><a href="mailto:techfit.backup@gmail.com">techfit@mail.apu.edu.my</a></p>
                     </div>
                     <div class="contact-box">
                         <h3><i class="fas fa-map-marker-alt icon"></i> Location</h3>

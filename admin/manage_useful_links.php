@@ -225,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 border: 1px solid var(--background-color-light);
                 padding: 8px;
                 border-radius: 4px;
-                width: calc(100% - 12px); /* Account for margin-left */
+                width: calc(100% - 12px);
                 font-size: 14px;
             }
 
@@ -248,7 +248,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 margin-bottom: 5px;
             }
 
-            /* Button styling */
             #formContainer button {
                 background-color: var(--primary-color);
                 color: var(--text-color);
@@ -268,13 +267,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 background-color: var(--accent-color);
             }
 
-            .cancel-button {
-                background-color: var(--danger-color) !important;
-                margin-left: 10px;
-            }
-
-            .cancel-button:hover {
-                background-color: var(--danger-color-hover) !important;
+            path {
+                background-color: var(--danger-color);
             }
     </style>
 <header>
@@ -349,7 +343,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div id="logout-popup" class="popup">
         <h2>Are you sure you want to Log Out?</h2>
         <button class="close-button" id="logout-confirm-button">Yes</button>
-        <button class="cancel-button" id="logout-cancel-button">No</button>
+        <button class="cancel-button" id="logout-cancel-button" style="background-color: var(--primary-color);">No</button>
     </div> 
 <body>
 <div id="formContainer">

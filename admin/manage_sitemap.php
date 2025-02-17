@@ -352,18 +352,6 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
             background-color: var(--primary-color-hover) !important;
         }
 
-        #faqForm .cancel-button {
-            display: block;
-            margin: 0 auto;
-            background-color: var(--danger-color);
-        }
-
-        #faqForm .cancel-button:hover {
-            background-color: var(--danger-color-hover) !important;
-            justify-content: center;
-            align-items: center;
-        }
-
         @media (max-width: 768px) {
             #formContainer {
                 padding: 10px;
@@ -770,7 +758,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                         const maxSizeInBytes = 1024;
 
                         if (file.size > maxSizeInBytes) {
-                            alert(`The selected image file is too large. The maximum file size is ${maxSizeInBytes / 1024}KB.`);
+                            alert(`The selected image file is too large. The maximum file size is ${maxSizeInBytes / 1024}MB.`);
                             return; 
                         }
                     }
@@ -789,7 +777,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('The selected image file is too large. The maximum file size is 800KB.');
+                        alert('The selected image file is too large. The maximum file size is 1MB.');
                     });
                 };
 
