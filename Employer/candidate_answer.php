@@ -526,12 +526,18 @@ session_write_close();
 
                 if ($result_score_time->num_rows > 0) {
                     $row_score_time = $result_score_time->fetch_assoc();
-                    $score = !is_null($row_score_time['score']) ? $row_score_time['score'] : 'N/A';
+                    // Convert score to float/integer to ensure proper comparison
+                    $score = (!is_null($row_score_time['score']) && $row_score_time['score'] !== '') 
+                        ? floatval($row_score_time['score']) 
+                        : 'N/A';
                     $time_used_value = $row_score_time['time_used'];
                     $time_used = !empty($time_used_value) ? $time_used_value : 'N/A';
                     $passing_score = $row_score_time['passing_score_percentage'];
-
-                    $score_class = ($score !== 'N/A' && $score >= $passing_score) ? 'score-passed' : 'score-failed';
+                
+                    // Use strict comparison and ensure score is numeric
+                    $score_class = ($score !== 'N/A' && is_numeric($score) && $score >= $passing_score) 
+                        ? 'score-passed' 
+                        : 'score-failed';
                     echo "<div class='detail-item'>Score: <span class='" . $score_class . "'>" . $score . "/100</span></div>";
                 } else {
                     echo "<div class='detail-item'>Score: N/A</div>";

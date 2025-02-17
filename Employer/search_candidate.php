@@ -153,14 +153,16 @@ if ($_SESSION['role'] !== 'Employer') {
                     $employer_id = $_SESSION['employer_id'];
 
                     $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
-                                    GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
-                                    AVG(ajs.score) AS avg_score
-                                FROM Job_Seeker js
-                                JOIN User u ON js.user_id = u.user_id
-                                LEFT JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
-                                LEFT JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id AND ei.employer_id = '$employer_id'
-                                WHERE ei.employer_id IS NULL AND ajs.result_id IS NOT NULL
-                                GROUP BY js.job_seeker_id";
+                            GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
+                            AVG(ajs.score) AS avg_score
+                            FROM Job_Seeker js
+                            JOIN User u ON js.user_id = u.user_id
+                            JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id 
+                            LEFT JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id AND ei.employer_id = '$employer_id'
+                            WHERE ei.employer_id IS NULL 
+                            AND ajs.end_time IS NOT NULL 
+                            AND ajs.score IS NOT NULL
+                            GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
     
                     if ($result->num_rows > 0) {
@@ -174,7 +176,7 @@ if ($_SESSION['role'] !== 'Employer') {
                             $experience = (isset($row['year_of_experience']) && $row['year_of_experience'] !== null) ? htmlspecialchars($row['year_of_experience']) : 'N/A';
                             echo "<td>" . $experience . "</td>";
                             
-                            $scores_display = !empty($row['scores']) ? htmlspecialchars($row['scores']) : 'N/A';
+                            $scores_display = (isset($row['scores']) && $row['scores'] !== null) ? htmlspecialchars($row['scores']) : 'N/A';
                             echo "<td>" . $scores_display . "</td>";
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
@@ -203,13 +205,17 @@ if ($_SESSION['role'] !== 'Employer') {
                     }
 
                     $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
-                                GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
-                                AVG(ajs.score) AS avg_score
+                            GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
+                            AVG(ajs.score) AS avg_score
                             FROM Job_Seeker js
                             JOIN User u ON js.user_id = u.user_id
-                            LEFT JOIN  Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
+                            JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
                             JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
-                            WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'interested' AND ei.is_active = 1 AND ajs.result_id IS NOT NULL
+                            WHERE ei.employer_id = '$employer_id' 
+                            AND ei.interest_status = 'interested' 
+                            AND ei.is_active = 1
+                            AND ajs.end_time IS NOT NULL 
+                            AND ajs.score IS NOT NULL
                             GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
 
@@ -224,7 +230,7 @@ if ($_SESSION['role'] !== 'Employer') {
                                 $experience = (!empty($row['year_of_experience']) || $row['year_of_experience'] === '0') ? htmlspecialchars($row['year_of_experience']) : 'N/A';
                             echo "<td>" . $experience . "</td>";
                             
-                                $scores_display = !empty($row['scores']) ? htmlspecialchars($row['scores']) : 'N/A';
+                            $scores_display = (isset($row['scores']) && $row['scores'] !== null) ? htmlspecialchars($row['scores']) : 'N/A';
                             echo "<td>" . $scores_display . "</td>";
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
@@ -252,13 +258,17 @@ if ($_SESSION['role'] !== 'Employer') {
                     }
 
                     $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
-                                GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
-                                AVG(ajs.score) AS avg_score
+                            GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
+                            AVG(ajs.score) AS avg_score
                             FROM Job_Seeker js
                             JOIN User u ON js.user_id = u.user_id
-                            LEFT JOIN  Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
+                            JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
                             JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
-                            WHERE ei.employer_id = '$employer_id' AND ei.interest_status = 'uninterested' AND ei.is_active = 1 AND ajs.result_id IS NOT NULL
+                            WHERE ei.employer_id = '$employer_id' 
+                            AND ei.interest_status = 'uninterested' 
+                            AND ei.is_active = 1
+                            AND ajs.end_time IS NOT NULL 
+                            AND ajs.score IS NOT NULL
                             GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
 
@@ -273,7 +283,7 @@ if ($_SESSION['role'] !== 'Employer') {
                                 $experience = (!empty($row['year_of_experience']) || $row['year_of_experience'] === '0') ? htmlspecialchars($row['year_of_experience']) : 'N/A';
                             echo "<td>" . $experience . "</td>";
                             
-                                $scores_display = !empty($row['scores']) ? htmlspecialchars($row['scores']) : 'N/A';
+                            $scores_display = (isset($row['scores']) && $row['scores'] !== null) ? htmlspecialchars($row['scores']) : 'N/A';
                             echo "<td>" . $scores_display . "</td>";
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
@@ -300,13 +310,16 @@ if ($_SESSION['role'] !== 'Employer') {
                     }
 
                     $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
-                                GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
-                                AVG(ajs.score) AS avg_score
+                            GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
+                            AVG(ajs.score) AS avg_score
                             FROM Job_Seeker js
                             JOIN User u ON js.user_id = u.user_id
-                            LEFT JOIN  Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
+                            JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
                             JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
-                            WHERE ei.employer_id = '$employer_id' AND ei.is_active = 0 AND ajs.result_id IS NOT NULL
+                            WHERE ei.employer_id = '$employer_id' 
+                            AND ei.is_active = 0
+                            AND ajs.end_time IS NOT NULL 
+                            AND ajs.score IS NOT NULL
                             GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
 
@@ -324,7 +337,7 @@ if ($_SESSION['role'] !== 'Employer') {
                             echo "<td>" . $experience . "</td>";
                             
                             
-                            $scores_display = !empty($row['scores']) ? htmlspecialchars($row['scores']) : 'N/A';
+                            $scores_display = (isset($row['scores']) && $row['scores'] !== null) ? htmlspecialchars($row['scores']) : 'N/A';
                             echo "<td>" . $scores_display . "</td>";
                             
                             echo "<td class='actions'>";
