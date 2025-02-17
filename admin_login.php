@@ -108,7 +108,7 @@ $conn->close();
         width: calc(100% - 20px);
         padding: 10px;
         margin: 10px 0;
-        border: 1px solid #ccc; /* Original border style kept */
+        border: 1px solid #ccc;
         border-radius: 5px;
         background-color: #333;
         color: #fff;

@@ -35,13 +35,11 @@ if (!isset($_SESSION['job_seeker_id'])) {
 }
 
 if (!isset($_SESSION['last_login']) || $_SESSION['last_login'] !== $_SESSION['user_id']) {
-    // Clear session storage
     echo "<script>
         sessionStorage.clear();
         localStorage.clear();
     </script>";
     
-    // Record current login
     $_SESSION['last_login'] = $_SESSION['user_id'];
 }
 
@@ -110,17 +108,14 @@ function fetchSectionQuestions($conn, $assessment_id) {
     return array_values($questions);
 }
 
-// Get section 1 questions initially
 $questions = fetchSectionQuestions($conn, 'AS75');
 
-// Get assessment settings
 $settings_query = "SELECT default_time_limit, passing_score_percentage 
                   FROM Assessment_Settings 
                   WHERE setting_id = '1'";
 $settings_result = $conn->query($settings_query);
 $assessment_settings = $settings_result->fetch_assoc();
 
-// Set time limit from settings (convert minutes to seconds)
 $countdownTime = ($assessment_settings['default_time_limit'] ?? 90) * 60;
 $conn->close(); 
 ?>
@@ -178,7 +173,6 @@ $conn->close();
             flex-direction: column;
         }
 
-        /* Add content wrapper styles */
         .content-wrapper {
             flex: 1;
             margin-bottom: 0;
@@ -423,14 +417,14 @@ $conn->close();
         }
 
         .code-blank:hover {
-            border-color: #666; /* Even lighter on hover */
+            border-color: #666;
         }
 
         .code-blank:focus {
             outline: none;
             border-color: var(--primary-color);
             background-color: var(--hover-background-color);
-            box-shadow: 0 0 0 1px var(--primary-color); /* Add glow effect on focus */
+            box-shadow: 0 0 0 1px var(--primary-color);
         }
 
         .code-container {
@@ -559,16 +553,13 @@ $conn->close();
                     return;
                 }
                 
-                // Clear previous content
                 questionContainer.innerHTML = '';
                 
-                // Add question number and text first
                 const questionNumber = ((currentSection - 1) * 5) + (currentQuestionIndex + 1);
                 const questionText = document.createElement('h3');
                 questionText.textContent = `Question ${questionNumber}: ${question.question_text}`;
                 questionContainer.appendChild(questionText);
 
-                // Add answer section after question text
                 let answerContainer = document.createElement('div');
                 answerContainer.className = question.answer_type === 'multiple choice' ? 'options grid-2x2' : 'options';
                 
@@ -594,29 +585,29 @@ $conn->close();
                     const codeBlock = document.createElement('div');
                     codeBlock.className = 'code-block';
                     
-                    // Add language indicator
+                    
                     const languageIndicator = document.createElement('div');
                     languageIndicator.className = 'language-indicator';
                     const language = question.programming_language.toLowerCase();
                     languageIndicator.textContent = `Language: ${language.charAt(0).toUpperCase() + language.slice(1)}`;
                     questionContainer.appendChild(languageIndicator);
                     
-                    // Create code container
+                    
                     const codeContainer = document.createElement('div');
                     codeContainer.className = 'code-container';
                     
-                    // Parse code template
+                    
                     const template = question.code_template
                         .replace(/\\u([0-9a-fA-F]{4})/g, (match, group) => 
-                            String.fromCharCode(parseInt(group, 16)))  // Convert unicode escapes
-                        .replace(/\\n/g, '\n')  // Convert escaped newlines
+                            String.fromCharCode(parseInt(group, 16)))  
+                        .replace(/\\n/g, '\n')  
                         .split('__BLANK__');
                         
                         const savedValues = savedAnswers[question.question_id] ? 
                             savedAnswers[question.question_id].split(ANSWER_DELIMITER) : [];
                     
                     template.forEach((part, index) => {
-                        // Create pre element for code segment
+                        
                         const codePart = document.createElement('pre');
                         codePart.className = 'code-segment';
                         codePart.textContent = part;
@@ -632,7 +623,7 @@ $conn->close();
                         }
                     });
                     
-                    // Update CSS for code formatting
+                    
                     const style = document.createElement('style');
                     style.textContent = `
                         .code-segment {
@@ -667,20 +658,20 @@ $conn->close();
                             font-size: inherit;
                             background-color: var(--background-color);
                             color: var(--text-color);
-                            border: 1px solid #555; /* Lighter border color for better visibility */
+                            border: 1px solid #555;
                             border-radius: 3px;
                             transition: all 0.2s ease;
                         }
 
                         .code-blank:hover {
-                            border-color: #666; /* Even lighter on hover */
+                            border-color: #666;
                         }
 
                         .code-blank:focus {
                             outline: none;
                             border-color: var(--primary-color);
                             background-color: var(--hover-background-color);
-                            box-shadow: 0 0 0 1px var(--primary-color); /* Add glow effect on focus */
+                            box-shadow: 0 0 0 1px var(--primary-color);
                         }
                     `;
                     document.head.appendChild(style);
@@ -697,15 +688,15 @@ $conn->close();
         }
 
         function getProgrammingAssessmentId() {
-            // Log the saved answer for debugging
+            
             log('Q209 answer:', savedAnswers['Q209']);
             
-            // Use choice IDs instead of language names
+            
             const assessmentMap = {
-                'C101': 'AS77', // Python
-                'C102': 'AS78', // Java
-                'C103': 'AS79', // JavaScript 
-                'C104': 'AS80'  // C++
+                'C101': 'AS77', 
+                'C102': 'AS78', 
+                'C103': 'AS79', 
+                'C104': 'AS80'  
             };
             
             return savedAnswers['Q209'] ? assessmentMap[savedAnswers['Q209']] : null;
@@ -754,7 +745,7 @@ $conn->close();
                                     const parts = q.split(FIELD_DELIMITER);
                                     log('Raw question parts:', parts);
 
-                                    // Destructure with proper names
+                                    
                                     const [
                                         questionId = '',
                                         questionText = '',
@@ -764,16 +755,16 @@ $conn->close();
                                         language = ''
                                     ] = parts;
 
-                                    // Clean up the programming language
+                                    
                                     const cleanLanguage = language.toLowerCase().trim();
 
-                                    // Parse choices if they exist
+                                    
                                     const choices = choicesStr ? choicesStr.split('~').map(choice => {
                                         const [choiceId, choiceText] = choice.split('=');
                                         return { choice_id: choiceId, choice_text: choiceText };
                                     }) : [];
 
-                                    // Return properly structured question object
+                                    
                                     return {
                                         question_id: questionId,
                                         question_text: questionText,
@@ -787,7 +778,7 @@ $conn->close();
                                 currentQuestionIndex = 0;
                                 currentSection = parseInt(sectionId);
                                 
-                                // Update UI
+                                
                                 displayQuestion();
                                 updateQuestionList();
                                 loadSavedAnswers(assessmentId);
@@ -821,11 +812,11 @@ $conn->close();
             
             log('Updating section UI for section:', sectionId);
 
-            // Update section title
+            
             document.getElementById('section-title').textContent = 
                 `Section ${sectionId}: ${sections[sectionId]}`;
                 
-            // Update active section box
+            
             document.querySelectorAll('.section-box').forEach(box => {
                 box.classList.remove('active');
             });
@@ -857,9 +848,9 @@ $conn->close();
                             const question = questions.find(q => q.question_id === questionId);
                             log('Processing answer:', {questionId, answer, type: question?.answer_type});
                             
-                            // For code answers, only replace pipes that are between code blanks
+                            
                             if (answer && question?.answer_type === 'code') {
-                                // Split by existing ANSWER_DELIMITER first
+                                
                                 const parts = answer.split(ANSWER_DELIMITER);
                                 savedAnswers[questionId] = parts.join(ANSWER_DELIMITER);
                             } else {
@@ -906,7 +897,7 @@ $conn->close();
                     }
                 } else if (currentQuestion.answer_type === 'code') {
                     const inputs = questionContainer.querySelectorAll('.code-blank');
-                    // Use ANSWER_DELIMITER for code answers only
+                    
                     const savedValues = savedAnswer.split(ANSWER_DELIMITER);
                     
                     inputs.forEach((input, index) => {
@@ -924,7 +915,7 @@ $conn->close();
                 .then(data => {
                     if (data.answer) {
                         document.querySelector('[data-section="3"]').classList.remove('locked');
-                        // Don't auto-load section 3 questions here
+                        
                         log('Programming language selected:', data.answer);
                     }
                 })
@@ -961,16 +952,16 @@ $conn->close();
 
         function loadSection3Questions(language) {
             const languageAssessments = {
-                'C101': 'AS77', // Python
-                'C102': 'AS78', // Java  
-                'C103': 'AS79', // JavaScript
-                'C104': 'AS80'  // C++
+                'C101': 'AS77', 
+                'C102': 'AS78', 
+                'C103': 'AS79', 
+                'C104': 'AS80'  
             };
             
-            // Get assessment ID based on choice ID rather than language name
+            
             const assessmentId = languageAssessments[savedAnswers['Q209']];
             if (assessmentId) {
-                loadSectionQuestions('3'); // Pass section ID 3
+                loadSectionQuestions('3'); 
             } else {
                 log('Invalid programming language choice');
             }
@@ -978,7 +969,7 @@ $conn->close();
 
         function startTimer(display) {
             const endTime = startTime + totalTime;
-            let hasExpired = false;  // Add flag to track timer expiration
+            let hasExpired = false;  
 
             function updateDisplay() {
                 const now = Math.floor(Date.now() / 1000);
@@ -992,8 +983,8 @@ $conn->close();
                 });
                 
                 if (remaining <= 0 && !hasExpired) {
-                    // Only submit if timer hasn't already expired
-                    hasExpired = true;  // Set flag to prevent multiple submissions
+                    
+                    hasExpired = true;  
                     clearInterval(timerInterval);
                     display.textContent = "Time's up!";
                     submitAssessment(true);
@@ -1089,10 +1080,10 @@ $conn->close();
                 return;
             }
 
-            // First check if trying to modify Q209 after section 3 access
+            
             if (questionId === 'Q209' && isSection3Active) {
                 alert('You cannot modify your programming language choice after accessing Section 3.');
-                // Revert radio button selection
+                
                 const inputs = document.querySelectorAll('input[type="radio"]');
                 inputs.forEach(input => {
                     input.checked = input.value === savedAnswers[questionId];
@@ -1100,10 +1091,10 @@ $conn->close();
                 return;
             }
 
-            // Then check if trying to modify after confirmation
+            
             if (questionId === 'Q209' && hasConfirmedLanguage && answer !== savedAnswers['Q209']) {
                 alert('You cannot modify your programming language choice after confirmation.');
-                // Revert radio button selection
+                
                 const inputs = document.querySelectorAll('input[type="radio"]');
                 inputs.forEach(input => {
                     input.checked = input.value === savedAnswers[questionId];
@@ -1133,7 +1124,7 @@ $conn->close();
                 return;
             }
 
-            // Handle programming language selection confirmation
+            
             if (questionId === 'Q209' && !hasConfirmedLanguage) {
                 const languageMap = {
                     'C101': 'Python', 
@@ -1143,18 +1134,18 @@ $conn->close();
                 };
 
                 if (!confirm(`You have selected ${languageMap[answer]} as your programming language. This choice will determine your programming questions in Section 3 and cannot be changed after confirmation. Are you sure?`)) {
-                    // If user cancels, revert the radio button selection
+                    
                     const inputs = document.querySelectorAll('input[type="radio"]');
                     inputs.forEach(input => {
                         input.checked = input.value === savedAnswers[questionId];
                     });
                     return;
                 }
-                // Store confirmation in session storage
+                
                 sessionStorage.setItem('confirmedLanguageChoice', 'true');
             }
 
-            // Set form data based on question type
+            
             if (currentQuestion && currentQuestion.answer_type === 'code') {
                 const inputs = document.querySelectorAll('.code-blank');
                 const answerText = Array.from(inputs)
@@ -1171,7 +1162,7 @@ $conn->close();
                 formData.append('job_seeker_id', '<?php echo $_SESSION["job_seeker_id"]; ?>');
             }
 
-            // Send to server
+            
             const xhr = new XMLHttpRequest();
             xhr.open('POST', 'save_answer.php', true);
             xhr.onload = function() {
@@ -1182,10 +1173,10 @@ $conn->close();
                         updateProgress();
                         updateQuestionList();
                         
-                        // Check and unlock section 3 immediately after saving Q209 answer
+                        
                         if (questionId === 'Q209') {
                             checkAndUnlockSection3();
-                            // Remove locked class and enable click handler
+                            
                             const section3Box = document.querySelector('[data-section="3"]');
                             if (section3Box) {
                                 section3Box.classList.remove('locked');
@@ -1227,7 +1218,7 @@ $conn->close();
             }
         });
 
-        // Add event listener for textareas
+        
         document.addEventListener('input', function(e) {
             if (e.target.matches('textarea.essay-input')) {
                 const currentQuestion = questions[currentQuestionIndex];
@@ -1250,7 +1241,7 @@ $conn->close();
             }
         });
 
-        // Add event listeners for answer changes
+        
         document.addEventListener('change', function(e) {
             if (e.target.matches('input[type="radio"][name="choice"]')) {
                 const currentQuestion = questions[currentQuestionIndex];
@@ -1332,11 +1323,11 @@ $conn->close();
         }
 
         function updateNavigationButtons() {
-            // Hide previous button on first question
+            
             const prevBtn = document.getElementById('prev-btn');
             prevBtn.style.display = (currentQuestionIndex === 0 && currentSection === 1) ? 'none' : 'block';
             
-            // Update next/submit button
+            
             const nextBtn = document.getElementById('next-btn');
             if (currentSection === 4 && currentQuestionIndex === questions.length - 1) {
                 nextBtn.textContent = 'Submit';
@@ -1344,7 +1335,7 @@ $conn->close();
                     log('Submit button clicked - calling submitAssessment with isTimeUp=false');
                     submitAssessment(false);
                 };
-                // Add success color styles
+                
                 nextBtn.style.backgroundColor = 'var(--success-color)';
                 nextBtn.style.color = 'white';
                 nextBtn.addEventListener('mouseover', function() {
@@ -1356,7 +1347,7 @@ $conn->close();
             } else {
                 nextBtn.textContent = 'Next';
                 nextBtn.onclick = nextQuestion;
-                // Reset to primary color styles
+                
                 nextBtn.style.backgroundColor = 'var(--primary-color)';
                 nextBtn.style.color = 'white';
                 nextBtn.addEventListener('mouseover', function() {
@@ -1374,7 +1365,7 @@ $conn->close();
             
             const allAnswers = JSON.parse(sessionStorage.getItem('allAnswers') || '{}');
             
-            // Only show boxes for actual questions
+            
             const validQuestions = questions.filter(q => q && q.question_id);
             
             validQuestions.forEach((question, index) => {
@@ -1382,10 +1373,10 @@ $conn->close();
                 const isQ209 = question.question_id === 'Q209';
                 const isSection3Active = document.querySelector('[data-section="3"]').classList.contains('active');
                 
-                // Calculate global question number (1-20)
+                
                 const globalQuestionNumber = ((currentSection - 1) * 5) + (index + 1);
                 
-                // Only create box if question number is valid (1-20)
+                
                 if (globalQuestionNumber <= 20) {
                     box.className = `question-box${
                         (savedAnswers[question.question_id] || allAnswers[question.question_id]) ? ' completed' : ''
@@ -1407,7 +1398,7 @@ $conn->close();
         }
 
         function isQuestionAnswered(questionId) {
-            // Check if question has an answer in the database
+            
             return savedAnswers.hasOwnProperty(questionId);
         }
 
@@ -1424,7 +1415,7 @@ $conn->close();
                 currentQuestionIndex
             });
 
-            // Only check for unanswered questions if not timed out
+            
             if (!isTimeUp) {
                 const allAnswers = JSON.parse(sessionStorage.getItem('allAnswers') || '{}');
                 const totalAnswered = Object.keys(allAnswers).length;
@@ -1441,10 +1432,10 @@ $conn->close();
                 }
             }
 
-            // Disable navigation and inputs while saving
+            
             document.querySelectorAll('button, input, textarea').forEach(el => el.disabled = true);
 
-            // Save all answers first
+            
             saveAllAnswers()
                 .then(() => {
                     log('All answers saved, updating assessment time');
@@ -1461,12 +1452,12 @@ $conn->close();
                     if (isTimeUp) {
                         alert("Time's up! Your assessment will be submitted automatically.");
                     }
-                    return cleanupAndRedirect(); // Wait for cleanup to complete
+                    return cleanupAndRedirect(); 
                 })
                 .catch(error => {
                     isSubmitting = false;
                     log('Error during submission:', error);
-                    // Re-enable inputs if there was an error
+                    
                     document.querySelectorAll('button, input, textarea').forEach(el => el.disabled = false);
                     if (!isTimeUp) {
                         alert('There was an error submitting your assessment. Please try again.');
@@ -1478,18 +1469,18 @@ $conn->close();
             log('Starting cleanup before redirect');
             
             return new Promise((resolve) => {
-                // Clear any running intervals
+                
                 if (timerInterval) {
                     clearInterval(timerInterval);
                 }
                 
-                // Remove window unload handler
+                
                 window.removeEventListener('beforeunload', saveState);
                 
-                // Clear session storage
+                
                 sessionStorage.clear();
                 
-                // Use timeout to ensure all cleanup is complete
+                
                 setTimeout(() => {
                     log('Cleanup complete, redirecting to results page');
                     window.location.replace('assessment_result.php');
@@ -1517,7 +1508,7 @@ $conn->close();
             } else if (currentSection < 4) {
                 const nextSection = currentSection + 1;
                 if (nextSection === 3) {
-                    // Check if Q209 is answered by fetching from server first
+                    
                     fetch('get_programming_answer.php?question_id=Q209')
                         .then(response => response.json())
                         .then(data => {
@@ -1547,7 +1538,7 @@ $conn->close();
             const currentQuestion = questions[currentQuestionIndex];
             if (!currentQuestion) return;
 
-            // Save current answer before moving
+            
             const answer = getAnswerValue();
             if (answer !== null && answer !== '') {
                 saveAnswer(currentQuestion.question_id, answer);
@@ -1559,7 +1550,7 @@ $conn->close();
             } else if (currentSection > 1) {
                 const prevSection = currentSection - 1;
                 if (currentSection === 4) {
-                    // Check if trying to access section 3
+                    
                     fetch('get_programming_answer.php?question_id=Q209')
                         .then(response => response.json())
                         .then(data => {
@@ -1569,8 +1560,8 @@ $conn->close();
                             }
                             savedAnswers['Q209'] = data.answer;
                             if (prevSection === 3) {
-                                // Going back to section 3
-                                switchSection('3', 4); // Go to last question
+                                
+                                switchSection('3', 4); 
                             } else {
                                 switchSection(prevSection.toString(), 4);
                             }
@@ -1615,7 +1606,7 @@ $conn->close();
                 const values = Array.from(inputs)
                     .map(input => input.value.trim());
                 
-                // Check if any value exists
+                
                 if (values.some(v => v !== '')) {
                     log('Got code answer:', values.join(ANSWER_DELIMITER));
                     return values.join(ANSWER_DELIMITER);
@@ -1630,7 +1621,7 @@ $conn->close();
 
         function jumpToQuestion(index) {
             if (index >= 0 && index < questions.length) {
-                // Check if trying to access Q209 after section 3 access
+                
                 if (questions[index].question_id === 'Q209' && 
                     document.querySelector('[data-section="3"]').classList.contains('active')) {
                     alert('You cannot modify your programming language choice after accessing Section 3.');
@@ -1644,30 +1635,30 @@ $conn->close();
         function switchSection(sectionId, startIndex = 0) {
             log('Switching to section:', sectionId);
 
-            // Validate section ID
+            
             if (!['1', '2', '3', '4'].includes(sectionId)) {
                 log('Invalid section ID:', sectionId);
                 return;
             }
 
-            // Check if trying to access section 3
+            
             if (sectionId === '3' && !savedAnswers['Q209']) {
                 alert('Please complete Question 4 in Section 1 to access the programming section.');
                 return;
             }
 
-            // Check if trying to modify programming language after section 3
+            
             if (sectionId === '1' && savedAnswers['Q209'] && 
                 document.querySelector('[data-section="3"]').classList.contains('active')) {
                 alert('You cannot modify your programming language after accessing Section 3.');
                 return;
             }
 
-            // Update section tracking
+            
             currentSection = parseInt(sectionId);
             sessionStorage.setItem('currentSection', sectionId);
             
-            // Load section questions
+            
             loadSectionQuestions(sectionId)
                 .then(() => {
                     currentQuestionIndex = startIndex;
@@ -1728,7 +1719,7 @@ $conn->close();
                     'C104': 'C++'
                 };
                 
-                // Only disable radio inputs if viewing Q209
+                
                 const currentQuestion = questions[currentQuestionIndex];
                 if (currentQuestion && currentQuestion.question_id === 'Q209') {
                     const radioInputs = document.querySelectorAll('input[type="radio"][name="choice"]');
@@ -1736,7 +1727,7 @@ $conn->close();
                         if (input.value === savedAnswers['Q209']) {
                             input.checked = true;
                         }
-                        // Only disable if in section 1 and section 3 is active/confirmed
+                        
                         input.disabled = (currentSection === 1 && (isSection3Active || hasConfirmedLanguage));
                     });
                 }
@@ -1749,7 +1740,7 @@ $conn->close();
             }
         }
 
-        // Save state on all state changes
+        
         window.addEventListener('beforeunload', saveState);
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -1803,11 +1794,11 @@ $conn->close();
                             <div class="profile-info">
                                 <span class="username" id="username">
                                     <?php
-                                    // Check if the user is logged in and display their username
+                                    
                                     if (isset($_SESSION['username'])) {
-                                        echo $_SESSION['username'];  // Display the username from session
+                                        echo $_SESSION['username'];  
                                     } else {
-                                        echo "Guest";  // Default if not logged in
+                                        echo "Guest";  
                                     }
                                     ?>
                                 </span>
@@ -1842,7 +1833,6 @@ $conn->close();
     </div>
 
     <div class="assessment-container">
-        <!-- Left Section - Question Display -->
         <div class="question-section">
             <h2 id="section-title">Section 1: General Questions</h2>
             <div class="question"></div>
@@ -1852,12 +1842,9 @@ $conn->close();
             </div>
         </div>
 
-        <!-- Right Section - Navigation Panel -->
         <div class="navigation-panel">
-            <!-- Timer -->
             <div id="timer" class="timer">Time Remaining: 00:00</div>
 
-            <!-- Section Navigation -->
             <div class="section-navigation">
                 <div class="section-box active" data-section="1">Section 1</div>
                 <div class="section-box" data-section="2">Section 2</div>
@@ -1865,13 +1852,11 @@ $conn->close();
                 <div class="section-box" data-section="4">Section 4</div>
             </div>
 
-            <!-- Question List (Collapsible) -->
             <div class="question-list-container">
                 <div class="question-list-header" onclick="toggleQuestionList()">
                     Question List ▼
                 </div>
                 <div id="question-list" class="question-list">
-                    <!-- Question boxes will be inserted here -->
                 </div>
             </div>
         </div>
@@ -1943,20 +1928,20 @@ $conn->close();
         }
 
         function logoutUser() {
-            window.location.href = '/Techfit'; // Redirect to the root directory
+            window.location.href = '/Techfit'; 
         }
 
         const answers = document.querySelectorAll('input[name="answer"]');
         const feedback = document.getElementById('feedback');
 
-        // Enable submit button when an answer is selected
+        
         answers.forEach(answer => {
             answer.addEventListener('change', () => {
                 document.querySelector('.submit_but button').disabled = false;
             });
         });
 
-        // Timer logic
+        
         startTimer(countdownTime, document.getElementById('timer'), document.querySelector('.submit_but button'));
     </script>
 </body>

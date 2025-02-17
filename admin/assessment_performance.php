@@ -208,8 +208,8 @@ session_write_close();
             const passCount = <?php echo json_encode($pass); ?>;
             const failCount = <?php echo json_encode($fail); ?>;
 
-            console.log("Pass Count: ", passCount); // Debugging
-            console.log("Fail Count: ", failCount); // Debugging
+            console.log("Pass Count: ", passCount); 
+            console.log("Fail Count: ", failCount); 
 
             const ctx = document.getElementById('assessmentChart').getContext('2d');
             new Chart(ctx, {
@@ -226,11 +226,11 @@ session_write_close();
                     plugins: {
                         legend: {
                             display: true,
-                            position: 'bottom', // Moves labels below the chart
+                            position: 'bottom', 
                             labels: {
-                                padding: 20, // Adds spacing between chart and labels
-                                align: 'center', // Ensures labels are centered
-                                boxWidth: 40, // Adjusts size of legend color box
+                                padding: 20, 
+                                align: 'center',
+                                boxWidth: 40,
                             }
                         },
                         datalabels: {
@@ -246,7 +246,7 @@ session_write_close();
                     },
                     layout: {
                         padding: {
-                            bottom: 10 // Extra space before labels
+                            bottom: 10 
                         }
                     }
                 }

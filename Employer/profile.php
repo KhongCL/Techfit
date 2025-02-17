@@ -194,7 +194,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_linkedin'])) {
             $response['success'] = false;
             $response['message'] = "Connection failed: " . $conn->connect_error;
         } else {
-            // Check for uniqueness first
             $stmt = $conn->prepare("SELECT user_id FROM " . ($_SESSION['role'] === 'Employer' ? 'Employer' : 'Job_Seeker') . " WHERE linkedin_link = ? AND user_id != ?");
             $stmt->bind_param("ss", $new_linkedin, $user_id);
             $stmt->execute();
@@ -233,7 +232,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_company_name'])) {
     $new_company_name = trim($_POST['new_company_name']);
     $response = array();
 
-    // Add regex validation for company name - only letters, numbers, spaces and basic punctuation
     if (!empty($new_company_name) && strlen($new_company_name) <= 100 && preg_match('/^[a-zA-Z0-9\s\-\.,\'&()]+$/', $new_company_name)) {
         $conn = new mysqli("localhost", "root", "", "techfit");
         if ($conn->connect_error) {
@@ -248,7 +246,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_company_name'])) {
         if ($stmt->execute()) {
             $response['success'] = true;
             $response['message'] = "Company name updated successfully.";
-            $response['company_name'] = $new_company_name; // Add this line
+            $response['company_name'] = $new_company_name;
         } else {
             $response['success'] = false;
             $response['message'] = "Failed to update company name: " . $stmt->error;
@@ -530,7 +528,6 @@ $conn->close();
         padding-right: 10px;
     }
 
-    /* Add custom scrollbar styling */
     .company-type-options::-webkit-scrollbar {
         width: 8px;
     }
@@ -569,7 +566,6 @@ $conn->close();
     }
 
     @media (max-width: 768px) {
-        /* Profile section styles */
         #profile {
             margin: 20px 0;
             padding: 10px;
@@ -618,7 +614,6 @@ $conn->close();
             margin-top: 30px;
         }
 
-        /* Popup styles */
         .popup {
             width: 90%;
             max-width: 350px;
@@ -678,7 +673,6 @@ $conn->close();
         border: none;
     }
 
-        /* Navigation styles */
         .nav-container {
             position: relative;
         }
@@ -755,7 +749,6 @@ $conn->close();
             transform: rotate(-45deg) translate(5px, -5px);
         }
 
-        /* Additional responsive fixes */
         .bottom-edit-button {
             margin-left: 0;
             margin-top: 10px;
@@ -1034,7 +1027,6 @@ $conn->close();
         }
 
         function showPageMessage(message, type) {
-            // Remove any existing messages first
             const existingMessages = document.querySelectorAll('.success-message, .error-message');
             existingMessages.forEach(msg => msg.remove());
             
@@ -1045,26 +1037,21 @@ $conn->close();
             const profileDetails = document.querySelector('.profile-details');
             const firstDetailLine = profileDetails.querySelector('.detail-line');
             
-            // Insert message and force layout reflow
             profileDetails.insertBefore(messageDiv, firstDetailLine);
-            messageDiv.offsetHeight; // Force reflow
+            messageDiv.offsetHeight; 
             
-            // Only set timeout for success messages
             if (type === 'success') {
-                // Remove previous timeout if exists
                 if (window.messageTimeout) {
                     clearTimeout(window.messageTimeout);
                 }
                 
-                // Set new timeout
                 window.messageTimeout = setTimeout(() => {
                     if (messageDiv && messageDiv.parentNode) {
                         messageDiv.remove();
                     }
-                }, 3000); // Increased to 3 seconds
+                }, 3000); 
             }
             
-            // Return the message div for reference
             return messageDiv;
         }
 
@@ -1081,12 +1068,10 @@ $conn->close();
                 'company-type-popup': 'company_type'
             };
 
-            // Get the actual type if it exists in the map
             const validationType = popupTypeMap[type] || type;
 
             switch(type) {
                 case 'username':
-                    // Add case-sensitive check
                     if (!/^[a-zA-Z0-9_]{5,20}$/.test(value)) {
                         errorMessage = "Username requirements:<br>" +
                             "- Length: 5-20 characters<br>" +
@@ -1175,29 +1160,23 @@ $conn->close();
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update display if callback exists
                     if (updateCallback) {
                         updateCallback(data);
                     }
                     
-                    // Remove any existing success messages first
                     const existingMessages = document.querySelectorAll('.success-message, .error-message');
                     existingMessages.forEach(msg => msg.remove());
                     
-                    // Create and show success message on page
                     const successMessage = document.createElement('p');
                     successMessage.className = 'success-message';
                     successMessage.textContent = data.message;
                     document.querySelector('.profile-details').insertBefore(successMessage, document.querySelector('.detail-line'));
                     
-                    // Remove success message after 3 seconds instead of 2
                     setTimeout(() => successMessage.remove(), 3000);
                     
-                    // Clear form and close popup
                     form.reset();
                     closePopup(popupId);
                     
-                    // Update display immediately
                     if (data.company_name) {
                         document.querySelector('.detail-line i.fa-building').nextElementSibling.textContent = data.company_name;
                     }
@@ -1236,7 +1215,6 @@ $conn->close();
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Update the display
                         if (input.name === 'new_username') {
                             document.getElementById('username-display').textContent = input.value;
                             document.querySelector('.username').textContent = input.value;
@@ -1244,14 +1222,11 @@ $conn->close();
                             document.querySelector('.detail-line .fa-envelope').nextElementSibling.textContent = input.value;
                         }
                         
-                        // Show success message on page
                         showPageMessage(data.message, 'success');
                         
-                        // Clear form and close popup
                         this.reset();
                         closePopup(popupId);
                         
-                        // Reload page if needed
                         if (input.name === 'new_linkedin') {
                             window.location.reload();
                         }
@@ -1286,10 +1261,8 @@ $conn->close();
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Show success message on page
                     showPageMessage(data.message, 'success');
                     
-                    // Close popup and reset form
                     this.reset();
                     closePopup(popupId);
                 } else {
@@ -1322,27 +1295,22 @@ $conn->close();
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update LinkedIn display immediately
                     const linkedinSpan = document.querySelector('.detail-line a[href^="http"]');
                     if (linkedinSpan) {
                         linkedinSpan.href = input.value;
                         linkedinSpan.textContent = input.value;
                     } else {
-                        // If no LinkedIn link exists yet, create one
                         const linkedinContainer = document.createElement('div');
                         linkedinContainer.className = 'detail-line';
                         linkedinContainer.innerHTML = `<a href="${input.value}" target="_blank" style="color: #007bff;">${input.value}</a>`;
                         document.querySelector('.detail-line img[alt="LinkedIn"]').closest('.detail-line').after(linkedinContainer);
                     }
                     
-                    // Reset form and close popup
                     form.reset();
                     closePopup('linkedin-popup');
 
-                    // Show alert message instead of success message
                     alert(data.message);
                     
-                    // Reload page
                     window.location.reload();
                 } else {
                     showError(data.message, 'linkedin-popup');
@@ -1374,10 +1342,8 @@ $conn->close();
         });
 
         function showSuccess(message, popupId) {
-            // Remove any existing messages
             removeMessages(popupId);
             
-            // Create and show success message
             const successDiv = document.createElement('div');
             successDiv.className = 'success-message';
             successDiv.innerHTML = message;
@@ -1387,10 +1353,8 @@ $conn->close();
         }
 
         function showError(message, popupId) {
-            // Remove any existing messages
             removeMessages(popupId);
             
-            // Create and show error message
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error-message';
             errorDiv.innerHTML = message;

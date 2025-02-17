@@ -197,7 +197,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_linkedin'])) {
             $response['success'] = false;
             $response['message'] = "Connection failed: " . $conn->connect_error;
         } else {
-            // Check for uniqueness first
             $stmt = $conn->prepare("SELECT user_id FROM " . ($_SESSION['role'] === 'Employer' ? 'Employer' : 'Job_Seeker') . " WHERE linkedin_link = ? AND user_id != ?");
             $stmt->bind_param("ss", $new_linkedin, $user_id);
             $stmt->execute();
@@ -563,7 +562,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
         margin: 10px 0;
     }
 
-    /* Style the file input button */
+   
     .popup input[type="file"]::-webkit-file-upload-button {
         background-color: var(--primary-color);
         color: var(--text-color);
@@ -613,12 +612,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
         flex-direction: column;
         gap: 10px;
         margin: 20px 0;
-        max-height: 250px; /* Set maximum height */
-        overflow-y: auto; /* Enable vertical scrolling */
-        padding-right: 10px; /* Add padding for scrollbar */
+        max-height: 250px;
+        overflow-y: auto;
+        padding-right: 10px;
     }
 
-    /* Add custom scrollbar styling */
+   
     .education-options::-webkit-scrollbar {
         width: 8px;
     }
@@ -778,14 +777,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
             padding: 20px;
             text-align: left;
             border-radius: 10px;
-            background-color: var(--background-color-light); /* Changed to match index.php */
+            background-color: var(--background-color-light);
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
-        /* Updated logout popup styles to match index.php */
+       
         #logout-popup h2 {
             margin-bottom: 20px;
-            font-size: 22px; /* Increased font size */
+            font-size: 22px;
             color: var(--text-color);
             font-weight: bold;
             text-align: left;
@@ -793,7 +792,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
 
         #logout-popup .button-container {
             display: flex;
-            justify-content: flex-start; /* Changed from space-between */
+            justify-content: flex-start;
             gap: 10px;
             margin-top: 20px;
         }
@@ -801,16 +800,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
         #logout-popup .close-button,
         #logout-popup .cancel-button {
             display: inline-block;
-            width: calc(45% - 10px); /* Made buttons smaller */
+            width: calc(45% - 10px);
             margin: 0px;
-            padding: 8px 0; /* Reduced padding */
-            font-size: 14px; /* Smaller font size */
+            padding: 8px 0;
+            font-size: 14px;
             border-radius: 5px;
             cursor: pointer;
             border: none;
         }
 
-        /* Other popup button styles */
+       
         .popup .close-button,
         .popup .cancel-button {
             width: 100%;
@@ -1132,7 +1131,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
             const popup = document.getElementById(popupId);
             popup.style.display = 'none';
             
-            // Clear any error messages
             const errorMessage = popup.querySelector('.error-message');
             if (errorMessage) {
                 errorMessage.remove();
@@ -1144,7 +1142,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
         }
 
         function showPageMessage(message, type) {
-            // Remove any existing messages first
             const existingMessages = document.querySelectorAll('.success-message, .error-message');
             existingMessages.forEach(msg => msg.remove());
             
@@ -1155,26 +1152,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
             const profileDetails = document.querySelector('.profile-details');
             const firstDetailLine = profileDetails.querySelector('.detail-line');
             
-            // Insert message and force layout reflow
             profileDetails.insertBefore(messageDiv, firstDetailLine);
-            messageDiv.offsetHeight; // Force reflow
+            messageDiv.offsetHeight;
             
-            // Only set timeout for success messages
             if (type === 'success') {
-                // Remove previous timeout if exists
                 if (window.messageTimeout) {
                     clearTimeout(window.messageTimeout);
                 }
                 
-                // Set new timeout
                 window.messageTimeout = setTimeout(() => {
                     if (messageDiv && messageDiv.parentNode) {
                         messageDiv.remove();
                     }
-                }, 3000); // Increased to 3 seconds
+                }, 3000);
             }
             
-            // Return the message div for reference
             return messageDiv;
         }
 
@@ -1191,12 +1183,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
             'company-type-popup': 'company_type'
         };
 
-        // Get the actual type if it exists in the map
         const validationType = popupTypeMap[type] || type;
 
             switch(type) {
                 case 'username':
-                    // Add case-sensitive check
                     if (!/^[a-zA-Z0-9_]{5,20}$/.test(value)) {
                         errorMessage = "Username requirements:<br>" +
                             "- Length: 5-20 characters<br>" +
@@ -1254,29 +1244,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update display if callback exists
                     if (updateCallback) {
                         updateCallback(data);
                     }
                     
-                    // Remove any existing success messages first
                     const existingMessages = document.querySelectorAll('.success-message, .error-message');
                     existingMessages.forEach(msg => msg.remove());
                     
-                    // Create and show success message on page
                     const successMessage = document.createElement('p');
                     successMessage.className = 'success-message';
                     successMessage.textContent = data.message;
                     document.querySelector('.profile-details').insertBefore(successMessage, document.querySelector('.detail-line'));
                     
-                    // Remove success message after 3 seconds instead of 2
                     setTimeout(() => successMessage.remove(), 3000);
                     
-                    // Clear form and close popup
                     form.reset();
                     closePopup(popupId);
                     
-                    // Update display immediately
                     if (data.company_name) {
                         document.querySelector('.detail-line i.fa-building').nextElementSibling.textContent = data.company_name;
                     }
@@ -1314,7 +1298,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Update the display
                         if (input.name === 'new_username') {
                             document.getElementById('username-display').textContent = input.value;
                             document.querySelector('.username').textContent = input.value;
@@ -1322,14 +1305,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
                             document.querySelector('.detail-line .fa-envelope').nextElementSibling.textContent = input.value;
                         }
                         
-                        // Show success message on page
                         showPageMessage(data.message, 'success');
                         
-                        // Clear form and close popup
                         this.reset();
                         closePopup(popupId);
                         
-                        // Reload page if needed
                         if (input.name === 'new_linkedin') {
                             window.location.reload();
                         }
@@ -1364,10 +1344,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Show success message on page
+                    
                     showPageMessage(data.message, 'success');
                     
-                    // Close popup and reset form
+                    
                     this.reset();
                     closePopup(popupId);
                 } else {
@@ -1400,27 +1380,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Update LinkedIn display immediately
+                    
                     const linkedinSpan = document.querySelector('.detail-line a[href^="http"]');
                     if (linkedinSpan) {
                         linkedinSpan.href = input.value;
                         linkedinSpan.textContent = input.value;
                     } else {
-                        // If no LinkedIn link exists yet, create one
+                        
                         const linkedinContainer = document.createElement('div');
                         linkedinContainer.className = 'detail-line';
                         linkedinContainer.innerHTML = `<a href="${input.value}" target="_blank" style="color: #007bff;">${input.value}</a>`;
                         document.querySelector('.detail-line img[alt="LinkedIn"]').closest('.detail-line').after(linkedinContainer);
                     }
                     
-                    // Reset form and close popup
+                    
                     form.reset();
                     closePopup('linkedin-popup');
 
-                    // Show alert message instead of success message
+                    
                     alert(data.message);
                     
-                    // Reload page
+                    
                     window.location.reload();
                 } else {
                     showError(data.message, 'linkedin-popup');
@@ -1442,14 +1422,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
                 body: formData
             })
             .then(response => {
-                // Show success message on page
+                
                 showPageMessage("Resume uploaded successfully.", 'success');
                 
-                // Close popup immediately
+                
                 form.reset();
                 closePopup('resume-popup');
                 
-                // Delay page reload
+                
                 setTimeout(() => {
                     window.location.reload();
                 }, 3000);
@@ -1460,10 +1440,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
         });
 
         function showSuccess(message, popupId) {
-            // Remove any existing messages
+            
             removeMessages(popupId);
             
-            // Create and show success message
+            
             const successDiv = document.createElement('div');
             successDiv.className = 'success-message';
             successDiv.innerHTML = message;
@@ -1473,10 +1453,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
         }
 
         function showError(message, popupId) {
-            // Remove any existing messages
+            
             removeMessages(popupId);
             
-            // Create and show error message
+            
             const errorDiv = document.createElement('div');
             errorDiv.className = 'error-message';
             errorDiv.innerHTML = message;
@@ -1501,19 +1481,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
         }
 
         function selectEducation(element) {
-            // Remove selected class from all options
+            
             document.querySelectorAll('.education-option').forEach(opt => {
                 opt.classList.remove('selected');
             });
             
-            // Add selected class to clicked option
+            
             element.classList.add('selected');
             
-            // Update hidden input value
+            
             document.getElementById('selected_education').value = element.dataset.value;
         }
 
-        // Modify your existing education popup form submission to use AJAX:
+        
         document.querySelector('#education-popup form').addEventListener('submit', function(e) {
             e.preventDefault();
             const newEducation = document.getElementById('selected_education').value;
@@ -1529,7 +1509,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
             .then(data => {
                 updateEducationLevel(newEducation);
                 closePopup('education-popup');
-                // Optional: Show success message
+                
                 const successMessage = document.createElement('p');
                 successMessage.className = 'success-message';
                 successMessage.textContent = 'Education level updated successfully.';
@@ -1540,13 +1520,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
                 console.error('Error:', error);
             });
         });
-        // Add to your existing script section
+        
         function updateExperience(years) {
             const experienceSpan = document.querySelector('.detail-line i.fa-briefcase').nextElementSibling;
             experienceSpan.textContent = years ? `${years} Years of Experience` : 'Years of Working Experience';
         }
 
-        // Add this to handle the form submission
+        
         document.querySelector('#experience-form').addEventListener('submit', function(e) {
             e.preventDefault();
             const newExperience = document.getElementById('new_experience').value;
@@ -1563,7 +1543,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
                 if (data.success) {
                     updateExperience(newExperience);
                     closePopup('experience-popup');
-                    // Show success message
+                    
                     const successMessage = document.createElement('p');
                     successMessage.className = 'success-message';
                     successMessage.textContent = data.message;

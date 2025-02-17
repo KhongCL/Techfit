@@ -16,7 +16,7 @@ if ($conn->connect_error) {
     die(json_encode(['success' => false, 'message' => 'Connection failed: ' . $conn->connect_error]));
 }
 
-// Validate POST data
+
 if (!isset($_POST['restore_users']) || !is_array($_POST['restore_users'])) {
     die(json_encode(['success' => false, 'message' => 'No users selected']));
 }
@@ -24,20 +24,20 @@ if (!isset($_POST['restore_users']) || !is_array($_POST['restore_users'])) {
 try {
     $conn->begin_transaction();
     
-    // Get the selected user IDs without converting to integers
+    
     $selected_user_ids = array_filter($_POST['restore_users']);
     
     if (empty($selected_user_ids)) {
         throw new Exception('No valid user IDs provided');
     }
 
-    // Debug - Log the selected IDs
+    
     error_log('Selected user IDs: ' . implode(', ', $selected_user_ids));
 
-    // Create placeholders for the IN clause
+    
     $placeholders = str_repeat('?,', count($selected_user_ids) - 1) . '?';
     
-    // First verify these users exist and get their current status
+    
     $check_sql = "SELECT user_id, username, is_active FROM User WHERE user_id IN ($placeholders)";
     $check_stmt = $conn->prepare($check_sql);
     
@@ -45,7 +45,7 @@ try {
         throw new Exception('Failed to prepare check statement: ' . $conn->error);
     }
     
-    // Bind parameters for the check using string type
+    
     $types = str_repeat('s', count($selected_user_ids));
     $check_stmt->bind_param($types, ...$selected_user_ids);
     
@@ -67,7 +67,7 @@ try {
         throw new Exception('No matching users found in database');
     }
 
-    // Simple update query for selected users
+    
     $update_sql = "UPDATE User SET is_active = 1 WHERE user_id IN ($placeholders)";
     $update_stmt = $conn->prepare($update_sql);
     
@@ -75,7 +75,7 @@ try {
         throw new Exception('Failed to prepare update statement: ' . $conn->error);
     }
     
-    // Use string type for binding parameters
+    
     $update_stmt->bind_param($types, ...$selected_user_ids);
     
     if (!$update_stmt->execute()) {
@@ -105,7 +105,7 @@ try {
     $conn->rollback();
     error_log('Restore users error: ' . $e->getMessage());
     
-    // Get current state of selected users
+    
     $debug_sql = "SELECT user_id, username, is_active FROM User WHERE user_id IN ('" . 
                 implode("','", array_map(function($id) use ($conn) {
                     return $conn->real_escape_string($id);

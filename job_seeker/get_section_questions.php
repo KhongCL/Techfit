@@ -71,7 +71,6 @@ $FIELD_DELIMITER = '<<FIELD>>';
 
 $output = [];
 foreach ($questions as $question) {
-    // Format choices as simple string
     $choices = '';
     if (!empty($question['choices'])) {
         $choices = implode('~', array_map(function($choice) {

@@ -656,7 +656,6 @@ $result = $stmt->get_result();
                 $current_section = '';
 
                 while ($row = $result->fetch_assoc()):
-                    // Skip questions that don't match programming section
                     if (in_array($row['assessment_id'], ['AS77', 'AS78', 'AS79', 'AS80']) &&
                         ($row['assessment_id'] !== $programming_section || 
                         $row['programming_language'] !== $programming_language)) {
@@ -670,7 +669,6 @@ $result = $stmt->get_result();
                         $current_section = $row['assessment_id'];
                         $section_name = $sections[$current_section];
                         
-                        // Update section name for programming section 
                         if ($row['assessment_id'] === $programming_section) {
                             $section_name = str_replace(
                                 ['Python', 'Java', 'JavaScript', 'C++'],

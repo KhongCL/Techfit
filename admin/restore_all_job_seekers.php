@@ -13,7 +13,6 @@ if ($conn->connect_error) {
     exit();
 }
 
-// First check if there are any deleted job seekers
 $checkSql = "SELECT COUNT(*) as count FROM User WHERE role = 'Job Seeker' AND is_active = 0";
 $result = $conn->query($checkSql);
 $row = $result->fetch_assoc();
@@ -24,7 +23,6 @@ if ($row['count'] == 0) {
     exit();
 }
 
-// If there are deleted job seekers, proceed with restoration
 $sql = "UPDATE User SET is_active = 1 WHERE role = 'Job Seeker' AND is_active = 0";
 
 if ($conn->query($sql) === TRUE) {

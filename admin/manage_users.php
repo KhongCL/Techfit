@@ -118,7 +118,7 @@ session_write_close();
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            margin-bottom: 40px; /* Add bottom margin to tables */
+            margin-bottom: 40px;
             table-layout: fixed;
         }
 
@@ -209,7 +209,7 @@ session_write_close();
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
-            margin-top: 40px; /* Add top margin to headers */
+            margin-top: 40px;
         }
 
         .header-controls h2 {
@@ -226,13 +226,13 @@ session_write_close();
             margin: 0;
         }
         @media (max-width: 768px) {
-            /* Main container adjustments */
+           
             main {
                 padding: 10px;
-                overflow-x: hidden; /* Prevent body scroll */
+                overflow-x: hidden;
             }
 
-            /* Wrap tables in scrollable containers */
+           
             table {
                 display: block;
                 overflow-x: auto;
@@ -242,15 +242,15 @@ session_write_close();
                 margin: 10px 0;
             }
 
-            /* Maintain minimum column widths */
+           
             th, td {
-                min-width: 100px; /* Base minimum width */
+                min-width: 100px;
                 padding: 8px;
             }
 
-            /* Specific column width adjustments */
+           
             th:first-child, td:first-child {
-                min-width: 40px; /* Checkbox column */
+                min-width: 40px;
                 position: sticky;
                 left: 0;
                 background-color: var(--background-color);
@@ -265,7 +265,7 @@ session_write_close();
                 min-width: 200px;
             }
 
-            /* Rest of your existing mobile styles... */
+           
             .header-controls {
                 flex-direction: column;
                 gap: 15px;
@@ -289,7 +289,7 @@ session_write_close();
         }
 
         @media (max-width: 480px) {
-            /* Adjust minimum widths for even smaller screens */
+           
             th, td {
                 min-width: 80px;
                 font-size: 13px;
@@ -341,7 +341,7 @@ session_write_close();
             });
         });
 
-        // Update the delete button event listener in manage_users.php
+        
         document.getElementById('deleteSelectedJobSeekers').addEventListener('click', function() {
             var selected = [];
             document.querySelectorAll('.selectJobSeeker:checked').forEach(function(checkbox) {
@@ -402,7 +402,7 @@ session_write_close();
                 });
             }
         });
-        // Employer table functionality
+        
         document.getElementById('selectAllEmployers').addEventListener('click', function() {
             var checkboxes = document.querySelectorAll('.selectEmployer');
             for (var checkbox of checkboxes) {
@@ -444,7 +444,7 @@ session_write_close();
                 alert('Please select at least one Employer to delete.');
             }
         });
-        // Deleted Users table functionality
+        
         document.getElementById('selectAllDeletedUsers').addEventListener('click', function() {
             var checkboxes = document.querySelectorAll('.selectDeletedUser');
             for (var checkbox of checkboxes) {
@@ -473,9 +473,9 @@ session_write_close();
             });
         });
 
-        // Update the restore button event listener in manage_users.php
+        
         document.getElementById('restoreSelectedUsers').addEventListener('click', function() {
-            // Get only the checked checkboxes
+            
             const selectedCheckboxes = Array.from(document.querySelectorAll('.selectDeletedUser:checked'));
             
             if (selectedCheckboxes.length === 0) {
@@ -483,10 +483,10 @@ session_write_close();
                 return;
             }
 
-            // Get the selected user IDs
+            
             const selectedUserIds = selectedCheckboxes.map(cb => cb.value);
             
-            // Debug logging
+            
             console.log('Selected users:', {
                 count: selectedCheckboxes.length,
                 userIds: selectedUserIds
@@ -495,12 +495,12 @@ session_write_close();
             if (confirm(`Are you sure you want to restore ${selectedCheckboxes.length} selected user(s)?`)) {
                 const formData = new FormData();
                 
-                // Add selected user IDs as individual array elements
+                
                 selectedUserIds.forEach(id => {
                     formData.append('restore_users[]', id);
                 });
 
-                // Debug - log the form data
+                
                 console.log('FormData entries:', Array.from(formData.entries()));
 
                 fetch('restore_users.php', {
@@ -512,7 +512,7 @@ session_write_close();
                     console.log('Server response:', data);
                     
                     if (data.success) {
-                        // Only remove the specifically selected rows
+                        
                         selectedUserIds.forEach(userId => {
                             const row = document.getElementById('deletedUserRow_' + userId);
                             if (row) {
@@ -805,7 +805,7 @@ session_write_close();
                     <h3>Reports</h3>
                     <ul>
                         <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                     
+                        
                     </ul>
                 </div>
                 <div class="footer-column">

@@ -52,19 +52,19 @@ session_write_close();
         .job-seeker-answer pre,
         .correct-answer pre,
         .code-template {
-            white-space: pre; /* Change from pre-wrap to pre */
-            word-break: normal; /* Change from break-all */
-            overflow-x: auto; /* Ensure horizontal scroll */
+            white-space: pre;
+            word-break: normal;
+            overflow-x: auto;
             display: block;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            font-family: 'Consolas', 'Monaco', monospace; /* Specify monospace fonts */
+            font-family: 'Consolas', 'Monaco', monospace;
             font-size: 0.9em;
-            tab-size: 4; /* Add tab size */
-            -moz-tab-size: 4; /* Firefox support */
-            text-align: left; /* Add this */
-            line-height: 1.5; /* Add this for better readability */
+            tab-size: 4;
+            -moz-tab-size: 4;
+            text-align: left;
+            line-height: 1.5;
         }
 
         .code-template {
@@ -103,13 +103,13 @@ session_write_close();
         .question-text {
             font-weight: bold;
             margin-bottom: 10px;
-            text-align: left; /* Add this */
+            text-align: left;
         }
 
         .job-seeker-answer,
         .correct-answer {
             margin-top: 10px;
-            text-align: left; /* Add this */
+            text-align: left;
         }
 
         .job-seeker-answer strong,
@@ -117,7 +117,7 @@ session_write_close();
             font-weight: bold;
             display: block;
             margin-bottom: 5px;
-            text-align: left; /* Add this */
+            text-align: left;
         }
 
         .section-navigator {
@@ -246,22 +246,22 @@ session_write_close();
             background-color: var(--background-color-light);
             border-radius: 8px;
             padding: 20px;
-            max-width: 1200px; /* Match section-navigator width */
-            margin: 0 auto; /* Center the container */
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .details {
             display: flex;
             justify-content: center;
             align-items: stretch;
-            gap: 10px; /* Reduced from 20px */
-            flex-wrap: nowrap; /* Changed from wrap */
+            gap: 10px;
+            flex-wrap: nowrap;
             margin-bottom: 15px;
         }
 
         .detail-item a {
-            width: 100%; /* Make links take full width */
-            text-align: center; /* Center link text */
+            width: 100%;
+            text-align: center;
         }
 
         .detail-item {
@@ -271,13 +271,13 @@ session_write_close();
             white-space: normal;
             word-wrap: break-word;
             justify-content: center;
-            font-size: 0.9em; /* Added smaller font size */
-            flex: 1; /* Added to distribute space evenly */
-            min-width: 0; /* Allow items to shrink below content size */
-            text-align: center; /* Added to center the text */
-            display: flex; /* Added to center content vertically */
-            align-items: center; /* Added to center content vertically */
-            min-height: 48px; /* Added minimum height to maintain consistent size */
+            font-size: 0.9em;
+            flex: 1;
+            min-width: 0;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            min-height: 48px;
         }
 
         .score-time {
@@ -526,7 +526,6 @@ session_write_close();
 
                 if ($result_score_time->num_rows > 0) {
                     $row_score_time = $result_score_time->fetch_assoc();
-                    // Convert score to float/integer to ensure proper comparison
                     $score = (!is_null($row_score_time['score']) && $row_score_time['score'] !== '') 
                         ? floatval($row_score_time['score']) 
                         : 'N/A';
@@ -534,7 +533,6 @@ session_write_close();
                     $time_used = !empty($time_used_value) ? $time_used_value : 'N/A';
                     $passing_score = $row_score_time['passing_score_percentage'];
                 
-                    // Use strict comparison and ensure score is numeric
                     $score_class = ($score !== 'N/A' && is_numeric($score) && $score >= $passing_score) 
                         ? 'score-passed' 
                         : 'score-failed';
@@ -728,7 +726,7 @@ session_write_close();
     </div>
 </div>
 
-    <footer>
+<footer>
         <div class="footer-content">
             <div class="footer-left">
                 <div class="footer-logo">
@@ -742,7 +740,7 @@ session_write_close();
                         <a href="https://instagram.com"><img src="images/instagram.png" alt="Instagram"></a>
                         <a href="https://linkedin.com"><img src="images/linkedin.png" alt="LinkedIn"></a>
                     </div>
-                    <p><a href="mailto:techfit@gmail.com">techfit@gmail.com</a></p>
+                    <p><a href="mailto:/a></p>techfit@gmail.com">techfit@gmail.com</a></p>
                 </div>
             </div>
             <div class="footer-right">

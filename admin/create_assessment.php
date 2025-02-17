@@ -220,7 +220,6 @@ $conn->close();
             color: white;
         }
 
-        /* Form styling */
         #create-assessment-form {
             background-color: var(--background-color);
             padding: 20px;
@@ -262,7 +261,6 @@ $conn->close();
             margin-bottom: 5px;
         }
 
-        /* Button styling */
         #create-assessment-form button {
             background-color: var(--primary-color);
             color: var(--text-color);
@@ -282,7 +280,6 @@ $conn->close();
             background-color: var(--accent-color);
         }
 
-        /* Form group spacing */
         .form-group {
             margin-bottom: 20px;
         }

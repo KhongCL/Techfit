@@ -12,17 +12,14 @@ function displayLoginMessage() {
     exit();
 }
 
-// Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
     displayLoginMessage();
 }
 
-// Check if user is a job seeker
 if ($_SESSION['role'] !== 'Job Seeker') {
     displayLoginMessage();
 }
 
-// Check if job_seeker_id exists
 if (!isset($_SESSION['job_seeker_id'])) {
     displayLoginMessage();
 }
@@ -48,7 +45,7 @@ $result = $stmt->get_result();
 $row = $result->fetch_assoc();
 
 if ($row['completed'] == 0) {
-    // No completed assessment found
+    
     echo '<script>
         if (confirm("You have not completed any assessment yet. Would you like to start an assessment?")) {
             window.location.href = "start_assessment.php";
@@ -59,7 +56,7 @@ if ($row['completed'] == 0) {
     exit();
 }
 
-// Check if user has any answers
+
 $check_answers_sql = "SELECT COUNT(*) as has_answers 
                      FROM Answer
                      WHERE job_seeker_id = ?";
@@ -71,7 +68,7 @@ $result = $stmt->get_result();
 $row = $result->fetch_assoc();
 
 if ($row['has_answers'] == 0) {
-    // No answers found
+    
     echo '<script>
         if (confirm("No answers found for your assessment. Would you like to start a new assessment?")) {
             window.location.href = "start_assessment.php";
@@ -85,7 +82,7 @@ if ($row['has_answers'] == 0) {
 $job_seeker_id = $_SESSION['job_seeker_id'];
 
 function calculateScore($conn, $job_seeker_id) {
-    // First evaluate multiple choice questions
+    
     $mc_sql = "UPDATE Answer a 
                JOIN Question q ON a.question_id = q.question_id 
                JOIN Choices c ON (a.answer_text = c.choice_id)
@@ -101,7 +98,7 @@ function calculateScore($conn, $job_seeker_id) {
     $stmt->bind_param("s", $job_seeker_id);
     $stmt->execute();
 
-    // Then evaluate code questions
+    
     $code_sql = "SELECT a.answer_id, a.question_id, a.answer_text, q.correct_answer 
                  FROM Answer a 
                  JOIN Question q ON a.question_id = q.question_id 
@@ -113,7 +110,7 @@ function calculateScore($conn, $job_seeker_id) {
     $stmt->execute();
     $result = $stmt->get_result();
 
-    // Prepare update statement once
+    
     $update_sql = "UPDATE Answer SET is_correct = ?, score_percentage = ? WHERE answer_id = ?";
     $update_stmt = $conn->prepare($update_sql);
 
@@ -123,7 +120,7 @@ function calculateScore($conn, $job_seeker_id) {
         
         $correct_count = 0;
         $total_blanks = count($correct_answers);
-        $points_per_blank = round(100 / $total_blanks, 2); // Round to 2 decimal places
+        $points_per_blank = round(100 / $total_blanks, 2); 
         
         for ($i = 0; $i < $total_blanks; $i++) {
             if (isset($user_answers[$i]) && trim($user_answers[$i]) === trim($correct_answers[$i])) {
@@ -131,28 +128,28 @@ function calculateScore($conn, $job_seeker_id) {
             }
         }
 
-        // Calculate total score for this question
+        
         $score_percentage = $correct_count * $points_per_blank;
         $is_correct = ($score_percentage == 100) ? 1 : 0;
 
-        // Update the answer record
+        
         $update_stmt->bind_param("ids", $is_correct, $score_percentage, $row['answer_id']);
         $update_stmt->execute();
 
-        // Add debug logging
+        
         error_log("Updating answer {$row['answer_id']}: correct_count=$correct_count, total_blanks=$total_blanks, score=$score_percentage%");
     }
 }
 
 calculateScore($conn, $job_seeker_id);
 
-// Get assessment settings and time info
+
 $settings_sql = "SELECT passing_score_percentage FROM Assessment_Settings WHERE setting_id = '1'";
 $settings_result = $conn->query($settings_sql);
 $settings = $settings_result->fetch_assoc();
 $passing_score = $settings['passing_score_percentage'];
 
-// Get assessment duration
+
 $time_sql = "SELECT TIMESTAMPDIFF(SECOND, start_time, end_time) as duration 
              FROM Assessment_Job_Seeker 
              WHERE job_seeker_id = ? 
@@ -162,18 +159,18 @@ $stmt->bind_param("s", $job_seeker_id);
 $stmt->execute();
 $time_result = $stmt->get_result();
 $time_info = $time_result->fetch_assoc();
-$duration_seconds = $time_info['duration']; // Changed from $duration to $duration_seconds
+$duration_seconds = $time_info['duration']; 
 
-// Calculate minutes and seconds
+
 $minutes = floor($duration_seconds / 60);
 $seconds = $duration_seconds % 60;
 
-// Get section scores
+
 $section_scores = [];
 $total_score = 0;
 $total_questions = 0;
 
-// Only count sections 2 and 3 for scoring
+
 $score_sql = "SELECT 
     q.assessment_id,
     COUNT(*) as total,
@@ -242,13 +239,13 @@ $prog_result = $stmt->get_result();
 $row = $prog_result->fetch_assoc();
 $programming_section = $row ? $row['assessment_id'] : null; 
 
-// Define sections, only including the taken programming section
+
 $sections = [
 'AS75' => 'General Questions',
 'AS76' => 'Scenario-Based Questions'
 ];
 
-// Add the specific programming section
+
 $programming_names = [
 'AS77' => 'Python Programming',
 'AS78' => 'Java Programming',
@@ -294,8 +291,8 @@ $answer_count = $answer_count_result->fetch_assoc()['answer_count'];
 
         .content-wrapper {
             flex: 1;
-            margin-bottom: 0; /* Remove bottom margin */
-            padding-bottom: 40px; /* Reduce padding */
+            margin-bottom: 0;
+            padding-bottom: 40px;
         }
 
         .assessment-container {
@@ -321,7 +318,7 @@ $answer_count = $answer_count_result->fetch_assoc()['answer_count'];
             overflow-y: auto;
             position: sticky;
             top: 20px;
-            max-height: calc(100vh - 140px); /* Adjust for header and some padding */
+            max-height: calc(100vh - 140px);
             height: fit-content;
         }
 
@@ -663,7 +660,6 @@ $answer_count = $answer_count_result->fetch_assoc()['answer_count'];
             </nav>
         </header>
 
-        <!-- Logout Popup -->
         <div id="logout-popup" class="popup">
             <h2>Are you sure you want to Log Out?</h2>
             <button class="close-button" onclick="logoutUser()">Yes</button>
@@ -689,7 +685,7 @@ $answer_count = $answer_count_result->fetch_assoc()['answer_count'];
                             </div>
                         <?php else: ?>
                             <?php
-                            // Get questions and answers grouped by section
+                            
                             $sections_sql = "SELECT 
                                 q.assessment_id,
                                 q.question_text,
@@ -734,10 +730,10 @@ $answer_count = $answer_count_result->fetch_assoc()['answer_count'];
                                     echo "<div class='your-answer'>Your Answer: " . htmlspecialchars($row['display_answer']) . "</div>";
                                 }
                                 
-                                // Show correct answer for all questions except AS75 and AS81 (which are not scored)
+                                
                                 if (in_array($row['assessment_id'], ['AS76', 'AS77', 'AS78', 'AS79', 'AS80'])) {
                                     if ($row['answer_type'] === 'code') {
-                                        // Code question display logic (keep existing code block display)
+                                        
                                         if (!empty($row['programming_language'])) {
                                             echo "<div class='language-indicator'>";
                                             echo "Language: " . ucfirst($row['programming_language']);
@@ -757,17 +753,17 @@ $answer_count = $answer_count_result->fetch_assoc()['answer_count'];
                                         echo "<ol class='answer-list'>";
                                         foreach ($user_answers as $index => $answer) {
                                             $is_correct = trim($answer) === trim($correct_answers[$index]);
-                                            $point_value = round(100/count($correct_answers))/100; // Convert to decimal
+                                            $point_value = round(100/count($correct_answers))/100; 
                                             echo "<li>" . htmlspecialchars($answer);
                                             echo "<span class='status-indicator " . 
                                                 ($is_correct ? 'status-correct' : 'status-incorrect') . "'>" .
                                                 ($is_correct ? '✓' : '✗') . "</span>";
-                                            // Format point value with 2 decimal places
+                                            
                                             echo "<span class='point-value'>(" . number_format($point_value, 2) . " points)</span></li>";
                                         }
                                         echo "</ol>";
                                         
-                                        // Add correct answers section
+                                        
                                         echo "<h4>Correct Answers:</h4>";
                                         echo "<ol class='answer-list'>";
                                         foreach ($correct_answers as $answer) {
@@ -777,10 +773,10 @@ $answer_count = $answer_count_result->fetch_assoc()['answer_count'];
                                         echo "</div>";
                             
                                         if (!empty($row['code_template'])) {
-                                            echo "</div>"; // Close code-container
+                                            echo "</div>"; 
                                         }
                                     } else {
-                                        // Non-code questions (multiple choice, etc.)
+                                        
                                         $status_class = $row['is_correct'] ? 'status-correct' : 'status-incorrect';
                                         $status_symbol = $row['is_correct'] ? '✓' : '✗';
                                         echo "<span class='status-indicator {$status_class}'>{$status_symbol}</span>";
@@ -922,7 +918,7 @@ $answer_count = $answer_count_result->fetch_assoc()['answer_count'];
             if (section) {
                 section.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 
-                // Update active state
+                
                 document.querySelectorAll('.section-nav-item').forEach(item => {
                     item.classList.remove('active');
                 });
@@ -933,7 +929,7 @@ $answer_count = $answer_count_result->fetch_assoc()['answer_count'];
             }
         }
 
-        // Track scroll position to update active section
+        
         document.addEventListener('scroll', () => {
             const sections = document.querySelectorAll('.section-questions');
             let currentSection = '';

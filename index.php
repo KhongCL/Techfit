@@ -9,7 +9,7 @@
         main {
             position: relative;
             min-height: 70vh;
-            padding: 0; /* Remove padding */
+            padding: 0;
         }
 
         #home {
@@ -45,10 +45,9 @@
             z-index: 1;
         }
 
-        /* Update the home-content styles to make text sharper */
         #home-content {
             position: relative;
-            z-index: 3; /* Increase z-index to ensure it's above the blur */
+            z-index: 3;
             padding: 2rem;
             background: rgba(0, 0, 0, 0.4);
             width: 100%;
@@ -57,27 +56,26 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            backdrop-filter: blur(0); /* Ensure content isn't blurred */
+            backdrop-filter: blur(0); 
         }
 
-        /* Enhance text styles for better focus */
         #home h2 {
-            font-size: 3rem; /* Slightly larger */
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Stronger shadow */
+            font-size: 3rem; 
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); 
             margin-bottom: 1rem;
             font-weight: bold;
             letter-spacing: 1px;
         }
 
         #home p {
-            font-size: 1.3rem; /* Slightly larger */
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* Stronger shadow */
+            font-size: 1.3rem; 
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); 
             margin-bottom: 2rem;
             letter-spacing: 0.5px;
         }
 
         #home button {
-            padding: 1rem 2.5rem; /* Slightly wider */
+            padding: 1rem 2.5rem;
             font-size: 1.2rem;
             border: none;
             border-radius: 5px;
@@ -86,12 +84,12 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Add shadow to button */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); 
         }
 
         #home button:hover {
             background-color: var(--accent-color);
-            transform: translateY(-2px); /* Slight lift effect */
+            transform: translateY(-2px); 
             box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
         }
     </style>

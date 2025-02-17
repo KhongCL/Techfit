@@ -610,7 +610,6 @@ $sections['AS81'] = 'Work-Style and Personality';
         </div>
         <div class="questions-section">
             <?php 
-            // Redefine and execute the query here
             $sections_sql = "SELECT 
                 q.assessment_id,
                 q.question_text,
@@ -644,7 +643,6 @@ $sections['AS81'] = 'Work-Style and Personality';
                 $current_section = '';
 
                 while ($row = $result->fetch_assoc()):
-                    // Rest of your display logic remains the same
                     if (in_array($row['assessment_id'], ['AS77', 'AS78', 'AS79', 'AS80']) &&
                         ($row['assessment_id'] !== $programming_section || 
                         $row['programming_language'] !== $programming_language)) {
