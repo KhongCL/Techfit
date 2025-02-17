@@ -103,7 +103,7 @@ $conn->close();
         }
 
         .form-section button:hover {
-            background-color: var(--button-hover-color);
+            background-color: var(--button-color-hover);
         }
 
         .notification-option {
@@ -130,7 +130,7 @@ $conn->close();
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: var(--popup-background-color);
+            background-color: var(--background-color-light);
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
@@ -148,7 +148,7 @@ $conn->close();
             cursor: pointer;
         }
         .popup .close-button:hover {
-            background-color: var(--danger-hover-color);
+            background-color: var(--danger-color-hover);
         }
         .popup .cancel-button {
             background-color: var(--primary-color);
@@ -159,7 +159,7 @@ $conn->close();
             cursor: pointer;
         }
         .popup .cancel-button:hover {
-            background-color: var(--button-hover-color);
+            background-color: var(--button-color-hover);
         }
 
         main {
