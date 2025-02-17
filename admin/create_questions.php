@@ -9,6 +9,16 @@ function displayLoginMessage() {
     exit();
 }
 
+function displayErrorMessage() {
+    echo '<script>
+        if (confirm("You need to access this page from create assessment. Go to Create Assessment? Click cancel to go to home page.")) {
+            window.location.href = "./create_assessment.php";
+        } else {
+            window.location.href = "./index.php";
+        }
+    </script>';
+    exit();
+}
 
 if (!isset($_SESSION['user_id'])) {
     displayLoginMessage(); 
@@ -19,6 +29,14 @@ if ($_SESSION['role'] !== 'Admin') {
     displayLoginMessage(); 
 }
 
+if (!isset($_GET['assessment_id']) || trim($_GET['assessment_id']) === '') {
+    displayErrorMessage();
+}
+
+$referer = $_SERVER['HTTP_REFERER'] ?? '';
+if (strpos($referer, 'create_assessment.php') === false) {
+    displayErrorMessage();
+}
 
 session_write_close();
 ?>
