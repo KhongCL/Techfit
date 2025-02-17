@@ -122,7 +122,6 @@ session_write_close();
         <button class="close-button" id="logout-confirm-button">Yes</button>
         <button class="cancel-button" id="logout-cancel-button">No</button>
     </div>
-    <script src="scripts.js"></script>
 
     <section id="start-assessment-container">
         <h2 id="start-assessment-title">Assessment</h2>
