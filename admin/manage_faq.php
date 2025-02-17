@@ -13,11 +13,6 @@ if ($mysqli->connect_error) {
     die(json_encode(['status' => 'error', 'message' => 'Database connection failed']));
 }
 
-if (!isset($_SESSION['user_id'])) {
-    die(json_encode(['status' => 'error', 'message' => 'User not logged in']));
-}
-$user_id = $_SESSION['user_id'];
-
 function displayLoginMessage() {
     echo '<script>
         alert("You need to log in to access this page.");
@@ -32,6 +27,12 @@ if (!isset($_SESSION['user_id'])) {
 if ($_SESSION['role'] !== 'Admin') {
     displayLoginMessage();
 }
+
+if (!isset($_SESSION['user_id'])) {
+    die(json_encode(['status' => 'error', 'message' => 'User not logged in']));
+}
+
+$user_id = $_SESSION['user_id'];
 
 $admin_id_query = $mysqli->prepare("SELECT admin_id FROM admin WHERE user_id = ?");
 $admin_id_query->bind_param("s", $user_id);
