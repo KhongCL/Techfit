@@ -147,7 +147,9 @@ CREATE TABLE Employer_Interest (
 
 CREATE TABLE Assessment_Settings (
     setting_id VARCHAR(5) PRIMARY KEY,
+    admin_id VARCHAR(5),
     default_time_limit INT NOT NULL,
-    passing_score_percentage INT NOT NULL
+    passing_score_percentage INT NOT NULL,
+    FOREIGN KEY (admin_id) REFERENCES Admin(admin_id)
 );
 
