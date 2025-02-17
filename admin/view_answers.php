@@ -31,10 +31,6 @@ if (!isset($_GET['assessment_id']) || trim($_GET['assessment_id']) === '') {
     displayErrorMessage();
 }
 
-if (!isset($_GET['job_seeker_id']) || trim($_GET['job_seeker_id']) === '') {
-    displayErrorMessage();
-}
-
 $referer = $_SERVER['HTTP_REFERER'] ?? '';
 if (strpos($referer, 'view_assessment_results.php') === false) {
     displayErrorMessage();
