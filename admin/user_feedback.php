@@ -130,16 +130,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } elseif (isset($_POST['resolve'])) {
         if (!empty($_POST['resolve_feedback_ids'])) {
             $feedbackIds = $_POST['resolve_feedback_ids']; 
+            $response_text = !empty($_POST['response_text']) ? trim($_POST['response_text']) : null;
             $resolved_feedback_count = 0; 
             foreach ($feedbackIds as $feedbackId) {
                 $action_type = 'resolved';
                 $timestamp = date("Y-m-d H:i:s");
                 $feedback_management_id = generateFeedbackManagementId($conn);
-
-                $stmt = $conn->prepare("INSERT INTO Feedback_Management (feedback_management_id, feedback_id, admin_id, action_type, timestamp)
-                                                            VALUES (?, ?, ?, ?, ?)");
-                $stmt->bind_param("sssss", $feedback_management_id, $feedbackId, $admin_id, $action_type, $timestamp);
-
+    
+                $stmt = $conn->prepare("INSERT INTO Feedback_Management (feedback_management_id, feedback_id, admin_id, action_type, timestamp, response_text)
+                                                            VALUES (?, ?, ?, ?, ?, ?)");
+                $stmt->bind_param("ssssss", $feedback_management_id, $feedbackId, $admin_id, $action_type, $timestamp, $response_text);
+    
                 if ($stmt->execute()) {
                     $resolved_feedback_count++;
                 } else {
@@ -309,25 +310,28 @@ ob_end_flush();
             </div>
 
             <div class="feedback-category">
-               <h3>Resolved Feedback</h3>
-               <div class="feedback-list handled-feedback">
-                <?php while ($row = $result_resolved->fetch_assoc()): ?>
-                   <div class="feedback-item handled">
-                    <div class="feedback-content">
-                        <p><strong>User:</strong> <?= $row['user_name'] ?></p>
-                        <p><strong>Feedback ID:</strong> <?= $row['feedback_id'] ?></p>
-                        <p><strong>Management ID:</strong> <?= $row['feedback_management_id'] ?></p>
-                        <p><strong>Text:</strong> <?= $row['text'] ?></p>
-                        <p><strong>Timestamp:</strong> <?= $row['timestamp'] ?></p>
-                        <p><strong>Handled Timestamp:</strong> <?= $row['management_timestamp'] ?></p>
-                        <p><strong>Action:</strong> Resolved</p>
+                <h3>Resolved Feedback</h3>
+                <div class="feedback-list handled-feedback">
+                    <?php while ($row = $result_resolved->fetch_assoc()): ?>
+                    <div class="feedback-item handled">
+                        <div class="feedback-content">
+                            <p><strong>User:</strong> <?= $row['user_name'] ?></p>
+                            <p><strong>Feedback ID:</strong> <?= $row['feedback_id'] ?></p>
+                            <p><strong>Management ID:</strong> <?= $row['feedback_management_id'] ?></p>
+                            <p><strong>Text:</strong> <?= $row['text'] ?></p>
+                            <p><strong>Timestamp:</strong> <?= $row['timestamp'] ?></p>
+                            <?php if (!empty($row['response_text'])): ?>
+                                <p><strong>Response:</strong> <?= $row['response_text'] ?></p>
+                            <?php endif; ?>
+                            <p><strong>Handled Timestamp:</strong> <?= $row['management_timestamp'] ?></p>
+                            <p><strong>Action:</strong> Resolved</p>
+                        </div>
                     </div>
-                   </div>
-                <?php endwhile; ?>
-                <?php if ($result_resolved->num_rows === 0): ?>
-                   <p>No resolved feedback.</p>
-                <?php endif; ?>
-               </div>
+                    <?php endwhile; ?>
+                    <?php if ($result_resolved->num_rows === 0): ?>
+                    <p>No resolved feedback.</p>
+                    <?php endif; ?>
+                </div>
             </div>
 
         </div>
@@ -451,6 +455,10 @@ ob_end_flush();
             } else if (event.submitter && event.submitter.name === 'resolve') {
                 if (selectedIdsForResolve.length === 0) {
                     alert('Please select at least one feedback to resolve.');
+                    event.preventDefault();
+                }
+                else if (!document.querySelector('textarea[name="response_text"]').value.trim()) {
+                    alert('Please enter a resolution message.');
                     event.preventDefault();
                 }
             }
