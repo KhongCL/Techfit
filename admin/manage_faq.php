@@ -209,6 +209,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         li {
             color: white;
         }
+        #formContainer button {
+                background-color: var(--primary-color);
+                color: var(--text-color);
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+            #formContainer button:disabled {
+                background-color: var(--background-color-light);
+                cursor: not-allowed;
+            }
+
+            #formContainer button:hover:not(:disabled) {
+                background-color: var(--accent-color);
+            }
+
     </style>
     <header>
         <div class="logo">
@@ -311,6 +330,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <button type="button" onclick="submitFAQ()" disabled id="submitBtn">Add FAQ</button>
         </div>
     </form>
+</div>  
+
 
     <div id="faq">
         <h2>Existing FAQs</h2>
@@ -431,6 +452,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         function submitFAQ() {
+            const submitButton = document.getElementById('submitBtn');
             const formData = new FormData(document.getElementById('faqForm'));
             fetch('manage_faq.php', { method: 'POST', body: formData })
                 .then(response => response.json())

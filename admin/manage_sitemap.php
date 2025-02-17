@@ -271,6 +271,26 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
             color: var(--text-color);
         }
 
+        #formContainer button {
+                background-color: var(--primary-color);
+                color: var(--text-color);
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+            }
+
+            #formContainer button:disabled {
+                background-color: var(--background-color-light);
+                cursor: not-allowed;
+            }
+
+            #formContainer button:hover:not(:disabled) {
+                background-color: var(--accent-color);
+            }
+
+
         .sitemap-category {
             background-color: var(--background-color-medium);
             padding: 20px;
@@ -473,7 +493,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                             <button class="edit-button" onclick="editSitemap('<?= $sitemap['resource_id'] ?>')" style="margin-right: 10px; padding: 5px 10px; background-color: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">Edit</button>
                             <button class="delete-button" onclick="deleteSitemap('<?= $sitemap['resource_id'] ?>')" style="padding: 5px 10px; background-color: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer;">Delete</button><br><br>
                             <strong style="display: block; margin-bottom: 5px; color: white;">Description:</strong>
-                            <p style="margin: 0; color: #555; font-size: 14px;">
+                            <p style="margin: 0; font-size: 14px;">
                                 <?= htmlspecialchars($sitemapDescriptions[$sitemap['resource_id']] ?? 'No description available', ENT_QUOTES, 'UTF-8') ?>
                             </p>
                         </div>

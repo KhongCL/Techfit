@@ -1286,7 +1286,7 @@ form#faqForm {
     margin: 0 auto 40px;
     padding: 20px;
     background-color: var(--background-color-medium);
-    border: 1px solid var();
+    border: 1px solid var(--background-color-medium);
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     color: var(--text-color);
@@ -1306,14 +1306,20 @@ form#faqForm textarea,
 form#faqForm select {
     width: 100%;
     padding: 10px;
+    background-color: var(--background-color);
     border: 1px solid var(--text-color);
     border-radius: 4px;
     font-size: 14px;
 }
 
 form#faqForm textarea {
+    color: var(--text-color);
     resize: vertical;
     min-height: 80px;
+}
+
+form#faqForm select {
+    color: var(--text-color);
 }
 
 form#faqForm button {
@@ -1326,10 +1332,6 @@ form#faqForm button {
     font-size: 16px;
     border-radius: 4px;
     cursor: pointer;
-}
-
-form#faqForm button:hover {
-    background-color: var(--primary-color-hover);
 }
 
 .faq-category {
@@ -1447,9 +1449,13 @@ form#faqForm button:hover {
 
 #sitemap p {
     font-size: 1.2rem;
-    color: var(--text-color);
+    color: var(--text-color-extra-light);
     margin-bottom: 40px;
     text-align: center;
+}
+
+#sitemap strong {
+    color: var(--text-color);
 }
 
 .sitemap-container {
