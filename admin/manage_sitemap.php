@@ -287,7 +287,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
             }
 
             #formContainer button:hover:not(:disabled) {
-                background-color: var(--accent-color);
+                background-color: var(--primary-color-hover);
             }
 
 
@@ -334,6 +334,34 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
 
         #manage_sitemap_button:hover {
             background-color: var(--primary-color-hover);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        #manage_sitemap_button {
+            background-color: var(--primary-color) !important;
+            transition: background-color 0.3s ease;
+        }
+
+        #manage_sitemap_button:hover {
+            background-color: var(--primary-color-hover) !important;
+        }
+
+        #faqForm .cancel-button {
+            display: block;
+            margin: 0 auto;
+            background-color: var(--danger-color);
+        }
+
+        #faqForm .cancel-button:hover {
+            background-color: var(--danger-color-hover) !important;
+            justify-content: center;
+            align-items: center;
         }
 
         @media (max-width: 768px) {
@@ -509,7 +537,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
     </div>
 </div>
     
-    <footer>
+<footer>
         <div class="footer-content">
             <div class="footer-left">
                 <div class="footer-logo">
@@ -546,7 +574,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                     <h3>Reports</h3>
                     <ul>
                         <li><a href="assessment_performance.php">Assessment Performance</a></li>
-                    
+                        
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -594,110 +622,193 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
         }
 
         function submitSitemap() {
-            const submitButton = document.querySelector('button[type="button"]');
+            
+            const submitButton = document.getElementById('submitBtn');
             submitButton.disabled = true;
-            const formData = new FormData(document.getElementById('faqForm'));
-            fetch('manage_sitemap.php', { method: 'POST', body: formData })
-            .then(response => response.json())
-            .then(data => {
-                alert(data.message);
-                if (data.status === 'success') location.reload();
-                else submitButton.disabled = false;
+
+            
+            const form = document.getElementById('faqForm');
+            const formData = new FormData(form);
+
+            
+            console.log("Form Data being sent:", formData);
+
+            
+            fetch('manage_sitemap.php', {
+                method: 'POST',
+                body: formData,
             })
-            .catch(() => {
+            .then(response => response.json()) 
+            .then(data => {
+                
+                alert(data.message);
+
+                
+                if (data.status === 'success') {
+                    location.reload();
+                } else {
+                    
+                    submitButton.disabled = false;
+                }
+            })
+            .catch(error => {
+                
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+
+                
                 submitButton.disabled = false;
             });
         }
 
         function editSitemap(id) {
             try {
-            const sitemapItem = document.querySelector(`.sitemap-item[data-id="${id}"]`);
-            if (!sitemapItem) {
-                alert('Sitemap item not found');
-                return;
-            }
-            const categoryText = sitemapItem.closest('.sitemap-category').querySelector('h1').textContent.trim().toLowerCase();
-            const category = categoryText.includes('job') ? 'jobSeeker' : 'employer';
+                
+                const sitemapItem = document.querySelector(`.sitemap-item[data-id="${id}"]`);
+                if (!sitemapItem) {
+                    alert('Sitemap item not found');
+                    return;
+                }
 
-            const form = document.getElementById('faqForm');
-            form.querySelector('[name="action"]').value = 'edit';
-            form.querySelector('[name="category"]').value = category;
+                
+                const categoryContainer = sitemapItem.closest('.sitemap-category');
+                if (!categoryContainer) {
+                    alert('Category container not found');
+                    return;
+                }
 
-            const description = sitemapItem.querySelector('p').innerText.trim();
-            form.querySelector('[name="description"]').value = description;
+                
+                const categoryHeading = categoryContainer.querySelector('h2');
+                if (!categoryHeading) {
+                    alert('Category heading not found');
+                    return;
+                }
 
-            const imageSrc = sitemapItem.querySelector('img').src;
-            const imageField = form.querySelector('[name="image"]');
-            const imagePreview = document.createElement('img');
-            imagePreview.src = imageSrc;
-            imagePreview.alt = 'Image Preview';
-            imagePreview.style.maxWidth = '100px';
-            imagePreview.style.display = 'block';
-            imagePreview.style.marginTop = '10px';
+                
+                const categoryText = categoryHeading.textContent.trim().toLowerCase();
+                const category = categoryText.includes('job seeker') ? 'jobSeeker' : 'employer';
 
-            const existingPreview = form.querySelector('img[alt="Image Preview"]');
-            if (existingPreview) {
-                existingPreview.remove();
-            }
+                
+                const form = document.getElementById('faqForm');
+                
+                
+                let actionInput = form.querySelector('[name="action"]');
+                if (!actionInput) {
+                    actionInput = document.createElement('input');
+                    actionInput.type = 'hidden';
+                    actionInput.name = 'action';
+                    form.appendChild(actionInput);
+                }
+                actionInput.value = 'edit';
 
-            imageField.insertAdjacentElement('afterend', imagePreview);
+                
+                const categorySelect = form.querySelector('[name="category"]');
+                categorySelect.value = category;
 
-            let idField = form.querySelector('[name="id"]');
-            if (!idField) {
-                idField = document.createElement('input');
-                idField.type = 'hidden';
-                idField.name = 'id';
-                form.appendChild(idField);
-            }
-            idField.value = id;
+                
+                const descriptionElement = sitemapItem.querySelector('p');
+                if (!descriptionElement) {
+                    alert('Description element not found');
+                    return;
+                }
+                const descriptionInput = form.querySelector('[name="description"]');
+                descriptionInput.value = descriptionElement.textContent.trim();
 
-            const submitButton = form.querySelector('button[type="button"]');
-            submitButton.textContent = 'Save Sitemap Changes';
+                
+                const imageElement = sitemapItem.querySelector('img');
+                if (!imageElement) {
+                    alert('Image element not found');
+                    return;
+                }
+                const imageSrc = imageElement.src;
 
-            submitButton.onclick = () => {
-                const formData = new FormData(form);
+                
+                let existingImageInput = form.querySelector('[name="existing_image"]');
+                if (!existingImageInput) {
+                    existingImageInput = document.createElement('input');
+                    existingImageInput.type = 'hidden';
+                    existingImageInput.name = 'existing_image';
+                    form.appendChild(existingImageInput);
+                }
+                existingImageInput.value = imageSrc;
 
-                fetch('manage_sitemap.php', {
-                method: 'POST',
-                body: formData,
-                })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    if (data.status === 'success') {
-                    location.reload();
-                    } else {
-                    alert('Failed to save changes: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred. Please try again.');
-                });
-            };
+                
+                const imagePreview = document.createElement('img');
+                imagePreview.src = imageSrc;
+                imagePreview.alt = 'Image Preview';
+                imagePreview.style.maxWidth = '100px';
+                imagePreview.style.marginTop = '10px';
 
-            let cancelButton = form.querySelector('button.cancel-button');
-            if (!cancelButton) {
-                cancelButton = document.createElement('button');
-                cancelButton.type = 'button';
-                cancelButton.className = 'cancel-button';
-                cancelButton.textContent = 'Cancel';
-                cancelButton.onclick = () => {
-                    form.reset();
-                    submitButton.textContent = 'Add Sitemap';
-                    cancelButton.remove();
-                    const existingPreview = form.querySelector('img[alt="Image Preview"]');
-                    if (existingPreview) {
-                        existingPreview.remove();
-                    }
+                const existingPreview = form.querySelector('img[alt="Image Preview"]');
+                if (existingPreview) existingPreview.remove();
+
+                const imageField = form.querySelector('[name="image"]');
+                imageField.insertAdjacentElement('afterend', imagePreview);
+
+                
+                let idField = form.querySelector('[name="id"]');
+                if (!idField) {
+                    idField = document.createElement('input');
+                    idField.type = 'hidden';
+                    idField.name = 'id';
+                    form.appendChild(idField);
+                }
+                idField.value = id;
+
+                
+                const submitButton = form.querySelector('button[type="button"]');
+                submitButton.textContent = 'Save Sitemap Changes';
+                submitButton.removeAttribute('disabled'); 
+
+                
+                submitButton.onclick = () => {
+                    const formData = new FormData(form);
+                    
+                    fetch('manage_sitemap.php', {
+                        method: 'POST',
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            location.reload();
+                        } else {
+                            alert('Error: ' + data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred. Please try again.');
+                    });
                 };
-                form.appendChild(cancelButton);
-            }
 
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                let cancelButton = form.querySelector('button.cancel-button');
+                if (!cancelButton) {
+                    cancelButton = document.createElement('button');
+                    cancelButton.type = 'button';
+                    cancelButton.className = 'cancel-button';
+                    cancelButton.textContent = 'Cancel';
+                    cancelButton.style.display = 'block';
+                    cancelButton.style.margin = '10px auto';
+                    cancelButton.onclick = () => {
+                        form.reset();
+                        form.querySelector('[name="action"]').value = 'add';
+                        submitButton.textContent = 'Add Sitemap';
+                        submitButton.setAttribute('disabled', 'disabled');
+                        cancelButton.remove();
+                        const existingPreview = form.querySelector('img[alt="Image Preview"]');
+                        if (existingPreview) {
+                            existingPreview.remove();
+                        }
+                    };
+                    submitButton.parentNode.appendChild(cancelButton);
+                }
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             } catch (error) {
-            console.error('Error in editSitemap function:', error);
-            alert('An error occurred. Please try again.');
+                console.error('Error in editSitemap:', error);
+                alert('An error occurred. Please check the console for details.');
             }
         }
 
