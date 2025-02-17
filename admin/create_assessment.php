@@ -195,14 +195,14 @@ $conn->close();
 
        
         #create-assessment-form {
-            background-color: var(--secondary-color);
+            background-color: var(--background-color-light);
             padding: 20px;
             border-radius: 5px;
             box-sizing: border-box;
         }
 
         #assessment_name, #description {
-            background-color: var(--background-color);
+            background-color: var(--background-color-light);
             border: 1px solid var(--text-color);
         }
 
@@ -236,7 +236,7 @@ $conn->close();
             margin-bottom: 10px;
             border: 1px solid var(--text-color);
             border-radius: 5px;
-            background-color: var(--background-color);
+            background-color: var(--background-color-medium);
             color: var(--text-color);
             transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
             box-sizing: border-box;

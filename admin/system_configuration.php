@@ -228,6 +228,12 @@ $conn->close();
             text-overflow: ellipsis;
         }
 
+        #default-time-limit, #passing-score {
+            height: 45px;
+            font-size: 1rem;
+            background-color: var(--background-color-light);
+        }
+
         @media (max-width: 768px) {
             main {
                 padding: 20px;
