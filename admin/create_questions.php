@@ -114,7 +114,7 @@ session_write_close();
             } else if (answerType === 'true/false') {
                 answerOptionsDiv.innerHTML = `
                     <label for="true_false_${id}">Answer:</label>
-                    <select id="true_false_${id}" name="correct_choice[]" required>
+                    <select id="true_false_${id}" style="border: 1px solid white; background-color: var(--background-color); name="correct_choice[]" required>
                         <option value="true">True</option>
                         <option value="false">False</option>
                     </select>
@@ -122,12 +122,12 @@ session_write_close();
             } else if (answerType === 'fill in the blank') {
                 answerOptionsDiv.innerHTML = `
                     <label for="blank_${id}">Blank:</label>
-                    <input type="text" id="blank_${id}" name="correct_choice[]" required>
+                    <input type="text" id="blank_${id}" style="border: 1px solid white; background-color: var(--background-color); name="correct_choice[]" required>
                 `;
             } else if (answerType === 'essay') {
                 answerOptionsDiv.innerHTML = `
                     <label for="essay_${id}">Correct Answer:</label>
-                    <textarea id="essay_${id}" name="correct_choice[]" required></textarea>
+                    <textarea id="essay_${id}" style="border: 1px solid white; background-color: var(--background-color); name="correct_choice[]" required></textarea>
                 `;
             } else if (answerType === 'code') {
                 answerOptionsDiv.innerHTML = getCodeQuestionOptions(id, includeEmptyChoice);
@@ -351,7 +351,7 @@ session_write_close();
             }
 
             button:hover {
-                background-color: var(--button-hover-color);
+                background-color: var(--button-color-hover);
                 color: var(--hover-text-color);
             }
 
@@ -360,7 +360,7 @@ session_write_close();
             }
 
             button.danger:hover {
-                background-color: var(--danger-hover-color);
+                background-color: var(--danger-color-hover);
             }
 
             button.success {
@@ -368,7 +368,7 @@ session_write_close();
             }
 
             button.success:hover {
-                background-color: var(--success-hover-color);
+                background-color: var(--success-color-hover);
             }
 
             button.remove-icon {

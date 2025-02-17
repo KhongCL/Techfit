@@ -537,7 +537,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
     </div>
 </div>
     
-<footer>
+    <footer>
         <div class="footer-content">
             <div class="footer-left">
                 <div class="footer-logo">
@@ -654,7 +654,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
             .catch(error => {
                 
                 console.error('Error:', error);
-                alert('An error occurred. Please try again.');
+                alert('The selected image file is too large. The maximum file size is 1MB.');
 
                 
                 submitButton.disabled = false;
@@ -763,7 +763,18 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                 
                 submitButton.onclick = () => {
                     const formData = new FormData(form);
-                    
+
+                    const imageInput = form.querySelector('[name="image"]');
+                    if (imageInput.files.length > 0) {
+                        const file = imageInput.files[0];
+                        const maxSizeInBytes = 1024;
+
+                        if (file.size > maxSizeInBytes) {
+                            alert(`The selected image file is too large. The maximum file size is ${maxSizeInBytes / 1024}KB.`);
+                            return; 
+                        }
+                    }
+                            
                     fetch('manage_sitemap.php', {
                         method: 'POST',
                         body: formData,
@@ -778,7 +789,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('An error occurred. Please try again.');
+                        alert('The selected image file is too large. The maximum file size is 800KB.');
                     });
                 };
 
@@ -808,7 +819,7 @@ $sitemaps = $result->fetch_all(MYSQLI_ASSOC);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } catch (error) {
                 console.error('Error in editSitemap:', error);
-                alert('An error occurred. Please check the console for details.');
+                alert('The selected image file is too large. The maximum file size is 1MB.');
             }
         }
 

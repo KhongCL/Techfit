@@ -54,7 +54,7 @@ session_start();
                 <input type="hidden" id="question_id_${questionCount}" name="question_id[]" value="">
                 <p>Question ID: <strong id="display_question_id_${questionCount}"></strong></p>
                 <label for="question_text_${questionCount}">Question Text:</label>
-                <textarea id="question_text_${questionCount}" style="border: 1px solid white; background-color: var(--background-color)" name="question_text[]" required></textarea><br>
+                <textarea id="question_text_${questionCount}" "style=border: 1px solid white; background-color: var(--background-color)" name="question_text[]" required></textarea><br>
 
                 <div class="dropdown-container">
                     <div class="dropdown-item">
@@ -263,7 +263,7 @@ session_start();
             `;
             if (includeEmptyChoice) {
                 choicesHtml += `
-                    <input type="text" name="choices_${id}[]" required>
+                    <input type="text" style="border: 1px solid white; background-color: var(--background-color); name="choices_${id}[]" required>
                 `;
             }
             choicesHtml += `
@@ -666,7 +666,7 @@ session_start();
             }
 
             button:hover {
-                background-color: var(--button-hover-color);
+                background-color: var(--button-color-hover);
                 color: var(--hover-text-color);
             }
 
@@ -675,7 +675,7 @@ session_start();
             }
 
             button.danger:hover {
-                background-color: var(--danger-hover-color);
+                background-color: var(--danger-color-hover);
             }
 
             button.success {
@@ -683,7 +683,7 @@ session_start();
             }
 
             button.success:hover {
-                background-color: var(--success-hover-color);
+                background-color: var(--success-color-hover);
             }
 
             button.remove-icon {
