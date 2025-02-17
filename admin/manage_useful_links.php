@@ -31,6 +31,7 @@ if ($_SESSION['role'] !== 'Admin') {
 if (!isset($_SESSION['user_id'])) {
     die(json_encode(['status' => 'error', 'message' => 'User not logged in']));
 }
+
 $user_id = $_SESSION['user_id'];
 
 $admin_id_query = $mysqli->prepare("SELECT admin_id FROM admin WHERE user_id = ?");
