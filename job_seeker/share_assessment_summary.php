@@ -1,10 +1,7 @@
 <?php
 session_start();
 
-
 $is_shared = isset($_GET['shared']) && $_GET['shared'] === 'true';
-
-
 
 $host = 'localhost';
 $username = 'root';
@@ -43,11 +40,9 @@ if (!isset($_SESSION['user_id'])) {
     displayLoginMessage(); 
 }
 
-
 if ($_SESSION['role'] !== 'Job Seeker') {
     displayLoginMessage(); 
 }
-
 
 if (!isset($_SESSION['job_seeker_id'])) {
     displayLoginMessage(); 
@@ -58,7 +53,7 @@ if (!isset($_GET['assessment_id']) || trim($_GET['assessment_id']) === '') {
 }
 
 $referer = $_SERVER['HTTP_REFERER'] ?? '';
-if (strpos($referer, 'assessment_summary.php') === false) {
+if (!$is_shared && strpos($referer, 'assessment_summary.php') === false) {
     displayErrorMessage();
 }
 
