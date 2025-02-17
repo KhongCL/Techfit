@@ -362,13 +362,12 @@ $conn->close();
             cursor: not-allowed;
         }
 
-        /* Style only the submit button (when Next button becomes Submit) */
         .navigation-buttons button[onclick="submitAssessment"] {
             background-color: var(--success-color);
         }
 
         .navigation-buttons button[onclick="submitAssessment"]:hover {
-            background-color: var(--success-hover-color);
+            background-color: var(--success-color-hover);
         }
         
         .question-box.current {
@@ -1349,7 +1348,7 @@ $conn->close();
                 nextBtn.style.backgroundColor = 'var(--success-color)';
                 nextBtn.style.color = 'white';
                 nextBtn.addEventListener('mouseover', function() {
-                    this.style.backgroundColor = 'var(--success-hover-color)';
+                    this.style.backgroundColor = 'var(--success-color-hover)';
                 });
                 nextBtn.addEventListener('mouseout', function() {
                     this.style.backgroundColor = 'var(--success-color)';
