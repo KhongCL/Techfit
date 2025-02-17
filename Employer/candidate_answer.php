@@ -246,23 +246,38 @@ session_write_close();
             background-color: var(--background-color-light);
             border-radius: 8px;
             padding: 20px;
+            max-width: 1200px; /* Match section-navigator width */
+            margin: 0 auto; /* Center the container */
         }
 
         .details {
             display: flex;
             justify-content: center;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
+            align-items: stretch;
+            gap: 10px; /* Reduced from 20px */
+            flex-wrap: nowrap; /* Changed from wrap */
             margin-bottom: 15px;
         }
 
+        .detail-item a {
+            width: 100%; /* Make links take full width */
+            text-align: center; /* Center link text */
+        }
+
         .detail-item {
-            padding: 8px 16px;
+            padding: 8px 12px;
             background-color: var(--background-color);
             border-radius: 4px;
-            white-space: nowrap;
+            white-space: normal;
+            word-wrap: break-word;
             justify-content: center;
+            font-size: 0.9em; /* Added smaller font size */
+            flex: 1; /* Added to distribute space evenly */
+            min-width: 0; /* Allow items to shrink below content size */
+            text-align: center; /* Added to center the text */
+            display: flex; /* Added to center content vertically */
+            align-items: center; /* Added to center content vertically */
+            min-height: 48px; /* Added minimum height to maintain consistent size */
         }
 
         .score-time {
@@ -480,10 +495,11 @@ session_write_close();
 
             $job_seeker_id = $_GET['job_seeker_id'];
 
-            $sql_candidate = "SELECT u.first_name, u.last_name, js.education_level, js.year_of_experience, js.linkedin_link
-                                         FROM User u
-                                         JOIN Job_Seeker js ON u.user_id = js.user_id
-                                         WHERE js.job_seeker_id = ?";
+            $sql_candidate = "SELECT u.first_name, u.last_name, js.education_level, js.year_of_experience, 
+                                js.linkedin_link, js.resume
+                                FROM User u
+                                JOIN Job_Seeker js ON u.user_id = js.user_id
+                                WHERE js.job_seeker_id = ?";
 
             $stmt = $conn->prepare($sql_candidate);
             $stmt->bind_param("s", $job_seeker_id);
@@ -534,6 +550,12 @@ session_write_close();
                     echo "<div class='detail-item'><a href='" . htmlspecialchars($row_candidate['linkedin_link']) . "' target='_blank'>LinkedIn Profile</a></div>";
                 } else {
                     echo "<div class='detail-item'>LinkedIn Profile: N/A</div>";
+                }
+
+                if (!empty($row_candidate['resume'])) {
+                    echo "<div class='detail-item'><a href='../job_seeker/job_seeker/resumes/" . htmlspecialchars($row_candidate['resume']) . "' target='_blank'>View Resume</a></div>";
+                } else {
+                    echo "<div class='detail-item'>No resume for this job seeker</div>";
                 }
 
                 $education_level = !empty($row_candidate['education_level']) ? htmlspecialchars($row_candidate['education_level']) : 'N/A';

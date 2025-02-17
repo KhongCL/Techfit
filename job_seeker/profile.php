@@ -553,6 +553,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['new_experience'])) {
     .popup input[type="submit"]:hover {
         background-color: #0056b3;
     }
+    .popup input[type="file"] {
+        color: var(--text-color);
+        background-color: var(--background-color);
+        border: 1px solid var(--background-color-light);
+        padding: 8px;
+        border-radius: 4px;
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    /* Style the file input button */
+    .popup input[type="file"]::-webkit-file-upload-button {
+        background-color: var(--primary-color);
+        color: var(--text-color);
+        padding: 8px 16px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-right: 10px;
+    }
+
+    .popup input[type="file"]::-webkit-file-upload-button:hover {
+        background-color: var(--primary-color-hover);
+    }
+
     .popup .close-button {
         background-color: #dc3545;
         color: #fff;
