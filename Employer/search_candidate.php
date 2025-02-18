@@ -153,15 +153,21 @@ if ($_SESSION['role'] !== 'Employer') {
                     $employer_id = $_SESSION['employer_id'];
 
                     $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
-                            GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
-                            AVG(ajs.score) AS avg_score
+                            GROUP_CONCAT(
+                                CASE 
+                                    WHEN ajs.score IS NULL AND ajs.end_time IS NOT NULL THEN '0'
+                                    WHEN ajs.score IS NOT NULL THEN CAST(ajs.score AS CHAR)
+                                    ELSE 'N/A'
+                                END 
+                                ORDER BY ajs.result_id SEPARATOR ', '
+                            ) AS scores,
+                            AVG(CASE WHEN ajs.score IS NULL AND ajs.end_time IS NOT NULL THEN 0 ELSE ajs.score END) AS avg_score
                             FROM Job_Seeker js
                             JOIN User u ON js.user_id = u.user_id
                             JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id 
                             LEFT JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id AND ei.employer_id = '$employer_id'
                             WHERE ei.employer_id IS NULL 
                             AND ajs.end_time IS NOT NULL 
-                            AND ajs.score IS NOT NULL
                             GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
     
@@ -176,7 +182,12 @@ if ($_SESSION['role'] !== 'Employer') {
                             $experience = (isset($row['year_of_experience']) && $row['year_of_experience'] !== null) ? htmlspecialchars($row['year_of_experience']) : 'N/A';
                             echo "<td>" . $experience . "</td>";
                             
-                            $scores_display = (isset($row['scores']) && $row['scores'] !== null) ? htmlspecialchars($row['scores']) : 'N/A';
+                            $scores_display = isset($row['scores']) ? 
+                                str_replace(
+                                    ['null', 'NULL'], 
+                                    '0', 
+                                    htmlspecialchars($row['scores'])
+                                ) : 'N/A';
                             echo "<td>" . $scores_display . "</td>";
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
@@ -205,18 +216,24 @@ if ($_SESSION['role'] !== 'Employer') {
                     }
 
                     $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
-                            GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
-                            AVG(ajs.score) AS avg_score
-                            FROM Job_Seeker js
-                            JOIN User u ON js.user_id = u.user_id
-                            JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
-                            JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
-                            WHERE ei.employer_id = '$employer_id' 
-                            AND ei.interest_status = 'interested' 
-                            AND ei.is_active = 1
-                            AND ajs.end_time IS NOT NULL 
-                            AND ajs.score IS NOT NULL
-                            GROUP BY js.job_seeker_id";
+                        GROUP_CONCAT(
+                            CASE 
+                                WHEN ajs.score IS NULL AND ajs.end_time IS NOT NULL THEN '0'
+                                WHEN ajs.score IS NOT NULL THEN CAST(ajs.score AS CHAR)
+                                ELSE 'N/A'
+                            END 
+                            ORDER BY ajs.result_id SEPARATOR ', '
+                        ) AS scores,
+                        AVG(CASE WHEN ajs.score IS NULL AND ajs.end_time IS NOT NULL THEN 0 ELSE ajs.score END) AS avg_score
+                        FROM Job_Seeker js
+                        JOIN User u ON js.user_id = u.user_id
+                        JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
+                        JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
+                        WHERE ei.employer_id = '$employer_id' 
+                        AND ei.interest_status = 'interested' 
+                        AND ei.is_active = 1
+                        AND ajs.end_time IS NOT NULL 
+                        GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
 
                     if ($result->num_rows > 0) {
@@ -230,7 +247,12 @@ if ($_SESSION['role'] !== 'Employer') {
                                 $experience = (!empty($row['year_of_experience']) || $row['year_of_experience'] === '0') ? htmlspecialchars($row['year_of_experience']) : 'N/A';
                             echo "<td>" . $experience . "</td>";
                             
-                            $scores_display = (isset($row['scores']) && $row['scores'] !== null) ? htmlspecialchars($row['scores']) : 'N/A';
+                            $scores_display = isset($row['scores']) ? 
+                                str_replace(
+                                    ['null', 'NULL'], 
+                                    '0', 
+                                    htmlspecialchars($row['scores'])
+                                ) : 'N/A';
                             echo "<td>" . $scores_display . "</td>";
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
@@ -258,8 +280,15 @@ if ($_SESSION['role'] !== 'Employer') {
                     }
 
                     $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
-                            GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
-                            AVG(ajs.score) AS avg_score
+                            GROUP_CONCAT(
+                                CASE 
+                                    WHEN ajs.score IS NULL AND ajs.end_time IS NOT NULL THEN '0'
+                                    WHEN ajs.score IS NOT NULL THEN CAST(ajs.score AS CHAR)
+                                    ELSE 'N/A'
+                                END 
+                                ORDER BY ajs.result_id SEPARATOR ', '
+                            ) AS scores,
+                            AVG(CASE WHEN ajs.score IS NULL AND ajs.end_time IS NOT NULL THEN 0 ELSE ajs.score END) AS avg_score
                             FROM Job_Seeker js
                             JOIN User u ON js.user_id = u.user_id
                             JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
@@ -268,7 +297,6 @@ if ($_SESSION['role'] !== 'Employer') {
                             AND ei.interest_status = 'uninterested' 
                             AND ei.is_active = 1
                             AND ajs.end_time IS NOT NULL 
-                            AND ajs.score IS NOT NULL
                             GROUP BY js.job_seeker_id";
                     $result = $conn->query($sql);
 
@@ -283,7 +311,12 @@ if ($_SESSION['role'] !== 'Employer') {
                                 $experience = (!empty($row['year_of_experience']) || $row['year_of_experience'] === '0') ? htmlspecialchars($row['year_of_experience']) : 'N/A';
                             echo "<td>" . $experience . "</td>";
                             
-                            $scores_display = (isset($row['scores']) && $row['scores'] !== null) ? htmlspecialchars($row['scores']) : 'N/A';
+                            $scores_display = isset($row['scores']) ? 
+                                str_replace(
+                                    ['null', 'NULL'], 
+                                    '0', 
+                                    htmlspecialchars($row['scores'])
+                                ) : 'N/A';
                             echo "<td>" . $scores_display . "</td>";
                             echo "<td class='actions'>";
                             if (isset($row['job_seeker_id'])) {
@@ -309,35 +342,65 @@ if ($_SESSION['role'] !== 'Employer') {
                         die("Connection failed: " . $conn->connect_error);
                     }
 
-                    $sql = "SELECT js.user_id, u.first_name, u.last_name, js.education_level, js.year_of_experience, js.job_seeker_id,
-                            GROUP_CONCAT(ajs.score ORDER BY ajs.result_id SEPARATOR ', ') AS scores,
-                            AVG(ajs.score) AS avg_score
-                            FROM Job_Seeker js
-                            JOIN User u ON js.user_id = u.user_id
-                            JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
-                            JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
-                            WHERE ei.employer_id = '$employer_id' 
-                            AND ei.is_active = 0
-                            AND ajs.end_time IS NOT NULL 
-                            AND ajs.score IS NOT NULL
-                            GROUP BY js.job_seeker_id";
+
+                    $sql = "SELECT 
+                            js.user_id, 
+                            u.first_name, 
+                            u.last_name, 
+                            js.education_level, 
+                            js.year_of_experience, 
+                            js.job_seeker_id,
+                            GROUP_CONCAT(
+                                CONCAT(
+                                    CASE 
+                                        WHEN ajs.score IS NULL AND ajs.end_time IS NOT NULL THEN 'NULL_SCORE'
+                                        WHEN ajs.score IS NOT NULL THEN CAST(ajs.score AS CHAR)
+                                        ELSE 'NA'
+                                    END,
+                                    '|',
+                                    CASE WHEN ajs.end_time IS NOT NULL THEN 'HAS_END_TIME' ELSE 'NO_END_TIME' END
+                                )
+                                ORDER BY ajs.result_id SEPARATOR ', '
+                            ) AS scores_debug,
+                            GROUP_CONCAT(
+                                CASE 
+                                    WHEN ajs.score IS NULL AND ajs.end_time IS NOT NULL THEN '0'
+                                    WHEN ajs.score IS NOT NULL THEN CAST(ajs.score AS CHAR)
+                                    ELSE 'N/A'
+                                END 
+                                ORDER BY ajs.result_id SEPARATOR ', '
+                            ) AS scores,
+                            AVG(CASE WHEN ajs.score IS NULL AND ajs.end_time IS NOT NULL THEN 0 ELSE ajs.score END) AS avg_score
+                        FROM Job_Seeker js
+                        JOIN User u ON js.user_id = u.user_id
+                        JOIN Assessment_Job_Seeker ajs ON js.job_seeker_id = ajs.job_seeker_id
+                        JOIN Employer_Interest ei ON js.job_seeker_id = ei.job_seeker_id
+                        WHERE ei.employer_id = '$employer_id' 
+                        AND ei.is_active = 0
+                        AND ajs.end_time IS NOT NULL 
+                        GROUP BY js.job_seeker_id";
+                        
                     $result = $conn->query($sql);
 
                     if ($result->num_rows > 0) {
                         while($row = $result->fetch_assoc()) {
+
                             echo "<tr id='row-" . $row['job_seeker_id'] . "'>";
                             echo "<td>" . $row['first_name'] . " " . $row['last_name'] . "</td>";
-                            
                             
                             $education_level = !empty($row['education_level']) ? htmlspecialchars($row['education_level']) : 'N/A';
                             echo "<td>" . $education_level . "</td>";
                             
-                            
                             $experience = (!empty($row['year_of_experience']) || $row['year_of_experience'] === '0') ? htmlspecialchars($row['year_of_experience']) : 'N/A';
                             echo "<td>" . $experience . "</td>";
                             
-                            
-                            $scores_display = (isset($row['scores']) && $row['scores'] !== null) ? htmlspecialchars($row['scores']) : 'N/A';
+
+                            $scores_display = isset($row['scores']) ? 
+                                str_replace(
+                                    ['null', 'NULL'], 
+                                    '0', 
+                                    htmlspecialchars($row['scores'])
+                                ) : 'N/A';
                             echo "<td>" . $scores_display . "</td>";
                             
                             echo "<td class='actions'>";
@@ -505,41 +568,39 @@ if ($_SESSION['role'] !== 'Employer') {
         xhr.open('GET', 'fetch_deleted_candidates.php', true);
         xhr.onreadystatechange = function() {
             if (xhr.readyState === 4 && xhr.status === 200) {
-                const response = JSON.parse(xhr.responseText);
-                const tbody = document.getElementById('view-deleted-candidates-tab');
-                tbody.innerHTML = '';
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    console.log('Received response:', response);
+                    const tbody = document.getElementById('view-deleted-candidates-tab');
+                    tbody.innerHTML = '';
 
-                if (response.noCandidates === true) {
-                    let noCandidatesRow = document.getElementById('no-candidates-view-deleted-candidates');
-                    if (!noCandidatesRow) { 
-                        tbody.innerHTML = `<tr id='no-candidates-view-deleted-candidates'><td colspan='6'class='no-candidates-message'>No candidates found</td></tr>`;
+                    if (response.noCandidates || !response || response.length === 0) {
+                        tbody.innerHTML = `<tr id='no-candidates-view-deleted-candidates'>
+                            <td colspan='6' class='no-candidates-message'>No candidates found</td>
+                        </tr>`;
+                        return;
                     }
-                } else {
-                    const deletedCandidates = response; 
-                    if (deletedCandidates.length > 0) { 
-                        deletedCandidates.forEach(candidate => {
-                            const row = document.createElement('tr');
-                            row.id = 'row-' + candidate.job_seeker_id;
-                            row.innerHTML = `
-                                <td>${candidate.name}</td>
-                                <td>${candidate.education_level}</td>
-                                <td>${candidate.years_of_experience}</td>
-                                <td>${candidate.assessment_scores}</td>
-                                <td class="actions">
-                                    <button class="accept" onclick="updateInterest('${candidate.job_seeker_id}', 'interested')">✔</button>
-                                    <button class="reject" onclick="updateInterest('${candidate.job_seeker_id}', 'uninterested')">✖</button>
-                                    <a href="candidate_answer.php?job_seeker_id=${candidate.job_seeker_id}" class='view'>View</a>
-                                </td>
-                            `;
-                            tbody.appendChild(row);
-                        });
-                        removeNoCandidatesMessage('view-deleted-candidates-tab');
-                    } else {
-                        let noCandidatesRow = document.getElementById('no-candidates-view-deleted-candidates');
-                        if (!noCandidatesRow) { 
-                            tbody.innerHTML = `<tr id='no-candidates-view-deleted-candidates'><td colspan='6'class='no-candidates-message'>No candidates found</td></tr>`;
-                        }
-                    }
+
+                    response.forEach(candidate => {
+                        console.log('Processing candidate:', candidate);
+                        const scores = candidate.assessment_scores === null ? '0' : candidate.assessment_scores;
+                        const row = document.createElement('tr');
+                        row.id = 'row-' + candidate.job_seeker_id;
+                        row.innerHTML = `
+                            <td>${candidate.name}</td>
+                            <td>${candidate.education_level}</td>
+                            <td>${candidate.year_of_experience}</td>
+                            <td>${scores}</td>
+                            <td class="actions">
+                                <button class="accept" onclick="updateInterest('${candidate.job_seeker_id}', 'interested')">✔</button>
+                                <button class="reject" onclick="updateInterest('${candidate.job_seeker_id}', 'uninterested')">✖</button>
+                                <a href="candidate_answer.php?job_seeker_id=${candidate.job_seeker_id}" class='view'>View</a>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                } catch (error) {
+                    console.error('Error processing response:', error);
                 }
             }
         };
