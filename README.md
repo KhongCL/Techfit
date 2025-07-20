@@ -1,5 +1,10 @@
 <img width="1920" height="1087" alt="Firefox_Screenshot_2025-07-20T16-24-34 089Z" src="https://github.com/user-attachments/assets/57b3547a-2367-4d3a-a5f2-bae732f541ef" />
 
+<img width="1920" height="1612" alt="Firefox_Screenshot_2025-07-20T16-28-29 199Z" src="https://github.com/user-attachments/assets/5a1011ae-497e-431c-8784-beb8168f77e3" />
+
+<img width="1920" height="1158" alt="Firefox_Screenshot_2025-07-20T16-29-46 924Z" src="https://github.com/user-attachments/assets/5fa08057-d0d8-46d8-b6f2-833997f5eaf0" />
+
+
 # TechFit Web Application
 
 [![Stability](https://img.shields.io/badge/stability-stable-green.svg)](https://www.your-license-link-here.com) 
