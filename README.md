@@ -38,7 +38,7 @@ Follow these steps to set up TechFit on your local machine:
     * Download and extract the project `.zip` file. This will typically create two items: a folder named `Techfit` (containing the web application files) and a database file named `techfit.sql`.
     * Alternatively, you can clone the repository using Git:
         ```bash
-        git clone <repository_url> Techfit
+        git clone https://github.com/KhongCL/Techfit Techfit
         ```
 
 2.  **Import Database:**
