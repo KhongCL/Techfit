@@ -1,13 +1,7 @@
-<img width="1920" height="1087" alt="Firefox_Screenshot_2025-07-20T16-24-34 089Z" src="https://github.com/user-attachments/assets/57b3547a-2367-4d3a-a5f2-bae732f541ef" />
-
-<img width="1920" height="1612" alt="Firefox_Screenshot_2025-07-20T16-28-29 199Z" src="https://github.com/user-attachments/assets/5a1011ae-497e-431c-8784-beb8168f77e3" />
-
-<img width="1920" height="1158" alt="Firefox_Screenshot_2025-07-20T16-29-46 924Z" src="https://github.com/user-attachments/assets/5fa08057-d0d8-46d8-b6f2-833997f5eaf0" />
-
-
 # TechFit Web Application
 
-[![Stability](https://img.shields.io/badge/stability-stable-green.svg)](https://www.your-license-link-here.com) 
+[![Stability](https://img.shields.io/badge/stability-stable-green.svg)](YOUR_LICENSE_OR_REPO_LINK_HERE) 
+
 ## 🌟 Introduction
 
 TechFit is an innovative online skill assessment platform designed to revolutionize the hiring process for both IT job seekers and employers. Its primary objective is to provide a structured, multi-stage evaluation system that allows IT professionals to showcase their technical skills, experience, and unique strengths. Concurrently, it streamlines the recruitment process for employers by offering a curated pool of highly skilled candidates.
@@ -15,16 +9,6 @@ TechFit is an innovative online skill assessment platform designed to revolution
 The platform goes beyond traditional resumes and interviews by incorporating targeted questions, coding challenges, personality tests, and work-style assessments, creating a well-rounded and dynamic candidate profile. TechFit's scope covers key hiring steps, from user registration and comprehensive skill assessment to efficient candidate shortlisting.
 
 By bridging the gap between opportunity and expertise, TechFit aims to create a more efficient, personalized, and effective hiring ecosystem for all stakeholders in the IT fields.
-
-### Key Features:
-
-* **User Registration and Profile Management:** Allows job seekers, employers, and administrators to register, create profiles, and manage account settings.
-* **Comprehensive Skill Assessments for Job Seekers:** Provides multi-stage assessments including preliminary questions, scenario-based questions, programming challenges, and work-style evaluations.
-* **Detailed Assessment History and Summary for Job Seekers:** Enables job seekers to review past assessments and access performance summaries.
-* **Candidate Search and Filtering for Employers:** Allows employers to efficiently search and filter candidates based on various criteria like assessment scores, skills, experience, and education level.
-* **In-depth Candidate Profile and Assessment Review for Employers:** Enables employers to browse detailed candidate profiles and review comprehensive assessment results.
-* **Admin Portal for System Management:** Provides administrators with functionalities to create and manage assessments, users, reports, resources, and system configurations.
-* **Resource Hub for All Users:** Offers access to useful links, FAQs, and a sitemap to enhance user experience.
 
 ---
 
@@ -44,7 +28,7 @@ Follow these steps to set up TechFit on your local machine:
     * Download and extract the project `.zip` file. This will typically create two items: a folder named `Techfit` (containing the web application files) and a database file named `techfit.sql`.
     * Alternatively, you can clone the repository using Git:
         ```bash
-        git clone https://github.com/KhongCL/Techfit Techfit
+        git clone [https://github.com/KhongCL/Techfit](https://github.com/KhongCL/Techfit) Techfit
         ```
 
 2.  **Import Database:**
@@ -111,6 +95,19 @@ Follow these steps to set up TechFit on your local machine:
 
 ---
 
+### 📸 Application Screenshots
+
+#### **Job Seeker Complete Assessment**
+<img alt="Job Seeker Dashboard" src="https://github.com/user-attachments/assets/57b3547a-2367-4d3a-a5f2-bae732f541ef" />
+
+#### **Employer Search Candidates**
+<img alt="Employer Dashboard" src="https://github.com/user-attachments/assets/5a1011ae-497e-431c-8784-beb8168f77e3" />
+
+#### **Admin Manage Assessents**
+<img alt="Admin Panel Example" src="https://github.com/user-attachments/assets/5fa08057-d0d8-46d8-b6f2-833997f5eaf0" />
+
+---
+
 ## 🛡️ Security Considerations
 
 * **Password Hashing:** Sensitive user data like passwords are encrypted.
@@ -146,3 +143,5 @@ If you encounter any issues or have questions, please open an issue on this GitH
 ---
 
 **Thank you for using TechFit!**
+
+**Note:** Please remember to update the placeholder link for the "Stability" badge at the very top: `YOUR_LICENSE_OR_REPO_LINK_HERE`.
