@@ -100,6 +100,9 @@ Follow these steps to set up TechFit on your local machine:
 #### **Job Seeker Complete Assessment**
 <img alt="Job Seeker Dashboard" src="https://github.com/user-attachments/assets/57b3547a-2367-4d3a-a5f2-bae732f541ef" />
 
+#### **Job Seeker Assessment Result**
+<img width="1920" height="1503" alt="Techfit Assessment Result" src="https://github.com/user-attachments/assets/6ae6f7f0-92b9-4487-a5ef-801f86e43d25" />
+
 #### **Employer Search Candidates**
 <img alt="Employer Dashboard" src="https://github.com/user-attachments/assets/5a1011ae-497e-431c-8784-beb8168f77e3" />
 
