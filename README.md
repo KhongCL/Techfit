@@ -146,5 +146,3 @@ If you encounter any issues or have questions, please open an issue on this GitH
 ---
 
 **Thank you for using TechFit!**
-
-**Note:** Please remember to update the placeholder link for the "Stability" badge at the very top: `YOUR_LICENSE_OR_REPO_LINK_HERE`.
