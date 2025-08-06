@@ -1,6 +1,6 @@
 # TechFit Web Application
 
-[![Stability](https://img.shields.io/badge/stability-stable-green.svg)](YOUR_LICENSE_OR_REPO_LINK_HERE) 
+[![Stability](https://img.shields.io/badge/stability-stable-green.svg)](https://github.com/KhongCL/Techfit/) 
 
 ## 🌟 Introduction
 
